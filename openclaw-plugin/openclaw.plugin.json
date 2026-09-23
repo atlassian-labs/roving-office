@@ -1,0 +1,47 @@
+{
+  "id": "roving-office",
+  "name": "The Roving Office",
+  "description": "Publishes OpenClaw agent activity to a Roving Office receiver as Agent Office Protocol events.",
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {},
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "url": {
+        "type": "string",
+        "description": "Ingest URL of the office, e.g. https://office.example.com/office/ab12cd34/aop/v0/events. Overrides AOP_URL and ~/.roving-office/endpoint.json."
+      },
+      "token": {
+        "type": "string",
+        "description": "Write token for that office. Sent as X-Roving-Office-Token."
+      },
+      "scene": {
+        "type": "string",
+        "description": "Force every session into one office, whatever repo it is in. Same effect as ROVING_OFFICE_SCENE."
+      },
+      "wrappedHarness": {
+        "type": "string",
+        "description": "Slug of the harness OpenClaw is wrapping here (claude-code, codex-cli). Stamped on ext.wrapped_harness so the office can de-duplicate against that harness's own adapter."
+      },
+      "heartbeatMs": {
+        "type": "integer",
+        "minimum": 5000,
+        "maximum": 120000,
+        "description": "Heartbeat interval for live sessions. Default 15000, per AOP spec §4.1."
+      },
+      "lingerMs": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 5000,
+        "description": "How long a batch waits for company before being posted. Default 250."
+      },
+      "enabled": {
+        "type": "boolean",
+        "description": "Set false to load the plugin but publish nothing."
+      }
+    }
+  }
+}

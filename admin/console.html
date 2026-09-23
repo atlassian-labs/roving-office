@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!--
+  The admin console's shell.
+
+  Deliberately empty of numbers. This file is byte-identical on a server that has
+  recorded a year of traffic and one that booted a second ago, which is what makes it
+  safe to serve before the password has been typed — see `handleAdmin` in server.cjs.
+  Everything below `<main>` is drawn by console.js from one gated JSON response.
+
+  `{{ADMIN_BASE}}` is the console's own path, substituted by the server on the way out.
+  It cannot be written down here: the path comes from the operator's environment, and a
+  path in this file would be a path published with the repository. There is no build step
+  in this project, so the substitution is the server's (see `sendAdminFile`).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Nothing here should ever be indexed or sent on as a referrer. -->
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Office statistics — The Roving Office</title>
+<!-- The shared theme first, then this page's own rules. Reception, the office and the
+     documentation all load the same file; the console joining them is the point. -->
+<link rel="stylesheet" href="/assets/ui-theme.css">
+<link rel="stylesheet" href="{{ADMIN_BASE}}/console.css">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192">
+</head>
+<body data-admin-base="{{ADMIN_BASE}}">
+
+<!-- Reception's own header, down to the mark and the type: this is a page of the same
+     application, reached from the same front door. -->
+<header class="reception-nav">
+  <a class="reception-brand" href="/">
+    <img src="/assets/logo-64.png" alt="" width="40" height="40">
+    <span>The Roving Office</span>
+  </a>
+  <nav aria-label="Console">
+    <span id="generated" class="nav-note"></span>
+    <button type="button" id="sign-out" hidden>Sign out</button>
+  </nav>
+</header>
+
+<!--
+  The sign-in panel. Shown when the stats request comes back 401, hidden when it does
+  not, which is the whole of the client protocol — there is no server-rendered login
+  page, on the same reasoning as the office's passcode prompt.
+-->
+<section id="gate" class="gate" hidden>
+  <form id="gate-form" class="gate-card" autocomplete="off">
+    <label class="gate-label" for="password">The office statistics</label>
+    <p class="gate-lede">Summary figures for this server. Nothing in here can look inside an office.</p>
+    <div class="gate-row">
+      <input type="password" id="password" name="password" class="gate-input"
+             autocomplete="current-password" spellcheck="false" required
+             placeholder="Password" aria-describedby="gate-error">
+      <button type="submit" class="gate-go">Sign in</button>
+    </div>
+    <p id="gate-error" class="gate-hint" role="status" aria-live="polite"></p>
+  </form>
+</section>
+
+<main id="report" hidden>
+  <h1>Office statistics</h1>
+  <p class="lede">How much this server has been used — in totals only, never one room at a time.</p>
+  <div id="report-body"></div>
+</main>
+
+<noscript>
+  <p class="gate">This console draws its charts in the browser, so it needs JavaScript.</p>
+</noscript>
+
+<script type="module" src="{{ADMIN_BASE}}/console.js"></script>
+</body>
+</html>

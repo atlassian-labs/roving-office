@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Post, parcels and the bin — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html" aria-current="page">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="post-parcels-and-the-bin" tabindex="-1">Post, parcels and the bin</h1>
+<p><em>How work gets into the room, and how it leaves.</em></p>
+<img src="../images/panels/agents-roster.png" width="256" alt="The agents panel: agents with coloured status dots and the job each is on, a status legend beneath them, and a Job Delivery section at the bottom.">
+<p><em>The <strong>Job Delivery</strong> feed at the bottom of the roster is the written record of everything this page describes.</em></p>
+<p>Every job you can see in the office arrived as a physical thing and leaves as one. That is
+the whole trick: you read the system by looking at where the paper is.</p>
+<h2 id="it-arrives-two-ways-and-the-difference-means-nothing" tabindex="-1">It arrives two ways, and the difference means nothing</h2>
+<ul>
+<li>A <strong><a href="../item-movements.html#paperPlane">paper plane</a></strong> flies in through the window.</li>
+<li>A <strong><a href="../item-movements.html#courier">courier</a></strong> pulls up outside and lobs a parcel in through the door.</li>
+</ul>
+<p>Which one you get says nothing about the work — both land in the same <a href="../item-movements.html#mailbox">mailbox</a>, and
+both are one job. The variety is there to watch, not to read.</p>
+<p>It is not quite a coin toss, though. <strong>The window is drawn twice as often as any other
+way in</strong>, because the plane arcing in over the desks is the thing worth watching for.
+Whatever else the room has takes an even share of the rest — the courier, and the
+<a href="../item-movements.html#printer">printer</a> if there is one, since a room with a printer can take work in as a fax as
+well. So a room with all three is half through the window, a quarter to the door and a
+quarter out of the machine; take one away, and the others share what it was getting.</p>
+<p><strong>If the <a href="../item-movements.html#mailbox">mailbox</a> flag is up, there is work waiting.</strong></p>
+<h3 id="sometimes-the-letter-comes-by-bird" tabindex="-1">Sometimes the letter comes by bird</h3>
+<p>Now and then the window admits a <strong>bird</strong> instead of a plane. It swoops in carrying the
+envelope, holds a flutter over the <a href="../item-movements.html#mailbox">mailbox</a> while the letter drops from its talons, and
+flies home. <strong>About one letter in three</strong> takes wing; the rest are paper planes.</p>
+<p>Watch it come through the glass: it <strong>folds its wings right back</strong> to fit the pane and
+spreads them again once it is inside, which is what a bird crossing a gap actually does
+— and it has to, because with its wings out it is wider than the opening. <strong>Only one
+bird flies at a time.</strong> Letters that arrive together queue at the window and come in a
+flight apart rather than two birds sharing one pane, which never looked like two birds.</p>
+<p><strong>Mostly the owl at night</strong> — three flights in four between 7pm and 7am on the world
+clock, so an office watched across dusk changes courier mid-evening. By day the owl keeps
+half, and the <strong>carrier pigeon</strong>, <strong>kookaburra</strong> and <strong>raven</strong> share what is left evenly,
+so any one of the three is about a flight in six by day and a flight in twelve at night.
+You might spot a raven if you look hard. Each carries the beak that names it across the
+room — the raven's long straight bill, the pigeon's stub under an orange eye, the
+kookaburra's great head and bandit stripe, the owl's hooked nub in a cream face.</p>
+<p>It is a second <em>vehicle</em>, not a third kind of post. What lands in the box is a letter like
+any other — same flag, same envelope in the collector's hand — because how work travels
+means nothing, and the bird is only a nicer way for nothing to be meant.</p>
+<p><strong>Which bird flies is yours to choose.</strong> In edit mode, <strong>Add item… → Jobs</strong> has a <em>Bird
+post</em> switch, and under it a strip of species: <strong>Mixed roster</strong> (the shifts above), or pin
+every flight to the <strong>owl</strong>, <strong>pigeon</strong>, <strong>kookaburra</strong> or <strong>raven</strong>. A chosen bird flies
+day and night, because the choice is the office's and the clock cannot overrule it. It is
+saved with the room, and undoable, like the other switches.</p>
+<h3 id="some-post-has-a-name-on-it" tabindex="-1">Some post has a name on it</h3>
+<p>Work typed at one particular agent is <strong>addressed</strong>. That plane is tinted their colour, so
+you can see across the room who it is for, and <strong>only they will collect it</strong> — anybody else
+walks past. Unaddressed work goes to whoever gets there first.</p>
+<h3 id="the-courier-is-not-one-of-your-agents" tabindex="-1">The <a href="../item-movements.html#courier">courier</a> is not one of your agents</h3>
+<p>He parks outside, walks two paces into the room, heaves the parcel in, and leaves the way
+he came. He wears no name tag and no status ring, because he does not work here. One at a
+time, and he takes whichever way in the building has — the stoop, the stairs, or the lift
+like everybody else.</p>
+<h2 id="somebody-comes-and-gets-it" tabindex="-1">Somebody comes and gets it</h2>
+<p>Addressed post gets its recipient out of their chair. Unaddressed post is picked up by
+whoever is passing.</p>
+<p>They check the air first: <strong>a plane still in flight is worth waiting for</strong>, so somebody
+who has walked to the mailbox may stand there a moment rather than take the parcel in the
+box. If the box holds nothing they are allowed to open, they go to the inbox instead.</p>
+<p>Five prompts in five seconds is five trips, in order. Nothing is dropped and nothing is
+merged.</p>
+<h2 id="it-gets-worked-on" tabindex="-1">It gets worked on</h2>
+<p>The desk label is the job's name — the first line of what you actually asked for, never a
+summary invented afterwards.</p>
+<p><strong>The label changes when the envelope is opened, not when it arrives.</strong> So there is a
+moment where somebody is walking across the room carrying work whose name you cannot see
+yet, which is correct: they have not read it either.</p>
+<p>Tool calls move them around the room — to the shelf, to the <a href="../item-movements.html#telescope">telescope</a> — and they always
+come back to the same desk, because it is the same job.</p>
+<blockquote>
+<p><strong>A new turn is not automatically a new job.</strong> Saying &quot;yes, carry on&quot; continues the job
+already on the desk. It does not summon a new plane.</p>
+</blockquote>
+<h2 id="it-leaves-and-always-somewhere-you-can-see" tabindex="-1">It leaves, and always somewhere you can see</h2>
+<p><strong>Finished work</strong> is carried to whichever way out is nearer and sent — the mailbox, or the
+<a href="../item-movements.html#printer">printer</a> as a fax. The mailbox flag goes up for five seconds afterwards, which is how you
+catch that something <em>just</em> went out.</p>
+<p><strong>Failed work</strong> gets crumpled up and dropped in the bin. There is a small pause first,
+which is the part worth watching: the job is over before the paper is.</p>
+<p>That is deliberate, and it is the most important rule in the room. <strong>Success and failure
+never look the same.</strong> If something fails at three in the morning, the crumpled paper is
+still in the bin when you look in the morning, and the panel keeps the record. An office
+where failure looked exactly like success would be a pretty screensaver.</p>
+<h2 id="the-panels-keep-the-receipts" tabindex="-1">The panels keep the receipts</h2>
+<p>Two feeds run down the side of the agents roster:</p>
+<ul>
+<li><strong>Job Delivery</strong> — what arrived, and who took it. A coloured dart, a first name and a
+time. Unaddressed post shows the time alone, because there is nobody to name yet.</li>
+<li><strong>Job Removal</strong> — what left, and how.</li>
+</ul>
+<p>The agent detail panel keeps each person's last ten jobs, with their outcome. A job that is
+made of several parts shows as <code>Done (5/5)</code> and expands.</p>
+<h2 id="post-nobody-collects" tabindex="-1">Post nobody collects</h2>
+<p>It stays there. The flag stays up, the parcels stack beside the box, and the pile is the
+signal: <strong>work is arriving faster than anyone is picking it up.</strong> Nothing sweeps it away
+behind your back.</p>
+<p>The machinery of all this — who may open what, what happens when two people reach for the
+same parcel, and the handful of places it is still rough — is in the
+<a href="../developer/job-delivery.html">developer docs</a>.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#it-arrives-two-ways-and-the-difference-means-nothing">It arrives two ways, and the difference means nothing</a><ul><li><a href="#sometimes-the-letter-comes-by-bird">Sometimes the letter comes by bird</a></li>
+<li><a href="#some-post-has-a-name-on-it">Some post has a name on it</a></li>
+<li><a href="#the-courier-is-not-one-of-your-agents">The courier is not one of your agents</a></li></ul></li>
+<li><a href="#somebody-comes-and-gets-it">Somebody comes and gets it</a></li>
+<li><a href="#it-gets-worked-on">It gets worked on</a></li>
+<li><a href="#it-leaves-and-always-somewhere-you-can-see">It leaves, and always somewhere you can see</a></li>
+<li><a href="#the-panels-keep-the-receipts">The panels keep the receipts</a></li>
+<li><a href="#post-nobody-collects">Post nobody collects</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

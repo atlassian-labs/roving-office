@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Claude Code — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html" aria-current="page">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="claude-code-adapter" tabindex="-1">Claude Code adapter</h1>
+<p><em>Installing it is <a href="../../user/sources/claude-code.html">Claude Code</a>. This is the mapper, and
+the version-bump ritual you cannot skip.</em></p>
+<p>The repo <strong>is</strong> the plugin: <code>.claude-plugin/plugin.json</code> declares it and
+<code>hooks/hooks.json</code> registers fifteen events. The host-selecting wrapper reaches the same
+<code>bin/aop-send.cjs</code> the Rovo and Codex adapters use. Everything measured here was measured
+on 2.1.246 — see <a href="../protocol/aop-harness-adapters.html#2-claude-code">adapter notes §2</a>.</p>
+<p>This is <a href="../protocol/aop-spec.html#9-conformance-levels">conformance level L2</a>, the richest
+of the five feeds.</p>
+<h2 id="changing-the-plugin-means-bumping-the-version" tabindex="-1">Changing the plugin means bumping the version</h2>
+<p><strong>Non-negotiable, and the reason is a snapshot.</strong> <code>claude plugin install</code> <em>copies</em> the
+plugin into <code>~/.claude/plugins/cache/&lt;marketplace&gt;/&lt;plugin&gt;/&lt;version&gt;/</code>, the cache is keyed
+on the version, and <code>claude plugin update</code> compares versions to decide whether to fetch
+anything at all. <strong>An update offered a version it already holds does nothing, silently,
+however far the files have drifted.</strong></p>
+<p>So any change under <code>hooks/</code>, <code>bin/aop-send.cjs</code>, <code>bin/aop-node.sh</code>,
+<code>bin/aop-plugin-hook.sh</code>, <code>bin/mappers/</code>, <code>.claude-plugin/</code> or <code>.codex-plugin/</code> has to bump
+the shared version in both plugin manifests <em>and</em> <code>package.json</code>.
+<code>connect:claude:status</code> is the check that tells you which update command you need.</p>
+<p>This is why the <strong>settings</strong> route exists. It points at the checkout rather than a copy, so
+a mapper edit applies to the very next tool call — which is what you want while you are
+actually working on one. <code>--project</code> scopes it to one repo by writing
+<code>.claude/settings.local.json</code>, the personal never-committed one, since the command contains
+an absolute path to <em>your</em> machine.</p>
+<p><strong>Claude runs every matching hook</strong>, not just the first. So unlike the Rovo installer this
+one simply adds itself beside whatever is already there and never touches it — and that is
+also why installing both routes sends every event twice. The installer refuses.</p>
+<p><strong>A third route needs no checkout at all.</strong> <code>npm run pack:plugins</code> builds the plugin as a
+versioned zip and generates the marketplace JSON the site serves at
+<code>/plugins/claude/marketplace.json</code>, pinned to the archive's SHA-256. That is what a
+stranger installs, and it is a snapshot too — with the same version rule and one more
+wrinkle, since third-party marketplaces have auto-update off by default. See
+<a href="../plugin-distribution.html">publishing the plugins</a>.</p>
+<h2 id="what-it-maps-that-the-others-cannot" tabindex="-1">What it maps that the others cannot</h2>
+<ul>
+<li><strong>Explicit turn boundaries</strong>, so a desk label is never inferred from tool activity.</li>
+<li><code>artifact.change</code> on a file write or a commit.</li>
+<li><code>permission.resolve</code> when you say no — Codex cannot report this.</li>
+<li><code>context.compact</code> when history is squeezed.</li>
+<li><strong>Real subagents.</strong> <code>SubagentStart</code> carries <code>agent_id</code>, <code>agent_type</code> and
+<code>parent_tool_use_id</code>, so a fan-out arrives as actual child sessions bound to the exact
+<code>Job</code> call that spawned them. Nothing is inferred from tool arguments and nothing is
+marked synthetic. Codex also provides a real subagent lifecycle, but without the parent
+tool-call id.</li>
+</ul>
+<p>The reducer (<code>src/data/aop-reducer.js</code>) holds a <code>TODO(ghosts)</code> and skips the children, so
+today they are a feed waiting on a scene. The shape they are owed is in
+<a href="../scene-internals.html#subagents-are-ghosts">scene internals</a>.</p>
+<h2 id="three-names-for-one-session-and-which-one-wins" tabindex="-1">Three names for one session, and which one wins</h2>
+<p>Claude's transcript carries a concise <code>ai-title</code> alongside an <code>agent-name</code>, and the session
+registry keeps a third, custom name.</p>
+<p>The adapter prefers <strong><code>ai-title</code></strong>, falls back to <code>agent-name</code>, and sentence-cases
+slug-shaped names (<code>add-office-printer</code> → &quot;Add office printer&quot;). It deliberately <strong>does not
+use the session registry's custom name</strong>: Desktop may replace that with an operational name
+such as <code>furniture-worktree-setup</code> while the assignment itself has not changed.</p>
+<p>Title lookup reads only a bounded tail below <code>~/.claude/projects/</code>, is best-effort, and is
+disabled entirely under <code>metadata</code> redaction.</p>
+<h2 id="three-surfaces-one-binary" tabindex="-1">Three surfaces, one binary</h2>
+<p><code>CLAUDE_CODE_ENTRYPOINT</code> is exported into every hook's environment
+[verified 2026-08-27, 2.1.246], so the mapper reads the surface for free rather than
+parsing a transcript to learn the same fact. An entrypoint nobody predicted is slugged and
+reported verbatim rather than dropped, on the grounds that a name we do not recognise is
+still better than silence about a harness we did not foresee.</p>
+<h3 id="the-launchd-path-trap" tabindex="-1">The launchd PATH trap</h3>
+<p>A hook inherits the environment of whatever launched the agent. From a terminal that is a
+login shell, so a version manager's shims resolve <code>node</code> — but a GUI session's parent is
+launchd, which hands down only
+<code>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</code>.</p>
+<p>nvm, fnm, volta and asdf all install Node under <code>$HOME</code>, none of which is on that list, so
+<code>env node</code> exited <strong>127</strong>, every hook failed, and the office stayed empty for exactly the
+sessions a GUI harness runs — silently, because a non-blocking hook's failure is not the
+agent's problem.</p>
+<p>Every plugin hook command therefore goes through <code>bin/aop-plugin-hook.sh</code> and then
+<code>bin/aop-node.sh</code>, which looks where version managers actually put Node and caches the
+answer in <code>~/.roving-office/node-path</code>. <code>connect:claude:status</code> reports the terminal case
+and the GUI case <strong>separately</strong>, because a status that only proves the terminal half proves
+the easy half.</p>
+<h2 id="remote-offices-need-no-version-bump" tabindex="-1">Remote offices need no version bump</h2>
+<p>The plugin's hooks post to whatever URL <code>~/.roving-office/endpoint.json</code> names, so pointing
+them at a remote receiver is not a plugin change: the snapshot Claude runs reads the same
+endpoint file your checkout does. Worth stating plainly right next to the section above,
+which is about the opposite case.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../protocol/aop-harness-adapters.html#2-claude-code">Adapter notes §2</a> — the event-by-event mapping and how fifteen hooks were verified</li>
+<li><a href="../protocol/aop-spec.html">The AOP spec</a> — the wire format</li>
+<li><a href="../extending.html#add-a-harness-adapter">Extending the office</a> — writing another one</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#changing-the-plugin-means-bumping-the-version">Changing the plugin means bumping the version</a></li>
+<li><a href="#what-it-maps-that-the-others-cannot">What it maps that the others cannot</a></li>
+<li><a href="#three-names-for-one-session-and-which-one-wins">Three names for one session, and which one wins</a></li>
+<li><a href="#three-surfaces-one-binary">Three surfaces, one binary</a><ul><li><a href="#the-launchd-path-trap">The launchd PATH trap</a></li></ul></li>
+<li><a href="#remote-offices-need-no-version-bump">Remote offices need no version bump</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

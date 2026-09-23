@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Codex — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html" aria-current="page">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="codex" tabindex="-1">Codex</h1>
+<p><em>OpenAI's coding agent. Ten lifecycle hooks, real subagents, and one trust step.</em></p>
+<h2 id="install-it" tabindex="-1">Install it</h2>
+<p>Codex installs a plugin from a <strong>marketplace it can clone</strong>, not from a file it can
+download — so unlike Claude Code, the published route needs a repository to point at, and
+that repository is not up yet. When it is, the commands will be:</p>
+<pre><code class="language-bash">codex plugin marketplace add &lt;publisher&gt;/roving-office-plugins
+codex plugin add roving-office@roving-office
+</code></pre>
+<p>Until then, install it from a copy of the project:</p>
+<pre><code class="language-bash">npm run connect:codex          # install or update the local plugin
+npm run connect:codex:status   # installation, version and hook readiness
+npm run connect:codex:dry      # show what it would run, change nothing
+npm run disconnect:codex       # remove the plugin
+</code></pre>
+<p>Either way, start a <strong>new Codex thread</strong>, open <code>/hooks</code>, and <strong>review and trust the
+commands</strong>. Codex loads plugins at thread start, so an already-open thread does not gain
+an adapter halfway through, and installing a plugin never trusts its hooks for you.</p>
+<p>Point an office at <strong>Codex</strong> (press <code>D</code>).</p>
+<blockquote>
+<p><strong>Hooks are shell commands, and Codex requires you to review them.</strong> <code>/hooks</code> is the
+source of truth if the plugin is installed but silent. The adapter always returns success
+and never prints a response: it observes Codex, and it cannot approve, deny, block or
+rewrite its work.</p>
+</blockquote>
+<h2 id="what-you-get" tabindex="-1">What you get</h2>
+<p>Sessions, turns, tool work, patches showing up as work produced, plans as checklists,
+permission requests, context compaction, and <strong>real subagents</strong> — a fan-out arrives as
+actual child sessions. The room does not draw them yet, so a fan-out looks like one busy
+person for now.</p>
+<p>Because Codex says when a session really ends, a quiet Codex character gets the patient
+30-minute clock rather than the five-minute fallback.</p>
+<h2 id="two-things-it-cannot-see" tabindex="-1">Two things it cannot see</h2>
+<p><strong>Whether a shell command failed.</strong> Codex hands the adapter a command's output but not its
+exit status, so a quiet failed command is indistinguishable from a successful one that
+printed nothing — and the adapter does not guess from error-looking text. A failure can
+therefore pass unremarked.</p>
+<p><strong>Web searches.</strong> Codex does not report its hosted web search as a tool, so that one
+activity can be invisible even while the rest of a turn is live. Nobody walks to the
+telescope for it.</p>
+<p>It also cannot say how a permission request was <em>resolved</em> — only that one was asked.</p>
+<h2 id="if-nothing-shows-up" tabindex="-1">If nothing shows up</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Plugin installed but silent</td>
+<td>Open <code>/hooks</code> and trust the commands. This is the usual answer</td>
+</tr>
+<tr>
+<td>An error about the command not launching</td>
+<td>Compare the version in <code>/hooks</code> with <code>connect:codex:status</code>. If it is old, reinstall and <strong>fully restart the Codex app</strong> so its plugin registry reloads</td>
+</tr>
+<tr>
+<td>Works in one thread, not another</td>
+<td>A thread keeps the plugin version it loaded at startup. Old threads keep working on the old snapshot; new threads get the new one</td>
+</tr>
+<tr>
+<td>Nothing, and your organisation manages Codex</td>
+<td>An administrator can require managed hooks only. <code>connect:codex</code> warns when it can see that setting; a local plugin cannot bypass it, and the command has to be deployed centrally</td>
+</tr>
+</tbody>
+</table>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../connect-your-agents.html">Connect your agents</a> — redaction, office routing, and when agents leave</li>
+<li>The hook table and the worktree trap are in the <a href="../../developer/adapters/codex.html">developer docs</a></li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#install-it">Install it</a></li>
+<li><a href="#what-you-get">What you get</a></li>
+<li><a href="#two-things-it-cannot-see">Two things it cannot see</a></li>
+<li><a href="#if-nothing-shows-up">If nothing shows up</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Generated offices — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html" aria-current="page">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="generated-offices" tabindex="-1">Generated offices</h1>
+<p><em>A seed is a room. Any string at all, the way any string is a Minecraft world seed.</em></p>
+<p><code>misty-quay-3100</code> is <em>Three Blocks</em>: eight desks in two teams of six and two, one block in
+the middle of a warehouse floor, a post box and a
+<a href="../item-movements.html#printer">printer</a>, and one warm couch in a big cold room.
+<strong>It will always be that office.</strong></p>
+<p>A seed decides how many desks a room has, how they are grouped into teams, which way work
+arrives and leaves, where the coffee is, what colour the rug is, what is planted in the
+corners, and what the place is called.</p>
+<p>The point is not variety. Variety is easy and worth nothing: scatter twenty props at
+random and every room is different and none of them is an office. The point is that
+<strong>every seed produces a room that works</strong> — desks in teams, aisles that go somewhere, the
+noisy machines away from the quiet end, somewhere to do every job the office needs doing,
+and nobody stranded behind the furniture.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="../images/generated/misty-quay-3100.png" width="430" alt="Overhead plan of a generated warehouse office: six desks back to back in a block in the middle of the floor with two more below them, a couch in the corner, a bookshelf with a globe, a printer, and planting in every corner"></td>
+<td><img src="../images/generated/copper-kiln-7220.png" width="430" alt="Overhead plan of a generated office under a mansard roof: six desks in one long back-to-back run down the length of the room, two printers and a stack of stock, and no letterbox"></td>
+</tr>
+<tr>
+<td><strong>Three Blocks</strong> — <code>misty-quay-3100</code><br>Eight desks in two teams of six and two, one block in the middle of the floor. A post box and a printer, and the courier calls. <em>Cold Store: one warm couch in a big cold room.</em></td>
+<td><strong>The Second Press Room</strong> — <code>copper-kiln-7220</code><br>Six desks in one team, one long back-to-back run down the room. Two printers and a stack of stock, and not a letter in the building. <em>Rooftop Spring: chimney pots and blossom, everything pale.</em></td>
+</tr>
+<tr>
+<td><img src="../images/generated/gallery-6.png" width="430" alt="Overhead plan of a generated brownstone office: eight desks in two teams of four in the middle of the floor, a post box, and a break corner with coffee and two things to sit on"></td>
+<td><img src="../images/generated/sweep-9.png" width="430" alt="Overhead plan of a generated office: seven desks in two pods with their screens meeting in the middle, a telescope at the window instead of a bookshelf, and nine plants round the edges"></td>
+</tr>
+<tr>
+<td><strong>The Brownstone Letterbox</strong> — <code>gallery-6</code><br>Eight desks in two teams of four, off a street across the room. One post box, and no courier. <em>Blossom Street: pale wood, cherry blossom, everything a shade lighter.</em></td>
+<td><strong>Pods and a Lookout</strong> — <code>sweep-9</code><br>Seven desks in two pods, screens meeting in the middle. Lookups go to a telescope at the window. Nine plants, which is as many as the corners will take. <em>First Frost: a warm room with a cold street through the glass.</em></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>These four are <strong>overhead plans</strong> rather than the isometric view the rest of the site
+uses, because a plan is the honest way to show a floor layout. Every name, reason and
+scheme line above is the plan's own — run
+<code>node bin/office-plan.js misty-quay-3100</code> and the same words come back. They are not
+maintained by hand on this page, which is how they came to be wrong once already.</p>
+</blockquote>
+<p><strong><a href="../office-seeds.html">Two dozen more →</a></strong> — a contact sheet with their names, their
+reasons and their scorecards, and each one carries an <strong>Open this office</strong> link that mints
+a keycard and furnishes the room from that seed. A plan you like is one click from a room
+you can walk into.</p>
+<h2 id="where-you-meet-one" tabindex="-1">Where you meet one</h2>
+<ul>
+<li><strong>A new office.</strong> Open a keycard nobody has used and its first room is generated.</li>
+<li><strong>New scene</strong> in an office you already have.</li>
+<li><strong>Random</strong>, in the furniture editor's Layout row (press <code>E</code>). It is an ordinary edit, so
+one <strong>⌘Z</strong> puts the previous room back.</li>
+<li><strong>A seed link</strong> — <code>/?seed=slate-orchard-2210</code>, which is what the gallery's links are.</li>
+</ul>
+<p>A room is generated <strong>once</strong>, when it is first opened, and never again.</p>
+<blockquote>
+<p><strong>The seed is the only way back to a room you liked</strong>, which is why the panel prints it
+on screen rather than tucking it in a log. Press <strong>Random</strong> six times and the five you
+passed over are gone unless you noted their seeds.</p>
+</blockquote>
+<p>The layout picker shows the office's own <strong>name</strong> while you are in it — <code>The January Parlour *</code>. By the letter of the editor's three states a generated room is an edit of the
+authored plan and should read <code>Default *</code>, but Default is exactly what it is not, and the
+whole point of generating a room is that it is a particular room with a particular name.
+The tooltip carries the seed.</p>
+<h2 id="what-a-seed-decides" tabindex="-1">What a seed decides</h2>
+<p>Two stages, and the order is the argument. First a <strong>brief</strong> — what this office wants,
+with no idea what will fit — then a <strong>test fit</strong>, which is the brief laid onto the actual
+floor. That is the order a space planner works in, and it is why a room may come back with
+fewer desks than were asked for and <em>say so</em> rather than pretending the brief was
+different.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Headcount</strong></td>
+<td>2 to 14 desks, weighted towards the sizes that make a <em>room</em>: four to nine is an office you can see the shape of at a glance.</td>
+</tr>
+<tr>
+<td><strong>Arrangement</strong></td>
+<td><code>rows</code> · <code>pods</code> · <code>spine</code> · <code>perimeter</code> · <code>island</code>. Five, and each is a real arrangement with a real argument for it rather than five ways of scattering furniture.</td>
+</tr>
+<tr>
+<td><strong>Teams</strong></td>
+<td>The desks divided into groups that sit together — three to five to a bench, four to six to a pod. This is what makes a pod a pod: a cluster is only a team's cluster if the team is the thing that decided its size.</td>
+</tr>
+<tr>
+<td><strong>Sit-stand desks</strong></td>
+<td>Usually one, sometimes none, occasionally two on a big floor. They go to the desks nearest the camera, because a raised top only reads as raised beside a neighbour at ordinary height.</td>
+</tr>
+<tr>
+<td><strong>Intake and dispatch</strong></td>
+<td>Seven characters, from a <code>post-room</code> to a <code>paperless</code> floor with no letterbox at all to a <code>wharf</code> with two boxes, a printer and a stack of stock.</td>
+</tr>
+<tr>
+<td><strong>Lookups</strong></td>
+<td>A <code>reference</code> shelf, a <code>library</code> of two, an <code>observatory</code> with a telescope and no books, or a <code>great-library</code> with both. The shelf answers for what the company knows and the telescope for what is outside the building, which are different questions.</td>
+</tr>
+<tr>
+<td><strong>Drinks</strong></td>
+<td>Coffee, water, both, or a dry floor. A room with nothing to drink is a poorer room and a working one.</td>
+</tr>
+<tr>
+<td><strong>Lounge</strong></td>
+<td>None, a reading corner, a snug, a parlour, two armchairs, or a proper lounge.</td>
+</tr>
+<tr>
+<td><strong>Planting</strong></td>
+<td>Bare to a jungle — nought to nine floor plants.</td>
+</tr>
+<tr>
+<td><strong>Colour</strong></td>
+<td>One of sixteen schemes.</td>
+</tr>
+</tbody>
+</table>
+<p>That is on the order of a <strong>billion distinct briefs</strong> before a single thing is placed, and
+placement adds more. Measured rather than argued: two thousand seeds produce two thousand
+distinct floor plans, no two of them the same room.</p>
+<h2 id="the-rules-it-will-not-break" tabindex="-1">The rules it will not break</h2>
+<p>Everything is placed the same way: work out every position the piece could stand at, score
+them all, and take the best one that does not fence anybody in. The worst that can happen
+is that there is nowhere at all — and then the piece is simply not in this office, and the
+report says so.</p>
+<p><strong>A generated room is a room somebody could have dragged into place</strong>, because the judge is
+the furniture editor's own arithmetic rather than a second copy of it. Nothing arrives
+anywhere a drag could not have put it.</p>
+<p>Beyond that: nobody may build in the doorway, nothing may stand where a person could not
+actually stand, and — the one rule no rectangle can express — <strong>nothing may be put down
+that fences anybody in.</strong> A bookcase that overlaps nothing at all can still seal the only
+way into the corridor behind a bank of desks, so each piece is checked against every
+standing spot already in the room as it goes down.</p>
+<h3 id="the-adjacencies-which-are-the-argument" tabindex="-1">The adjacencies, which are the argument</h3>
+<p>Every station scores on where its <em>job</em> wants it, and each rule is one you would recognise
+from a real floor plan.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Printer, coffee machine</td>
+<td><strong>Away from the quiet end.</strong> The two things every space-planning guide names.</td>
+</tr>
+<tr>
+<td>Bookshelf</td>
+<td><strong>Where the work is.</strong> A shelf is somewhere you go mid-task, so it scores the other way: near the desks, against a wall.</td>
+</tr>
+<tr>
+<td>Coat stand</td>
+<td><strong>By the door</strong>, because that is what a coat stand is.</td>
+</tr>
+<tr>
+<td>Post</td>
+<td><strong>Where the post arrives</strong> — near the entrance, or under a window. Both are true here: a parcel comes in through the door and a letter flies in through the glass.</td>
+</tr>
+<tr>
+<td>Stock</td>
+<td>With the post and out of the way. A stack of boxes is furniture you take from, not somewhere anybody queues.</td>
+</tr>
+<tr>
+<td>Telescope</td>
+<td><strong>At a window</strong>, refused anywhere else. A telescope in the middle of a room is a prop somebody left out.</td>
+</tr>
+<tr>
+<td>Bin</td>
+<td><strong>In a corner, near the printer</strong> — and never the corner by the door, which is the one corner a bin may not have.</td>
+</tr>
+<tr>
+<td>Couch, armchairs, table, lamp</td>
+<td><strong>As a group.</strong> The couch goes wherever the room has been left most generous, and everything else is placed against it: a chair within arm's reach, a table at arm's length, a lamp at the end. A chair on its own across the room is not part of the corner the couch makes.</td>
+</tr>
+<tr>
+<td>Planting</td>
+<td><strong>Corners, edges and window bays</strong>, and this one is a refusal rather than a preference. A plant in the middle of open floor is something somebody left there. In a packed room that means fewer plants than the brief asked for, which is the right answer: the corners are where the plants go, and they are full.</td>
+</tr>
+<tr>
+<td>Seasonal planting</td>
+<td>Out on the open edges and in the window bays, where the street is visible behind them — so when they turn, they turn against a matching season outdoors. The rest of the room stays evergreen, which is what stops February looking dead.</td>
+</tr>
+</tbody>
+</table>
+<p>The desks get three more, all out of the same place in the literature: put the focus zone
+where the entrance traffic does not run through it, give the desks the daylight, and hang
+them off a circulation lane rather than making people thread between them. Which side of
+the street the desks go on is decided by the plainest of the three — <strong>the quiet end is the
+end without the door in it.</strong></p>
+<h2 id="the-colour-scheme" tabindex="-1">The colour scheme</h2>
+<p>Most of a room's colour is not the layout's to choose: the walls, the floor finish and the
+light come from the building. What a <em>layout</em> paints is the rug and the soft furniture, and
+those are the two things that have to agree with everything already decided.</p>
+<p>So a seed picks a <strong>scheme</strong>: one of sixteen — the whole grid of four buildings by four
+seasons — each with the rug and upholstery that go with it, each named for what it is.
+<em>High Summer</em>, <em>Long Shadows</em>, <em>Cold Store</em>, <em>Night Shift</em>, <em>Zinc and Limestone</em>.</p>
+<p>The pairs are written down rather than computed, and the reason is worth stating: moss
+velvet on stained warehouse boards under an October sun is a scheme, and the same green in
+the tower's grey daylight is a mistake. That judgement does not come out of a hue rotation.</p>
+<p>A scheme carries a second upholstery colour for its accent, so a room may have a matched
+suite or a chair that deliberately does not match. Both are real rooms.</p>
+<h2 id="the-name-and-the-reason" tabindex="-1">The name, and the reason</h2>
+<p>Both are read off the room that was actually <strong>built</strong>, never off the brief that asked for
+it — because the floor plate gets a say, and a room called &quot;Four Pods&quot; with three pods in it
+is worse than no name at all.</p>
+<p>A name is a short phrase about the one or two things that make this office itself: how the
+desks are arranged, and whatever is <em>unusual</em> about it. <strong>Unusual is the whole test.</strong> Every
+office has somewhere for work to arrive, so &quot;post room&quot; says nothing and the room falls back
+to being named after its desks; a floor with no letterbox in the building is worth naming
+after that fact.</p>
+<blockquote>
+<p><strong>The Reading Room</strong> · <strong>Bench Room and an Exchange</strong> · <strong>The Russet Print Shop</strong> ·
+<strong>Pods and a Lookout</strong> · <strong>The Frosted Pod Room</strong> · <strong>The Little Long Room</strong> · <strong>Blocks
+and a Letterbox</strong> · <strong>The Thirty-Fourth Mail Room</strong> · <strong>Benches and a Great Library</strong> ·
+<strong>The Palm Court</strong></p>
+</blockquote>
+<p>Every word is earned by something in the layout. The adjectives are grouped by what they
+are <em>about</em>, so a winter scheme may be called cold and a nine-desk floor may be called
+great, and neither may borrow the other's word.</p>
+<p>Two offices that genuinely are &quot;the frosted pod room&quot; share the name, and that is allowed:
+a name describes the room, and those two rooms are the same room in every way a name can
+carry. Two thousand seeds come out with 1,185 different names between them, 897 of which
+belong to exactly one office. <strong>The seed is the identity; the name is a description.</strong></p>
+<p>The <strong>reason</strong> is the same facts written out, in the order somebody walking in would notice
+them:</p>
+<pre><code>8 desks in two teams of 6 and 2, one block of desks in the middle of the floor,
+off a street across the room. Work comes and goes by a post box and a printer,
+and the courier calls. Lookups go to a bookshelf. The break end has two things to
+sit on, kept away from the quiet desks. Cold Store: one warm couch in a big cold
+room.
+</code></pre>
+<p><strong>It cannot flatter the room.</strong> A floor that came out with fewer desks than the brief asked
+for says so; a team that ended up with one desk is described as what it is — somebody on
+their own at the end of a bank — rather than counted in as a &quot;team of 1&quot;, which is the sort
+of phrase that tells you a sentence was assembled rather than written.</p>
+<p>The name, the seed and the reason all ride inside the layout file, so a generated office
+can be exported, pasted, downloaded and saved to your shelf
+<a href="layouts.html#four-ways-in-and-out">like any other layout</a>.</p>
+<h2 id="a-generated-room-is-just-a-layout" tabindex="-1">A generated room is just a layout</h2>
+<p>Nothing about a generated office is special once it exists. It is
+<a href="layouts.html">a layout</a> like any other — rearrange it, save it under a name, export it, send
+it to somebody. The seed is only how this one got here.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="rearranging-furniture.html">Rearranging the furniture</a> — where <strong>Random</strong> lives, and how to
+keep a room you like</li>
+<li><a href="buildings.html">Buildings and themes</a> — the shell a generated layout is dressed in</li>
+<li>The gate, the scorecard and the two-thousand-seed sweep are in the
+<a href="../developer/layout-algorithm.html">developer docs</a></li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#where-you-meet-one">Where you meet one</a></li>
+<li><a href="#what-a-seed-decides">What a seed decides</a></li>
+<li><a href="#the-rules-it-will-not-break">The rules it will not break</a><ul><li><a href="#the-adjacencies-which-are-the-argument">The adjacencies, which are the argument</a></li></ul></li>
+<li><a href="#the-colour-scheme">The colour scheme</a></li>
+<li><a href="#the-name-and-the-reason">The name, and the reason</a></li>
+<li><a href="#a-generated-room-is-just-a-layout">A generated room is just a layout</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The coplanar-face probe — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html" aria-current="page">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="the-coplanar-face-probe" tabindex="-1">The coplanar-face probe</h1>
+<pre><code class="language-bash">npm run probe -- --building=skyscraper
+npm run probe -- --sweep
+npm run probe -- --sweep --assert=test/coplanar-baseline.json   # what CI runs
+</code></pre>
+<p>The <code>--assert</code> form turns the sweep into a pass/fail: each building's worst
+visible pair is compared against the recorded baseline, and a regression exits
+non-zero with the buildings named. After a <em>deliberate</em> geometry change,
+re-record with <code>--record=test/coplanar-baseline.json</code> and commit the file.</p>
+<p>The baseline carries the seed it was taken under, and asserting against a
+baseline recorded under a different seed is refused rather than reported — see
+<a href="#the-same-scene-every-time">The same scene every time</a>.</p>
+<p>One bug has accounted for nearly every graphical glitch reported in this scene: <strong>two faces landing on exactly the same coordinate.</strong> The depth buffer has no way to order them, so the two surfaces trade places pixel by pixel as the camera moves, and it reads as flashing, crawling or shimmering.</p>
+<p>It is very hard to find by reading the code. Three rounds of fixes were attempted by reasoning about the geometry; each round found real faults and each round missed the ones actually on screen. The reason is arithmetic: a kerb is fine at <code>WALK_Y + 0.04</code> until you notice a pavement slab is also <code>0.18</code> thick starting at <code>WALK_Y - 0.18</code>, and nothing in either line of code mentions the other.</p>
+<p>So measure it instead. <code>bin/coplanar-probe.js</code> builds the scene headlessly, takes every mesh's world-space bounding box, and reports every pair of faces sharing a plane, ranked by the area they contest.</p>
+<h2 id="two-rules-that-make-the-output-readable" tabindex="-1">Two rules that make the output readable</h2>
+<p>Without these, the list is swamped and useless.</p>
+<p><strong>Only same-facing pairs can fight.</strong> If one box's <em>top</em> sits on another box's <em>bottom</em>, the surfaces merely touch — normal, and safe, because only one of the two faces points at any given camera; the other is a backface. A real fight needs both faces pointing the same way. The probe reports the direction, so <code>y+</code> is a pair of upward faces and <code>y-</code> a pair of downward ones.</p>
+<p>That distinction also tells you whether a hit matters. A <code>y-</code> pair buried under something solid — a deck underside below the ground plane, skirting inside a floor slab — is a hit but not a symptom. The <code>--sweep</code> summary reports the worst <em>visible</em> pair for this reason.</p>
+<p><strong>Transparent surfaces cannot fight.</strong> They blend rather than contest a pixel. The night-light pools are deliberately coincident planes, and glass balustrades are stacked with their posts. Anything <code>transparent</code>, or with <code>depthWrite</code> or <code>depthTest</code> off, is skipped.</p>
+<h2 id="reading-a-line" tabindex="-1">Reading a line</h2>
+<pre><code>   12.960  y+=-1.120  #b6b2a8|#b6b2a8  z[-3.60,0.00] x[-3.60,0.00]
+</code></pre>
+<p>Nearly 13 square units of contested surface, on a pair of <strong>upward</strong> faces at <code>y = -1.120</code>, between two meshes of the same colour, over a 3.6 by 3.6 square. That was two pavement slabs crossing at a corner, both <code>WALK_Y</code> high — they were laid as four long strips that ran past each other instead of two L-shapes.</p>
+<p>Same colour on both sides usually means duplicated geometry. Different colours usually means two elements sharing a rung on a depth ladder.</p>
+<h2 id="finding-out-what-a-pair-actually-is" tabindex="-1">Finding out what a pair actually is</h2>
+<p>The scene does not name its meshes, so identify by plane:</p>
+<pre><code class="language-bash">npm run probe -- --building=skyscraper --n=0 --dump=z:20.21
+</code></pre>
+<p>That lists every mesh with a face on <code>z = 20.21</code>, with size and extents — enough to match against the code. It is how the spandrel/slab-edge collision was found: a <code>26.00 x 0.42 x 0.20</code> panel and a <code>26.24 x 0.42 x 0.42</code> band, both with an outer face on that plane, because <code>SLAB_H / 2</code> and <code>D_SPANDREL</code> were both <code>0.21</code>.</p>
+<p>It is also how the mansard's balcony edge was found, and that one is
+worth reading because <strong>the pair was too small to be in the top twelve</strong>. The
+report was flicker where the floorboards meet the railings and the planting;
+<code>--dump=y:0.1</code> listed every top face on the floor's own plane and the answer was
+right there in the extents. The floorboards ran to <code>x = 26.09</code> because a whole
+final plank was laid however much of a bay was left over, and the stone ledge
+started at <code>x = 26.00</code> — 0.09 of overlap down the whole open edge, both faces on
+<code>y = FLOOR_TOP</code>. The same dump caught the wrap ledge at the far corner reaching
+0.85 back into the room, which is the smaller patch of flicker the report also
+mentioned. Both now stop at the room's own boundary.</p>
+<p>The lesson is the dump, not the ranking: <strong>a pair only has to be big enough to
+see, not big enough to rank.</strong> 1.8 square units sat 30-odd rows down a list of
+1293, under a hundred pairs of distant rooftops that no camera ever gets near.
+Rank by what the report describes — pick the plane the symptom is on and dump it
+— rather than by area.</p>
+<h2 id="the-lift" tabindex="-1">The lift</h2>
+<p>A static scene only ever shows the doors shut and the car at the landing, so drive them:</p>
+<pre><code class="language-bash">for t in 0 0.25 0.5 0.75 1; do npm run probe -- --door=$t --only=leaf --min=0.01; done
+for f in 1 2 3; do npm run probe -- --car=$f --only=car --min=0.01; done
+</code></pre>
+<p>The lift accounted for more reported flicker than anything else in the scene, and the reason it took so long is that <strong>every round of fixes aimed at the doors</strong>. The leaves are geometrically clean at every point of travel, and always were. Two faults sat either side of them:</p>
+<ul>
+<li>The <strong>shadow map</strong>, once. A leaf is <code>0.14</code> thick sliding inside a wall <code>0.2</code> thick, so the wall shadowed itself, and the acne moved with the doors because the caster did. The probe cannot see that class of fault — it only knows about surfaces contesting a plane — but proving the geometry clean is what pointed at the shadow pass. The leaves now cast nothing.</li>
+<li>The <strong>threshold surround</strong>, which is what was still on screen afterwards. Each jamb butted flush to the opening, so its inner face landed exactly on the wall's reveal: <code>2.14</code> square units contested down the full height of the door, twice over, and the largest visible pair in the building. The head did the same against the soffit above the opening. None of it needed the doors to move or the sun to be up, only a camera — so it read as &quot;the lift is still glitching&quot; long after the doors were innocent. The frame now laps over the opening, burying the reveal behind it.</li>
+</ul>
+<p>The <strong>car</strong> was clean on the same measure only by luck of the filter: its floor, ceiling and back were each exactly as wide as the car, and the side panels' outer faces landed on that same width, so three pairs contested each side plane. They sit tens of rows down a 600-pair list and <code>--only=leaf</code> hides them, which is what <code>--only=car</code> is for. The shell is now a depth ladder.</p>
+<p>Two lessons worth keeping. <strong><code>--only=leaf</code> answers a question about the leaves and nothing else</strong> — reach for <code>--only=car</code>, or a colour, or <code>--dump</code>, before concluding the lift is clean. And <strong>a fault that needs no animation to show is not in the animated part</strong>: if flicker survives <code>--door=0</code>, stop reading the door code.</p>
+<h2 id="the-same-scene-every-time" tabindex="-1">The same scene every time</h2>
+<p>The scene <strong>dresses itself at random</strong> — book widths, which props land on a
+shelf, which panes of the tower are lit, where the trees are planted. In a
+browser that is variety. To a probe it is the difference between a measurement
+and a sample, because &quot;the worst pair of surfaces contesting a plane&quot; in a
+randomly dressed scene is a random number.</p>
+<p>For a while it was exactly that. The same commit scored <code>0.97</code> on one run and
+<code>1.55</code> on the next, so CI failed and passed identical trees at random: pipeline
+#48 and #50 were one commit with opposite results, and <code>main</code> sat red for days
+over a documentation change that could not have moved a vertex. A red build
+everybody re-runs is a red build nobody reads, which is worse than no gate.</p>
+<p>So the probe fixes the dressing. <code>seedRandom()</code> in <code>bin/lib/headless-scene.js</code>
+replaces <code>Math.random</code> with mulberry32 — the same trick the scene already plays
+on itself in <code>src/scene/outlooks/city.js</code>, so a project always looks out at the
+same skyline — and the probe reseeds <strong>before every build</strong>, so a building
+measures the same whether it is raised alone or tenth in a sweep.</p>
+<p><strong>Seeding alone was not enough</strong>, for a reason worth knowing before you write
+another tool against this scene. three.js draws four <code>Math.random()</code> values to
+make a UUID for every object, geometry, material and texture it creates: about
+22,000 draws a build, against a few dozen for the dressing. So where a book's
+width lands in the stream depends on how many <em>things</em> were made before it — and
+the scene hands out materials from a process-wide cache, so the first build of a
+process creates 273 that later builds get for free. Same seed, differently
+dressed scene: <code>mansard/winter</code> scored 1263 pairs built alone and 1266 built
+tenth in a sweep.</p>
+<p>So the probe <strong>builds from cold</strong>, calling the same two resets <code>buildWorld()</code> in
+<code>src/world.js</code> calls before it builds — <code>clearMaterialCache()</code> and
+<code>releaseNightLightAssets()</code>. In a browser every build is a cold one, because
+those caches are keyed on colour and would otherwise hand back the last theme's
+materials. Doing the same here costs nothing, makes each build independent of
+every build before it, and keeps the probe measuring the scene the app actually
+raises rather than a warm variant of it that no reader will ever see. It also
+means the probe leans on an invariant the app already depends on: a cache that
+survives a rebuild is a theming bug there, so this cannot quietly rot while the
+app stays correct.</p>
+<h3 id="varying-the-seed-on-purpose" tabindex="-1">Varying the seed on purpose</h3>
+<p><code>--seed=&lt;n&gt;</code> is how you hunt for pairs that only one dressing produces. Most of
+the scene does not care — <code>warehouse</code>, <code>skyscraper</code> and <code>mansard</code> return the same
+worst pair for every seed, because their worst pair is structural. <code>simple</code> moves:</p>
+<pre><code>seed 1  0.97      seed 7  0.97
+seed 5  1.06      seed 9  1.41
+seed 2  1.70      seed 10 0.97
+</code></pre>
+<p>Worth following one before you fix it: at seed 2 the <code>1.70</code> is <code>#6b5a4b|#6b5a4b</code>
+in winter — one colour on both sides, so duplicated geometry by the rule above,
+and true as far as it goes. It is two bare limbs, planted close and spun at
+random, whose <em>bounding boxes</em> came to share a plane while the diagonal branches
+inside them never meet. That is the over-report below, not a fault.</p>
+<p>Which is the sharpest version of why this had to be fixed rather than absorbed by
+widening the slack: the gate was failing honest commits over a known false
+positive, and it was random which commit wore it.</p>
+<p>Because a number is only comparable to another number from the same dressing, the
+recorded baseline carries its seed, and <code>--assert</code> under any other seed stops
+rather than quietly comparing two different scenes. Explore with <code>--seed</code> alone;
+<code>--record</code> a baseline for a seed you intend to keep.</p>
+<h2 id="the-one-limitation-to-remember" tabindex="-1">The one limitation to remember</h2>
+<p><strong>It compares axis-aligned bounding boxes</strong>, so it over-reports rotated and curved geometry. The largest hit in the warehouse — 77 square units — is the external stair's stringer and handrail: two parallel diagonal boards whose bounding boxes coincide exactly while their actual surfaces never meet. Tree canopies do the same, being spheres tangent to a shared plane.</p>
+<p>Treat a hit on anything sloped or spherical as a question. Every fault fixed so far has been on axis-aligned boxes, where a hit means what it says.</p>
+<h2 id="options" tabindex="-1">Options</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--building=&lt;key&gt;</code></td>
+<td><code>simple</code>, <code>warehouse</code> or <code>skyscraper</code></td>
+</tr>
+<tr>
+<td><code>--season=&lt;key&gt;</code></td>
+<td><code>summer</code>, <code>autumn</code>, <code>winter</code>, <code>spring</code></td>
+</tr>
+<tr>
+<td><code>--sweep</code></td>
+<td>every building and season, one summary line each</td>
+</tr>
+<tr>
+<td><code>--n=&lt;count&gt;</code></td>
+<td>how many pairs to list (default 12; <code>0</code> to list none)</td>
+</tr>
+<tr>
+<td><code>--min=&lt;area&gt;</code></td>
+<td>ignore pairs contesting less than this (default <code>0.05</code>)</td>
+</tr>
+<tr>
+<td><code>--only=&lt;hex&gt;</code></td>
+<td>only pairs involving that colour; <code>leaf</code> means the door leaves, <code>car</code> the lift car's shell</td>
+</tr>
+<tr>
+<td><code>--door=&lt;0..1&gt;</code></td>
+<td>slide the lift doors open by this fraction first</td>
+</tr>
+<tr>
+<td><code>--car=&lt;floors&gt;</code></td>
+<td>park the lift car this many storeys below the open floor</td>
+</tr>
+<tr>
+<td><code>--dump=&lt;axis&gt;:&lt;n&gt;</code></td>
+<td>list every mesh with a face on that plane</td>
+</tr>
+<tr>
+<td><code>--seed=&lt;n&gt;</code></td>
+<td>the dressing to measure (default <code>1</code>); vary it to hunt, leave it to compare</td>
+</tr>
+</tbody>
+</table>
+<p>The probe needs <code>three</code>, which the app itself loads from a CDN through the import map in <code>index.html</code>. On first run it fetches that exact pinned version into <code>node_modules/three</code> and caches it there. Nothing else is installed, and there is still no build step. That fetch, the canvas stub that lets a scene module be imported outside a browser, and the seeding above all live in <code>bin/lib/headless-scene.js</code> — shared with the <a href="prop-portraits.html">prop portrait tool</a>, which is the other thing here that runs scene code in Node.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#two-rules-that-make-the-output-readable">Two rules that make the output readable</a></li>
+<li><a href="#reading-a-line">Reading a line</a></li>
+<li><a href="#finding-out-what-a-pair-actually-is">Finding out what a pair actually is</a></li>
+<li><a href="#the-lift">The lift</a></li>
+<li><a href="#the-same-scene-every-time">The same scene every time</a><ul><li><a href="#varying-the-seed-on-purpose">Varying the seed on purpose</a></li></ul></li>
+<li><a href="#the-one-limitation-to-remember">The one limitation to remember</a></li>
+<li><a href="#options">Options</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

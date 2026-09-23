@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Architecture — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html" aria-current="page">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="architecture" tabindex="-1">Architecture</h1>
+<p>How a keystroke in a terminal becomes somebody walking across a room, and where the seams are.</p>
+<h2 id="the-pipeline" tabindex="-1">The pipeline</h2>
+<pre><code>your harness              a hook fires with a JSON payload on stdin
+   │                       ...or, for OpenClaw, an in-process hook bus
+   ▼
+bin/aop-send.cjs          one adapter for every hook-based harness:
+   │  + mappers/*.cjs     payload -&gt; AOP events, tool names -&gt; tool_class,
+   │                      redaction applied here, before anything leaves
+   │
+   │  openclaw-plugin/    the same job for a harness that never spawns a process:
+   │                      a long-lived plugin, so it batches and can heartbeat
+   │                      (both routes share bin/lib/aop-core.cjs)
+   ▼
+server.cjs                the receiver: token-checked ingest, ring buffer,
+   │                      SSE fan-out, replay of sessions still in flight
+   ▼  SSE
+src/data/aop-reducer.js   the one reducer: AOP -&gt; stage directions
+   │                      (&quot;this person arrived&quot;, &quot;they are researching X&quot;,
+   │                       &quot;they are on part 2 of 5&quot;)
+   ▼
+src/data/feeds.js         one feed per source the office selected, merged into
+   │                      one stream: ids namespaced, states summarised
+   ▼
+src/agents/AgentManager.js  stage directions -&gt; behaviour: who has which desk,
+   │                        who walks where, whose post is in the box
+   ▼
+src/agents/states.js      an action queue per character, ticked every frame
+   │
+   ▼
+scene/* and ui/*          meshes, and the panels that describe them
+</code></pre>
+<p>These rules hold that chain together.</p>
+<p><strong>Redaction happens at the near end.</strong> The adapter decides what leaves your machine, not the office and not the server, so a decision about privacy is made once, in the process that already has the secret. See <a href="../user/connect-your-agents.html#how-much-of-your-prompt-the-office-is-told">Sources</a>.</p>
+<p><strong>There is exactly one reducer.</strong> <code>server.cjs</code> holds a ring buffer and nothing else — it does not interpret events, and it does not know what a desk is. All translation from AOP into office behaviour is in <code>src/data/aop-reducer.js</code> — extracted from <code>AopSource</code>, which keeps the transport, precisely so the rules can be tested against recorded streams with fake clocks (<code>test/aop-reducer.test.js</code>) — so there is one place to look when the room disagrees with reality.</p>
+<p><strong>Every source is the same shape.</strong> <code>src/data/AgentSource.js</code> is the interface; <code>MockSource</code> and <code>AopSource</code> both implement it, <code>sources.js</code> declares the six sources and how each is built, and nothing downstream can tell them apart. Optional capabilities are feature-detected rather than branched on by name — that is why <strong>T</strong> vanishes when nothing selected can invent a job, without the UI knowing what a mock is.</p>
+<p><strong>An office is a set of sources, and <code>feeds.js</code> is where that stops mattering.</strong> It starts one feed per selected source, prefixes every id with the feed it came from so two harnesses cannot collide on a session id, and collapses their separate connection states into the one line a pill can hold. Downstream of it there is a single stream of stage directions again, so nothing in the room has to reason about how many harnesses it is looking at — only an agent's own mark and detail panel ever name one.</p>
+<p><strong>The set moves without the room moving.</strong> <code>feeds.sync()</code> takes a new choice of sources and shifts only the difference: feeds still chosen are left running untouched, feeds that went are stopped and dropped, and feeds that arrived are built and started on the spot. Removing a source is not the same as removing its people, so it hands the removed definitions back and <code>AgentManager.showOut()</code> walks those characters out of the building on the ordinary path — desk given back, coat off the stand, lift, door. The office used to answer this by rebuilding the world, which took the building, the furniture and every <em>other</em> feed's agents with it.</p>
+<p><strong>Observation beats the feed where the room can see for itself.</strong> The <a href="../user/the-room.html#the-mid-job-coffee-run">mid-job coffee run</a> is timed by <code>AgentManager</code> counting seated working time, not sent by any harness, so it works for every source including ones that could never report it.</p>
+<p><strong>Appearance changes preserve the running office.</strong> <code>world.changeAppearance()</code> replaces
+the shell, outlook and lights while retaining the world root, furniture handles,
+<code>AgentManager</code>, feeds and UI subscriptions. Palette-key materials repaint the retained
+props; sill planting is rebuilt for the season. Disposal excludes resources still used
+by the retained root. Interior actions and reservations stay intact, walks replan, and
+an agent using a replaced entrance transfers to the new landing with queued work kept.
+An unchanged lift inherits its state. Mail and courier queues continue to deliver once.
+Switching to a different scene still uses full teardown and starts that scene's feeds.</p>
+<h2 id="receiving-events" tabindex="-1">Receiving events</h2>
+<p><code>server.cjs</code> is both the static dev server and the AOP receiver:</p>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Who calls it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST /office/&lt;keycard&gt;/aop/v0/events</code></td>
+<td>Harness adapters, with the URL and token from <code>~/.roving-office/endpoint.json</code></td>
+</tr>
+<tr>
+<td><code>GET /office/&lt;keycard&gt;/aop/v0/stream</code></td>
+<td>The browser, over SSE — one harness at a time with <code>?harness=</code>, or all of them without it (the <a href="developing.html#reading-the-events-as-text">debug log</a>); <code>?after=&lt;cursor&gt;</code> replays from the buffer</td>
+</tr>
+<tr>
+<td><code>GET /office/&lt;keycard&gt;/aop/v0/state</code></td>
+<td>The browser on load, to replay sessions still in flight</td>
+</tr>
+<tr>
+<td><code>GET /office/&lt;keycard&gt;/aop/v0/health</code></td>
+<td>You, wondering whether anything is connected</td>
+</tr>
+<tr>
+<td><code>GET</code>/<code>POST</code> <code>/office/&lt;keycard&gt;/aop/v0/tokens</code>, <code>DELETE .../tokens/&lt;id&gt;</code></td>
+<td>You, adding a second machine to an office or taking one away — each needs a token you already hold</td>
+</tr>
+<tr>
+<td><code>DELETE /office/&lt;keycard&gt;/api</code></td>
+<td>The keycard dialog, closing the office — needs its write token</td>
+</tr>
+<tr>
+<td><code>POST /office/&lt;keycard&gt;/api/passcode</code></td>
+<td>The same dialog setting or clearing a passcode (write token), or a visitor typing one (nothing)</td>
+</tr>
+</tbody>
+</table>
+<p>Every office has its own 2 000-event ring buffer and nothing else, and the surface is gated per route rather than per network: a keycard is enough to <em>watch</em> an office from another device, and not enough to inject agents into one. Reads (<code>/stream</code>, <code>/state</code>, <code>/health</code>) need only the keycard already in the URL; <code>POST /events</code> needs a token as well — either the local receiver's own per-process one from <code>endpoint.json</code>, or one of the office's own write tokens. That second kind is what lets a laptop feed an office running on a server somewhere rather than on the machine the agents are on. An office holds a <em>list</em> of them, so a second machine can be added and one machine taken away without disturbing the others: <code>POST /api/offices</code> returns the first, and <code>GET</code>/<code>POST</code>/<code>DELETE</code> on <code>/office/&lt;keycard&gt;/aop/v0/tokens</code> list, mint and revoke the rest — each requiring a token, never the keycard alone (<a href="protocol/aop-spec.html">aop-spec.md §5.5.1</a>). All reduction from AOP into office behaviour happens in <code>src/data/aop-reducer.js</code>, so there is exactly one reducer in the system.</p>
+<h3 id="owning-an-office-and-the-optional-passcode" tabindex="-1">Owning an office, and the optional passcode</h3>
+<p><strong>Holding an office's write token is the whole of owning it.</strong> There is no account, no sign-up and no user store, and there is not going to be one. <code>POST /api/offices</code> returns the office's first token exactly once, and the browser that asked keeps it in <code>localStorage</code> (<code>src/office/owner.js</code>); the CLI keeps its copy in <code>endpoint.json</code>. Every privileged act asks for that token and nothing else, which is the same rule the token routes above already followed — capability begets capability. For a long time the browser read the keycard out of that response and dropped the token on the floor, so an office cut at reception was permanently unownable: nothing could add a machine to it, revoke a token on it or close it when its link leaked.</p>
+<p>Two acts hang off it, both refused outright on the reserved demo office — asked of the <em>keycard</em> rather than of <code>office.reserved</code>, so the answer does not change depending on whether anything has instantiated that room yet:</p>
+<ul>
+<li><strong><code>DELETE /office/&lt;keycard&gt;/api</code></strong> closes the office, over <code>store.remove()</code>, which already closed the bus and hung up every watcher for the reaper's sake. It revokes everything at once, and it has one property worth knowing: because visiting an unknown keycard <em>creates</em> an office, a closed office cannot 404. The leaked link opens an empty room and whoever kept it is told nothing.</li>
+<li><strong><code>POST /office/&lt;keycard&gt;/api/passcode</code></strong> sets, changes or clears an optional read passcode — <code>scryptSync</code> with a per-office salt, because a passcode is a handful of characters a person chose and the store file sits on a mounted volume. The same route with <em>no</em> token is an unlock attempt.</li>
+</ul>
+<p>A successful unlock is answered with a cookie, and one rule holds the arrangement up: <strong>a seal may only ever admit a read; a write always needs a header token.</strong> Every read it covers is an idempotent GET, so there is no CSRF to have, and <code>handleAop</code> matches the writes <em>above</em> the gate so a write route can never consult one. The seal is <code>HMAC-SHA256(key = the stored passcode digest, msg = the keycard)</code>, which means no new server secret to persist and no session table: it survives a restart, it proves nothing about another office, and changing or clearing the passcode invalidates every browser's copy at once. <code>passcodeOk</code> also passes a write token straight through, so an owner cannot lock themselves out of the room they just locked.</p>
+<p>Guessing is bounded by a <strong>per-office</strong> attempt limiter as well as a per-client one, and the first is the one that matters: the client key is a header behind a proxy and therefore spoofable, while the office key is in the path. Without it a short passcode would be worth nothing however good the KDF, so the limiter and the scrypt parameters are two halves of one control. Only wrong attempts count, and both limiters are checked before the KDF runs — an unmetered attempt route would be a way to spend the server's CPU as well as a way to guess.</p>
+<p><strong>The app shell is deliberately ungated.</strong> <code>index.html</code> is byte-identical for every office, so serving it reveals nothing and the passcode prompt is ordinary client UI reacting to <code>401 {&quot;passcode&quot;: true}</code> (<code>src/ui/passcode-prompt.js</code>). There is no login page and no new template anywhere, which is what keeps <code>/</code> and the demo office out of reach of the gate — the one failure mode this could have had, and the thing <code>test/office-owner.test.js</code> names a test after. <code>?peek</code> degrades to <code>{keycard, reserved, passcode, locked}</code> rather than refusing, because reception uses it to ask whether an office in your history is still there and a 401 there would strike a live office out of the only list that records it exists.</p>
+<p><strong>Creating</strong> an office is the one thing on that surface that needs no credential at all, and it cannot be gated without breaking the product: reception's front door and a link shared before the room exists both depend on it. So it is <em>bounded</em> instead — a sliding-window rate limit per client and across the whole server, and a hard cap on how many offices may exist (<code>lib/rate-limit.cjs</code>, <code>MAX_OFFICES</code> in <code>lib/office-store.cjs</code>). The limits sit at every door that creates a room rather than only on the mint route, because a first <code>GET</code> on an invented keycard and an unauthenticated <code>POST</code> to one both create an office too, and a cap that guarded one of three doors would not be a cap. Every refusal names which limit was hit and when to come back — <code>429</code> for a rate, <code>503</code> for the cap, since a rate is not the problem there — and reception prints that sentence rather than a status code. The defaults, the reasoning behind each number and the <code>ROVING_OFFICE_MAX_OFFICES</code> / <code>ROVING_OFFICE_MINT_*</code> / <code>ROVING_OFFICE_TRUST_PROXY</code> overrides a deployment sets are documented where they are declared, at the top of <code>server.cjs</code> and <code>lib/office-store.cjs</code>.</p>
+<p>Events have to land somewhere in particular, and there is one <code>endpoint.json</code> per machine holding one URL — so exactly one office receives local hooks. That office does not have to be on this machine: <code>node bin/aop-connect.cjs &lt;url&gt;</code> writes the same file pointing at a remote receiver, and <code>AOP_URL</code>/<code>AOP_TOKEN</code> override it for a single shell. Only a server started with <code>--publish</code> writes that file at all — <code>npm run serve</code> does, a bare <code>node server.cjs</code> does not, so the four servers running one per worktree cannot take the feed from the office you are watching. Within a publishing server, the office you open takes the endpoint if any of its scenes wants live agents, which means a glance at the demo office cannot quietly unplug your work; <code>node server.cjs --publish 8080 --office K7F2-9QBX</code> pins it instead. The chip beside the office name is lit when the room you are looking at is the one being fed.</p>
+<p>Adapters read that URL rather than building one, so nothing under <code>bin/</code> or <code>hooks/</code> knows that keycards exist. You can drive the whole thing by hand:</p>
+<pre><code class="language-bash">EP=$(node -p &quot;JSON.stringify(require(require('os').homedir()+'/.roving-office/endpoint.json'))&quot;)
+URL=$(node -p &quot;($EP).url&quot;); TOKEN=$(node -p &quot;($EP).token&quot;)
+curl -s -X POST &quot;$URL&quot; -H &quot;Authorization: Bearer $TOKEN&quot; \
+  -d '{&quot;aop&quot;:&quot;0.1&quot;,&quot;id&quot;:&quot;1&quot;,&quot;type&quot;:&quot;session.start&quot;,&quot;harness&quot;:{&quot;name&quot;:&quot;claude-code&quot;},
+       &quot;session&quot;:{&quot;id&quot;:&quot;S1&quot;,&quot;label&quot;:&quot;hand-rolled&quot;},&quot;payload&quot;:{&quot;source&quot;:&quot;startup&quot;}}'
+</code></pre>
+<p>The unprefixed <code>/aop/v0/*</code> paths remain as an alias for whichever office currently holds the endpoint, so a recipe written before offices had addresses still works.</p>
+<h2 id="where-the-pieces-live" tabindex="-1">Where the pieces live</h2>
+<pre><code>index.html            # the office: canvas, import map, UI overlay
+home.html             # /offices: enter a keycard or open a personal office
+debuglog.html         # the event log: the same header, no canvas and no three.js
+                      #   — and no import map, so nothing it loads may import
+                      #   three at all (test/debuglog-no-three.test.js)
+styles.css            # overlay styling, for all three pages
+favicon.ico           # the tab icon, at the root because that is where a browser
+                      #   looks for one whether or not a page mentions it
+assets/               # the logo, and every size cut from it: the icons the pages
+                      #   link, and the display copies reception and the title bar use
+server.cjs            # static dev server + the AOP receiver (ingest, SSE, replay),
+                      #   one buffer per office, and the office lifecycle with it
+lib/
+  office-store.cjs    # the offices the server knows about: keycards, scenes, sweeping
+  aop-bus.cjs         # per-office event buffer and SSE fan-out
+  avatar-store.cjs    # agent portraits, addressed by the hash of their own bytes:
+                      #   uploaded once by an adapter, shared by every office
+.claude-plugin/
+  plugin.json         # this repo, declared as a Claude Code plugin
+  marketplace.json    # ...and as a one-entry marketplace, so it installs by path
+.codex-plugin/
+  plugin.json         # the same repo declared as a Codex plugin
+plugins/
+  claude/             # the *published* plugin: a versioned archive and the marketplace
+                      #   JSON that pins it, generated and committed because the site
+                      #   serves them and no deploy target may build
+hooks/
+  hooks.json          # shared Claude/Codex hooks; each host reads the names it supports
+bin/
+  aop-send.cjs        # the adapter every hook-based harness calls: payload -&gt; AOP
+  aop-plugin-hook.sh  # selects claude-code or codex-cli for the shared hook manifest
+  aop-node.sh         # finds a Node before running an adapter: a hook launched
+                      #   from the GUI inherits launchd's PATH, not your shell's
+  aop-rovo-install.cjs   # writes/removes the Rovo CLI eventHooks entries
+  aop-claude-install.cjs # installs the plugin, or hooks in Claude's settings.json
+  aop-cursor-install.cjs # writes/removes the user-level Cursor hook commands
+  aop-codex-install.cjs  # installs/removes the local Codex plugin and reports policy
+  aop-openclaw-install.cjs # links openclaw-plugin/ into OpenClaw, sets its config
+  aop-openclaw-pack.cjs  # ...or vendors + tarballs it, for a Gateway with no checkout,
+                         #   copying the installer below out beside the tarball
+  aop-plugin-pack.cjs    # builds the Claude and Codex plugins as distribution
+                         #   artifacts: a pinned zip + the marketplace JSON the site
+                         #   serves, and a Codex marketplace tree (npm run pack:plugins)
+  aop-openclaw-server.sh # runs on that Gateway: mints an office, installs the tarball
+                         #   with --force, sets the config keys that matter
+  gen-colour-names.mjs   # rewrites src/agents/colour-names.js from a pinned release
+  coplanar-probe.js   # headless geometry check for z-fighting (npm run probe)
+  prop-portrait.js    # a PNG of every object on its own, for the docs (npm run portrait)
+  prop-portrait.html  # the studio it drives: one catalogue entry, lit and framed
+  scene-map.js        # a straight-down PNG of each theme's whole city (npm run map)
+  scene-map.html      # the page it drives: environment + lighting + props, no agents
+  lib/
+    cli-args.js       # `--name` and `--name=value`, read the one way every tool
+                      #   in bin/ reads them — no parser dependency, no drift
+    cli-flags.cjs     # `--name` and `--name &lt;value&gt;` — the same job for the aop
+                      #   installers, whose flags carry a path rather than an `=`
+    aop-core.cjs      # the emitter core: which office, what may be said, the POST.
+                      #   shared by the hook adapter and the OpenClaw bridge
+    local-config.cjs  # ~/.roving-office scaffolding shared by every installer
+    pack-audit.cjs    # &quot;does this staged artifact reach outside itself, or import
+                      #   something it forgot to bring&quot; — asked by both packers
+    zip.cjs           # a zip writer with no compressor and no clock, so the archive
+                      #   the marketplace pins is the same bytes on every machine
+    headless-scene.js # three.js + a canvas stub, so tools can run scene modules in Node
+    shutter.js        # find a browser, serve the repo, take the PNG — the recipe both
+                      #   static-scene photographers use (portraits and scene maps)
+  mappers/
+    rovo-cli.cjs      # Rovo hook payloads -&gt; AOP events, tool names -&gt; tool_class
+    claude-code.cjs   # shared hook state machine and Claude's names
+    codex-cli.cjs     # Codex fields/tool names -&gt; that shared state machine
+    cursor.cjs        # Cursor-native hook payloads -&gt; AOP
+    lib/
+      tool-classes.cjs # tool name/command -&gt; tool_class, shared by every mapper
+      todo-steps.cjs   # a harness todo list -&gt; plan + step.start/step.end (spec 4.2).
+                       #   TodoWrite and update_todo are nearly one tool with two names:
+                       #   it holds the list per turn, because Rovo's may arrive as a
+                       #   merge by id rather than a rewrite (adapter notes 4.6)
+      event-shape.cjs  # the per-session bookkeeping record, undefined-stripping for a
+                       #   merge, and the result byte count — same in every mapper
+openclaw-plugin/      # OpenClaw's adapter: a plugin, not a hook. Linked, not copied.
+  openclaw.plugin.json # manifest: activation.onStartup, and the config it accepts
+  index.mjs           # entry: registers ten hooks, never returns a decision
+  lib/
+    map.mjs           # OpenClaw hook payloads -&gt; AOP, including real subagents
+    publisher.mjs     # queue + batch + retry + heartbeat, so a slow office is
+                      #   never a slow agent (OpenClaw awaits hook handlers)
+    shared.mjs        # the only file that reaches up into bin/, so it is the only
+                      #   one the packer rewrites when vendoring for a server
+src/
+  config.js           # the constants a scene is built against: palette,
+                      #   statuses, room shell, windows, camera
+  layout.js           # the furniture: floor plan, stations, obstacle footprints,
+                      #   how many of each kind the room may hold, and the blob
+                      #   the editor exports and imports
+  measure.js          # turning a quantity into a 0-to-1 number: the ramp, band,
+                      #   mean and share every scorer here is built out of
+  ease.js             # its sibling for movement rather than scoring: the lerp
+                      #   and the two easing curves every animation here bends
+                      #   its progress through
+  local-store.js      # what this browser keeps to itself, and the one rule for
+                      #   keeping it: storage is allowed to refuse, and a refusal
+                      #   is never fatal
+  dice.js             # the choices nobody needs to be able to reproduce — a shirt,
+                      #   a thinking pause, a book — as pick, chance, whole, spread
+                      #   and between, one draw each. plan/rng.js is the other kind
+  rovo-mark.js        # the Rovo mark's four polygons, once: scene/standees.js
+                      #   extrudes them into the standee, ui/marks.js draws them
+                      #   as the picker tile. A leaf importing nothing, because
+                      #   the debug log reaches marks.js and must never load
+                      #   three.js (see debuglog.html above); a bare import there
+                      #   is a blank page, and only that page notices
+  main.js             # bootstrap, UI wiring and the render loop
+  world.js            # how a world is assembled and torn down; main decides when
+  fpv.js              # the ride: a perspective lens behind an agent's eyes (press F)
+  host.js             # the control surface for whoever is embedding the office:
+                      #   what a frame may switch off, and how it asks
+  plan/               # the seeded office generator: a seed in, a whole layout out
+    rng.js            # seeds, and the streams a seed hands out — one per stage, hashed
+    brief.js          # what an office wants, before anything is placed
+    floor.js          # the floor plate: rectangles, wall bands, the street it reserves
+    furnish.js        # the test fit: circulation, desks, stations, then the dressing
+    naming.js         # what came out, as a name and as a sentence of reasons
+    reach.js          # can everybody get everywhere — asked of a plan, not of a room
+    index.js          # the check, the retry, and the blob everything else reads
+  editor/
+    editor.js         # the furniture editor: drag the layout, re-route the paths (press E)
+    placement.js      # where a new piece may go, and what the room already cannot reach
+    gizmos.js         # its floor overlays: blocked cells, footprints, selection
+    panel.js          # its strip: selection, snap, export
+    layouts.js        # the layouts this browser has saved — per-browser, like
+                      #   office/recent.js, and never part of the shared office
+    path-trails.js    # its route ribbons: where each walker is going, and was
+  debug/
+    debuglog.js       # the event log page: every arriving event as text, no scene
+    aop-tail.js       # the wire unreduced, every harness at once — what the log reads
+    event-row.js      # one event as one readable line
+    log-filters.js    # the log's filter strip: character, type, sender, free text
+  scene/
+    environment.js    # room shell, themed floor, walls, windows, door, landing
+    exterior.js       # the outlook dispatcher: resolves the mode through the
+                      #   registry and lays the one shared ground plane — it
+                      #   never names an outlook
+    outlooks/
+      index.js        # the outlook registry: every world that can be outside,
+                      #   welded to projects.js's OUTSIDE_MODES at first import
+      street.js       # the corner: sidewalks, roads, park, backdrop skyline
+      skyline.js      # the rooftop field a tower looks down on, and its towers
+      paris.js        # zinc caps, chimney pots, a tower in the haze
+      streetscape.js  # the shared kit: pavement level, trees, lamps, cars,
+                      #   and the seeded RNG that keeps rebuilds still
+      city.js         # low-fi skyline beyond the towers: lit windows painted
+                      #   into a texture, so a building is 4 meshes not ~360
+    plants.js         # the office planting, and the two places it tells the season
+    building.js       # storeys below, for offices above ground level
+    mail.js           # paper-airplane job arrivals (pooled, bezier flight)
+    beam.js           # the cone of light that takes away anybody thirty seconds
+                      #   overdue to leave — the room's floor of last resort
+    courier.js        # package arrivals: a courier in off the street, the stairs or the lift
+    approach.js       # the stoop and the external flight, and the routes over both
+    globe.js          # the bookshelf globe: canvas-drawn world map. Turns for a web
+                      #   look-up in a room with no telescope to do it at
+    props.js          # which props the layout wants, where they stand, and
+                      #   the reconciliation after an edit
+    props/            # the prop registry: one file per piece — its builder,
+                      #   and its own mounting where the common pattern is not
+                      #   enough. index.js names them all, and refuses to load
+                      #   a kind the layout and the registry disagree about
+    kanban.js         # the animated board on every desk's second monitor
+    movables.js       # what makes a prop draggable, and how a removed one
+                      #   gives back what it was holding
+    catalogue.js      # every object, buildable one at a time — for the docs gallery,
+                      #   and read by nothing the running scene depends on
+    build.js          # low-poly geometry helpers, and `put()` — the make-it,
+                      #   place-it, parent-it stanza every prop is kit-bashed from
+    renderer.js       # the office's look — shadow filter, colour space, tone mapping
+                      #   and exposure — so the room, reception's vignette, a prop
+                      #   portrait and a scene map are all pictures of one office
+    camera.js         # constrained isometric camera (orbit, zoom, clamped pan)
+    camera-depth.js   # depth clearance for the foreground, without changing framing
+    camera-view.js    # that camera's place, kept in localStorage: a view is a
+                      #   browser preference, not something an office holds
+    framing.js        # zoom and target for a viewport, because fitting a nearly
+                      #   square room into a wide window wastes a third of it
+    standees.js       # the brand-mark standees, extruded from their own vector
+                      #   artwork rather than kit-bashed like the rest of the room
+    lighting.js       # sun, sky and ambient, driven by the clock and the room's bearing
+    vignette.js       # reception's close-up: one desk, one agent, a corner and a window
+    night-lights.js   # ceiling fittings and street-lamp pools, for after dark
+    path-trails.js    # the editor's route ribbons: where each walker is going, and was
+  agents/
+    Agent.js          # character mesh, name tag, status ring, carryables, work log
+    colour.js         # the shirt palette, and reading a colour somebody described:
+                      #   `Rich red / crimson` -&gt; a name-table match, fitted in OkLab
+                      #   to the range those shirts occupy
+    colour-names.js   # 12,005 colour names (generated; bin/gen-colour-names.mjs),
+                      #   imported only when a description actually turns up
+    mark-texture.js   # a source's SVG mark -&gt; tintable silhouette for the name tag
+    drinks.js         # what each agent drinks, and which station serves it
+    names.js          # names for live sessions, and the mock roster
+    cast.js           # session -&gt; character: who is in the office and what they
+                      #   are called, read by both the room and the debug log so
+                      #   one session can never be two different people. Also
+                      #   where session.actor is honoured (spec 3.2)
+    AgentManager.js   # events -&gt; office behaviour, desk/seat assignment, mail runs
+    pilot.js          # the buttons that drive one agent by hand: a catalogue of the
+                      #   events a feed would have sent, drawn by the detail panel
+                      #   and run by AgentManager.pilot (no behaviours of its own).
+                      #   `Beam up` is the one entry standing in for no event, there
+                      #   being none a harness could send — see beam.js
+    post.js           # what is in the mailbox, whose it is, how big (no Three.js)
+    steps.js          # a job's parts: how far through, and how to say it in one
+                      #   line. Shared by the roster, inspector, HUD and name tag,
+                      #   because four surfaces phrasing it apart is four offices
+    states.js         # action-queue behaviour engine
+    pathfinding.js    # nav grid + A* (extends through the doorway)
+    crowd.js          # standing room at a station, so two people don't share a spot
+  data/
+    AgentSource.js    # pluggable source interface
+    MockSource.js     # simulated agent lifecycle -&gt; the &quot;Test Data&quot; source
+    AopSource.js      # live harness feed: snapshot, SSE and reconnect — the
+                      #   transport that drives the reducer
+    aop-reducer.js    # the one reducer: AOP -&gt; stage directions, clocks and
+                      #   timers injected so a test can drive it
+    feeds.js          # one office, several sources: fan-in, id namespacing,
+                      #   one pill's worth of state for the whole set, and
+                      #   sync() to change the set without rebuilding the room
+    sources.js        # the six sources, their marks and how each one is built
+  projects.js         # authored scenes + themes (floors, palettes, light, outlook)
+  office/
+    office.js         # the office client: its scenes and sources, as the server
+                      #   holds them — the keycard is the whole address
+    keycard.js        # minting and parsing keycards (Crockford base32)
+    new-office.js     # asking the server to cut one: reception's button, and the
+                      #   two places the demo office offers an office of your own
+    recent.js         # the offices this browser has been in — a convenience, not a record
+  wizard.js           # the optional office-entry page: keycards and recent offices
+  time.js             # the world clock: real time, or scrubbed in the scene panel
+  ui/overlay.js       # roster, legend, inspector + work log and the buttons that
+                      #   drive one agent by hand, job delivery feed
+  ui/switcher.js      # scene dropdown in the title bar: a row per scene, each with
+                      #   an inline rename and an arming trash can, plus the row
+                      #   below the divider: &quot;+ New scene&quot;, or the way out of the
+                      #   demo office
+  ui/keycard-chip.js  # the keycard beside the office name: copy it, or leave
+  ui/source-picker.js # centred modal: which sources fill this office (toggle + confirm)
+  ui/source-badge.js  # source + connection pill beside the office name
+  ui/fpv-hud.js       # the first-person panel, vignette and hidden title bar (press F)
+  ui/format.js        # job wording, clock times and durations, shared by the panels
+  ui/compass-dial.js  # which way the room faces, as a dial rather than a slider:
+                      #   a bearing is a circle, and 359 and 1 are two degrees apart
+  ui/place-map.js     # where on earth the room is, picked by pointing — a sun map
+                      #   rather than a world map, since there is no coastline data here
+  ui/canvas-control.js # what both of those need before they can draw: a focusable
+                      #   canvas, a context in CSS pixels on a retina screen, the
+                      #   theme's own ink, and press-and-sweep as a stream of points
+  ui/marks.js         # source marks: real brand vectors where they exist,
+                      #   stylised glyphs where they don't — all inline SVG
+  ui/strip.js         # the bottom strip every panel above and below is built from:
+                      #   host, heading, close button, sections, readouts, segmented
+                      #   controls
+  ui/panel-state.js   # which panels were open, kept in localStorage per browser:
+                      #   the roster, the scene strip and the developer strip come
+                      #   back the way they were left
+  ui/scene-panel.js   # time/lights/season/building strip — the room's own dials
+                      #   (press S)
+  ui/dev-panel.js     # camera readout, the way to the debug log, and the shutter
+                      #   (press V)
+  ui/photo.js         # copies the canvas to the clipboard as a PNG (press C)
+  ui/shortcuts.js     # shortcut registry + the help panel it renders (press ?)
+  ui/dom.js           # the element-with-a-class-and-words factory every panel is
+                      #   built out of, the shared panel-host resolver, and the one ×
+                      #   every panel closes with — see &quot;Every panel closes with the
+                      #   mouse&quot; below
+docs/
+  getting-started.md       # run it, drive it, connect a harness to it
+  the-scene.md             # what every prop, colour and character is for
+  images/objects/*.png     # those portraits: npm run portrait rewrites them
+  buildings-and-themes.md  # the offices, and how a building is put together
+  architecture.md          # this document
+  developing.md            # the loop, the probe and the traps
+  extending.md             # the recipes: a prop, a building, a source, an adapter
+  watching-the-office.md   # for anyone looking at the room: two minutes, no code
+  the-jobs-system.md       # the concepts: what a job is, and why the office has the word
+  editor.md                # the furniture editor: what moves, the blob, baking a layout
+  sources.md               # the source model, redaction, routing, reaping
+  sources/*.md             # one per source: what each can see, and how to install it
+  job-delivery.md          # post, done work and the bin: letters, packages, and who may open which
+  aop-spec.md              # Agent Office Protocol v0 — the wire format harnesses emit
+  aop-harness-adapters.md  # how Claude Code, Rovo CLI, Codex and OpenClaw emit it
+  aop-v0.schema.json       # machine-readable schema for AOP events
+  physics.md               # how characters accelerate, turn and avoid each other
+  coplanar-probe.md        # finding two surfaces fighting for the same plane
+  character-movements.html # every way a character moves, one panel each (bare HTML)
+  item-movements.html      # every catalogue object on a turntable (bare HTML)
+</code></pre>
+<p>Because the layout lives entirely in <code>layout.js</code>, moving a desk automatically moves its chair, its occupant's seat position, and the walkable map around it. That is also what makes <a href="editor.html">the furniture editor</a> small: it drags a prop, writes the number back into the layout, and asks the room to re-derive itself.</p>
+<p>It is what makes <a href="layout-algorithm.html">the layout algorithm</a> possible at all, for the same reason: a whole room is one blob written into that singleton, so a seed can produce an office without a line of scene code knowing it was generated. <code>src/plan/</code> writes positions; everything downstream derives itself from them exactly as it does after a drag.</p>
+<p>The same file says <em>which</em> furniture exists, and how much of it there may be — one mailbox, any number of bookshelves, one agent per desk. Adding a piece writes an instance into the layout and the room reconciles itself against it, so the count of desks is data rather than a number repeated in four places.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../user/watching.html">Watching the office</a> — the end-user view: what a job is and how agents show work</li>
+<li><a href="../user/concepts.html">The jobs system</a> — what the office thinks work <em>is</em>, before any of the machinery</li>
+<li><a href="protocol/aop-spec.html">The Agent Office Protocol</a> — the wire format, and the reduction rules <code>aop-reducer.js</code> implements</li>
+<li><a href="protocol/aop-harness-adapters.html">Adapter notes</a> — what each harness can actually see</li>
+<li><a href="job-delivery.html">Job delivery</a> — the mailbox, which is the most stateful corner of the system</li>
+<li><a href="editor.html">The furniture editor</a> — the layout as a mutable singleton, and what re-derives from it</li>
+<li><a href="extending.html">Extending the office</a> — the four recipes: a prop, an outlook, a source, an adapter</li>
+<li><a href="physics.html">Physics</a> — how a character actually moves along a path</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#the-pipeline">The pipeline</a></li>
+<li><a href="#receiving-events">Receiving events</a><ul><li><a href="#owning-an-office-and-the-optional-passcode">Owning an office, and the optional passcode</a></li></ul></li>
+<li><a href="#where-the-pieces-live">Where the pieces live</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

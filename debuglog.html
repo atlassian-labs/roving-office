@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event log · The Roving Office</title>
+  <!-- Absolute, not relative: this page is served from /office/<keycard>/debuglog,
+       and "./styles.css" would be looked for inside the office. -->
+  <link rel="stylesheet" href="/styles.css" />
+  <!-- The icon set, absolute for the same reason the stylesheet is. /favicon.ico is
+       the one a browser asks for whether or not a page mentions it, so it lives at
+       the root and carries 16/32/48 in the one file; the PNG is what everything
+       modern prefers, and the touch icon is what iOS puts on a home screen.
+       All sizes are exported from assets/logo.png. -->
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <!-- No import map, and that absence is the feature. This page answers "what is
+       actually arriving?", and it has to answer it on a machine where the room is
+       too slow, too dark or too broken to read — so it draws no scene, opens no
+       WebGL context and never loads three.js. See src/debuglog.js. -->
+</head>
+<body class="debuglog">
+  <!-- The same header as the office, element for element, so switching between the
+       room and the log is not switching between two products. It is the real
+       #title-bar with the real components in it (src/ui/switcher.js and friends);
+       only its positioning differs, because this page is a document you scroll
+       rather than an overlay on a canvas. -->
+  <header id="title-bar">
+    <div class="brand">
+      <!-- Back to reception, where a keycard is entered or minted. The mark is inside
+           the anchor rather than beside it: one link, so there are not two adjacent
+           targets pointing at the same page for a keyboard to tab through. -->
+      <h1><a href="/"><img class="brand-mark" src="/assets/logo-64.png" alt="" width="64" height="64" />The Roving Office</a></h1>
+      <!-- The office's keycard: its whole address, and the only way back into it.
+           Built by src/ui/keycard-chip.js. -->
+      <div id="keycard-chip" class="keycard-chip"></div>
+      <!-- Scene switcher is built by src/ui/switcher.js -->
+      <div id="scene-switcher" class="switcher"></div>
+      <!-- Which sources this scene listens to, and whether they are connected.
+           Filled in by src/ui/source-badge.js. -->
+      <div id="source-badge" class="source-badge"></div>
+      <!-- The way back into the room this log belongs to. -->
+      <a id="to-office" class="linkout" href="./">View the office</a>
+    </div>
+  </header>
+
+  <main id="debuglog">
+    <!-- The controls strip and the log itself are both built by src/debuglog.js:
+         every row in here is generated, so there is no markup worth stating twice. -->
+    <div id="log-controls" class="log-controls"></div>
+    <div id="log-filters" class="log-filters"></div>
+    <ol id="log-rows" class="log-rows" aria-live="off"></ol>
+    <div id="log-empty" class="log-empty"></div>
+  </main>
+
+  <!-- Source picker modal: the host is its own backdrop and src/ui/source-picker.js
+       fills in the card, exactly as in the office. -->
+  <div id="source-picker" class="hidden"></div>
+
+  <script type="module" src="/src/debug/debuglog.js"></script>
+</body>
+</html>

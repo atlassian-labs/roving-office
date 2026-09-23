@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Astra experiments — before and after</title>
+<style>
+:root{color-scheme:light;--ink:#203038;--muted:#65747a;--line:#d9dfdf;--paper:#f4f6f5;--blue:#245ece;--green:#23624e;--amber:#805b13}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #80aaff;outline-offset:3px}button{color:inherit}main{max-width:1500px;margin:auto;padding:32px 32px 64px}.eyebrow{font-size:11px;font-weight:750;letter-spacing:.14em;color:var(--muted)}h1{font-size:34px;line-height:1.15;letter-spacing:-.035em;margin:8px 0 12px}h2{font-size:20px;margin:0}.intro{max-width:900px;color:var(--muted);margin:0}.stats{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}.stat{display:flex;align-items:baseline;gap:8px;background:white;border:1px solid var(--line);border-radius:8px;padding:10px 16px}.stat strong{font-size:23px;line-height:1}.stat span{font-size:13px;color:var(--muted)}.method{padding:14px 18px;background:#eaf0f9;border-left:3px solid #7095d0;border-radius:0 7px 7px 0;font-size:13px;max-width:1100px}.method p{margin:0}.method p+p{margin-top:4px}.source{font-size:12px;color:var(--muted);margin-top:14px}.source summary{cursor:pointer}.source p{margin:6px 0}code{font:12px ui-monospace,SFMono-Regular,monospace;color:var(--ink)}.toolbar{margin:28px 0 16px;background:var(--paper)}.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:16px}.tab{border:0;border-bottom:3px solid transparent;background:transparent;padding:10px 16px;font-weight:650;color:var(--muted)}.tab[aria-selected=true]{border-color:var(--blue);color:var(--blue)}.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.search{flex:1;min-width:180px;max-width:400px}input[type=search],select{width:100%;padding:10px 12px;border:1px solid #cbd4d5;border-radius:7px;background:white;color:var(--ink)}select{width:auto;min-width:200px}.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.chip,.small-button{border:1px solid var(--line);border-radius:7px;background:white;padding:6px 12px;font-size:13px}.chip[aria-pressed=true]{background:#263d49;color:white;border-color:#263d49}.results{font-size:13px;color:var(--muted);margin:15px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.card{min-width:0;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}.card-header{display:flex;align-items:flex-start;gap:12px;padding:17px 18px 13px;justify-content:space-between}.card-header h2{font-size:18px;line-height:1.25}.category{font-size:11px;color:var(--muted);margin-bottom:4px;letter-spacing:.05em;text-transform:uppercase}.badge{white-space:nowrap;border:1px solid transparent;border-radius:5px;padding:3px 7px;font-size:10px;font-weight:750;letter-spacing:.025em}.attempted{background:#e7f2ec;color:var(--green);border-color:#cce0d3}.partial{background:#fbf1d8;color:var(--amber);border-color:#eadbb8}.pending{background:#eff1f2;color:#59666d;border-color:#dfe3e5}.lighting{background:#e8effc;color:#315aa0;border-color:#d1ddf3}.pair{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}.image-button{display:block;border:0;padding:0;background:#e7e9e8;position:relative;overflow:hidden;text-align:left;min-width:0}.image-button img{display:block;width:100%;aspect-ratio:1.2;object-fit:contain;transition:transform .18s}.image-button:hover img{transform:scale(1.035)}.image-label{position:absolute;top:10px;left:10px;border:1px solid #d4dada;background:#fffffff0;border-radius:4px;font-size:10px;font-weight:700;padding:3px 7px;color:#4c5d65}.after-label{color:#234d85}.card-note{padding:14px 18px 16px;font-size:13px;color:var(--muted);display:flex;gap:16px;align-items:flex-start}.card-note p{margin:3px 0 0}.focus{font-weight:650;color:var(--ink)}.enlarge{border:0;background:transparent;color:var(--blue);padding:0;white-space:nowrap;font-size:12px;margin-left:auto}.empty{padding:40px;border:1px dashed #bac5c9;text-align:center;border-radius:9px;color:var(--muted)}[hidden]{display:none!important}.scenes .grid{grid-template-columns:1fr}.scenes .image-button img{aspect-ratio:1.6}.footer{margin-top:32px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:16px}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}dialog{width:min(1500px,96vw);max-height:94vh;border:1px solid var(--line);border-radius:12px;padding:0;background:white;color:var(--ink)}dialog::backdrop{background:#18242bba;backdrop-filter:blur(3px)}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px;border-bottom:1px solid var(--line)}.modal-title{display:flex;align-items:center;gap:14px}.close{border:0;background:#eef1f1;border-radius:50%;font-size:24px;width:34px;height:34px;line-height:1}.modal-tools{padding:12px 22px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.modal-tools button[aria-pressed=true]{background:#263d49;color:white;border-color:#263d49}.nav{margin-left:auto;display:flex;gap:8px}.modal-pair{background:#e7e9e8;display:grid;grid-template-columns:1fr 1fr;gap:1px}.modal-pair figure{margin:0;position:relative;min-width:0}.modal-pair img{width:100%;display:block;object-fit:contain;max-height:65vh}.modal-note{margin:0;padding:16px 22px;font-size:14px;color:var(--muted)}.wipe{position:relative;background:#e7e9e8;max-width:1000px;margin:auto;--split:50%}.wipe img{width:100%;display:block;max-height:60vh;object-fit:contain}.wipe .over{position:absolute;inset:0;width:100%;height:100%;clip-path:inset(0 0 0 var(--split))}.wipe::after{content:"";position:absolute;left:var(--split);top:0;bottom:0;border-left:2px solid #245ece;pointer-events:none}.range{max-width:1000px;padding:10px 20px;margin:auto;display:flex;gap:14px;align-items:center;font-size:12px}.range input{flex:1;accent-color:var(--blue)}@media(max-width:850px){main{padding:24px 16px 40px}.grid{grid-template-columns:1fr}h1{font-size:28px}.stat{padding:9px 12px}.modal-title{align-items:flex-start;flex-direction:column;gap:5px}.modal-pair{grid-template-columns:1fr}.modal-pair img{max-height:50vh}.modal-head{padding:14px}.card-note{gap:8px}.nav{margin-left:0}.source code{word-break:break-all}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="main">
+  <header>
+    <div class="eyebrow">The Roving Office · Astra experiments</div>
+    <h1>Before &amp; after</h1>
+    <p class="intro">A visual inventory of the first pass: what was attempted, what changed only in part, and what is still untouched. Select any pair for a larger view or a sliding comparison.</p>
+    <div class="stats" id="stats"></div>
+    <div class="method">
+      <p><strong>Objects:</strong> both sides use identical studio lighting, camera, scale, time and seeded dressing. This isolates changes to geometry and materials.</p>
+      <p><strong>Scenes:</strong> both sides use the same camera, season and hour. Each pair describes the scope of that experiment.</p>
+      <p><strong>“Attempted” means a first pass, not finished or approved.</strong> Plant changes are labelled partial because only their pots were worked on.</p>
+    </div>
+    <details class="source"><summary>Snapshot details and coverage</summary><p id="sources"></p><p>Embedded renderings: the file works offline and does not need a running office. Poses and screens are frozen for comparison. Scene views cover the architecture and surroundings; object inventories, when included, cover the whole catalogue.</p></details>
+  </header>
+  <section class="toolbar" aria-label="Comparison filters">
+    <div class="tabs" role="tablist" aria-label="Comparison type">
+      <button class="tab" id="objects-tab" role="tab" aria-selected="true">Objects</button>
+      <button class="tab" id="scenes-tab" role="tab" aria-selected="false">Scenes &amp; lighting</button>
+    </div>
+    <div class="filters">
+      <label class="search"><span class="sr-only">Search objects</span><input type="search" id="search" placeholder="Find a desk, plant, building…"></label>
+      <label><span class="sr-only">Category</span><select id="category"><option value="all">All categories</option></select></label>
+    </div>
+    <div class="chips" id="statuses" aria-label="Attempt status"></div>
+  </section>
+  <div id="results" class="results" aria-live="polite"></div>
+  <div id="grid" class="grid"></div>
+  <p id="empty" class="empty" hidden>No matches. Try a different search or choose All objects.</p>
+  <footer class="footer">Rendered from the Roving Office source models. The page records the experiment at the revisions above; later changes require regenerating the report.</footer>
+</main>
+<dialog id="viewer" aria-labelledby="viewer-title">
+  <div class="modal-head"><div class="modal-title"><h2 id="viewer-title"></h2><span class="badge" id="viewer-status"></span></div><button class="close" id="close" aria-label="Close comparison">×</button></div>
+  <div class="modal-tools"><button class="small-button" id="side-mode" aria-pressed="true">Side by side</button><button class="small-button" id="wipe-mode" aria-pressed="false">Slide comparison</button><div class="nav"><button class="small-button" id="previous">← Previous</button><button class="small-button" id="next">Next →</button></div></div>
+  <div class="modal-pair" id="modal-pair"><figure><img id="large-before" alt=""><figcaption class="image-label">BEFORE</figcaption></figure><figure><img id="large-after" alt=""><figcaption class="image-label after-label">CURRENT ATTEMPT</figcaption></figure></div>
+  <div id="wipe-container" hidden><div class="wipe" id="wipe"><img id="wipe-before" alt=""><img id="wipe-after" class="over" alt=""></div><label class="range">Before<input id="divider" type="range" min="0" max="100" value="50" aria-label="Comparison divider position">Current</label></div>
+  <p id="viewer-note" class="modal-note"></p>
+</dialog>
+<script id="comparison-data" type="application/json">/*__COMPARISON_DATA__*/</script>
+<script>
+const data = JSON.parse(document.getElementById('comparison-data').textContent);
+const $ = id => document.getElementById(id);
+const names = {attempted:'ATTEMPTED',partial:'PARTIAL · POT ONLY',pending:'NOT ATTEMPTED',lighting:'LIGHTING ONLY'};
+const categories = Object.fromEntries(data.groups.map(g=>[g.id,g.label]));
+const counts = Object.fromEntries(['attempted','partial','pending'].map(s=>[s,data.objects.filter(o=>o.status===s).length]));
+if(!data.scenes.length)$('scenes-tab').hidden=true;
+let tab=data.objects.length?'objects':'scenes',status='all',city='all',visible=[],current=0;
+const node = (tag,cls,text) => {const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;};
+for(const [value,label] of [[data.objects.length,'objects'],[counts.attempted,'attempted'],[counts.partial,'partial'],[counts.pending,'not attempted'],[data.scenes.length,'scene pairs']]){
+  if(!data.objects.length && label!=='scene pairs')continue;
+  const stat=node('div','stat');stat.append(node('strong','',value),node('span','',label));$('stats').append(stat);
+}
+if(!data.objects.length){
+  document.querySelector('h1').textContent=data.title||'Alder Street · a greener city';
+  document.title=document.querySelector('h1').textContent+' · Astra experiments';
+  document.querySelector('.intro').textContent='Experiments in connected streets, generous parks and planted buildings. Compare the office view, neighbourhood, street plan, evening, winter and a turned camera.';
+  document.querySelector('.method p').hidden=true;
+  document.querySelector('.method p:last-child').textContent='“Attempted” means an initial treatment. Each city is ready to review; this does not mark its design as finished.';
+  document.querySelector('.search .sr-only').textContent='Search city views';
+  $('search').placeholder='Find a city, winter, street plan…';
+  $('empty').textContent='No matches. Try a different search or choose All cities.';
+  $('objects-tab').hidden=true;
+  if(data.cities?.length>1){
+    const picker=node('select');picker.setAttribute('aria-label','City');
+    for(const entry of [{id:'all',label:'All cities'},...data.cities]){const option=node('option','',entry.label);option.value=entry.id;picker.append(option);}
+    picker.addEventListener('change',()=>{city=picker.value;render();});document.querySelector('.filters').append(picker);
+  }
+}
+$('sources').append('Before: ',node('code','',data.revisions.before.slice(0,12)),' · Current: ',node('code','',data.revisions.after.slice(0,12)),` · Generated ${new Date(data.generated).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}.`);
+for(const group of data.groups){const option=node('option','',group.label);option.value=group.id;$('category').append(option);}
+for(const [key,label] of [['all',`All objects · ${data.objects.length}`],['attempted',`Attempted · ${counts.attempted}`],['partial',`Partial · ${counts.partial}`],['pending',`Not attempted · ${counts.pending}`]]){
+  const button=node('button','chip',label);button.dataset.status=key;button.setAttribute('aria-pressed',String(key===status));button.addEventListener('click',()=>{status=key;render();});$('statuses').append(button);
+}
+function render(){
+  const query=$('search').value.trim().toLowerCase();
+  visible=data[tab].filter(item=>(tab==='scenes'||status==='all'||item.status===status)&&(tab==='scenes'||$('category').value==='all'||item.group===$('category').value)&&(tab!=='scenes'||city==='all'||item.building===city)&&`${item.label} ${item.focus} ${item.notes}`.toLowerCase().includes(query));
+  if(tab==='objects')visible.sort((a,b)=>({attempted:0,partial:1,pending:2}[a.status])-({attempted:0,partial:1,pending:2}[b.status]));
+  $('grid').replaceChildren();
+  $('main').classList.toggle('scenes',tab==='scenes');
+  $('statuses').hidden=tab==='scenes';$('category').parentElement.hidden=tab==='scenes';
+  $('objects-tab').setAttribute('aria-selected',String(tab==='objects'));$('scenes-tab').setAttribute('aria-selected',String(tab==='scenes'));
+  document.querySelectorAll('[data-status]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.status===status)));
+  $('results').textContent=tab==='scenes'?`${visible.length} scene pairs · matching views of the two snapshots`:`${visible.length} of ${data.objects.length} objects · matched studio lighting on both sides`;
+  $('empty').hidden=visible.length!==0;
+  visible.forEach((item,index)=>{
+    const card=node('article','card');card.id=`object-${item.id}`;
+    const head=node('div','card-header'),title=node('div');title.append(node('div','category',categories[item.group]||'Whole scene'),node('h2','',item.label));head.append(title,node('span',`badge ${item.status}`,names[item.status]));
+    const pair=node('div','pair');
+    for(const side of ['before','after']){
+      const button=node('button','image-button');button.setAttribute('aria-label',`Enlarge ${item.label} comparison`);
+      const img=node('img');img.src=item[side];img.alt=`${item.label}, ${side==='before'?'before experiments':'current attempt'}`;img.loading='lazy';img.decoding='async';
+      button.append(img,node('span',`image-label ${side==='after'?'after-label':''}`,side==='before'?'BEFORE':'CURRENT ATTEMPT'));button.addEventListener('click',()=>openItem(index));pair.append(button);
+    }
+    const note=node('div','card-note'),text=node('div');text.append(node('span','focus',item.focus),node('p','',item.notes));const more=node('button','enlarge','Enlarge ↗');more.addEventListener('click',()=>openItem(index));note.append(text,more);card.append(head,pair,note);$('grid').append(card);
+  });
+}
+function openItem(index){
+  current=(index+visible.length)%visible.length;const item=visible[current];
+  $('viewer-title').textContent=item.label;$('viewer-note').textContent=item.notes;
+  $('viewer-status').className=`badge ${item.status}`;$('viewer-status').textContent=names[item.status];
+  for(const side of ['before','after'])for(const prefix of ['large','wipe']){const img=$(`${prefix}-${side}`);img.src=item[side];img.alt=`${item.label}, ${side}`;}
+  $('divider').value=50;$('wipe').style.setProperty('--split','50%');
+  if(!$('viewer').open)$('viewer').showModal();
+}
+function mode(wipe){$('modal-pair').hidden=wipe;$('wipe-container').hidden=!wipe;$('side-mode').setAttribute('aria-pressed',String(!wipe));$('wipe-mode').setAttribute('aria-pressed',String(wipe));}
+$('objects-tab').addEventListener('click',()=>{tab='objects';render();});$('scenes-tab').addEventListener('click',()=>{tab='scenes';render();});
+$('search').addEventListener('input',render);$('category').addEventListener('change',render);
+$('close').addEventListener('click',()=>$('viewer').close());$('side-mode').addEventListener('click',()=>mode(false));$('wipe-mode').addEventListener('click',()=>mode(true));
+$('divider').addEventListener('input',()=>$('wipe').style.setProperty('--split',`${$('divider').value}%`));
+$('previous').addEventListener('click',()=>openItem(current-1));$('next').addEventListener('click',()=>openItem(current+1));
+$('viewer').addEventListener('click',e=>{if(e.target===$('viewer')){const r=$('viewer').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('viewer').close();}});
+document.addEventListener('keydown',e=>{if(!$('viewer').open||e.target.tagName==='INPUT')return;if(e.key==='ArrowRight')openItem(current+1);if(e.key==='ArrowLeft')openItem(current-1);});
+render();
+</script>
+</body>
+</html>

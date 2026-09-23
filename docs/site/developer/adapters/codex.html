@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Codex — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html" aria-current="page">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="codex-adapter" tabindex="-1">Codex adapter</h1>
+<p><em>Installing it is <a href="../../user/sources/codex.html">Codex</a>. This is the mapper, the staging
+trap, and the two gaps in the contract.</em></p>
+<p><code>bin/mappers/codex-cli.cjs</code> shares the proven Claude state machine and only normalises the
+places their contracts differ: turn ids, built-in tool names, plans and patches. Full
+reasoning and the alternatives to hooks are in
+<a href="../protocol/aop-harness-adapters.html#3-codex-cli">adapter notes §3</a>.</p>
+<h2 id="hook-aop" tabindex="-1">Hook → AOP</h2>
+<table>
+<thead>
+<tr>
+<th>Codex hook</th>
+<th>AOP event</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SessionStart</code> / <code>SessionEnd</code></td>
+<td><code>session.start</code> / <code>session.end</code></td>
+</tr>
+<tr>
+<td><code>UserPromptSubmit</code> / <code>Stop</code></td>
+<td><code>turn.start</code> / <code>turn.end</code></td>
+</tr>
+<tr>
+<td><code>PreToolUse</code> / <code>PostToolUse</code></td>
+<td><code>tool.start</code> / <code>tool.end</code></td>
+</tr>
+<tr>
+<td>successful <code>apply_patch</code></td>
+<td><code>artifact.change</code></td>
+</tr>
+<tr>
+<td>successful <code>update_plan</code></td>
+<td><code>step.start</code> / <code>step.end</code></td>
+</tr>
+<tr>
+<td><code>PermissionRequest</code></td>
+<td><code>permission.request</code></td>
+</tr>
+<tr>
+<td><code>PreCompact</code></td>
+<td><code>context.compact</code></td>
+</tr>
+<tr>
+<td><code>SubagentStart</code> / <code>SubagentStop</code></td>
+<td>real child <code>session.start</code> / <code>session.end</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>Bash</code>, <code>apply_patch</code>, <code>update_plan</code>, <code>request_user_input</code>, <code>spawn_agent</code> and <code>view_image</code>
+are normalised onto the tool classes the room already understands. MCP and future tools
+fall through the shared classifier.</p>
+<p>The explicit <code>SessionEnd</code> capability is what gets an idle Codex character the office's
+patient lifecycle rather than the five-minute fallback.</p>
+<h2 id="what-the-contract-does-not-give-us" tabindex="-1">What the contract does not give us</h2>
+<p><strong>No <code>permission.resolve</code>.</strong> Codex has no hook telling an observer how a permission request
+was resolved, so the mapper does not claim it. It has no notification or idle-heartbeat
+hook either.</p>
+<p><strong><code>PostToolUse</code> carries Bash output but not its exit status.</strong> A quiet failed command is
+therefore indistinguishable from a successful command that printed nothing, and <strong>the
+adapter does not guess from error-looking text.</strong> That is a deliberate refusal: inferring
+failure from output would mean the room crumpling paper into the bin on the strength of a
+regex.</p>
+<p><strong>Subagent hooks identify the parent session but not the tool call that spawned it</strong>, so
+the ghost is real but cannot be tied to an exact <code>spawn_agent</code> call — unlike Claude, which
+carries <code>parent_tool_use_id</code>.</p>
+<p><strong>Hosted <code>WebSearch</code> is not exposed as a tool hook</strong>, so that one activity is invisible
+even while the rest of a turn is live.</p>
+<h2 id="the-staging-step-and-why-a-worktree-needs-it" tabindex="-1">The staging step, and why a worktree needs it</h2>
+<p>The installer stages this checkout as a small, <strong>non-Git</strong> marketplace under
+<code>~/.roving-office/codex-marketplaces/</code>, then installs <code>roving-office@roving-office</code>.</p>
+<p>That indirection is load-bearing in a worktree: <strong>Codex clones a Git-backed local source at
+its default branch</strong>, which would silently install <code>main</code> instead of the branch being
+tested. Staging a non-Git directory is what stops that.</p>
+<p>Installation is a snapshot, so plugin changes ship with a fresh version and
+<code>npm run connect:codex</code>. When the plugin is already present, the installer removes its
+immutable cache and marketplace registration before adding the current staged snapshot —
+Codex's idempotent <code>plugin add</code> alone would leave an older snapshot in place.</p>
+<p><strong>A thread keeps the versioned plugin root it loaded at startup</strong>, so the installer
+preserves the previous cache directory when refreshing: already-open threads keep working
+on their old snapshot while new threads load the new one.</p>
+<h3 id="a-published-marketplace-is-a-repository-not-a-file" tabindex="-1">A published marketplace is a repository, not a file</h3>
+<p>Codex takes a marketplace as a local path, <code>owner/repo</code>, or a Git URL — and nothing else.
+There is no equivalent of the archive URL Claude Code accepts, so a published Codex plugin
+needs something to clone. <code>npm run pack:plugins</code> builds that something:
+<code>plugins/codex/</code> is a complete distribution repository, <code>.agents/plugins/marketplace.json</code>
+at its root with <code>&quot;source&quot;: &quot;./&quot;</code>, which is correct there for the same reason the staging
+step above exists — the marketplace root and the plugin root are one directory.</p>
+<p>Everything up to the push is built and verified, including a real
+<code>codex plugin marketplace add</code> against the generated tree in a throwaway <code>CODEX_HOME</code>.
+Only the public repository is missing. See
+<a href="../plugin-distribution.html">publishing the plugins</a>.</p>
+<h2 id="verifying-against-a-local-office" tabindex="-1">Verifying against a local office</h2>
+<p>Use an office of your own. <code>TEST-0000</code> deliberately disables every source that needs an
+adapter, so it cannot be turned into a Codex or mixed-source office.</p>
+<pre><code class="language-bash">node server.cjs 8082 --publish --office ABCD-1234
+npm run connect:codex
+npm run connect:codex:status
+</code></pre>
+<p>The status output names both answers that matter: the installed plugin version and the
+exact <code>.../office/&lt;keycard&gt;/aop/v0/events</code> receiver. Remove <code>/aop/v0/events</code> to get the URL
+to open in a browser.</p>
+<p><strong>The endpoint is machine-wide and read on every hook</strong>, so repointing the server at a
+different keycard needs no reinstall and no Codex restart. Installing new hook <em>code</em> is
+different: start a new thread, open <code>/hooks</code>, and trust the new snapshot. An exit code
+<code>127</code> means the registered command could not be launched — compare the version in <code>/hooks</code>
+with <code>connect:codex:status</code> first.</p>
+<h2 id="managed-installations" tabindex="-1">Managed installations</h2>
+<p>An administrator can set <code>allow_managed_hooks_only = true</code> in <code>requirements.toml</code>.
+<code>connect:codex</code> and <code>connect:codex:status</code> check the known policy locations and warn when
+they can see it; <strong>a local plugin cannot bypass it</strong>, and in that environment the command
+has to be deployed as a managed hook.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../protocol/aop-harness-adapters.html#3-codex-cli">Adapter notes §3</a> — the event-by-event reasoning</li>
+<li>Codex's own contracts: <a href="https://learn.chatgpt.com/docs/hooks">hooks</a> · <a href="https://developers.openai.com/plugins/build/plugins">plugin packaging</a></li>
+<li><a href="../extending.html#add-a-harness-adapter">Extending the office</a> — writing another one</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#hook-aop">Hook → AOP</a></li>
+<li><a href="#what-the-contract-does-not-give-us">What the contract does not give us</a></li>
+<li><a href="#the-staging-step-and-why-a-worktree-needs-it">The staging step, and why a worktree needs it</a><ul><li><a href="#a-published-marketplace-is-a-repository-not-a-file">A published marketplace is a repository, not a file</a></li></ul></li>
+<li><a href="#verifying-against-a-local-office">Verifying against a local office</a></li>
+<li><a href="#managed-installations">Managed installations</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

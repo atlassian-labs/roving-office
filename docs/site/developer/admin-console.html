@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The admin console — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html" aria-current="page">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="the-admin-console" tabindex="-1">The admin console</h1>
+<p>A password-gated page of summary statistics about one deployment: how many offices have
+been opened and closed, how many harnesses have successfully connected, how much work has
+been delivered and finished, and what people set their rooms to look like.</p>
+<p><img src="../images/admin-console-sample.png" alt="The admin console with sample figures: the small print, the headline numbers and the first chart"></p>
+<blockquote>
+<p><strong>Every number in that picture is invented.</strong> It is a server deliberately seeded with
+fifteen days of made-up counters — including a two-day gap — so that the charts have
+something in them to look at. It is nobody's traffic, and this project has published no
+usage figures. A real instance on its first day shows zeros and a one-day axis, which is
+the honest and much less interesting picture.</p>
+</blockquote>
+<p>The label is in three places on purpose — this caption, the image's alt text, and the
+file's own name (<code>admin-console-sample.png</code>) — because a screenshot gets copied out of the
+page it was captioned in, and the filename is the only one of the three that travels with
+it. In a public repository a committed screenshot of invented figures would otherwise read
+as real usage.</p>
+<p>Note what is at the top of the page: not a number, but the list of what these numbers
+cannot tell you. That panel is the most important thing on the console, for the reason
+<a href="#what-is-recorded-and-what-cannot-be">given below</a>.</p>
+<p>It is an <strong>operator</strong> surface, not a user one. Nothing in it is about an individual
+office, and there is deliberately no way to make it be.</p>
+<pre><code>&lt;your path&gt;                    the console
+&lt;your path&gt;/api/session        POST to sign in, DELETE to sign out
+&lt;your path&gt;/api/stats          GET the numbers (signed in only)
+</code></pre>
+<h2 id="it-does-not-exist-unless-you-configure-it-and-that-takes-two-variables" tabindex="-1">It does not exist unless you configure it — and that takes two variables</h2>
+<pre><code class="language-bash">ROVING_OFFICE_ADMIN_PASSWORD='something long that only you know' \
+ROVING_OFFICE_ADMIN_PATH=/a-word-nobody-would-guess \
+  npm start
+</code></pre>
+<p>Both come from the environment and neither has a default. <strong>Either one missing and every
+request that could have reached the console answers 404 with the body <code>Not found</code></strong>,
+byte-identical to a missing static file. Not 401: a deployment that has not asked for an
+admin surface should not advertise one. The console's own files live in <code>admin/</code> and the
+static file server refuses that directory outright, so there is no second way to reach
+them.</p>
+<p>Choose the password as you would any other single credential protecting a whole
+deployment. It is not the office passcode: that one guards one room and is short because a
+person reads it off a card, while this one guards a whole server's statistics and is typed
+from a password manager.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ROVING_OFFICE_ADMIN_PASSWORD</code></td>
+<td><em>(none — console absent)</em></td>
+<td>The password. Environment only.</td>
+</tr>
+<tr>
+<td><code>ROVING_OFFICE_ADMIN_PATH</code></td>
+<td><em>(none — console absent)</em></td>
+<td>Where it answers. Environment only.</td>
+</tr>
+<tr>
+<td><code>ROVING_OFFICE_ADMIN_PER_CLIENT</code></td>
+<td>5</td>
+<td>Wrong passwords one caller may offer per window.</td>
+</tr>
+<tr>
+<td><code>ROVING_OFFICE_ADMIN_PER_SERVER</code></td>
+<td>15</td>
+<td>Wrong passwords the server hears from everybody.</td>
+</tr>
+<tr>
+<td><code>ROVING_OFFICE_ADMIN_WINDOW_MS</code></td>
+<td>600000</td>
+<td>The window both count over.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-path-is-not-a-security-control" tabindex="-1">The path is not a security control</h3>
+<p><strong>The password is.</strong> The path's only job is keeping the console out of casual discovery
+and out of the bot scans that walk a wordlist of common admin addresses. It survives being
+guessed, shoulder-read or found in a log, because everything behind it still needs the
+password — so do not let a clever path talk you into a weaker one.</p>
+<p>Two things follow from that, and both are deliberate:</p>
+<ul>
+<li><strong>The path is not written down in this repository, and cannot be.</strong> This code is
+published, so any &quot;obscure&quot; path compiled into the source would be published with it —
+one address, readable out of the tree, shared by every deployment in the world. Only an
+operator's own path is not public knowledge. That is why there is no default rather than
+a default somebody might leave in place.</li>
+<li><strong>It is not derived from the password</strong>, not even through a hash. A path travels where a
+password must never go: server access logs, browser history, and a <code>Referer</code> header on
+any link followed from the page. Anything computed from the secret would be depositing a
+function of it in all three.</li>
+</ul>
+<p>A path that is not a path, or one that would shadow the app's own routes (<code>/office</code>,
+<code>/api</code>, <code>/docs</code> and the rest), is refused — and refused by <strong>leaving the console absent</strong>
+rather than by failing to boot. A mistyped admin path must not be able to stop anybody's
+room from loading, and &quot;no console&quot; is the safe direction to fail in. The reason is printed
+at start-up; the path itself is printed too, since it is not the secret, and the password
+never is.</p>
+<p>Only wrong attempts count — a correct one is refunded — so a typo costs nothing once you
+get it right. The per-server limit is the one that matters: there is exactly one admin
+password, so &quot;this password&quot; and &quot;this server&quot; are the same target, and a caller rotating
+a forwarded-for header cannot sidestep it.</p>
+<p>Changing either variable and restarting invalidates every signed-in session. That is the
+whole of rotation here.</p>
+<h2 id="how-it-is-secured" tabindex="-1">How it is secured</h2>
+<p>Everything reuses machinery that was already here rather than introducing a second of
+anything:</p>
+<ul>
+<li><strong>One key derivation.</strong> <code>deriveKey</code> in <a href="https://github.com/atlassian-labs/roving-office/blob/main/lib/office-store.cjs"><code>lib/office-store.cjs</code></a>
+is the project's only <code>scrypt</code> call site, shared with the per-office passcode. <code>sameDigest</code>
+beside it is the only constant-time compare. A secret is never compared with <code>===</code>.</li>
+<li><strong>The existing limiter</strong>, <a href="https://github.com/atlassian-labs/roving-office/blob/main/lib/rate-limit.cjs"><code>lib/rate-limit.cjs</code></a>, used exactly
+as the per-office unlock route uses it: two limiters, both spent <em>before</em> the KDF runs,
+so an unmetered attempt route cannot become a way to spend the server's CPU.</li>
+<li><strong>A signed cookie</strong>, on the model of <code>passcodeSeal</code>: <code>HMAC-SHA256</code> keyed on the password
+digest. No session table, nothing new to persist, and twelve hours rather than the
+office passcode's thirty days.</li>
+</ul>
+<p>The salt is a fixed string in the code, and that is correct here rather than an oversight:
+a salt defends a <em>stored</em> digest against precomputation, and nothing is stored. The
+password lives in the process environment and its digest in the process heap, both already
+lost to anyone who can read either. What <code>scrypt</code> is still doing is making each online
+guess expensive, which is the half that pairs with the limiters.</p>
+<p>The console's shell is served without a credential and its numbers are not. <code>console.html</code>
+is a fixed file with no data in it, identical on a server that has recorded a year of
+traffic and one that booted a second ago — the same reasoning the office applies to the
+app shell behind a passcode. The password form is ordinary client UI reacting to a 401.</p>
+<p>Nothing about this touches the front door. <code>/</code> and the demo office keep needing no
+credential, and no ordinary office becomes harder to open.</p>
+<h2 id="what-is-recorded-and-what-cannot-be" tabindex="-1">What is recorded, and what cannot be</h2>
+<p><a href="https://github.com/atlassian-labs/roving-office/blob/main/lib/stats-store.cjs"><code>lib/stats-store.cjs</code></a> starts a record that never existed
+before it. The office registry is a list of what exists <em>now</em>; the reaper deletes an idle
+office leaving no trace; the AOP bus is a ring buffer that forgets. <strong>So every per-day
+number begins at the day the counters were first written and there is no way to backfill a
+single day before it.</strong> The console says so on its face, first thing on the page, because
+an empty chart that looks complete is worse than one labelled as empty.</p>
+<p>What is kept is counters and small per-day buckets:</p>
+<table>
+<thead>
+<tr>
+<th>Per day</th>
+<th>From</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Offices minted, closed, reaped</td>
+<td><code>onOpen</code> / <code>onClose</code> on the office store</td>
+</tr>
+<tr>
+<td>Connections per source — distinct offices fed, and event volume</td>
+<td>accepted AOP events</td>
+</tr>
+<tr>
+<td>Jobs delivered, done, unfinished, claimed, dropped</td>
+<td>accepted AOP event types</td>
+</tr>
+<tr>
+<td>Seasons and buildings chosen</td>
+<td>a scene <code>PATCH</code> carrying a <code>look</code></td>
+</tr>
+<tr>
+<td>Demo-office events, counted apart</td>
+<td>accepted AOP events</td>
+</tr>
+</tbody>
+</table>
+<p>And what cannot be:</p>
+<ul>
+<li><strong>How many people.</strong> There are no accounts anywhere in this project and nothing is
+fingerprinted. The nearest defensible proxies are offices minted and live write tokens,
+both of which count <em>capabilities</em> rather than people, and the console labels them as
+that. It does not present either as a headcount.</li>
+<li><strong>Anything about the past.</strong> Not for offices closed before recording began, and not for
+the settings or furniture of any office that has since been reaped — that data went with
+the office and was never written down anywhere else.</li>
+<li><strong>Furniture and settings as history.</strong> Both come from a census of the offices that exist
+right now (<code>census</code> in <code>lib/office-store.cjs</code>), which is a photograph rather than a
+record. The per-day look counters are the only going-forward version.</li>
+</ul>
+<h3 id="the-lines-this-does-not-cross" tabindex="-1">The lines this does not cross</h3>
+<ul>
+<li><strong>No content, ever.</strong> No prompts, titles, summaries, file paths, tool names, agent
+names, URLs, keycards or tokens. Only an event's <code>type</code> and its <code>harness.name</code> are read,
+and only to decide which counter to add one to.</li>
+<li><strong>No per-office rows</strong> in any aggregate. &quot;Distinct offices per source per day&quot; is
+counted through an in-memory set that holds <code>day|source|keycard</code> until the day rolls and
+is never written to disk. The honest cost is that <strong>a restart re-counts</strong> — an office fed
+both before and after a redeploy counts twice in that day's number — and that is the
+right trade: the alternative is persisting a record of which office used which harness.</li>
+<li><strong>No new identifiers.</strong> No visitor ids, no client addresses, no hashes of either.</li>
+<li><strong>The demo office is excluded from every statistic</strong>, and counted separately rather than
+discarded so that the exclusion is visible instead of silent. <code>/</code> redirects into that
+room, so its traffic is visitors and tests rather than anybody's usage.</li>
+</ul>
+<p>Retention is <code>RETAIN_DAYS</code> in <code>lib/stats-store.cjs</code>: 120 daily buckets, then dropped. That
+is the whole retention rule, and it is the only thing bounding the file — the per-day
+bucket is a fixed set of counters, so nothing else in it grows.</p>
+<h2 id="jobs-in-the-offices-own-vocabulary" tabindex="-1">Jobs, in the office's own vocabulary</h2>
+<p>AOP has no event called &quot;job done&quot;
+(<a href="protocol/aop-spec.html">the spec</a>, §4.2 and §4.5), so the mapping is written down rather
+than guessed at:</p>
+<table>
+<thead>
+<tr>
+<th>The console says</th>
+<th>The events</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Delivered to a desk</td>
+<td><code>turn.start</code></td>
+<td>Reduces to <code>mail</code> — the paper aeroplane arriving</td>
+</tr>
+<tr>
+<td>Delivered to the mailbox</td>
+<td><code>job.queued</code></td>
+<td>Also <code>mail</code>, but work arriving from outside</td>
+</tr>
+<tr>
+<td>Done</td>
+<td><code>turn.end</code> with <code>status: &quot;completed&quot;</code></td>
+<td>Reduces to <code>dispatch</code> — out through the outbox</td>
+</tr>
+<tr>
+<td>Not finished</td>
+<td><code>turn.end</code>, any other status</td>
+<td><code>error</code>, <code>cancelled</code> and <code>blocked</code> together</td>
+</tr>
+</tbody>
+</table>
+<p><code>turn.title</code> is deliberately not counted. The spec says it renames work in flight and MUST
+NOT be read as a new job, and a counter that ignored that would inflate deliveries by
+however often harnesses rename their work.</p>
+<p>The two deliveries are kept apart rather than added, because a round of work in a session
+and a job landing in a mailbox are different things. Very few harnesses emit <code>job.*</code> at
+all, so the mailbox numbers are expected to be near zero even on a busy server.</p>
+<h2 id="the-charts" tabindex="-1">The charts</h2>
+<p>The console wears the project's shared theme, <code>assets/ui-theme.css</code> — the same file
+reception, the office and these documentation pages load, so every colour, space, radius
+and type size comes from one place and nothing is restated. It deliberately does <em>not</em>
+import <code>styles.css</code>: that file is the office's, and its first rule sets
+<code>overflow: hidden</code> on <code>body</code> for a full-viewport canvas, which is the one thing a long
+scrolling page of charts must not inherit. So the few surfaces the console needs —
+reception's nav bar, its card, its button, the panels' small-caps headings — are drawn in
+<code>admin/console.css</code> in the same idiom rather than borrowed wholesale.</p>
+<p>The series colours are worth a line, because picking them badly is easy. The job chart
+uses the theme's <strong>own status colours</strong>, so a bar means what the room means by it:
+<code>--status-walking</code> for work carried to a desk, <code>--status-delivering</code> for the mailbox,
+<code>--job-done</code> for finished, <code>--status-error</code> for a turn that did not. Harnesses have no
+such meaning to borrow, so those are chosen for being told apart in a stack, with two
+exceptions that do carry one: Test Data wears the idle grey because it is not real usage,
+and an unrecognised harness wears the sun yellow because it is the series an operator
+should notice. A warm orange is avoided throughout — it is close enough to Claude's own
+brand colour to read as &quot;the Claude bar&quot; on a page that draws a Claude bar.</p>
+<p>Hand-authored inline SVG in <code>admin/console.js</code>, with <strong>no charting library</strong>. This project
+vendors its dependencies and keeps a licence inventory for the open-source release, so a
+package would mean new licence evidence, new notices and a new row in
+<code>third-party/inventory.json</code> — for a handful of bar charts. There is no build step here
+either, and the console is served as plain files like everything else.</p>
+<p>Two rules run through the drawing, both because these numbers get used to make decisions:</p>
+<ol>
+<li><strong>Nothing is interpolated or smoothed.</strong> Bars only. A line between two bars asserts a
+value for the day in between, and there is none.</li>
+<li><strong>A day with no recorded events is drawn as an explicit gap mark below the baseline,
+never as a zero.</strong> &quot;Nothing happened&quot; and &quot;we were not running&quot; are different facts.</li>
+</ol>
+<p>Days are cut at UTC midnight, which the console states — a reader's own midnight is not
+this one, and a day that looks half-empty is usually that.</p>
+<h2 id="should-it-ship" tabindex="-1">Should it ship?</h2>
+<p>It does, and the reasoning is worth keeping: the only secret is environment-only, so there
+is nothing in the repository for the console to leak. A public checkout of this code has no
+admin surface until somebody deliberately sets a variable, and a deployment that never sets
+one is indistinguishable from a build without the feature. Excluding it via <code>.exportignore</code>
+would mean the public repository's server had a 404 branch nobody could explain, and the
+next contributor would reinvent it worse.</p>
+<h2 id="looking-at-it" tabindex="-1">Looking at it</h2>
+<p>It is a page, so look at it:</p>
+<pre><code class="language-bash">ROVING_OFFICE_ADMIN_PASSWORD=letmein ROVING_OFFICE_ADMIN_PATH=/back-of-house \
+  node server.cjs 8081
+</code></pre>
+<p>Then open <code>http://localhost:8081/back-of-house</code>. A fresh state directory has nothing in
+it, which is itself worth seeing — an empty console should read as &quot;recording started
+today&quot;, not as a broken page.</p>
+<p>It wears the shared theme (<code>assets/ui-theme.css</code>), so it should look like a page of this
+application and not like a dashboard from somewhere else. If the fonts come out as a
+system stack, check the <code>Content-Security-Policy</code> in <code>sendAdminFile</code>: under
+<code>default-src 'none'</code> a missing <code>font-src</code> blocks the webfonts silently.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#it-does-not-exist-unless-you-configure-it-and-that-takes-two-variables">It does not exist unless you configure it — and that takes two variables</a><ul><li><a href="#the-path-is-not-a-security-control">The path is not a security control</a></li></ul></li>
+<li><a href="#how-it-is-secured">How it is secured</a></li>
+<li><a href="#what-is-recorded-and-what-cannot-be">What is recorded, and what cannot be</a><ul><li><a href="#the-lines-this-does-not-cross">The lines this does not cross</a></li></ul></li>
+<li><a href="#jobs-in-the-offices-own-vocabulary">Jobs, in the office's own vocabulary</a></li>
+<li><a href="#the-charts">The charts</a></li>
+<li><a href="#should-it-ship">Should it ship?</a></li>
+<li><a href="#looking-at-it">Looking at it</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

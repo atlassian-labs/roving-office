@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tuning the layout generator — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html" aria-current="page">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="tuning-the-layout-generator" tabindex="-1">Tuning the layout generator</h1>
+<p><a href="layout-algorithm.html">The layout algorithm</a> explains how a seed becomes an office.
+This explains how we found out whether the offices were any <em>good</em>, and it is the
+more useful document of the two — the generator is a few hundred lines of scoring
+rules, and almost every one of those rules was set, moved or thrown away because a
+number said to.</p>
+<p>Five things the offices were asked to be:</p>
+<ol>
+<li>visually pleasing</li>
+<li>easy to move around, nobody blocked</li>
+<li>quick to fetch a job, send one, and get a drink</li>
+<li>still all of that at any headcount</li>
+<li>like a real office</li>
+</ol>
+<p>Four of those five can be measured. The first cannot, so it was <strong>fitted to a
+person's judgement</strong> — 146 pairwise comparisons over 74 rooms, in three rounds.
+That is the part worth reading about, and the part with the most ways to fool
+yourself.</p>
+<h2 id="contents" tabindex="-1">Contents</h2>
+<ul>
+<li><a href="#the-gallery">The gallery</a> — thirty offices, if you would rather look than read</li>
+<li><a href="#the-rig">The rig</a> — one number, and what goes into it</li>
+<li><a href="#teaching-it-taste">Teaching it taste</a> — three rounds of labelling, and a judge</li>
+<li><a href="#the-ratchet">The ratchet</a> — an autonomous loop against that number</li>
+<li><a href="#what-we-learnt">What we learnt</a> — the parts that generalise beyond this project</li>
+</ul>
+<h2 id="the-gallery" tabindex="-1">The gallery</h2>
+<p><strong><a href="../office-variety.html">Thirty offices, thirty seeds</a></strong> — seeds <code>variety-1</code> to
+<code>variety-30</code>, in order, nothing hand-picked and nothing rejected. Each one carries
+its own generated name, the sentence explaining why it is laid out that way, and
+its three scores. If you want to know what the tuning below actually bought, that
+page is the answer: five arrangements, 2–9 desks, eleven colour schemes, rug areas
+that read as rooms-within-rooms, and lounges where the seats face each other.</p>
+<p>Regenerate it with:</p>
+<pre><code class="language-sh">node bin/scene-map.js --seed=variety-1 … --size=560 --out=docs/images/variety
+</code></pre>
+<h2 id="the-rig" tabindex="-1">The rig</h2>
+<p><code>bin/office-fitness.js</code> is one number for the whole generator, and it is the most
+load-bearing file in the tuning work — a loop can only ever be as good as the
+number it ratchets on. Three parts:</p>
+<table>
+<thead>
+<tr>
+<th>part</th>
+<th>weight</th>
+<th>what it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>plan</strong></td>
+<td>0.40</td>
+<td>the scorecard in <code>src/plan/score.js</code>: seated, daylight, teams, quiet, errands, floor</td>
+</tr>
+<tr>
+<td><strong>flow</strong></td>
+<td>0.35</td>
+<td>the office <em>run</em>, headless, in <code>bin/lib/office-sim.js</code></td>
+</tr>
+<tr>
+<td><strong>looks</strong></td>
+<td>0.25</td>
+<td>a model of one person's taste, <code>bin/lib/looks-judge.js</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>flow is a simulation, not a heuristic.</strong> <code>openRoom()</code> builds the real room with
+the real agent layer and no renderer, then re-furnishes it per layout and runs it
+at a fixed 1/30 timestep. It measures how long a collection, a dispatch, a lookup
+and a drink actually take, how far people walked against how far it was, how many
+frames they spent inside the furniture, and how many errands nobody ever
+completed. Every layout is run at half its desks and at all of them, and the
+<em>worst</em> headcount counts as much as the average — that is goal 4, and it is the
+one a static score cannot reach at all.</p>
+<p>Three rules keep the number honest, and they matter more than the weights:</p>
+<ul>
+<li><strong>A held-out seed set.</strong> <code>tune-*</code> is what the tuning sees; <code>hold-*</code> is a disjoint
+set it never does. Seeds are strings, so two prefixes give two sets that cannot
+overlap however many are drawn.</li>
+<li><strong>Nothing in the rig is in scope.</strong> The generator is mutable; the scorer, the
+simulator and the agent layer are not. The cheapest way to stop agents bumping
+into furniture is to edit the walker.</li>
+<li><strong>Every component is printed.</strong> A composite that only shows its total is a
+composite nobody can argue with.</li>
+</ul>
+<h3 id="floors-and-why-a-single-number-is-not-enough" tabindex="-1">Floors, and why a single number is not enough</h3>
+<p>Widening the gap between desks in a bench from 5.1–5.35 to 5.4–6.4 makes a room
+measurably easier to walk about — <code>detour</code> +0.05, errand times better — and
+measurably worse as an office, because the desk nearest yours stops being your
+teammate's (<code>teams</code> −0.028). As a composite those cancel almost exactly: <strong>+0.0006,
+which is nothing.</strong> Measured, not supposed.</p>
+<p>So office-likeness is a <strong>floor</strong> rather than a dial. <code>--record</code> writes the current
+value of each floored component to <code>test/fitness-floors.json</code>; <code>--guard</code> fails if
+any has fallen by more than 0.01. A change that breaches a floor is reverted
+however good the total looks.</p>
+<p>Calibrating that took a planted bug: the bench-pitch change above scores +0.0006
+as a composite and is caught immediately as a floor breach. A geometric mean
+instead of a weighted sum was <em>worse</em> at catching it.</p>
+<p><code>test/plan-score.test.js</code> also fails if any measure scores identically across 60
+offices — because a floor cannot see a measure that has been quietly deleted, and
+gutting one raised the score by +0.0021 before that test existed.</p>
+<h2 id="teaching-it-taste" tabindex="-1">Teaching it taste</h2>
+<p>&quot;Visually pleasing&quot; is the goal no measurement reaches on its own, so it was
+reached the way subjective quality always is: ask somebody, carefully, then build
+a judge that agrees with them and <strong>check that it does</strong>.</p>
+<h3 id="how-the-asking-works" tabindex="-1">How the asking works</h3>
+<p><code>bin/looks-pick.js</code> chooses a round's rooms and freezes them. <code>bin/looks-ask.js</code>
+builds a page of pairwise comparisons. <code>bin/looks-check.js</code> fits a Bradley-Terry
+ranking from the answers and reports the rank correlation for the judge and for
+each measure. <code>bin/looks-explore.js</code> does the same for <em>candidate</em> measures that
+have not earnt a weight yet.</p>
+<p>Four choices in that pipeline, each of which was learnt the hard way:</p>
+<p><strong>Pairwise, not a score out of five.</strong> People are reliable at &quot;which of these two&quot;
+and unreliable at &quot;how good is this&quot;. An absolute scale drifts over a session, so
+room 3 and room 15 end up graded against different standards.</p>
+<p><strong>The judge reads a layout blob, not a built room.</strong> The first version read the
+generator's output, which meant every label expired the moment the generator
+changed — a label is attached to a <em>room</em>, and a seed's room is whatever today's
+code says it is. Correlating yesterday's judgements against today's scores took an
+agreement of +0.40 and turned it into <strong>+0.01</strong>, not because the measures got worse
+but because the rooms had been swapped out underneath them. Layouts are now frozen
+before any picture is taken, and verified byte-identical afterwards.</p>
+<p><strong>Rooms are stratified on whatever is being tested.</strong> Round one asked about
+eighteen rooms from a generator that could not overlap rugs and could not stand a
+plant away from a wall. When both arrived there was no evidence either way, and
+the measures written for them could not be validated on anything.</p>
+<p><strong>Check a trait varies before splitting on it.</strong> Round three's first attempt
+balanced on &quot;gridded desks&quot; and came back with an empty bucket, because 256 of 260
+candidate offices are gridded — desks go down on a lattice with quarter-turn
+facings. A trait that is 98% true is not a split, it is a constant with a rounding
+error.</p>
+<h3 id="what-three-rounds-did-to-the-answers" tabindex="-1">What three rounds did to the answers</h3>
+<table>
+<thead>
+<tr>
+<th>measure</th>
+<th>r1 (18 rooms)</th>
+<th>r2 (16)</th>
+<th>r3 (40)</th>
+<th>pooled (74)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>interest</code></td>
+<td>+0.317</td>
+<td>+0.076</td>
+<td>+0.365</td>
+<td><strong>+0.291</strong></td>
+</tr>
+<tr>
+<td><code>together</code></td>
+<td>−0.156</td>
+<td>+0.406</td>
+<td>+0.372</td>
+<td><strong>+0.251</strong></td>
+</tr>
+<tr>
+<td><code>covered</code></td>
+<td>+0.276</td>
+<td>+0.326</td>
+<td>+0.111</td>
+<td><strong>+0.198</strong></td>
+</tr>
+<tr>
+<td><code>divided</code></td>
+<td>−0.168</td>
+<td>+0.221</td>
+<td>−0.092</td>
+<td>−0.043</td>
+</tr>
+<tr>
+<td><code>balance</code></td>
+<td>+0.247</td>
+<td>+0.159</td>
+<td>−0.058</td>
+<td>+0.063</td>
+</tr>
+<tr>
+<td><code>quarters</code></td>
+<td>+0.117</td>
+<td>+0.335</td>
+<td>−0.103</td>
+<td>+0.045</td>
+</tr>
+<tr>
+<td><code>organised</code></td>
+<td>+0.098</td>
+<td>−0.115</td>
+<td>−0.350</td>
+<td><strong>−0.190</strong></td>
+</tr>
+<tr>
+<td><code>amenity</code></td>
+<td>+0.179</td>
+<td>−0.159</td>
+<td>−0.276</td>
+<td><strong>−0.140</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Read the columns before the numbers. <strong>Four measures changed sign between rounds
+one and two.</strong> That is not two different tastes; it is one taste measured twice
+with too few rooms.</p>
+<p>A rank correlation over <em>n</em> rooms has a standard error of about <code>1/sqrt(n-1)</code>.
+Sixteen rooms is <strong>±0.26</strong> — so no single round could tell +0.3 from zero, and
+round one's headline &quot;+0.527 agreement&quot; was never an estimate of anything. It was
+hand-picked weights scored on the eighteen rooms they were picked for.</p>
+<p><strong>Pairs buy a better ranking of the rooms you have. Only rooms buy power.</strong> Round
+two spent 53 pairs on 16 rooms and was less informative than round three's 64 pairs
+on 40.</p>
+<p>Two measures were promoted on round two's evidence and reduced to nothing by round
+three (<code>balance</code>, <code>quarters</code>). One candidate, <code>breathing</code>, scored +0.524 in round
+two — the strongest agreement anything has ever managed here — and −0.089 in round
+three. Had it been promoted it would have outweighed everything else in the judge.</p>
+<h3 id="fitting-the-weights" tabindex="-1">Fitting the weights</h3>
+<p>Weights come from a <strong>rule</strong>, not a hand: each is ten times that measure's pooled
+rank agreement, floored at zero (<code>weightsFor</code> in <code>bin/lib/looks-fit.js</code>). A rule
+can be cross-validated; a hand cannot.</p>
+<p>The rule has to be <strong>continuous</strong>, and that took a wrong turn to learn. The first
+version gave weight only once agreement cleared the noise floor, which reads as
+caution and is a cliff: leaving one room out moves an agreement by hundredths, and
+hundredths either side of a threshold switch a whole measure on or off —
+<em>systematically</em>, because the room a measure agrees with is the room whose removal
+drops that measure below the line. Cross-validated agreement came out at −0.01
+against +0.42 in sample, which looked like a judge that could not generalise and
+was really a rule that could not be tested.</p>
+<p>Its one real weakness is <strong>collinearity</strong>: it scores each measure alone and cannot
+see two of them reading the same variable. <code>planted</code> pools at +0.171 and positive
+in all three rounds, so the rule wants to give it 1.7 — and adding it <em>lowered</em> both
+the fit and the cross-validation, because <code>interest</code> already reads the plant count.
+It is declared <code>collinear: 'interest'</code> and excluded, which is model selection
+rather than hand-tuning: the reason is structural, known in advance, and folded
+into the rule so the cross-validated figure still measures the procedure in use.</p>
+<p><strong>Where it ended up:</strong></p>
+<pre><code>JUDGE, in sample          +0.374
+JUDGE, leave-one-room-out +0.292
+</code></pre>
+<p>+0.29 is real and it is weak. It is why <code>looks</code> is still only a quarter of the
+fitness, and it should go up when there are enough labels to earn it.</p>
+<h3 id="the-one-thing-that-worked-immediately" tabindex="-1">The one thing that worked immediately</h3>
+<p>Everything above is inference. One requirement was simply <em>stated</em>:</p>
+<blockquote>
+<p>Sofas and armchairs, side tables etc. should always face each other, or face at
+90 degrees to each other, never away from each other.</p>
+</blockquote>
+<p>Measured over 400 offices before it was enforced: <strong>43% of seats faced away from
+their own group</strong> and <strong>55% of side tables stood behind the back of the seat they
+served</strong>. It is now a refusal in placement and an assertion in
+<code>test/plan-generator.test.js</code> — 0% and 0%.</p>
+<p>And then <code>together</code>, the measure of exactly that, went from −0.156 to +0.406 in the
+next round and stayed there. <strong>A stated rule belongs in a test, not in a judge.</strong>
+A judge is for what somebody cannot articulate; anything they can say outright is
+an invariant, and weighing it against being near the coffee machine is a category
+error.</p>
+<p>The same applies to <code>amenity</code> — &quot;easy access to coffee / research&quot; — which pools at
+−0.140. It is a real requirement, it is invisible in an overhead render, and the
+simulator already measures it properly in seconds. Two votes in the judge were two
+votes for a thing the labels know nothing about.</p>
+<h2 id="the-ratchet" tabindex="-1">The ratchet</h2>
+<p>With a number and a guard, the generator can be improved by an autonomous loop:
+read the log, make <strong>one</strong> focused change, verify, keep or revert, write down what
+happened. <code>program.md</code> is the brief it works from and <code>autoresearch/*/results.tsv</code>
+is its memory. The skill is vendored under <code>.claude/skills/autoresearch/</code>.</p>
+<p>Two runs so far.</p>
+<p><strong>Pilot, 12 iterations:</strong> +0.0122 on tune, 3 kept. Two of those gained on tune and
+<em>lost</em> on the holdout and were reverted — which is the holdout doing the only job
+it has.</p>
+<p><strong>Main run, 21 iterations:</strong> +0.0213 on tune and <strong>+0.0150 on the holdout</strong>, 6 kept.
+It stopped itself by the brief's own rule — six iterations in a row without a keep
+— rather than running out of the fifty it was given.</p>
+<pre><code>daylight  0.4943 -&gt; 0.6587      covered   0.5547 -&gt; 0.7049
+together  0.6480 -&gt; 0.7082      zoned     0.6634 -&gt; 0.8052
+</code></pre>
+<p>The target was found by looking rather than guessing: <code>daylight</code> sat at 0.50 while
+every other component of the plan score was above 0.85. All five arrangements
+scored within 0.10 of each other on it and desk count barely mattered, so it was
+not a window-frontage limit — and the cause was one line. <strong>The door is in a window
+wall.</strong> <code>plate</code> gave the desks the block <em>away</em> from the door, because a bank with
+the entrance traffic running through it is worse than one without, so &quot;desks away
+from the traffic&quot; pointed at exactly the block &quot;desks get the light&quot; pointed away
+from — and the block-level choice had no daylight term at all.</p>
+<p>The single best change was not a placement rule at all. Iteration 11 shifted
+<code>brief.rugs</code> so rooms ask for more of them, and gained <strong>more on the holdout
+(+0.0120) than on the tune set (+0.0082)</strong>. Changing the <em>distribution of briefs</em>
+changes the average room without changing any rule.</p>
+<h3 id="the-loops-most-useful-output-was-its-failures" tabindex="-1">The loop's most useful output was its failures</h3>
+<ul>
+<li><strong>A change to the number of draws is a change to the whole room.</strong> One iteration
+wrote <code>max(range(), range())</code> where there had been one draw. Every later decision
+in every office was re-rolled, so its guard failure meant nothing. Transform the
+draw; never add one.</li>
+<li><strong>Hand-set constants can be at a local optimum, and you can prove it.</strong>
+<code>STREET_W</code> fails the guard at 3.0 (<code>reliable</code>) and at 2.0 (<code>clear</code>). The
+desk-on-a-lane bonus fails at 3.5 and at 0. Both bracketed in both directions —
+and the log says so, so nobody tries again.</li>
+<li><strong>Harshness can be the point.</strong> The rug-join rule tests for a shared edge, exact
+to a hundredth. Replacing it with a continuous &quot;how nearly does this fill its
+bounding box&quot; — on the reasonable theory that a near miss is nearly a rectangle
+— dropped rectangular rug areas from 62% to 46% while the metric did not move at
+all. A 0.9 fill earning most of the bonus is enough to beat holding out for a
+true rectangle.</li>
+<li><strong>One holdout sample of 96 seeds has sd ≈ 0.005.</strong> One iteration looked like a
+−0.0069 holdout regression on a single sample and was flat on two. Below about
+0.010, check with <code>--noise=2</code> before believing it.</li>
+</ul>
+<h3 id="when-a-floor-is-wrong" tabindex="-1">When a floor is wrong</h3>
+<p><code>zoned</code> — &quot;each group of furniture stands on a rug&quot; — vetoed the first two attempts
+at the daylight fix. Desks pulled towards the glass sit where a rug's nine by seven
+will not fit, so rug coverage fell and the floor breached.</p>
+<p>That is a floor misfiring. A floor exists to stop the loop trading <em>office-likeness</em>
+for speed, and <code>zoned</code> is not office-likeness — it is a proxy for one person's
+taste, it is the weakest measure the labelling supports (+0.112 pooled, −0.011 in
+the largest round), and <code>daylight</code> is both a stated goal and floored itself. <strong>A
+taste proxy may not hold a stated goal hostage.</strong> It was removed from <code>FLOORS</code>, on
+the record, as a decision taken outside the loop — which is what <code>program.md</code> tells
+the loop to do when it believes a floor is wrong: say so and stop.</p>
+<p>Rug coverage is still <em>scored</em>; it no longer has a veto. <code>covered</code>, the
+better-supported measure of the same property, went from 0.55 to 0.70 over the run.</p>
+<p>One change was also kept <strong>against</strong> the number, at −0.0012: rectangular rug areas
+are a stated preference and <code>compact</code> carries weight 1, so the metric under-prices
+them relative to what was asked for. Said plainly in the log rather than hidden in
+a rounding.</p>
+<h2 id="what-we-learnt" tabindex="-1">What we learnt</h2>
+<p>The parts that are not about offices at all:</p>
+<ol>
+<li><strong>Label the artefact, not the identifier.</strong> Anything you ask a person about must
+be frozen at the moment you ask, or your labels decay silently as the generator
+improves.</li>
+<li><strong>Get the standard error before the result.</strong> <code>1/sqrt(n-1)</code> would have saved two
+measures from being promoted and one from nearly being.</li>
+<li><strong>Fit with a rule so you can cross-validate it.</strong> In-sample agreement is the
+number you optimised, not an estimate. Here the gap is +0.37 against +0.29 — and
+it was +0.53 against something much lower before there was enough data to check.</li>
+<li><strong>Continuous rules can be tested; thresholded ones cannot.</strong> A cliff in a fitting
+rule interacts with leave-one-out in a way that looks exactly like failure to
+generalise.</li>
+<li><strong>A stated requirement is an invariant.</strong> It goes in a test. Only what somebody
+cannot articulate belongs in a fitted model.</li>
+<li><strong>A composite metric needs floors, and the floors need calibrating with a
+planted bug.</strong> Two real effects at ±0.03 cancel to +0.0006, and a single number
+will happily sell you one for the other.</li>
+<li><strong>Distributions are a bigger lever than rules.</strong> The largest and most
+generalising win in 21 iterations changed what rooms <em>ask for</em>, not how anything
+is placed.</li>
+<li><strong>Write the failures down in more detail than the successes.</strong> Six of 21
+iterations were kept; the other fifteen are why the next person does not repeat
+them.</li>
+</ol>
+<h2 id="where-the-code-lives" tabindex="-1">Where the code lives</h2>
+<pre><code>bin/
+  office-fitness.js         # the number: plan + flow + looks, floors, guard, holdout
+  sim-office.js             # one office, run and explained, when a number moves
+  looks-pick.js             # choose and freeze a labelling round's rooms
+  looks-ask.js              # the pairwise comparison page
+  looks-check.js            # does the judge agree with the person?
+  looks-explore.js          # candidate measures, every round, with the noise floor
+  lib/office-sim.js         # the headless office: build once, re-furnish per layout
+  lib/looks-judge.js        # the taste model, weighted by measured agreement
+  lib/looks-candidates.js   # measures that have not earnt a weight
+  lib/looks-fit.js          # Bradley-Terry, Spearman, and the weighting rule
+docs/images/looks{,2,3}/    # three rounds: renders, frozen layouts, labels
+program.md                  # the brief the autonomous loop works from
+autoresearch/*/results.tsv  # every iteration, kept or not, and why
+</code></pre>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="layout-algorithm.html">The layout algorithm</a> — how a seed becomes an office in the
+first place, and what the scorecard's six measures are</li>
+<li><a href="../office-variety.html">Thirty offices, thirty seeds</a> — the output, with each
+room's own reasons</li>
+<li><a href="editor.html">The furniture editor</a> — the <strong>Random</strong> button, and everything else
+that moves a prop</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#contents">Contents</a></li>
+<li><a href="#the-gallery">The gallery</a></li>
+<li><a href="#the-rig">The rig</a><ul><li><a href="#floors-and-why-a-single-number-is-not-enough">Floors, and why a single number is not enough</a></li></ul></li>
+<li><a href="#teaching-it-taste">Teaching it taste</a><ul><li><a href="#how-the-asking-works">How the asking works</a></li>
+<li><a href="#what-three-rounds-did-to-the-answers">What three rounds did to the answers</a></li>
+<li><a href="#fitting-the-weights">Fitting the weights</a></li>
+<li><a href="#the-one-thing-that-worked-immediately">The one thing that worked immediately</a></li></ul></li>
+<li><a href="#the-ratchet">The ratchet</a><ul><li><a href="#the-loops-most-useful-output-was-its-failures">The loop's most useful output was its failures</a></li>
+<li><a href="#when-a-floor-is-wrong">When a floor is wrong</a></li></ul></li>
+<li><a href="#what-we-learnt">What we learnt</a></li>
+<li><a href="#where-the-code-lives">Where the code lives</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

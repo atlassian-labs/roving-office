@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<!--
+  The Character Movement Library: every way a character moves, one to a card, on a loop.
+
+  Open it by hand while the office is running —
+  http://localhost:8080/docs/character-movements.html — or point a headless Chrome at
+  it. It ships with the server. It needs one only because it imports the
+  real modules: every character here is a real `Agent`, driven by the real
+  `AgentController` through the real action vocabulary in `agents/states.js`, and every
+  prop is built by the same builder the room uses. Nothing is re-drawn for the page. If
+  a walk cycle changes in `Agent.update`, it changes here, which is the only way a
+  library like this stays true for longer than a week.
+
+  Two things are deliberately not real.
+
+  The nav grid is a stub that answers every route with a straight line. Each card is an
+  empty stage with one prop on it, so there is nothing to path around, and standing up a
+  real grid per card would be a lot of machinery to demonstrate that A* still works.
+  What is being shown is the walk, not the route.
+
+  Every panel is its own camera on its own orbit: drag to turn the subject, scroll to
+  zoom, double-click to put the camera back. That is not a flourish — a movement studied
+  from one fixed angle is a movement with a desk in front of it half the time, and the
+  whole point of a library is being able to look at the thing.
+
+  And there is one renderer, not one per card. A browser gives out somewhere around
+  sixteen WebGL contexts before it starts taking them back, and this page wants more
+  panels than that eventually — so the canvas is a single fixed sheet behind the page,
+  and each card is drawn into the rectangle its own element happens to occupy, by
+  scissoring the viewport to it. Scroll the page and the panels follow, because they
+  were never anywhere else.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>The Roving Office — Character Movement Library</title>
+<!-- The icon set, absolute for the same reason the stylesheet is. /favicon.ico is
+     the one a browser asks for whether or not a page mentions it, so it lives at
+     the root and carries 16/32/48 in the one file; the PNG is what everything
+     modern prefers, and the touch icon is what iOS puts on a home screen.
+     All three are cut from assets/logo.png. -->
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+<link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+<script type="importmap">
+  {
+    "imports": {
+      "three": "/vendor/three/build/three.module.js",
+      "three/addons/": "/vendor/three/examples/jsm/"
+    }
+  }
+</script>
+<style>
+  /* Two palettes, one set of names. The renderer is alpha:true and no card paints a
+     background of its own, so the page's colour *is* the colour behind every agent —
+     which is the point of the switch: a movement that reads on charcoal can lose its
+     silhouette on cream, and you want to find that out here rather than in a room. */
+  :root {
+    --bg: #14171b; --panel: #1c2027; --line: #2c323b;
+    --text: #e8e4da; --muted: #9aa2ad; --wood: #c8a06a;
+    --faint: #6d7681;
+    --btn: rgba(255,255,255,0.05); --btn-hover: rgba(255,255,255,0.1);
+  }
+  :root[data-theme="light"] {
+    --bg: #f2efe8; --panel: #fbfaf7; --line: #ded7c9;
+    --text: #22262b; --muted: #656c75; --wood: #8a6220;
+    --faint: #878e97;
+    --btn: rgba(0,0,0,0.04); --btn-hover: rgba(0,0,0,0.09);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.55 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  /* The one canvas everything is drawn into, behind the page and never scrolling. */
+  #stage { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+  .page { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+  header { margin-bottom: 28px; }
+  h1 { font-size: 22px; font-weight: 600; letter-spacing: 0.2px; margin: 0 0 6px; }
+  header p { margin: 0; color: var(--muted); max-width: 62ch; }
+  .sibling { margin: 10px 0 0; font-size: 13px; }
+  a { color: var(--wood); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  header code { color: var(--wood); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .grid { display: grid; gap: 22px; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+  /* The card paints nothing of its own behind the panel, and that is the whole trick:
+     the canvas is a single fixed sheet *behind* the page, so anything opaque stacked
+     over it hides the very thing it is framing. Only `.meta` carries the panel colour;
+     the view is a hole. */
+  .card { background: transparent; border: 1px solid var(--line); border-radius: 12px;
+    overflow: hidden; display: flex; flex-direction: column; }
+  .view { aspect-ratio: 4 / 3; background: transparent; }
+  .meta { padding: 12px 14px 14px; border-top: 1px solid var(--line); background: var(--panel); }
+  .row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  h2 { font-size: 14px; font-weight: 600; margin: 0; letter-spacing: 0.3px; }
+  /* Every card is addressable, so the prose in docs/user can point at one movement
+     rather than at the page and a hope. The mark is faint until you go looking for it:
+     the reader who wants to link to a card is hunting for exactly this, and everyone
+     else is here to watch somebody sit down. */
+  h2 .anchor { color: var(--muted); text-decoration: none; opacity: 0; padding-left: 6px;
+    font-weight: 400; }
+  .card:hover h2 .anchor, h2 .anchor:focus { opacity: 1; }
+  /* Where a deep link lands, so it is obvious which card you were sent to. `--wood` and
+     not a green: these two pages have their own palette and no `--sage` in it, which the
+     first version of this rule assumed and got a transparent border for. */
+  .card:target { border-color: var(--wood); box-shadow: 0 0 0 2px rgba(200, 160, 106, 0.28); }
+  .note { margin: 6px 0 0; font-size: 12.5px; color: var(--muted); }
+  .api { margin: 8px 0 0; font-size: 11.5px; color: var(--wood);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-word; }
+  .hint { margin: 7px 0 0; font-size: 11px; color: var(--faint); }
+  .view { cursor: grab; }
+  .view:active { cursor: grabbing; }
+  button { font: inherit; font-size: 12px; color: var(--muted); background: var(--btn);
+    border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; cursor: pointer;
+    flex: 0 0 auto; transition: color .15s, background .15s; }
+  button:hover { color: var(--text); background: var(--btn-hover); }
+  button[data-playing="false"] { color: var(--wood); border-color: var(--wood); }
+  button:focus-visible { outline: 2px solid var(--wood); outline-offset: 2px; }
+  .new { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px;
+    font-size: 10px; letter-spacing: 0.6px; text-transform: uppercase;
+    color: var(--bg); background: var(--wood); vertical-align: middle; }
+  /* The page's own controls, held at the top right against the title. The same shape
+     the scene panel uses: a pair of positions drawn as one switch, seam between them
+     rather than a gap, and the one in force filled rather than outlined. */
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 28px; }
+  .topbar header { flex: 1 1 auto; }
+  .controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+    flex: 0 0 auto; padding-top: 2px; }
+  .seg { display: flex; flex-wrap: nowrap; }
+  .seg button { border-radius: 0; margin-left: -1px; }
+  .seg button:first-child { border-radius: 999px 0 0 999px; margin-left: 0; }
+  .seg button:last-child { border-radius: 0 999px 999px 0; }
+  .seg button[aria-pressed="true"] { color: var(--bg); background: var(--wood);
+    border-color: var(--wood); font-weight: 600; }
+  /* Drawn rather than typed: a sun and a moon as characters are an emoji on one
+     platform and a dingbat on the next, and these two have to look like a matched
+     pair. Same grid, same stroke, and `currentColor` so each takes the colour of the
+     position it is in — filled or outlined, light palette or dark. */
+  .icon { width: 13px; height: 13px; flex: 0 0 auto; }
+  button { display: inline-flex; align-items: center; gap: 6px; }
+  #error { display: none; padding: 20px; margin: 0 0 20px; border-radius: 10px;
+    background: #2a1512; color: #ffb4a8; white-space: pre-wrap;
+    font: 12px/1.5 ui-monospace, monospace; }
+
+  /* The Add-item menu's own lozenges, so a reader of the docs can tell at a glance what
+     a thing is *for* and what can be done to it. Same words and same three hues as the
+     editor (see `.kit-tag` in styles.css): blue for work coming in, green for work going
+     out, amber for "this one comes in colours". Repeated here rather than shared because
+     these pages carry their own stylesheet — but the *data* is not repeated: the tags are
+     read out of `kitItems()` and `KIT_PORTRAITS`, so a kind that changes job changes its
+     lozenge here without anybody editing this page. */
+  .tags { display: inline-flex; flex-wrap: wrap; gap: 3px 4px; vertical-align: middle; }
+  .tag {
+    display: inline-block; padding: 1px 6px;
+    font-size: 9.5px; letter-spacing: 0.03em; border-radius: 999px;
+  }
+  .tag-intake { color: #7fb2d9; background: rgba(127, 178, 217, 0.16); }
+  .tag-dispatch { color: #8ba888; background: rgba(139, 168, 136, 0.16); }
+  .tag-colour { color: #e8ab52; background: rgba(232, 171, 82, 0.16); }
+  :root[data-theme="light"] .tag-intake { color: #2f6d9e; background: rgba(47, 109, 158, 0.13); }
+  :root[data-theme="light"] .tag-dispatch { color: #46704a; background: rgba(70, 112, 74, 0.13); }
+  :root[data-theme="light"] .tag-colour { color: #8a5a12; background: rgba(138, 90, 18, 0.13); }
+  .row { gap: 8px; }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+<div class="page">
+  <div class="topbar">
+  <header>
+    <h1>Character Movement Library</h1>
+    <p>
+      Every way a character moves, one to a card, looping. Each is a real
+      <code>Agent</code> driven by the real <code>AgentController</code>, with the prop
+      the movement needs built by the same builder the office uses — so what plays here
+      is what the room does.
+    </p>
+    <p class="sibling">Looking for the furniture instead?
+      <a href="/docs/item-movements.html">Item Library</a></p>
+  </header>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Colour scheme">
+      <button type="button" data-theme-choice="light" aria-pressed="false"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="3.1"/><path d="M8 1.3v1.5M8 13.2v1.5M14.7 8h-1.5M2.8 8H1.3M12.7 3.3l-1.1 1.1M4.4 11.6l-1.1 1.1M12.7 12.7l-1.1-1.1M4.4 4.4L3.3 3.3"/></svg>Light</button>
+      <button type="button" data-theme-choice="dark" aria-pressed="true"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M13.3 9.7A5.9 5.9 0 0 1 6.3 2.7 5.9 5.9 0 1 0 13.3 9.7Z"/></svg>Dark</button>
+    </div>
+  </div>
+  </div>
+  <pre id="error"></pre>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script type="module">
+// Seeded, so book covers and cup colours are the same on every reload and a diff of
+// two screenshots is a diff of the movement. Installed before any scene module loads.
+let seed = 0x5eed1e;
+Math.random = function seeded() {
+  seed = (seed + 0x6d2b79f5) >>> 0;
+  let t = seed;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+// Dark or light, remembered across visits. Set before the scene modules load so the
+// page never shows a flash of the palette you did not choose. Duplicated in the Item
+// Library: these two pages are standalone documents that ship as bare HTML, and a
+// shared file would not ship with them.
+const THEME_KEY = 'roving-office:docs-theme';
+// Two positions of one switch rather than a button that flips, which is how the scene
+// panel draws Lights: a control that says which of two states is in force reads at a
+// glance, where a button labelled with the state you are *not* in has to be worked out.
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function setTheme(name) {
+  document.documentElement.dataset.theme = name;
+  // The floors live in the other module script, which has its own scope: an event is
+  // the seam between the page's chrome and the scene it is showing.
+  window.dispatchEvent(new CustomEvent('themechange', { detail: name }));
+  for (const b of themeButtons) {
+    b.setAttribute('aria-pressed', String(b.dataset.themeChoice === name));
+  }
+  try {
+    localStorage.setItem(THEME_KEY, name);
+  } catch { /* a private window: the choice simply will not outlive the tab */ }
+}
+let savedTheme = null;
+try {
+  savedTheme = localStorage.getItem(THEME_KEY);
+} catch { /* as above */ }
+setTheme(savedTheme === 'light' ? 'light' : 'dark');
+for (const b of themeButtons) {
+  b.addEventListener('click', () => setTheme(b.dataset.themeChoice));
+}
+
+window.addEventListener('error', (e) => {
+  const el = document.getElementById('error');
+  el.style.display = 'block';
+  el.textContent += `${(e.error && e.error.stack) || e.message}\n\n`;
+});
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { lerp, smoothstep } from '/src/ease.js';
+import { Agent } from '/src/agents/Agent.js';
+import { AgentController, act, walk, face, wait, carry, status } from '/src/agents/states.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { sitDownOn, standUpFrom, getIntoChair, getOutOfChair, chairEntryFromTheFront }
+  from '/src/agents/AgentManager.js';
+import { buildCatalogueObject } from '/src/scene/catalogue.js';
+import { buildDesk, SEAT_HEIGHT } from '/src/scene/props/desk.js';
+import { buildCouch, COUCH_SEAT_HEIGHT } from '/src/scene/props/couch.js';
+import { buildPrinter } from '/src/scene/props/printer.js';
+import { ROLE_TAGS } from '/src/editor/kit-menu.js';
+
+/**
+ * The Add-item menu's lozenge for the job a movement serves, where it serves one.
+ *
+ * Most movements are not about a job — a walk, a break, a dance — so most cards carry
+ * nothing. The two that are about work crossing the room's boundary say so in the
+ * editor's own words and colours, taken from `ROLE_TAGS` rather than written again:
+ * somebody who has met "intake" on a row in the Add-item menu should recognise it here
+ * without being told twice, and a role that is renamed is renamed in one place.
+ */
+const roleTag = (role) => {
+  const tag = ROLE_TAGS[role];
+  return tag ? `<span class="tags"><span class="tag tag-${tag.tone}">${tag.label}</span></span>` : '';
+};
+import { buildCourier, buildParcel } from '/src/scene/courier.js';
+import { BeamUps } from '/src/scene/beam.js';
+import { FURNITURE_KINDS } from '/src/layout.js';
+
+const v = (x, z) => new THREE.Vector3(x, 0, z);
+
+/**
+ * A route planner that always answers "straight there".
+ *
+ * The controller asks a nav grid for a path before every walk. Each card is an open
+ * stage with one prop on it and nothing to walk around, so the honest answer is the
+ * straight line — and building a real grid per card would be a page about pathfinding
+ * rather than about how somebody moves.
+ */
+const STRAIGHT = { findPath: (_from, to) => [to.clone()] };
+
+/** A prop from the gallery, placed and turned. Its own builder, unchanged. */
+function prop(id, { x = 0, z = 0, facing = 0 } = {}) {
+  const obj = buildCatalogueObject(id);
+  obj.position.set(x, 0, z);
+  obj.rotation.y = facing;
+  return obj;
+}
+
+// ---------------------------------------------------------------------------
+// The movements.
+//
+// Each card is a `story`: what to build, where to look from, and the loop the
+// character runs. `setup` returns anything the loop needs to hold on to.
+
+const MOVES = [
+  {
+    id: 'walking',
+    title: 'Walking',
+    note: 'The walk cycle: legs swinging from the hip, knees bending one way, arms '
+      + 'counter-swinging, and the whole body rising a little on each step.',
+    api: 'walk(target)',
+    look: { at: [0, 1.1, 0], from: [6.2, 4.2, 7.4] },
+    setup: () => ({}),
+    loop: () => [
+      walk(v(-2.4, 0)), wait(0.35),
+      walk(v(2.4, 0)), wait(0.35),
+    ],
+  },
+  {
+    id: 'carrying',
+    title: 'Carrying work',
+    role: 'intake',
+    note: 'Work arrives two ways — a parcel by courier, an envelope by air — and which '
+      + 'one is a coin toss that says nothing about the job. Both are held in front, so '
+      + 'the arms stop counter-swinging and lock forward.',
+    api: "carry('package') · carry('letter')",
+    look: { at: [0, 1.1, 0], from: [6.2, 4.2, 7.4] },
+    setup: () => ({}),
+    loop: () => [
+      carry('package'), walk(v(-2.3, 0)), wait(0.3),
+      carry('letter'), walk(v(2.3, 0)), wait(0.3),
+      carry(null),
+    ],
+  },
+  {
+    id: 'sitting-desk',
+    title: 'Sitting down at a desk',
+    note: 'The whole manoeuvre: come round to the standing room in front of the chair, '
+      + 'turn to face the monitors, then lower into it. The last stride and the fold '
+      + 'are one action: a step back onto the spot their feet will keep, then the fold '
+      + 'over them. Getting out, the chair swivels clear first and they stand on those '
+      + 'same planted feet before stepping away.',
+    api: 'getIntoChair(desk, entry) · getOutOfChair(desk, entry)',
+    look: { at: [-0.3, 1.1, 0.4], from: [6.4, 4.6, 7.8] },
+    setup: (scene) => {
+      const { obj, handle } = buildDesk({ id: 'card', x: 1.0, z: 0, facing: -Math.PI / 2 }, 0);
+      handle.setWorking(true);
+      scene.add(obj);
+      return { desk: handle, tick: (dt) => handle.update(dt) };
+    },
+    // The office's own choreography, not a copy of it. `chairEntryFromTheFront` is the
+    // way in that always exists; the room picks a side with the nav grid, which a card
+    // with one desk on an empty floor has no need of.
+    loop: (c) => {
+      const entry = chairEntryFromTheFront(c.desk);
+      return [
+        walk(v(entry.front.x + 1.6, entry.front.z + 1.2)),
+        walk(entry.front),
+        ...getIntoChair(c.desk, () => entry),
+        wait(2.4, { typing: true }),
+        ...getOutOfChair(c.desk, entry),
+        walk(v(entry.front.x + 2.0, entry.front.z + 1.4)),
+        wait(0.4),
+      ];
+    },
+  },
+  {
+    id: 'typing',
+    title: 'Typing',
+    note: 'Held at the desk: both shoulders reaching forward, pumping out of phase so '
+      + 'the hands never move as one. The second screen runs the board while they work.',
+    api: "wait(seconds, { typing: true })",
+    look: { at: [-0.4, 1.2, 0.1], from: [4.4, 3.4, 5.4] },
+    setup: (scene) => {
+      const { obj, handle } = buildDesk({ id: 'card', x: 1.0, z: 0, facing: -Math.PI / 2 }, 0);
+      handle.setWorking(true);
+      scene.add(obj);
+      return { desk: handle, tick: (dt) => handle.update(dt) };
+    },
+    start: (c, agent) => {
+      agent.setPositionXZ(c.desk.seat.x, c.desk.seat.z);
+      agent.setRotation(c.desk.sitRotation);
+      // Already sitting when the card opens, so no lowering to watch: this panel is
+      // about the hands, not about arriving.
+      agent.setSeated(true, { seatHeight: SEAT_HEIGHT, instant: true });
+    },
+    loop: () => [wait(3, { typing: true })],
+  },
+  {
+    id: 'sitting-couch',
+    title: 'Sitting on the couch',
+    note: 'The office\'s own break, played here: the seat is inside the couch and is '
+      + 'never walked to, so they come round to the floor in front of it, turn to face '
+      + 'out of the room, and step back to where their feet will finish, '
+      + 'settle onto both of them, and fold — the feet stay put and the hips travel '
+      + 'down and back over them. Getting up is the same in reverse: planted feet, hips '
+      + 'forward, and only then a step away.',
+    api: 'sitDownOn(seat, COUCH_SEAT_HEIGHT) · standUpFrom(seat)',
+    look: { at: [0, 0.8, 0.4], from: [6.0, 4.2, 7.4] },
+    setup: (scene) => {
+      const kind = FURNITURE_KINDS.couch;
+      const spec = {
+        id: 'card', kind: 'couch', x: 0, z: -0.6, facing: 0,
+        approach: { x: 0, z: kind.approachDist },
+        seats: kind.seatOffsets.map((o) => ({
+          x: o.x, z: o.z - 0.6, rotation: 0, front: { x: o.x, z: kind.hd + 0.4 },
+        })),
+      };
+      const { obj, handle } = buildCouch(spec);
+      obj.position.set(spec.x, 0, spec.z);
+      scene.add(obj);
+      return { seat: handle.seats[1] };
+    },
+    // Straight out of AgentManager: this is the list the room runs when somebody takes
+    // a break, and the card is worth nothing if it is not.
+    loop: (c) => [
+      walk(v(c.seat.front.x + 1.6, c.seat.front.z + 0.5)),
+      ...sitDownOn(c.seat, COUCH_SEAT_HEIGHT),
+      status('resting'),
+      wait(2.6),
+      ...standUpFrom(c.seat),
+      status('idle'),
+      walk(v(c.seat.front.x + 2.0, c.seat.front.z + 0.6)),
+      wait(0.3),
+    ],
+  },
+  {
+    id: 'reading',
+    title: 'Looking something up',
+    note: 'A book comes off the shelf and both arms come up to hold it. The globe on '
+      + 'top turns while somebody is reading beside it.',
+    api: "carry('book') · wait(n, { reading: true })",
+    look: { at: [0, 1.1, 0.7], from: [6.4, 4.4, 7.6] },
+    setup: (scene) => { scene.add(prop('bookshelf', { z: -0.9 })); return {}; },
+    loop: () => [
+      walk(v(1.9, 1.4)),
+      walk(v(0.2, 0.9)),
+      face(Math.PI),
+      carry('book'),
+      status('researching'),
+      wait(2.6, { reading: true }),
+      carry(null),
+      status('idle'),
+      walk(v(2.2, 1.6)),
+      wait(0.3),
+    ],
+  },
+  {
+    id: 'faxing',
+    title: 'Faxing it out',
+    note: 'The other way finished work leaves the room, and the one an agent whose desk '
+      + 'is nearer the machine than the post takes. The page goes into the feeder, the '
+      + 'ready light turns amber, and they walk off while it is still chuntering — '
+      + 'which is what everybody does. The copy it keeps lands in the output tray, and '
+      + 'the sheet on the floor is the once-in-six overshoot: it comes out with too '
+      + 'much enthusiasm and sails clear of the tray altogether.',
+    role: 'dispatch',
+    api: "wait(n, { dialling: true }) · printer.fax() · carry('fax')",
+    // From the front left, and further out than most cards. Both are forced by the
+    // geometry rather than chosen: the machine faces the room, so somebody using it
+    // stands between it and any camera in front — and the output tray and the sheet
+    // that misses it are both on the *left* of that face, so the left is the only side
+    // from which the gag is visible at all.
+    look: { at: [-0.3, 1.5, -0.3], from: [-8.2, 3.8, 6.4] },
+    setup: (scene) => {
+      // Built here rather than through `prop()`, which throws the handle away: this
+      // card drives the same `fax()` and `print()` the room calls, so what plays is
+      // what happens. `tick` runs the machine's own update, which is what turns the
+      // ready light amber and brings it back to green.
+      const { obj, handle } = buildPrinter();
+      obj.position.set(0, 0, -1.3);
+      scene.add(obj);
+      return { handle, tick: (dt) => handle.update(dt) };
+    },
+    loop: (ctx) => [
+      // Carried as paper. A fax is a sheet, not an envelope, and the two carryables are
+      // drawn apart on purpose — an agent walking with a page is the visible half of
+      // "the fax went".
+      carry('fax'),
+      walk(v(2.0, 1.7)),
+      // The room's own standing room, not a spot that looked right on the card: the
+      // kind table puts it `approachDist` 2.0 in front of the machine's centre, and the
+      // prop here sits at z −1.3, so this is that same 2.0. It also puts them 0.76 off
+      // the loose page, which is the distance the prop was positioned for.
+      walk(v(0, 0.7)),
+      face(Math.PI),
+      status('delivering'),
+      wait(0.4),
+      // Dialling the number: one hand up at the touchscreen, jabbing at it. A fax needs
+      // a whole number punched in, which is both the joke and the thing that makes an
+      // outgoing fax read as *outgoing* rather than as somebody standing near a machine.
+      wait(1.4, { dialling: true }),
+      // Forced to overshoot, because the whole point of the gag is that it is
+      // occasional — a card that waited for a one-in-six draw would show it to about
+      // one reader in six. `print(() => 0)` is a losing draw every time.
+      act(() => { ctx.handle.fax(); ctx.handle.setWaiting(2); ctx.handle.print(() => 0); }),
+      carry(null),
+      wait(1.1),
+      status('idle'),
+      walk(v(2.2, 1.8)),
+      wait(0.4),
+    ],
+  },
+  {
+    id: 'collecting',
+    title: 'Collecting a printout',
+    note: 'The other half, and a different movement: faxing is something they *do* to '
+      + 'the machine, and this is something they take from it. Work arrives here as a '
+      + 'fax — no plane, no courier, it simply appears — and the tray holds it until '
+      + 'somebody comes. The page that missed the tray is picked up first, on the way '
+      + 'past: it is between them and the machine, and walking over it to take a clean '
+      + 'sheet off the top is not what anybody does. They carry it back as paper.',
+    role: 'intake',
+    api: "printer.ring() · printer.retrieve() · carry('fax')",
+    look: { at: [-0.3, 1.4, -0.2], from: [-8.2, 3.8, 6.4] },
+    setup: (scene) => {
+      const { obj, handle } = buildPrinter();
+      obj.position.set(0, 0, -1.3);
+      scene.add(obj);
+      // A tray with something in it and a page on the floor, which is the state this
+      // card is about — the room gets there by working, and a card has to be handed it.
+      handle.setWaiting(3);
+      handle.print(() => 0);
+      return { handle, tick: (dt) => handle.update(dt) };
+    },
+    // The tray starts empty and the call comes in while they watch, which is the order
+    // the room does it in — a page that was already there would skip the arrival.
+    start: (ctx) => { ctx.handle.setWaiting(0); ctx.handle.ring(1.0); },
+    loop: (ctx) => [
+      // The call: the handset shakes on the screen for a second and the page lands as it
+      // stops. This is a fax's whole journey — it does not fly in or arrive at the door —
+      // so it is the beat that says the work came from outside.
+      act(() => ctx.handle.ring(1.0)),
+      wait(1.0),
+      act(() => { ctx.handle.setWaiting(2); ctx.handle.print(() => 0); }),
+      wait(0.6),
+      // Then somebody comes for it.
+      walk(v(2.0, 1.7)),
+      walk(v(0, 0.7)),
+      face(Math.PI),
+      wait(0.4),
+      // The loose page first, then the tray. Two beats rather than one, because they are
+      // two things and the order is the joke.
+      act(() => ctx.handle.retrieve()),
+      wait(0.6),
+      act(() => ctx.handle.setWaiting(1)),
+      carry('fax'),
+      wait(0.4),
+      status('working'),
+      walk(v(2.4, 1.9)),
+      wait(0.3),
+      carry(null),
+      status('idle'),
+    ],
+  },
+  {
+    id: 'stooping',
+    title: 'Looking something up outside',
+    note: 'The other way of looking something up, and the only pose that folds the '
+      + 'figure rather than moving its arms. The bend is at the waist and it is small — '
+      + 'at this leverage a bend is mostly a lean, so the same angle that lowers an eye '
+      + '10cm carries it half a metre in towards the eyepiece, which is what using a '
+      + 'telescope actually looks like. The tube sweeps while somebody has an eye to it, '
+      + 'and eases back to its resting pitch once they walk away.',
+    api: "wait(n, { stooping: true })",
+    // Watched from the side rather than over the shoulder, which is the only angle the
+    // pose can be judged from: face-on, the head and the eyepiece are the same few
+    // pixels whether they are touching or half a metre apart. The tube runs along z, so
+    // a camera out on x sees both the pitch and the gap at their true size.
+    look: { at: [0, 1.65, -0.3], from: [9.2, 3.5, 1.2] },
+    setup: (scene) => {
+      // Square on, not turned: the eyepiece then sits straight behind the tube on the
+      // z axis, so an agent standing at the right distance is also standing at the
+      // right *place*. Turning the prop for the camera's benefit — which the portrait
+      // does, and is right to — would offset the eyepiece in x and put the figure's
+      // shoulder where its eye should be.
+      scene.add(prop('telescope', { z: -1.2 }));
+      return {};
+    },
+    loop: () => [
+      walk(v(1.9, 1.6)),
+      // Derived, not eyeballed, and the same arithmetic as `approachDist` in the
+      // layout's kind table: the cup stands 0.65 in front of the prop's origin, the
+      // stoop carries an eye 0.50 forward, and 0.37 of head-and-air is left over. The
+      // first version stood them at 0.75 and the eye finished three quarters of a metre
+      // off the lens, which is exactly what this card exists to show.
+      walk(v(0, 0.32)),
+      face(Math.PI),
+      wait(0.5),
+      status('researching'),
+      wait(2.8, { stooping: true }),
+      status('idle'),
+      // Straightening up happens on the way out rather than as a beat of its own: the
+      // stoop is eased off by whichever pose runs next, which here is the walk.
+      walk(v(1.6, 1.7)),
+      wait(0.3),
+    ],
+  },
+  {
+    id: 'drinking',
+    title: 'Taking a break',
+    note: 'A cup, and one arm lifting it. The drinking arm rocks; the other one hangs. '
+      + 'Break time is the only status that is about not working.',
+    api: "carry('cup') · wait(n, { drinking: true })",
+    look: { at: [0, 1.1, 0.6], from: [6.0, 4.3, 7.2] },
+    setup: (scene) => { scene.add(prop('coffeeStation', { z: -1.0 })); return {}; },
+    loop: () => [
+      walk(v(1.8, 1.3)),
+      walk(v(0.1, 0.8)),
+      face(Math.PI),
+      wait(0.5),
+      carry('cup'),
+      status('drinking'),
+      wait(2.4, { drinking: true }),
+      carry(null),
+      status('idle'),
+      walk(v(2.1, 1.5)),
+      wait(0.3),
+    ],
+  },
+  {
+    id: 'delivering',
+    title: 'Delivering to the mailbox',
+    role: 'dispatch',
+    note: 'Finished work is carried to the mailbox and posted. The walk out is the '
+      + 'same one back, with empty hands and the status back to idle.',
+    api: "status('delivering') · carry(null)",
+    look: { at: [0, 1.0, 0.4], from: [5.8, 4.1, 7.2] },
+    setup: (scene) => { scene.add(prop('mailbox', { z: -1.0 })); return {}; },
+    loop: () => [
+      carry('package'),
+      status('delivering'),
+      walk(v(2.2, 2.0)),
+      walk(v(0.2, 1.7)),
+      face(Math.PI),
+      wait(0.6),
+      carry(null),
+      wait(0.5),
+      status('idle'),
+      walk(v(2.3, 1.6)),
+      wait(0.4),
+    ],
+  },
+  {
+    id: 'throwing',
+    title: 'Throwing a parcel',
+    role: 'intake',
+    note: 'The courier: not an agent, and deliberately so — scenery that walks. He '
+      + 'leans in, winds the arms right back and heaves the parcel across the room to '
+      + 'the pile beside the mailbox, which is the only delivery nobody carries.',
+    api: 'buildCourier() · buildParcel()',
+    look: { at: [0, 1.2, 0.6], from: [6.6, 4.4, 8.2] },
+    setup: (scene) => {
+      scene.add(prop('mailbox', { x: 3.0, z: 1.9, facing: -Math.PI / 2 }));
+      const courier = buildCourier();
+      courier.obj.visible = true;
+      scene.add(courier.obj);
+      const parcel = buildParcel();
+      parcel.visible = true;
+      scene.add(parcel);
+      return { courier, parcel, t: 0 };
+    },
+    // The courier has no controller: his throw is four phases on a clock, which is
+    // how `CourierDeliveries` drives him in the room too.
+    solo: true,
+    tick(c, dt) {
+      const { courier, parcel } = c;
+      c.t = (c.t + dt) % 6;
+      const t = c.t;
+      const FROM = { x: -0.15, y: 2.0, z: 0.6 };
+      const TO = { x: 2.4, y: 0.25, z: 1.9 };
+      const stride = (dist) => {
+        const swing = Math.sin(dist * 1.5) * 0.5;
+        courier.legs[0].rotation.x = swing;
+        courier.legs[1].rotation.x = -swing;
+      };
+      if (t < 1.6) {                        // walking in
+        const k = t / 1.6;
+        courier.obj.position.set(-3.4 + k * 3.0, 0, -0.4);
+        courier.obj.rotation.y = Math.PI / 2;
+        stride(k * 9);
+        courier.arms.rotation.x = 0;
+        parcel.position.set(courier.obj.position.x, 1.25, courier.obj.position.z + 0.4);
+        parcel.rotation.set(0, 0, 0);
+      } else if (t < 2.3) {                 // the wind-up, arms right back
+        const k = (t - 1.6) / 0.7;
+        courier.arms.rotation.x = -1.5 * smoothstep(k);
+        const e = smoothstep(k);
+        parcel.position.set(
+          lerp(-0.4, FROM.x, e), lerp(1.25, FROM.y, e), lerp(0.0, FROM.z, e),
+        );
+        stride(0);
+      } else if (t < 3.4) {                 // the heave, and the parcel on its arc
+        const k = (t - 2.3) / 1.1;
+        courier.arms.rotation.x = lerp(-1.5, 0.35, smoothstep(Math.min(1, k * 3)));
+        parcel.position.set(
+          lerp(FROM.x, TO.x, k),
+          lerp(FROM.y, TO.y, k) + Math.sin(Math.PI * k) * 0.9,
+          lerp(FROM.z, TO.z, k),
+        );
+        parcel.rotation.x = k * 5;
+      } else if (t < 4.2) {                 // it lands, he straightens up
+        courier.arms.rotation.x *= 0.85;
+        parcel.position.set(TO.x, TO.y, TO.z);
+        parcel.rotation.x = 0;
+      } else {                              // and he leaves the way he came
+        const k = (t - 4.2) / 1.8;
+        courier.obj.position.set(-0.4 - k * 3.0, 0, -0.4);
+        courier.obj.rotation.y = -Math.PI / 2;
+        stride(k * 9);
+        courier.arms.rotation.x = 0;
+        parcel.position.set(TO.x, TO.y, TO.z);
+      }
+    },
+  },
+  {
+    id: 'beamed-up',
+    title: 'Beamed up',
+    isNew: true,
+    note: 'How somebody leaves when they cannot leave. Going home is a walk to the '
+      + 'door, and a walk can be held up — or never get a frame to run in, which is '
+      + 'what a background tab is. Thirty seconds overdue and a cone of light comes '
+      + 'down out of the sky instead: it slams down, they hang for a beat, and then '
+      + 'they go up, turning, drawn away to nothing. The cone closes on an empty '
+      + 'patch of floor.',
+    api: 'BeamUps.beamUp(agent, onGone)',
+    // Pulled back and up, unlike every other card here: the subject is taller than a
+    // person by a factor of six. Framed on the person, the pool of light at their feet
+    // and enough of the column to read it — the far end of the beam is out of the shot
+    // on purpose, exactly as it is in the room.
+    look: { at: [0, 2.2, 0], from: [7.6, 5.4, 9.4] },
+    setup: (scene) => {
+      const beams = new BeamUps(scene);
+      return { beams, tick: (dt) => beams.update(dt) };
+    },
+    // The office's own call, and then the card puts them back — which the room never
+    // does, because in the room this is the last thing that happens to anybody.
+    loop: (c, agent) => [
+      walk(v(-1.6, 0.8)),
+      wait(0.3),
+      walk(v(0, 0)),
+      act(() => c.beams.beamUp(agent, () => { agent.root.visible = false; })),
+      wait(2.2),
+      act(() => {
+        agent.root.visible = true;
+        agent.root.scale.setScalar(1);
+        agent.root.position.y = 0;
+        agent.setRotation(0);
+      }),
+      wait(0.5),
+    ],
+  },
+  {
+    id: 'dancing',
+    title: 'Happy dance',
+    isNew: true,
+    note: 'A celebration, and the one movement here that is not in the office yet. '
+      + 'Arms overhead pumping out of phase, a hop that lands on every beat, and a '
+      + 'lean at half that rate so the loop is two beats rather than one.',
+    api: 'wait(n, { dancing: true })',
+    look: { at: [0, 1.2, 0], from: [4.6, 3.4, 6.2] },
+    setup: () => ({}),
+    loop: () => [
+      status('delivering'),
+      wait(3.4, { dancing: true }),
+    ],
+  },
+];
+
+// ---------------------------------------------------------------------------
+// The page: one renderer, one scene per card, scissored into each card's rectangle.
+
+const renderer = new THREE.WebGLRenderer({
+  canvas: document.getElementById('stage'), antialias: true, alpha: true,
+});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setScissorTest(true);
+
+const grid = document.getElementById('grid');
+const cards = [];
+/**
+ * The floor of each little stage, which follows the page. A warm brown disc is right
+ * under an agent on charcoal and reads as a hole on cream, and the switch is meant to
+ * show a movement on a light *scene* rather than merely a light page.
+ */
+const floorMaterials = [];
+const FLOOR = { dark: 0xc79f68, light: 0xdccdb2 };
+const floorColour = () => FLOOR[document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'];
+window.addEventListener('themechange', () => {
+  for (const m of floorMaterials) m.color.setHex(floorColour());
+});
+
+/**
+ * A card's address, from its title.
+ *
+ * The docs link at individual movements — "the blue cone that beams somebody up" wants to
+ * point at *that* card, not at forty of them — so every card needs a stable id. Deriving
+ * it from the title rather than keeping a second list of slugs means a new movement is
+ * addressable the moment it is added, with nothing else to remember.
+ *
+ * The cost is real and worth writing down: **renaming a title changes the anchor**, and
+ * every link in docs/user pointing at the old one goes dead. `npm run docs` will not catch
+ * it, because these ids are set here at runtime and the link checker reads static HTML.
+ * If you rename a card, grep docs/user for the old slug.
+ */
+const slug = (title) => title.trim().toLowerCase()
+  .replace(/[^\w\s-]/g, '')
+  .replace(/\s+/g, '-');
+
+for (const move of MOVES) {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.id = slug(move.title);
+  el.innerHTML = `
+    <div class="view"></div>
+    <div class="meta">
+      <div class="row">
+        <h2>${move.title}${move.isNew ? '<span class="new">new</span>' : ''}<a class="anchor" href="#${el.id}" aria-label="Link to this movement">#</a></h2>
+        ${roleTag(move.role)}
+        <button type="button" data-playing="true">Stop</button>
+      </div>
+      <p class="note">${move.note}</p>
+      <p class="api">${move.api}</p>
+      <p class="hint">drag to turn · scroll to zoom · double-click to reset</p>
+    </div>`;
+  grid.appendChild(el);
+
+  const scene = new THREE.Scene();
+  // The room's own rig, in miniature: a warm key that casts, and a sky/ground fill.
+  scene.add(new THREE.HemisphereLight(0xdfe9ef, 0xb08a5a, 0.85));
+  const key = new THREE.DirectionalLight(0xfff1dd, 1.5);
+  key.position.set(5, 8, 7);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  const d = 7;
+  Object.assign(key.shadow.camera, { left: -d, right: d, top: d, bottom: -d, near: 1, far: 26 });
+  scene.add(key);
+
+  const floorMaterial = new THREE.MeshStandardMaterial({ color: floorColour(), roughness: 0.95 });
+  floorMaterials.push(floorMaterial);
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(6.4, 48), floorMaterial);
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  const ctx = move.setup?.(scene) ?? {};
+
+  let agent = null;
+  let controller = null;
+  if (!move.solo) {
+    agent = new Agent({ id: move.id, name: move.title, color: 0x6fb1e0 });
+    // No name tag. The card's own heading says what this is, and the tag is an overlay
+    // sprite drawn on top of everything — including, on this page, the cards above it.
+    for (const sprite of [agent.nameTag, agent.statusDot, agent.sourceIcon]) {
+      if (sprite) sprite.visible = false;
+    }
+    scene.add(agent.root);
+    controller = new AgentController(agent, STRAIGHT);
+    const restart = () => { move.start?.(ctx, agent); controller.push(move.loop(ctx, agent)); };
+    controller.onIdle = restart;
+    restart();
+  }
+
+  const camera = new THREE.PerspectiveCamera(30, 4 / 3, 0.1, 60);
+  camera.position.set(...move.look.from);
+  camera.lookAt(new THREE.Vector3(...move.look.at));
+
+  // An orbit apiece. Bound to the card's own element rather than the shared canvas, so
+  // a drag belongs to the panel it started in and two panels are never turning at once.
+  const view = el.querySelector('.view');
+  const controls = new OrbitControls(camera, view);
+  controls.target.set(...move.look.at);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  // No panning: the subject is the point of the panel, and a pan is how you lose it.
+  // Reframing is what the double-click is for.
+  controls.enablePan = false;
+  controls.minDistance = 1.6;
+  controls.maxDistance = 18;
+  // Stop just short of the horizon, so nobody ends up looking at the underside of the
+  // floor and wondering where the office went.
+  controls.maxPolarAngle = Math.PI * 0.495;
+  controls.update();
+  view.addEventListener('dblclick', () => {
+    camera.position.set(...move.look.from);
+    controls.target.set(...move.look.at);
+    controls.update();
+  });
+
+  const card = { move, el: view, scene, camera, controls, ctx, agent, controller, playing: true };
+  cards.push(card);
+
+  // Stopping holds the pose rather than hiding the panel: a still frame of a movement
+  // is the other half of what this page is for.
+  const button = el.querySelector('button');
+  button.addEventListener('click', () => {
+    card.playing = !card.playing;
+    button.textContent = card.playing ? 'Stop' : 'Play';
+    button.dataset.playing = String(card.playing);
+  });
+}
+
+/*
+ * Jump to a deep-linked card, now that the cards exist.
+ *
+ * The browser tries this on its own and fails: it looks for the fragment while the page is
+ * parsing, which is before this script has built a single card, so arriving at
+ * `#beamed-up` lands you at the top of forty movements with no idea which one you were
+ * sent to. Doing it here — after the loop — is the whole reason the deep links work.
+ */
+if (location.hash.length > 1) {
+  document.getElementById(decodeURIComponent(location.hash.slice(1)))
+    ?.scrollIntoView({ block: 'center' });
+}
+
+function resize() {
+  const w = renderer.domElement.clientWidth;
+  const h = renderer.domElement.clientHeight;
+  if (renderer.domElement.width !== w * renderer.getPixelRatio()
+    || renderer.domElement.height !== h * renderer.getPixelRatio()) {
+    renderer.setSize(w, h, false);
+  }
+}
+
+let last = performance.now();
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min((now - last) / 1000, 0.05);
+  last = now;
+  resize();
+
+  const view = renderer.domElement;
+  for (const card of cards) {
+    const r = card.el.getBoundingClientRect();
+    // Off screen is not drawn and not stepped: a page of panels should cost what is
+    // being looked at, not what exists.
+    if (r.bottom < 0 || r.top > view.clientHeight || r.right < 0 || r.left > view.clientWidth) {
+      continue;
+    }
+    if (card.playing) {
+      card.move.tick?.(card.ctx, dt);
+      card.ctx.tick?.(dt);
+      card.controller?.update(dt);
+    }
+    // Outside the play check: a stopped card is a held pose you can still walk round,
+    // which is most of why you would stop one.
+    card.controls.update();
+    const w = r.width;
+    const h = r.height;
+    const bottom = view.clientHeight - r.bottom;
+    renderer.setViewport(r.left, bottom, w, h);
+    renderer.setScissor(r.left, bottom, w, h);
+    card.camera.aspect = w / h;
+    card.camera.updateProjectionMatrix();
+    renderer.render(card.scene, card.camera);
+  }
+}
+requestAnimationFrame(frame);
+
+// Exposed for the harness that photographs this page; nothing here reads it.
+window.__cards = cards;
+</script>
+</body>
+</html>

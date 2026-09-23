@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test Data — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html" aria-current="page">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="test-data" tabindex="-1">Test Data</h1>
+<p><em>The simulation, and the default. Nothing to install.</em></p>
+<p>A fresh office opens onto a busy room with nothing installed, nothing running and no
+adapter configured — because <strong>a room with nobody in it is indistinguishable from a room
+that is broken.</strong></p>
+<p>It is also how everything visual gets checked, so all four
+<a href="../buildings.html">authored offices</a> use it.</p>
+<h2 id="what-a-simulated-shift-looks-like" tabindex="-1">What a simulated shift looks like</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>arrive</strong></td>
+<td>climb the stairs, hang a coat, settle in — not available for work until they are actually in</td>
+</tr>
+<tr>
+<td><strong>intake</strong></td>
+<td>a request lands addressed to them; they fetch it from the box and take it to their desk</td>
+</tr>
+<tr>
+<td><strong>look up</strong></td>
+<td>sometimes: the bookshelf for what the company knows, the globe or telescope for what the web knows</td>
+</tr>
+<tr>
+<td><strong>wait</strong></td>
+<td>sometimes: blocked on you</td>
+</tr>
+<tr>
+<td><strong>fail</strong></td>
+<td>occasionally: the work is binned, and that is the end of it</td>
+</tr>
+<tr>
+<td><strong>post</strong></td>
+<td>the finished work goes in the mailbox</td>
+</tr>
+<tr>
+<td><strong>break</strong></td>
+<td>a drink or a sit down, then the next request</td>
+</tr>
+<tr>
+<td><strong>clock off</strong></td>
+<td>after a handful of requests, out the door</td>
+</tr>
+</tbody>
+</table>
+<p>Roughly, per request: half involve a look-up, a fifth a wait, an eighth fail, a fifth
+arrive unaddressed, and three in ten are big enough to come by courier.</p>
+<p><strong>The post is what drives it.</strong> A request is posted to somebody who is <em>free</em>, and what
+they spend the next minute on is whatever was inside that envelope — so the plane you
+watched land is the work you can then follow across the floor.</p>
+<h2 id="the-room-fills-and-empties-like-a-real-one" tabindex="-1">The room fills and empties like a real one</h2>
+<p>The headcount is the shape of a day rather than a number. The office <strong>opens with its
+regulars</strong>, fills up <strong>slowly</strong> over the next couple of minutes as the extras drift in,
+and from then on <strong>wanders between the two</strong>: somebody's shift ends, and a while later
+somebody else turns up.</p>
+<p>Everyone walks in with a shift of two to four requests and leaves when it is done — unless
+they are one of the regulars holding the room, in which case the shift quietly extends.
+<strong>An office that empties reads as one that is broken</strong>, which is the whole reason this
+source exists.</p>
+<p>In a five-desk office opening with three, that works out at roughly a fifth of the hour at
+three people, half at four, a third at five, and never fewer than three.</p>
+<h2 id="they-are-named-the-way-real-sessions-are" tabindex="-1">They are named the way real sessions are</h2>
+<p>Simulated agents used to draw from a short playful pool — <code>Rovo</code>, <code>Pixel</code>, <code>Vex</code>. They now
+go through <a href="../agent-names.html">exactly the same naming as a live session</a>,
+so <code>Fix the flaky checkout test</code> makes somebody <code>Flaky-Mender</code>.</p>
+<p>Nothing is lost in telling them apart, because the name was never the honest signal: every
+agent wears the mark of the source it arrived on, and the badge says
+<code>Test Data · simulated</code>.</p>
+<h2 id="pressing-t" tabindex="-1">Pressing T</h2>
+<p><strong>T</strong> posts a request by hand, addressed to whoever is free — or unaddressed into the box
+if nobody is. It <strong>deliberately ignores whether anybody is free</strong>: somebody asking for work
+by hand has already judged that for themselves, and a keypress that quietly declined would
+just look broken.</p>
+<p>Keep Test Data ticked alongside a live feed and <strong>T</strong> stays available, which is genuinely
+useful while you are still getting an adapter working.</p>
+<h2 id="handy-for-a-second-office" tabindex="-1">Handy for a second office</h2>
+<p>Nothing about Test Data needs the receiver. Only one office on a machine can be the one
+your adapters feed, so a second one serves the page but gets no events — point that one at
+Test Data and it behaves perfectly.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../connect-your-agents.html">Connect your agents</a> — swapping this for your real sessions</li>
+<li><a href="../watching.html">Watching the office</a> — how to read what you are now looking at</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#what-a-simulated-shift-looks-like">What a simulated shift looks like</a></li>
+<li><a href="#the-room-fills-and-empties-like-a-real-one">The room fills and empties like a real one</a></li>
+<li><a href="#they-are-named-the-way-real-sessions-are">They are named the way real sessions are</a></li>
+<li><a href="#pressing-t">Pressing T</a></li>
+<li><a href="#handy-for-a-second-office">Handy for a second office</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

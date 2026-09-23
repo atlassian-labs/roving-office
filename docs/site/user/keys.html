@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Keys and panels — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html" aria-current="page">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="keys-and-panels" tabindex="-1">Keys and panels</h1>
+<p><em>Everything the keyboard does. Press <code>?</code> in the app for the same list.</em></p>
+<img src="../images/panels/shortcuts.png" width="584" alt="The shortcuts panel: keys grouped under Agents, Scene, Edit Mode and Developer, each with the key on the left and what it does on the right.">
+<p><em>Press <strong><code>?</code></strong> in the office and you get this — the same list as below, generated from the same registry.</em></p>
+<p>The compact top bar holds your keycard, scene switcher and source picker. Hover over
+each control for a tooltip explaining what it does. Press <code>S</code>
+for the scene controls, <code>E</code> for furniture, <code>A</code> for the agents roster, or <code>?</code> for help.
+Select an agent and choose <strong>Follow Along</strong> in their detail panel to see the room from
+their shoulder.</p>
+<h2 id="time-of-day" tabindex="-1">Time of day</h2>
+<p>The office opens at your local time. Press <code>S</code> to open <strong>Scene</strong> and drag the time
+slider to explore the day. Choose <strong>Now</strong> to return to your local clock. This
+changes the room's lighting; job timestamps still show real time.</p>
+<h2 id="the-camera" tabindex="-1">The camera</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Drag</strong></td>
+<td>Orbit. Clamped in tilt and swing, so it always reads as a diorama rather than a game.</td>
+</tr>
+<tr>
+<td><strong>Scroll</strong></td>
+<td>Zoom.</td>
+</tr>
+<tr>
+<td><strong>Ctrl/⌘ + drag</strong></td>
+<td>Pan, clamped so the office cannot be shoved off screen.</td>
+</tr>
+<tr>
+<td><strong>Click an agent</strong></td>
+<td>Their detail panel: status, current job, and the last ten jobs.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-keys" tabindex="-1">The keys</h2>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>?</code></td>
+<td>The shortcuts panel.</td>
+</tr>
+<tr>
+<td><code>Esc</code></td>
+<td>Close the open panel, or drop the selected agent.</td>
+</tr>
+<tr>
+<td><code>D</code></td>
+<td><strong>Datasources</strong> — which harnesses fill this office. It can hold several at once.</td>
+</tr>
+<tr>
+<td><code>S</code></td>
+<td>The scene panel: time-of-day scrubber, lights, season and building. The room's own dials.</td>
+</tr>
+<tr>
+<td><code>L</code></td>
+<td>Cycle the lights: follow the clock, force on, force off.</td>
+</tr>
+<tr>
+<td><code>A</code></td>
+<td>Hide the agents roster, which covers the corner the camera usually points at.</td>
+</tr>
+<tr>
+<td><code>F</code></td>
+<td>Look through the selected agent's eyes. Again to step out.</td>
+</tr>
+<tr>
+<td><code>E</code></td>
+<td><strong>Rearrange the furniture</strong> — drag props about and watch the paths re-route. <a href="rearranging-furniture.html">More</a></td>
+</tr>
+<tr>
+<td><code>P</code></td>
+<td>Show or hide the route ribbons: the paths people are walking.</td>
+</tr>
+<tr>
+<td><code>T</code></td>
+<td>Airmail a job in. Only offered when something selected can invent one.</td>
+</tr>
+<tr>
+<td><code>C</code></td>
+<td>Copy a photo of the scene to the clipboard — the canvas only, no panels.</td>
+</tr>
+<tr>
+<td><code>G</code></td>
+<td>The activity log: every event, as text.</td>
+</tr>
+<tr>
+<td><code>V</code></td>
+<td>The developer panel: camera readout, and the way to the debug log.</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>Scene</strong> panel adapts to the space beside the other panels. Buildings use two
+columns. Time and Season share a section: <strong>Now</strong> sits beside Time, with the scrubber
+and a wrapping row of season buttons underneath. The scrubber expands into spare
+space. <strong>Auto</strong> lets the clock control the lights; the disabled switch shows whether
+they're on. Click Auto again to use the switch yourself. In a narrow panel, the
+switch sits underneath Auto.</p>
+<h2 id="every-panel-also-closes-with-a-click" tabindex="-1">Every panel also closes with a click</h2>
+<p>Each one carries an <strong>×</strong> in its own top-right corner — the strips along the bottom, the
+agents roster, the agent detail panel, the shortcuts card, the source picker and the
+first-person caption.</p>
+<p>A key is a shortcut, not the only door. If you opened a panel by clicking something, you
+should not have to learn a key to put it away again. It is the same × everywhere, and it
+does whatever the key does rather than merely hiding the panel — Edit Mode's × leaves the
+mode, gizmos and route ribbons included.</p>
+<h2 id="the-room-comes-back-the-way-you-left-it" tabindex="-1">The room comes back the way you left it</h2>
+<p>Put the agents roster away and it stays away. Leave the <strong>Scene</strong> or <strong>Developer</strong> strip
+open and it is still open next time. The three panels you can show and hide with <code>A</code>, <code>S</code>
+and <code>V</code> are remembered, so an office you have arranged to watch one way does not have to
+be rearranged every time you open it.</p>
+<p>It is remembered <strong>by this browser</strong>, not by the office — the same as where you left the
+camera and the layouts on your shelf. Send somebody your keycard and they get the room,
+not your screen; open the same office on your phone and it arranges itself however you
+last left it <em>there</em>. If your browser will not keep anything — a private window, for
+instance — the panels simply open the way they always did.</p>
+<p>Two things are deliberately <em>not</em> remembered. <strong>Edit Mode</strong> always opens closed, because
+it changes what dragging the mouse does and coming back to a room that is already
+rearrangeable is a surprise rather than a convenience. And an agent's <strong>detail panel</strong>
+needs an agent, so it waits for you to pick one.</p>
+<h2 id="two-keys-that-behave-oddly-on-purpose" tabindex="-1">Two keys that behave oddly on purpose</h2>
+<p><strong><code>T</code> disappears.</strong> It offers to invent a job, so it is only there when something selected
+can actually invent one — Test Data can, a live harness cannot. It vanishes from the
+keyboard <em>and</em> from the <code>?</code> panel in that case, because fabricating work on a live feed
+would be the office telling you a lie about your agents.</p>
+<p><strong><code>F</code> is listed even when it does nothing.</strong> It needs an agent selected. The shortcut
+stays in the list so you can discover the mode before selecting anyone; <strong>Follow Along</strong>
+in the detail panel offers the same view once you do.</p>
+<h2 id="riding-along" tabindex="-1">Riding along</h2>
+<p><strong>Follow Along</strong> or <code>F</code> puts the camera on the selected agent's shoulder. Their head is hidden while you ride,
+name tags fade as you get close, and the corners of the screen darken so it reads as
+looking <em>through</em> somebody rather than at them. Press <code>F</code> again to step out.</p>
+<p>It is the best way to appreciate that the room is a real space with real distances in it,
+and the fastest way to notice that the printer is a head taller than the people using it.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#time-of-day">Time of day</a></li>
+<li><a href="#the-camera">The camera</a></li>
+<li><a href="#the-keys">The keys</a></li>
+<li><a href="#every-panel-also-closes-with-a-click">Every panel also closes with a click</a></li>
+<li><a href="#the-room-comes-back-the-way-you-left-it">The room comes back the way you left it</a></li>
+<li><a href="#two-keys-that-behave-oddly-on-purpose">Two keys that behave oddly on purpose</a></li>
+<li><a href="#riding-along">Riding along</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

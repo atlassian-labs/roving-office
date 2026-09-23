@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Buildings and themes — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html" aria-current="page">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="buildings-and-themes" tabindex="-1">Buildings and themes</h1>
+<p><em>Eight buildings. One floor plan, and everything else different.</em></p>
+<p>Every office shares the same floor — the same room dimensions, the same places the desks
+can stand — and differs in all the ways you actually notice: the walls, the floor finish,
+the light, the way in, and the city outside the windows.</p>
+<p>Press <strong><code>S</code></strong> for the scene panel and change <strong>Building</strong> to move house. The room comes
+with you.</p>
+<p><strong>So do your agents.</strong> Changing the building or the season keeps everybody in the office —
+their desk assignments, their current jobs, their recent history, and whoever you had
+selected. Live feeds keep running. Somebody caught on a staircase or in a lift that the
+new building does not have carries on from the new entrance instead.</p>
+<h2 id="the-eight" tabindex="-1">The eight</h2>
+<h3 id="alder-street" tabindex="-1">Alder Street</h3>
+<img src="../images/buildings/simple.png" width="880" alt="An isometric cutaway brownstone office: warm wood floors, sage walls, a park with trees visible across the street.">
+<p><em>A brownstone beside a leafy city park.</em> Ground floor, a <strong>stoop</strong> with steps down to the
+pavement, and a park across the road. The plainest of the eight, and the one the office
+opens on.</p>
+<hr>
+<h3 id="foundry-loft" tabindex="-1">Foundry Loft</h3>
+<img src="../images/buildings/warehouse.png" width="880" alt="An isometric cutaway warehouse office: dark stained boards, deep sage walls, a brick arcade facade and a service yard with loading bays below.">
+<p><em>Brick, timber and industrial character.</em> Top floor of two, reached by <strong>an external
+staircase</strong> run hard against the facade — everything that comes in climbs it, the courier
+included. Below is a service yard with loading bays on the bay grid, and a concrete apron
+with painted markings.</p>
+<hr>
+<h3 id="rue-dauphine" tabindex="-1">Rue Dauphine</h3>
+<img src="../images/buildings/mansard.png" width="880" alt="An isometric cutaway Parisian studio: pale plaster walls, a mansard roof with chimney pots, and a city of hipped rooftops outside.">
+<p><em>A Parisian studio above the rooftops.</em> Top of three, up <strong>a glazed-in stairwell</strong> — two
+storeys of bare external stair against limestone reads as a fire escape, so the top of the
+back wall goes behind glass. Which is also why <strong>this one's back wall has no windows</strong>, and
+therefore no window boxes. A steep mansard roof with chimney stacks standing on it.</p>
+<hr>
+<h3 id="tide-wharf" tabindex="-1">Tide Wharf</h3>
+<img src="../images/buildings/tide.png" width="880" alt="An isometric cutaway studio on a harbour pier: pale ash floors, dark blue trim, timber decking and water on three sides, with a moored fishing boat.">
+<p><em>An airy studio on a working harbour.</em> A <strong>stoop</strong> onto timber decking, water on three
+sides, and a boat moored at the end of the pier.</p>
+<p>A low Nordic harbour studio: pale ash boards and dark blue steel framing broad views
+across the water. A stone quay and timber deck connect the room to a continuous
+waterfront, with coves, docks, moored boats and layers of harbour buildings beyond. Cool
+blue daylight makes the interior feel open; warm lamps make it a sheltered place after
+dark.</p>
+<hr>
+<h3 id="canopy-house" tabindex="-1">Canopy House</h3>
+<img src="../images/buildings/canopy.png" width="880" alt="An isometric cutaway office among trees: timber structure, green foliage pressing in at every window, a garden outside.">
+<p><em>A light-filled office among the trees.</em> Ground floor, a <strong>stoop</strong>, and foliage at every
+window — the most enclosed outlook of the eight. You are in a garden rather than looking
+at one.</p>
+<p>A timber-framed garden pavilion. Tall windows wrap two sides of the room with tree
+canopies just beyond the glass, and oak floorboards, exposed beams, woven pendant shades
+and a planted wall bring the warmth of a conservatory indoors. Ferns fill the window
+planters and trailing greenery hangs from the upper ledge. Outside, a winding path leads
+from the entrance past a few low neighbouring buildings among the trees.</p>
+<p>Move the time towards evening to see the warm interior against the darkening garden.</p>
+<hr>
+<h3 id="kestrel-tower" tabindex="-1">Kestrel Tower</h3>
+<img src="../images/buildings/skyscraper.png" width="880" alt="An isometric cutaway office on a tower floor: polished concrete, cool grey walls, neighbouring towers rising past the windows over a field of rooftops far below.">
+<p><em>Glass, sky and gardens above the city.</em> Level 34, reached by <strong>a lift</strong> on the outside of
+the building whose car really travels. Three storeys of curtain wall are modelled below
+you, and the neighbouring towers rise <em>past</em> eye level over a field of rooftops. There is
+no season in its name, because a tower is never on a street.</p>
+<hr>
+<h3 id="lantern-court" tabindex="-1">Lantern Court</h3>
+<img src="../images/buildings/lantern.png" width="880" alt="An isometric cutaway office in dark timber: paper screens, a Japanese garden with raked gravel and maples outside.">
+<p><em>Dark timber overlooking a Japanese garden.</em> Ground floor, a <strong>stoop</strong>, and a courtyard
+garden of raked gravel and maples.</p>
+<p>A low garden pavilion of dark timber, creamy paper screens and carefully framed clear
+windows. A pale woven floor and restrained indigo and burgundy accents give the room a
+calm, ordered feel. Narrow paths wind through a full garden of moss, ferns, shrubs, pines,
+bamboo and seasonal maples, with water and a small footbridge. At night the screens and
+lanterns glow against the darker garden — this is the building where the lamps matter
+most.</p>
+<hr>
+<h3 id="dune-atelier" tabindex="-1">Dune Atelier</h3>
+<img src="../images/buildings/dune.png" width="880" alt="An isometric cutaway office with earth walls and arched openings: terracotta floors, a pergola, an olive tree and shaded desert alleys outside.">
+<p><em>Earth walls, shaded alleys and desert light.</em> Ground floor, a <strong>stoop</strong>, and arched
+openings cut through thick earth walls.</p>
+<p>A sculpted courtyard office with thick sandy walls, deep rounded openings and terracotta
+floor tiles. The light falls across broad plaster surfaces and through timber shade
+elements — the hardest light of the eight, which is why so much of it is shaded. Outside,
+a quiet walled garden holds an olive tree, succulents and a narrow water channel, and the
+entrance leads into a low earthen town with shaded alleys, backed by layers of
+wind-shaped dunes.</p>
+<blockquote>
+<p>Every picture on this page is generated from the real building by
+<code>npm run shot</code>, so a building that changes and a page that is rebuilt cannot disagree.
+Each heading and the italic line beneath its picture are that building's own <code>label</code>
+and <code>subtitle</code>, not captions written here — they have changed once already.</p>
+</blockquote>
+<h2 id="the-way-in-is-part-of-the-building" tabindex="-1">The way in is part of the building</h2>
+<table>
+<thead>
+<tr>
+<th>Way in</th>
+<th>Used by</th>
+<th>What you see</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Stoop</strong></td>
+<td>Alder Street, Tide Wharf, Canopy House, Lantern Court, Dune Atelier</td>
+<td>A hinged door onto a stoop with steps down to the ground.</td>
+</tr>
+<tr>
+<td><strong>Stairs</strong></td>
+<td>Foundry Loft, Rue Dauphine</td>
+<td>A single straight external flight along the facade. Everything that comes in climbs it.</td>
+</tr>
+<tr>
+<td><strong>Elevator</strong></td>
+<td>Kestrel Tower</td>
+<td>An exposed shaft on the outside of the building, with a car that really travels.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The staircase is taken in turns.</strong> Nobody goes round anybody on a flight — there are no
+lanes, and stepping aside means stepping off it. One walker holds it; the next sets off once
+the one ahead is a couple of treads up, and anybody heading the other way waits for it to
+empty. A crowd of arrivals spreads across the pad at the foot rather than stacking on one
+spot. Before that rule, several agents arriving at once climbed as a single body all the way
+to the landing.</p>
+<p><strong>The lift's car doubles as the landing</strong>, which is why a lift building has no stoop: when
+the car is at your floor its plate is flush with the office floor and people step straight
+out onto it. The car only ever travels <em>down</em>, because the office is the top of the
+building.</p>
+<p>You can watch either at
+<a href="../character-movements.html#walking">the movement library</a>.</p>
+<h2 id="storeys-below" tabindex="-1">Storeys below</h2>
+<p>Some buildings show the floors underneath — Kestrel Tower has three, Rue Dauphine two,
+Foundry Loft one. Only the floor you are on is cut open. Every level below is a finished
+facade with a minority of windows lit, so the building reads as occupied rather than
+abandoned.</p>
+<h2 id="two-facades-and-only-where-they-are-seen" tabindex="-1">Two facades, and only where they are seen</h2>
+<p>Detail is spent only where it is seen. Each storey builds all four faces, but the two the
+camera actually looks at get the expensive treatment and the hidden pair gets the cheap one.</p>
+<table>
+<thead>
+<tr>
+<th>Style</th>
+<th>The camera-facing elevations</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Glazed</strong></td>
+<td>A curtain wall: a glazed ribbon at each apparent floor, a dark spandrel band on every floor line, continuous full-height mullion fins, scattered lit offices.</td>
+<td>Kestrel Tower</td>
+</tr>
+<tr>
+<td><strong>Solid</strong></td>
+<td>A brick arcade: round-arched openings between pilasters, on a painted base course, under a corbelled cornice, with faded painted signage over the top.</td>
+<td>Foundry Loft</td>
+</tr>
+<tr>
+<td><strong>Punched</strong></td>
+<td>Plain masonry with tall openings in a regular grid: a string course at each floor line, a stone surround and sill to every window, a centre mullion and transom, wrought-iron balconies on the upper row.</td>
+<td>Rue Dauphine, and most things</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-arcade" tabindex="-1">The arcade</h3>
+<p>Foundry Loft's elevation is divided into equal bays and each bay is given a <em>role</em> — arched
+window, square-headed loading shutter, or the arched entrance — so the doors land on the bay
+grid instead of being placed independently of it. That is what stopped the earlier flat
+elevation reading as stickers on a wall.</p>
+<p><strong>One opening width for the whole building.</strong> The tighter of the two elevations wins, so the
+arches match round the corner. Sizing each side independently made the long side read as
+squished: it carries five bays to the short side's three.</p>
+<p>The loading doors get a concrete apron with painted bays and a driveway out to the street
+over a dropped kerb — loading doors with no road to arrive on read as wrong without your
+being able to say why.</p>
+<h2 id="the-roof" tabindex="-1">The roof</h2>
+<p>A cutaway office cannot have a roof over it: the camera looks down into the room, and a
+complete roof is a lid on the diorama. So the roof is built only where it is <strong>not in the
+way</strong> — the two standing walls get a pitched plane each, sloping away from the room and
+overhanging outside, and the near half is open exactly as its near elevations are.</p>
+<p>What that buys is the silhouette, which is all a roof is at this distance: a fascia and
+eaves above the far walls, a ridge behind them, and something for snow to lie on or a
+chimney to stand out of.</p>
+<h2 id="the-cities-from-above" tabindex="-1">The cities, from above</h2>
+<p>The room is one shared floor plan, but what is <em>outside</em> it is what each building is really
+named for — and that only shows from above.</p>
+<table>
+<thead>
+<tr>
+<th><code>brownstone</code></th>
+<th><code>snowfall</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="../images/maps/brownstone.png" width="440" alt="Overhead map: the office on its street corner, a park with a pond across the road, a skyline of rooftops in the distance"></td>
+<td><img src="../images/maps/snowfall.png" width="440" alt="Overhead map: the same street and park under snow, bare trees, a frozen pond"></td>
+</tr>
+<tr>
+<td>Alder Street · warm wood</td>
+<td>Alder Street · winter</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><code>tower</code></th>
+<th><code>studio</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="../images/maps/tower.png" width="440" alt="Overhead map: the office as one lit rooftop among a cluster of neighbouring towers, with a rooftop garden and pond nearby"></td>
+<td><img src="../images/maps/studio.png" width="440" alt="Overhead map: the warehouse's service yard and loading bays below the wall, an autumn park with orange trees across the street"></td>
+</tr>
+<tr>
+<td>Kestrel Tower · level 34</td>
+<td>Foundry Loft · top floor</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><code>tide</code></th>
+<th><code>dune</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="../images/maps/tide.png" width="440" alt="Overhead map: the studio on its pier, timber decking, moored boats and open water"></td>
+<td><img src="../images/maps/dune.png" width="440" alt="Overhead map: the atelier among shaded desert alleys and courtyards"></td>
+</tr>
+<tr>
+<td>Tide Wharf · the harbour</td>
+<td>Dune Atelier · the courtyard</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th><code>lantern</code></th>
+<th><code>canopy</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="../images/maps/lantern.png" width="440" alt="Overhead map: the office around a Japanese courtyard garden with raked gravel and maples"></td>
+<td><img src="../images/maps/canopy.png" width="440" alt="Overhead map: the office among trees, foliage pressing in from every side"></td>
+</tr>
+<tr>
+<td>Lantern Court · the garden</td>
+<td>Canopy House · among the trees</td>
+</tr>
+</tbody>
+</table>
+<p>Same desks, same rug, same stations, right at the centre of every shot. What changes is
+everything around them.</p>
+<h2 id="what-is-outside-is-not-chosen-directly" tabindex="-1">What is outside is not chosen directly</h2>
+<p>A theme names a <strong>season</strong> and a <strong>building</strong>, and the outlook falls out of the pair.</p>
+<p>Kestrel Tower insists on a skyline however green its season, because a park you are
+thirty-four floors above is not a view of a park. Tide Wharf, Dune Atelier, Lantern Court
+and Canopy House each force their own — a harbour, a courtyard, a garden. The street-level
+brownstone and Foundry Loft take that season's street.</p>
+<p>That is why the season and building switches are two independent controls rather than one
+long list of every combination — and why a tower's subtitle names no season. Naming one you
+cannot see would be a lie.</p>
+<h2 id="what-is-deliberately-not-themeable" tabindex="-1">What is deliberately not themeable</h2>
+<p>Room dimensions, station coordinates and the desk layout. Every path an agent walks is
+derived from those, so varying them per building would mean re-deriving the pathfinding for
+each one. Offices therefore share a floor plan and differ in finish, light and outlook.</p>
+<p>They are not un-<em>editable</em>, though — <a href="rearranging-furniture.html">the furniture editor</a> moves
+everything at runtime, and that is also what lets a whole room be
+<a href="generated-offices.html">generated from a seed</a>.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="solar-geometry.html">Solar geometry</a> — the light that falls on all eight, and the seasons</li>
+<li><a href="the-room.html">The room, prop by prop</a> — what is inside them</li>
+<li><a href="generated-offices.html">Generated offices</a> — a whole layout from any string</li>
+<li>Adding a building or a new view outside is a <a href="../developer/extending.html#add-a-building-or-an-outlook">developer job</a></li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#the-eight">The eight</a><ul><li><a href="#alder-street">Alder Street</a></li>
+<li><a href="#foundry-loft">Foundry Loft</a></li>
+<li><a href="#rue-dauphine">Rue Dauphine</a></li>
+<li><a href="#tide-wharf">Tide Wharf</a></li>
+<li><a href="#canopy-house">Canopy House</a></li>
+<li><a href="#kestrel-tower">Kestrel Tower</a></li>
+<li><a href="#lantern-court">Lantern Court</a></li>
+<li><a href="#dune-atelier">Dune Atelier</a></li></ul></li>
+<li><a href="#the-way-in-is-part-of-the-building">The way in is part of the building</a></li>
+<li><a href="#storeys-below">Storeys below</a></li>
+<li><a href="#two-facades-and-only-where-they-are-seen">Two facades, and only where they are seen</a><ul><li><a href="#the-arcade">The arcade</a></li></ul></li>
+<li><a href="#the-roof">The roof</a></li>
+<li><a href="#the-cities-from-above">The cities, from above</a></li>
+<li><a href="#what-is-outside-is-not-chosen-directly">What is outside is not chosen directly</a></li>
+<li><a href="#what-is-deliberately-not-themeable">What is deliberately not themeable</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

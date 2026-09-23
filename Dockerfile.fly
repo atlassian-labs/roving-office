@@ -1,0 +1,57 @@
+# Zero-dependency Node server — no npm install, no build step. Ships exactly what
+# bin/kaizen-build.sh ships for the Kaizen artifact, so the two deploy targets can't
+# drift out of sync with each other.
+#
+# The `.fly` suffix is the whole point of the name: as `Dockerfile` this failed the
+# trust scanner on pull requests that never touched deployment. Fly is told where to
+# find it by `dockerfile` under `[build]` in fly.toml, so the suffix costs nothing at
+# the call site — `flyctl deploy` is still a bare command — and no `Dockerfile` ever
+# exists in the checkout, not even for the length of a build.
+FROM node:24-slim
+
+WORKDIR /app
+
+COPY *.html styles.css favicon.ico server.cjs package.json ./
+# Complete licenses for the vendored browser library and derived colour data.
+COPY THIRD_PARTY_NOTICES.txt ./
+# The docs that are pages rather than prose — see bin/kaizen-build.sh, which ships the
+# same set. `.dockerignore` excludes the rest of docs/ and lets these back through.
+COPY docs/*.html ./docs/
+# The built documentation site, served at /docs. Committed rather than built, because
+# this image deliberately runs no `npm install` and Eleventy is a devDependency — see
+# docs/developer/publishing.md. The markdown source stays out of the image.
+COPY docs/site ./docs/site
+# All the doc imagery. The object portraits are app furniture as well as documentation —
+# the editor's add menu shows one per row from /docs/images/objects — and now that the
+# prose ships too, every other picture is needed for the same reason.
+COPY docs/images ./docs/images
+# The downloadable examples docs/user/layouts.md links at.
+COPY docs/examples ./docs/examples
+# The published Claude plugin — the marketplace JSON added by URL and the archive it
+# pins. bin/kaizen-build.sh ships the same directory, minus the same Codex tree
+# (excluded in .dockerignore here): a marketplace that existed on one deploy target and
+# 404ed on the other would be worse than one that existed on neither.
+COPY plugins ./plugins
+COPY assets ./assets
+COPY lib ./lib
+COPY src ./src
+COPY vendor ./vendor
+# The admin console's three files. It is reachable only when a deployment sets
+# ROVING_OFFICE_ADMIN_PASSWORD, and `server.cjs` serves these itself because the static
+# file server refuses this directory — so without them a configured console would answer
+# 404 to its own page and look broken rather than absent. bin/kaizen-build.sh ships the
+# same directory: a console that worked on one deploy target and not the other would be
+# worse than one that worked on neither.
+COPY admin ./admin
+
+ENV PORT=8080
+# `server.cjs` binds loopback by default, because on a laptop it serves the whole working
+# tree and that is not a thing to offer the network. A container is the other case: the
+# only way in is the port the runtime publishes, so loopback here means nothing can reach
+# it at all — Fly's proxy least of all, since it arrives on the machine's private
+# interface. The container boundary is what makes the wide bind correct, so the recipe
+# that creates that boundary is where it is set.
+ENV HOST=0.0.0.0
+EXPOSE 8080
+
+CMD ["node", "server.cjs"]

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Job delivery — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html" aria-current="page">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="job-delivery" tabindex="-1">Job delivery</h1>
+<p><em>The mailbox machinery: how a request gets from a harness into an agent's hands, how
+finished work leaves again, and what happens to work that fails or is never collected.</em></p>
+<p>What a reader sees of all this — the plane, the courier, the flag, the bin — is
+<a href="../user/work-and-post.html">post, parcels and the bin</a>. This page is the model underneath
+it.</p>
+<p>The <strong>mailbox</strong> is both the in-tray and the out-tray: letters land in the slot, parcels stack on the floor beside it, and finished work is walked back and dropped in. Its red flag means <em>there is work waiting</em>, whichever shape that work is in. The <strong>inbox</strong> — the stack of cardboard boxes — is the fallback source of material when no post is waiting. The <strong>bin</strong> takes work that errored. Every one of those is a station in <code>src/layout.js</code>, and the behaviour that walks to them lives in <code>src/agents/AgentManager.js</code>.</p>
+<p>The ownership rules are deliberately separate, in <code>src/agents/post.js</code>, with no Three.js in them.</p>
+<p>Files worth having open:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>What it owns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/agents/post.js</code></td>
+<td>Who may open which envelope, and how big it is. Pure logic, no scene.</td>
+</tr>
+<tr>
+<td><code>src/agents/AgentManager.js</code></td>
+<td>Turning events into walking about.</td>
+</tr>
+<tr>
+<td><code>src/scene/mail.js</code></td>
+<td>The paper airplane flight and its queue — letters.</td>
+</tr>
+<tr>
+<td><code>src/scene/courier.js</code></td>
+<td>The courier, the throw and its queue — packages, by stoop, stairs or lift.</td>
+</tr>
+<tr>
+<td><code>src/scene/approach.js</code></td>
+<td>The stoop and the staircase: where the steps are, and the routes over them. Shared by the builder, the courier and the agents.</td>
+</tr>
+<tr>
+<td><code>src/scene/props/mailbox.js</code></td>
+<td>The mailbox flag, letters, parcel pile, and the bin's crumples.</td>
+</tr>
+<tr>
+<td><code>src/data/AopSource.js</code></td>
+<td>Which harness events become which office events.</td>
+</tr>
+<tr>
+<td><code>src/ui/overlay.js</code></td>
+<td>The Job Delivery / Job Removal panel.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="1-the-two-kinds-of-post" tabindex="-1">1. The two kinds of post</h2>
+<p>A single mailbox holds two kinds of envelope, and the difference is about ownership rather than looks.</p>
+<p><strong>Unaddressed</strong> (<code>forId: null</code>) is work nobody owns yet — a queued ticket, a scheduled job. The first agent to reach the box takes it, and that race is real: two agents can set off and only one can win. This is what an AOP <code>job.queued</code> event becomes, and what a fifth of <code>MockSource</code>'s requests are, so the race stays exercised offline.</p>
+<p><strong>Addressed</strong> (<code>forId</code> set) is a prompt typed into one specific session. Only its recipient can open it, so nobody else should so much as walk over.</p>
+<p>The crucial design decision is <em>when</em> addressing happens: at <strong>posting</strong> time, not at collection time. <code>Post.post(forId)</code> bumps an in-flight counter the moment the envelope is sent, before the plane has moved:</p>
+<pre><code class="language-js">post(forId = null) {
+  if (forId) this.inFlight.set(forId, (this.inFlight.get(forId) ?? 0) + 1);
+}
+</code></pre>
+<p>That is what lets the room be honest about work in flight. The request exists the moment it is made, so its recipient can get up, walk over, and <em>wait at the box</em> for a plane that has not landed yet. Only the animation lags; the simulation never lies about what has been asked for. It also means the plane can be tinted with the recipient's colour in flight (<code>ADDRESS_TINT</code> in <code>mail.js</code>), so you can see from across the room who a request is for — a name on an envelope.</p>
+<h2 id="1a-how-it-arrives-and-why-that-means-nothing" tabindex="-1">1a. How it arrives, and why that means nothing</h2>
+<p>Work arrives by air as a paper plane through the window, by courier as a parcel thrown in through the door, or — in a room with a printer — out of the machine as a fax. <strong>Which one is a draw that nothing about the work enters into</strong> — <code>arrivalFor()</code> in <code>post.js</code>, walking <code>ARRIVALS</code> by <code>ARRIVAL_WEIGHTS</code>.</p>
+<p>The weights are <code>letter: 2</code>, <code>package: 1</code>, <code>fax: 1</code>. The mailbox counts double because the window is the room's front door for work — it is the arrival with the flag, the pile, and two vehicles of its own — and an even three-way split had the thing people watch for arriving a third of the time. It is emphatically not a claim that a letter <em>means</em> more than a parcel; the weights are about which animation is worth seeing most often, which is a question about the room rather than about the job. An unlisted channel weighs 1, so a new way in draws from the day its string is added, and the shares renormalise over the pool <code>enabledArrivals</code> hands over rather than reserving anything for a channel the room does not have.</p>
+<p>It used to say something, and the reason it stopped is worth keeping. Small work came as a letter and big work as a package, decided by <code>sizeOf(job)</code>: word lists of &quot;refactor&quot; and &quot;migrate&quot; against &quot;typo&quot; and &quot;bump&quot;, a square-rooted lean on the title's length, clamps at both ends, a tuned <code>PACKAGE_SHARE</code> of 0.18 to land the observed share near a quarter. Eighty-odd lines, carefully built, and all of it a <strong>guess</strong> — because the feed carries a line of text and nothing else, so there was no signal to read.</p>
+<p>Two things were wrong with it:</p>
+<ul>
+<li><strong>A wrong guess is worse than no guess.</strong> A room that shows work as &quot;big&quot; is making a claim, and a claim nobody can check is noise wearing the clothes of information. The inference was wrong often enough to notice: &quot;port the config&quot; is a crate, &quot;important note&quot; nearly was.</li>
+<li><strong>The distinction was not real.</strong> A letter and a parcel are the same thing — a job — and everything downstream already treated them identically. The only thing the inference bought was two animations chosen for a bad reason.</li>
+</ul>
+<p>So the animations stayed and the meaning went. Both channels are equivalent ways into the same mailbox, and the courier is not a different class of delivery — he is the mailbox, on foot. What an agent carries still matches how it arrived, so work that came by air is delivered by air and binned as a letter, but that is consistency rather than significance.</p>
+<p>The arrival is settled in <code>_post</code>, before anything leaves, because it decides which channel the work travels by. A source may state it outright (<code>ev.arrival</code>), and exactly one kind of thing does: the mail buttons in the pilot panel, which exist to show each channel on demand.</p>
+<p><strong>Adding a third way in is a string and an animation.</strong> A printout or an incoming fax joins <code>ARRIVALS</code> and needs no rule to learn about it — which is the whole benefit of the channel meaning nothing.</p>
+<h3 id="the-letters-other-vehicle-the-bird" tabindex="-1">The letter's other vehicle: the bird</h3>
+<p>A letter has a <em>vehicle</em> as well as a channel, settled in the same place and by the same kind of draw: two letters in three by paper plane, the third by <strong>bird</strong> (<code>scene/birds.js</code>). The bird flies in through the window along a bezier, hovers over the box while the letter drops from its talons, and flies back out — phased as <code>MailFlights</code> is, and announcing the arrival at the drop rather than at its own exit, because the drop is the touchdown.</p>
+<h3 id="threading-the-window-and-why-the-wings-tuck" tabindex="-1">Threading the window, and why the wings tuck</h3>
+<p>A plane can go through a window without anybody checking the numbers. A bird cannot, and this is the part worth reading before touching the flight path.</p>
+<p>The opening is not a hole. It is three lights by two, so there are <strong>two mullions and a transom in the middle of it</strong> — and a bird with its wings out is about 3.1 units across against a light 2.1 wide. Two things follow, and the birds shipped without either:</p>
+<ul>
+<li><strong>It has to aim at a light, not at the window.</strong> The centre of the opening <em>is</em> the transom. <code>windowLight()</code> in config.js returns one light's clear rectangle, inset by half a bar on the divided edges and half the frame on the outer ones; the birds use the middle light of the top row (<code>LIGHT</code> in <code>birds.js</code>), clear of both jambs and high enough to come in over the desks. The glazing bars moved out of <code>buildWindow()</code> into <code>WINDOW_LIGHTS</code> at the same time, because a builder that divided the glass differently from what the birds asked about would put them straight through timber — which is what it was doing.</li>
+<li><strong>It has to fold.</strong> <code>poseWings()</code> sweeps both wings back at the shoulder by up to 72°, keyed off distance from the wall plane (<code>tuckAt</code>) rather than off the curve's own <code>t</code>, so a change to the path cannot leave a bird arriving at the frame half-folded. Tucked, the widest species measures 1.67 across. The beat is damped by the same factor, because a tucked wing still flapping reads as a glitch rather than a glide. This is a gesture with a job, not decoration: without it there is no route through this window at all, which is what <code>test/bird-window.test.js</code> asserts first.</li>
+</ul>
+<p>The crossing is kept square by putting <strong>both</strong> middle control points of the bezier on the light's centre line. With them coincident there, the curve's drift off the line is the cubic's last term alone — <code>t³</code> — so the bend has barely started by the time the bird's tail is out of the frame. A single control point on the line was not enough: the bank was already underway with the tail still in the opening, and the wingtip cleared the near mullion by −0.01. It has to hold for a mailbox dragged anywhere in the room, so it cannot be a path tuned against the default layout.</p>
+<h3 id="one-bird-at-a-time" tabindex="-1">One bird at a time</h3>
+<p>The courier's rule, for the courier's reason. Planes get away with four at once because a dart can pass a foot from another dart; birds converge on one hole in one window and then on one slot in one box, so two at once were not near each other but <strong>inside</strong> each other. <code>POOL_SIZE</code> is 1 and the rest of the letters queue, so a burst trickles in a flight apart — about two and a half seconds — and the tally on the box is the same either way.</p>
+<p>The flight was slower than that when the queue arrived, and the two compounded into &quot;the birds are sluggish&quot;. <code>IN_TIME</code> and the three beats beside it now run at 1.75× the pace they were first flown at, which is a shorter wait for a queued letter as well as a quicker bird. The travel wingbeat scales with them; the hover's flutter does not, because that one is about holding still.</p>
+<p>Three things about it are worth knowing, and they are all consequences of the channel meaning nothing:</p>
+<ul>
+<li><strong>It is a vehicle, not a channel.</strong> Nothing downstream can tell. What lands is a letter — same box tally, same envelope in the collector's hand, same word in the log — and the letter mesh is tinted for its recipient the way an addressed plane is, so who a request is for survives the change of courier. Adding it needed no new arrival, no new rule, and no change to the collect-and-bin path.</li>
+<li><strong>A feed may name it</strong> (<code>vehicle: 'bird'</code> on a <code>mail</code> event), which is what the pilot's <strong>Job by bird</strong> button does. Naming the bird names the channel too: <code>_post</code> reads <code>vehicle: 'bird'</code> as a request for <code>letter</code>, because a coin toss that could hand an explicitly-asked-for bird to the courier is a toss outranking an instruction. Left unsaid, <code>ev.vehicle == null</code> falls to the <code>BIRD_SHARE</code> draw — one letter in three.</li>
+<li><strong>The room outranks the feed.</strong> The draw is gated on <code>CHANNELS.birds</code>, so with the aviary switched off even a feed asking for a bird gets the plane. That is the courier switch's rule, for the courier switch's reason: the switch is a fact about the office, and a request cannot argue with the room.</li>
+</ul>
+<p>Which bird flies is the one decision <code>birds.js</code> makes for itself. <code>CHANNELS.birdKind</code> is <code>'roster'</code> by default, and <code>rosterBird()</code> draws it per flight off <code>OWL_SHARE</code>: the owl takes <strong>0.75 of the night</strong> (<code>NIGHT_FROM</code> to <code>NIGHT_TO</code>, 19:00–07:00 off <code>worldClock</code>) and <strong>0.5 of the day</strong>, and whatever is left goes to one of <code>UNDERSTUDIES</code> — pigeon, kookaburra, raven — drawn evenly. Evenly on purpose: a weighted tail would be three more numbers to tune in exchange for a difference nobody watching the room could detect. Two tosses rather than one, because reusing the first roll's remainder would correlate the understudy with how narrowly the owl missed. Or set any of <code>BIRD_KIND_OPTIONS</code> to pin every flight to one species, day and night, because a chosen bird is the office's choice and the clock cannot overrule it. It rides in <code>CHANNELS</code>, so it is committed through the editor's <code>commit</code>, undoable, and saved with the room.</p>
+<h2 id="1b-the-courier" tabindex="-1">1b. The courier</h2>
+<p>One delivery at a time, because two couriers sharing a doorway reads as a bug even when the queue behind them is honest. Anything asked for mid-round waits in <code>courier.waiting</code>.</p>
+<p>The beats are <code>approach → heave → throw → leave</code>: in from off-stage, a wind-up over the shoulder while the door swings, a flat parabola across the room, then back out the way he came. He does not throw from the threshold — he takes <strong>two paces inside the room first</strong>, at every entrance, because a delivery man lobbing a parcel from a doorway is a silhouette and the point of him is that he can be seen. <code>INSIDE</code> is picked to clear the coat stand, so the pace in lands on open floor. It used to have to dodge the bin's approach lane as well; the bin has since moved to the back wall, which leaves the courier the only thing standing inside the doorway on purpose. He gets away with it where the bin did not because he stands 0.89 off the open leaf's centre plane rather than 0.26 — clear of it by better than a body's half-width — and because he holds the door open himself (<code>_holdDoor</code>) rather than tripping the proxy that used to open it on anybody standing nearby.</p>
+<p>He is built to an <strong>agent's measurements</strong> — hips at 0.9, shoulders at 1.78, a 0.62 head at 2.2 — and not to his own. He used to be a two-thirds-scale version of all of it, which made a grown man delivering to an office look like a child on the doorstep; the door is the one place in the scene where two human figures stand next to each other, so it is the one place a scale mismatch has something to be measured against. He is still not an <code>Agent</code>, and should not be: no name tag, no status ring, no work log, no crowd. He is scenery that walks.</p>
+<p>And he walks <strong>briskly</strong> — <code>WALK</code> is half again what an agent manages, because the round is the job and a delivery man who ambles in reads as somebody who works here. <code>RUN</code> and <code>STEP</code> are pinned to it as multiples rather than set independently, since what sells them is the ratio: stairs faster than the flat, the pace through the doorway slower than the approach. Leg swing is per unit walked, so a faster pace is more steps a second rather than a longer stride — wound back from 2.0 to 1.5 radians when the walk sped up, because at the new pace the old figure was a blur of legs.</p>
+<h3 id="one-route-per-entrance" tabindex="-1">One route per entrance</h3>
+<p>The three entrances differ only in the <em>route walked</em>, not in the phases. A route is a list of points, each carrying the speed of the leg that arrives at it, timed once at the start so every frame is a lookup:</p>
+<table>
+<thead>
+<tr>
+<th>Entrance</th>
+<th>Route</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stoop</code></td>
+<td>round the outside corner of the building → along the wall → up onto the landing → inside</td>
+</tr>
+<tr>
+<td><code>stairs</code></td>
+<td>along the pavement a storey below → the foot of the flight → <strong>up it at a run</strong> → the landing → inside</td>
+</tr>
+<tr>
+<td><code>elevator</code></td>
+<td>ride the car up (<code>summon</code>) → out of it → inside</td>
+</tr>
+</tbody>
+</table>
+<p>The way out is the same route reversed, which is where a speed belonging to a <em>leg</em> rather than a point earns its keep: reversing the points alone would take the flight at the pavement's walk and the doorway at a run, so each point inherits the speed of the point that followed it (<code>Route.reversed</code>).</p>
+<p>Legs run at a constant speed rather than easing across the whole trip, because the speeds <em>are</em> the performance — a run up the flight between a walk along the pavement and a step through the door. Easing the lot flattens the three back into one. Leg swing is driven by distance covered, so a faster pace is more steps a second rather than a longer stride.</p>
+<p>Where the steps are is <strong>not</strong> the courier's to decide: <code>scene/approach.js</code> works out both the stoop and the flight once and hands the same descriptors to the builder, to the courier and to the agent layer (see <a href="../user/buildings.html#the-way-in-is-part-of-the-building">buildings-and-themes.md</a>).</p>
+<p>The stoop route is the one that changed most. The courier used to appear on open pavement past the end of the stoop, in plain view — a delivery man popping into existence mid-street. He now comes round the <strong>outside corner of the building</strong>, where the two standing walls meet: from the diorama's camera that corner is the one piece of the exterior the building hides from itself, so he walks out from behind it and the arrival has somewhere to have come from. He walks it at pavement height and steps up onto the landing, rather than gliding in a metre above the kerb as he did before.</p>
+<p>The door needed nothing new — it has had a hinged leaf and <code>requestOpen</code> since agents started walking through it (<code>environment.js</code>) — but the hold did. How long the courier is inside now depends on a throw whose length depends on the room, so instead of booking a duration up front he renews a short hold every frame from <code>DOOR_LEAD</code> before the doorway until he is back out through it. A lift's landing doors answer the very same call, since <code>handles.door</code> and <code>handles.elevator</code> are one object, and asking a lift to open also summons it — which is exactly what is wanted while standing on its floor.</p>
+<p>The throw is timed and shaped from the distance it actually has to cover. Both used to be constants tuned for a parcel launched from the threshold; from inside the room the throw is a good deal shorter, and the old numbers made it a slow, towering lob over four units.</p>
+<p>The lift wait is bounded at <code>LIFT_WAIT</code>, and this is the one thing worth being careful about. If the car never comes the courier steps out onto the floor and throws anyway, because the parcel arriving late through a shut door is a room that has fallen behind reality, while a parcel that never arrives is a request the office has silently lost. The audit in §8.2 is the same lesson learned at the mailbox.</p>
+<h2 id="2-state-and-where-it-lives" tabindex="-1">2. State, and where it lives</h2>
+<p>Five pieces of state describe the mailbox, which is four more than ideal (see §8.6).</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Lives in</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>post.pending[]</code></td>
+<td><code>post.js</code></td>
+<td>Envelopes in the box, oldest first.</td>
+</tr>
+<tr>
+<td><code>post.inFlight</code></td>
+<td><code>post.js</code></td>
+<td>id → how many envelopes for them are airborne.</td>
+</tr>
+<tr>
+<td><code>mail.waiting[]</code></td>
+<td><code>mail.js</code></td>
+<td>Payloads with no free plane yet (pool is 4).</td>
+</tr>
+<tr>
+<td><code>courier.waiting[]</code></td>
+<td><code>courier.js</code></td>
+<td>Packages waiting for the courier to come back.</td>
+</tr>
+<tr>
+<td><code>mailbox.waiting*</code></td>
+<td><code>props.js</code></td>
+<td><em>Derived.</em> Told once a frame what the model holds.</td>
+</tr>
+<tr>
+<td><code>rec.hasMaterial</code></td>
+<td><code>AgentManager</code></td>
+<td>Does this agent have something to work on?</td>
+</tr>
+<tr>
+<td><code>rec.workSize</code></td>
+<td><code>AgentManager</code></td>
+<td>Which size they are carrying, so it leaves as it came.</td>
+</tr>
+</tbody>
+</table>
+<p>The mailbox no longer keeps its own tally. <code>AgentManager.update</code> reads <code>post.countBySize()</code> and hands it over with <code>setWaiting(letters, parcels)</code>, so the flag and the meshes cannot disagree with the model — see §8.6.</p>
+<h2 id="3-new-work-arriving" tabindex="-1">3. New work arriving</h2>
+<h3 id="31-the-sequence" tabindex="-1">3.1 The sequence</h3>
+<pre><code>harness event                     AopSource._reduce
+  turn.start        ──▶  { type:'mail', job, forId: sessionKey }   addressed
+  job.queued       ──▶  { type:'mail', job }                      unaddressed
+                                        │
+                                        ▼
+                          AgentManager._post(ev)
+                            ├─ recipient not in the room?  drop, silently
+                            ├─ post.post(forId)            count it in-flight
+                            └─ mail.launch(payload)
+                                 ├─ free plane   → fly (1.45 s)
+                                 ├─ pool busy    → mail.waiting (max 16)
+                                 └─ queue full   → false → post.unpost(forId)
+                                        │
+                                    touchdown
+                                        ▼
+                          MailFlights.update
+                            ├─ mailbox.receive()      flag up, letter appears
+                            └─ onArrive(payload)
+                                        ▼
+                          AgentManager._mailArrived
+                            └─ post.land({job, forId}, isPresent)
+                                 ├─ recipient gone → false → mailbox.collect()
+                                 └─ pushed to pending → emitFeed('delivery')
+</code></pre>
+<p>A <code>delivery</code> entry carries the recipient with it — <code>for</code> is their name and <code>forColor</code> their colour — so the panel can say who an addressed envelope is for: a dart in that colour and their first name, on the same line as the time. The colour is the one the plane wore across the room, and the surname is left off because it is this office's word for the job, which the line below is already spelling out. Unaddressed post has nobody to name, and shows the time alone.</p>
+<p>Both facts are copied onto the entry rather than left as an id for the panel to resolve, because an entry is a record of a moment: the line should still name its recipient after they have gone home.</p>
+<p>Note that <code>turn.start</code> sends the job <em>inside</em> the envelope rather than setting it on the agent. The desk label changes when the agent opens the envelope, not when the event arrives — which is the whole point of the envelope. Prompts used to retitle a desk silently, so new work was nearly invisible.</p>
+<p><strong>A turn is not automatically a new job.</strong> The first substantive request earns the
+session's stable job label. Acknowledgements, referential corrections (&quot;make it
+smaller&quot;) and routine packing-up turns (tests, commit, worktree cleanup) carry that
+same label through the mailbox instead of quoting the latest message onto the roster.
+An explicit boundary such as &quot;new job&quot; or &quot;switch to&quot;, and a plainly substantive
+unrelated request, replaces it. This is deliberately conservative: losing a real job
+to conversational chatter is much more misleading than leaving a short-lived follow-up
+under the heading it qualifies.</p>
+<h3 id="32-deciding-to-go-and-fetch-it" tabindex="-1">3.2 Deciding to go and fetch it</h3>
+<p>Two things start a mail run. The first is a <code>working</code> status arriving while the agent has nothing to work on. The second — the interesting one — is <code>_checkPost</code>, called for every agent on every frame:</p>
+<pre><code class="language-js">_checkPost(rec) {
+  if (rec.onMailRun) return;
+  const settled = rec.agent.status === 'idle'
+    || (rec.agent.status === 'working' &amp;&amp; rec.agent.seated);
+  if (!settled) return;
+  if (!this.post.hasOwn(rec.agent.id)) return;
+  this._work(rec);
+}
+</code></pre>
+<p>Three guards, each earning its place:</p>
+<ul>
+<li><strong><code>onMailRun</code></strong> is set by <code>_begin</code>, so exactly one owner declares &quot;this action list is a trip to the box&quot;. The controller runs roughly one action per frame, so for a frame or two after a mail run starts the agent is still <code>idle</code> with post waiting. Anything that cleared the flag from inside an action let <code>_checkPost</code> rebuild the walk from the top on the next frame, and the agent restarted forever without taking a step.</li>
+<li><strong><code>settled</code></strong> means seated and working, or standing about with nothing on. Interrupting a walk, a permission wait, a bookshelf trip or a coffee run would replace the action list mid-stride. Every one of those states ends in a status change that comes back here anyway. <code>idle</code> counts on purpose: a turn that ends before its envelope was collected used to strand the post in the box with the desk label never set.</li>
+<li><strong><code>hasOwn</code></strong> is <strong>addressed post only</strong>. Unaddressed mail keeps its looser meaning — picked up on the way to a job by whoever is going anyway — so it must not drag a seated agent out of their chair.</li>
+</ul>
+<p>Driving this from the frame loop rather than from the event is what makes the interruption safe: here the agent is provably settled. A queue that outruns the walking is fine and expected — five prompts in five seconds is five trips, taken in order, and a single trip that collected the whole stack would be faster and less true. The room falls behind reality rather than lying about it.</p>
+<h3 id="33-the-walk" tabindex="-1">3.3 The walk</h3>
+<p><code>_work</code> builds one action list (<code>_work</code> in <code>src/agents/AgentManager.js</code>):</p>
+<pre><code class="language-js">const ownPost = this.post.hasOwn(rec.agent.id);
+if (ownPost || !rec.hasMaterial) {
+  const fromMailbox = ownPost || this.post.canCollect(rec.agent.id);
+  const station = fromMailbox ? STATIONS.mailbox : STATIONS.inbox;
+  ...
+  if (fromMailbox) {
+    waitUntil(() =&gt; this.post.canCollect(rec.agent.id), ownPost ? MAIL_WAIT : 0)
+    wait(0.35)
+    act(() =&gt; this._collectMail(rec))
+  } else {
+    wait(0.6); act(() =&gt; { this.props.inbox?.takePackage(); rec.hasMaterial = true; })
+  }
+  actions.push(carry('package'));
+}
+// then: walk to desk, sit, setWorking(true), status 'working', wait(HOLD)
+</code></pre>
+<p>Airmail first, since that is the freshest request; the inbox stack only if the box has nothing this agent may open. Note that the station is chosen with <code>canCollect</code> rather than <code>size</code>: a box holding only somebody else's envelope is, for this agent, an empty one, and they head for the inbox instead.</p>
+<p>The <code>waitUntil</code> is the honest move — the request exists, so the agent stands at the box until it lands rather than pretending it already had. <code>MAIL_WAIT</code> is 20 s against a 1.45 s flight, generous enough that it only ever expires if something upstream dropped the envelope. It applies only to post of their own: an agent who came over for unaddressed mail is fetching something already in the box, so if they lost the race the predicate is checked once and they carry on rather than loitering at a box with nothing in it.</p>
+<h3 id="34-opening-it" tabindex="-1">3.4 Opening it</h3>
+<p><code>_collectMail</code> is where the label finally changes:</p>
+<pre><code class="language-js">const original = rec.agent.currentJobLabel();
+if (rec.agent.renameOpenJob(item.job)) {
+  rec.jobAlias = { from: original, to: item.job };   // remember the swap
+} else {
+  rec.agent.job = item.job;
+  rec.agent.beginJob(item.job);
+}
+</code></pre>
+<p>Retitle rather than begin where possible: the agent was already logged as starting work, and this request is what that work turned out to be. With no job open — a first prompt, or one collected after a delivery — it opens a new entry instead, so the log never loses a request.</p>
+<p><code>jobAlias</code> then survives the feed re-announcing the original title, which it does after a bookshelf trip (<code>handleEvent</code>, <code>case 'job'</code>).</p>
+<p>The completion summary does not replace <code>agent.job</code>. It is the agent's answer, not
+the assignment; keeping it on the delivery/log side is what stops an idle roster from
+turning into a transcript after every <code>turn.end</code>.</p>
+<h3 id="35-arrivals-are-limited-by-free-hands-and-the-plane-pool" tabindex="-1">3.5 Arrivals are limited by free hands, and the plane pool</h3>
+<p>Mail posted on a blind timer builds an unbounded queue: it lands at ~5.8/min against an office throughput of ~4.9/min. The mock source used to be handed a <code>getBacklog</code> callback and hold off while the box was full; it now posts each request <strong>to somebody who is free</strong>, and simply waits when nobody is. That is the same brake with the cause rather than the symptom in it, and it needs nothing from the room — the simulation is what is keeping everybody busy, so it already knows (see <a href="test-data.html">Test Data</a>).</p>
+<p>Pressing <strong>T</strong> ignores that deliberately — someone asking for a job by hand has already judged it for themselves.</p>
+<p>Planes are <strong>pooled, and the pool can be outrun</strong>. Four planes carry a 1.45s flight, which no timer could ever exhaust, but one keypress can: press <strong>T</strong> five times in a second and the fifth finds every plane airborne. <code>MailFlights.launch()</code> therefore holds the overflow and sends it as planes land, in request order, rather than dropping it — a job that vanished because the animation was busy would read as the office having swallowed it. It only refuses (returning <code>false</code>) once even the waiting list is full, and §6 covers what happens to the envelope then.</p>
+<h2 id="4-finished-work-leaving" tabindex="-1">4. Finished work leaving</h2>
+<p><code>turn.end</code> with <code>status: 'completed'</code> becomes a <code>dispatch</code> event, and <code>_deliver</code> walks the work to the mailbox:</p>
+<pre><code>release desk ▸ carry('package') ▸ status 'delivering' ▸ walk to mailbox
+  ▸ face ▸ wait 0.7 ▸ mailbox.deliver()
+                       hasMaterial = false
+                       agent.finishJob('done')
+                       jobAlias = null
+  ▸ carry(null) ▸ wait 0.4 ▸ status 'idle'
+</code></pre>
+<p>The <code>finishJob('done')</code> fires inside the <code>act</code>, at the moment the work actually hits the box, not when the walk began.</p>
+<p>If the round had a checklist, its final snapshot is retained on that one history entry
+before the live plan disappears. <strong>Recent jobs</strong> puts the completed fraction beside the
+outcome — <em>Done (5/5)</em> — and makes that row expandable so each completed, skipped,
+failed or cancelled part remains inspectable. A job without parts has no disclosure
+control and looks exactly as it did before checklist history existed.</p>
+<p><strong><code>dispatch</code> the event and <code>delivering</code> the status are different things</strong>, and confusing them would mark work finished every time an agent ran <code>git push</code>. A <code>delivering</code> status — which <code>AopSource._toolStart</code> emits for a push or a commit — routes to <code>_postRun</code> instead: the same walk to the same box, <code>mailbox.deliver()</code> all the same, but the desk stays booked and the agent sits back down with the job still open. An errand, not a finish.</p>
+<p>Outgoing work does not add a letter to the box. <code>mailbox.deliver()</code> only sets <code>_hold = 5</code>, which keeps the flag up for five seconds as an acknowledgement:</p>
+<pre><code class="language-js">deliver() { this.deliveries++; this._hold = 5; },
+receive() { this.received++; this.pending++; this._syncLetters(); },
+collect() { if (this.pending === 0) return false; this.pending--; ... },
+update(dt) { const up = this.pending &gt; 0 || this._hold &gt; 0; /* ease flag */ }
+</code></pre>
+<p>So the 3D flag means &quot;post waiting <strong>or</strong> something just went out&quot;, while the overlay's flag means only &quot;post waiting&quot;. They disagree for five seconds after every delivery.</p>
+<h2 id="5-the-bin" tabindex="-1">5. The bin</h2>
+<p><code>_discard</code> runs on an <code>error</code> status — from <code>turn.end</code> with <code>status: 'error'</code>, a bare <code>error</code> event, or any harness error:</p>
+<pre><code>release desk ▸ status 'error' ▸ wait 1.2 ▸ carry('package')
+  ▸ walk to bin ▸ face ▸ wait 0.5
+  ▸ bin.discard()                    a crumple appears (3 meshes, cycled)
+    hasMaterial = false
+    label = agent.currentJobLabel()
+    agent.finishJob('error')
+    emitFeed({ kind:'removal', job: label, by: agent.name })
+  ▸ carry(null) ▸ wait 0.4 ▸ status 'idle'
+</code></pre>
+<p>The <code>wait(1.2)</code> before picking the work up is the pause where you realise it has gone wrong. As with delivery, the log entry lands as the paper hits the bin.</p>
+<p>A <code>removal</code> entry relabels the whole overlay section to &quot;Job Removal&quot; and names what was binned; the flag it sets still reflects the mailbox, not the bin. The bin takes both sizes and crumples them the same way, which is the one place the two are deliberately not told apart — what went wrong matters more than how big it was.</p>
+<p>Collections name the size too: &quot;Nova took a letter&quot;, &quot;Zephyr took a package&quot;, falling back to &quot;took one&quot; where the size is unknown. That line also now survives the box emptying — before, a collection that left nothing behind lowered the flag and printed &quot;Mailbox is empty&quot;, so the last thing taken was the one thing never announced.</p>
+<p><strong>The bin only ever receives work an agent carried to it.</strong> Post that is binned in the data model — orphaned by a departure, dropped because the flight queue was full, or landed for a recipient who had already gone — is deleted from an array with no crumple, no walk, and no feed entry. See §8.3.</p>
+<h2 id="6-post-that-is-never-collected" tabindex="-1">6. Post that is never collected</h2>
+<p>Three routes bin an envelope without anyone touching it.</p>
+<p><strong>The recipient leaves.</strong> <code>_remove</code> calls <code>post.dropFor(id)</code>, which filters the array and clears the in-flight count, and then compensates the prop by hand:</p>
+<pre><code class="language-js">const orphaned = this.post.dropFor(rec.agent.id);
+for (let i = 0; i &lt; orphaned; i++) this.props.mailbox?.collect();
+</code></pre>
+<p><strong>The recipient left while the plane was airborne.</strong> <code>post.land</code> takes an <code>isPresent</code> predicate and returns <code>false</code>, and <code>_mailArrived</code> calls <code>mailbox.collect()</code> to undo the <code>receive()</code> that touchdown already did. Without that, the flag would stay up over an envelope nobody could ever open.</p>
+<p><strong>The flight queue was full.</strong> <code>mail.launch</code> returns <code>false</code> past <code>QUEUE_MAX = 16</code>, and <code>_post</code> calls <code>post.unpost(forId)</code> so the recipient is not left waiting at an empty box.</p>
+<p>And one route gives up on an envelope that was never in the box to begin with. <strong>The recipient waited and nothing came.</strong> If <code>MAIL_WAIT</code> expires, <code>_collectMail</code> finds nothing to take and calls <code>post.abandon(id)</code>, which clears every expectation standing for that agent. This matters more than it looks: <code>hasOwn</code> is what sends an agent to the box, so an expectation left standing after a failed trip would send them back on the very next frame, and the frame after that, forever. Giving up is safe against a plane that lands late, because <code>land</code> puts a late envelope in the box regardless and one waiting there is enough to bring its recipient back.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../user/work-and-post.html">Post, parcels and the bin</a> — the same system, as a reader meets it</li>
+<li><a href="architecture.html">Architecture</a> — where this sits in the pipeline</li>
+<li><a href="physics.html">The physics of the office</a> — why a destination is a place and not a point</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#1-the-two-kinds-of-post">1. The two kinds of post</a></li>
+<li><a href="#1a-how-it-arrives-and-why-that-means-nothing">1a. How it arrives, and why that means nothing</a><ul><li><a href="#the-letters-other-vehicle-the-bird">The letter's other vehicle: the bird</a></li>
+<li><a href="#threading-the-window-and-why-the-wings-tuck">Threading the window, and why the wings tuck</a></li>
+<li><a href="#one-bird-at-a-time">One bird at a time</a></li></ul></li>
+<li><a href="#1b-the-courier">1b. The courier</a><ul><li><a href="#one-route-per-entrance">One route per entrance</a></li></ul></li>
+<li><a href="#2-state-and-where-it-lives">2. State, and where it lives</a></li>
+<li><a href="#3-new-work-arriving">3. New work arriving</a><ul><li><a href="#31-the-sequence">3.1 The sequence</a></li>
+<li><a href="#32-deciding-to-go-and-fetch-it">3.2 Deciding to go and fetch it</a></li>
+<li><a href="#33-the-walk">3.3 The walk</a></li>
+<li><a href="#34-opening-it">3.4 Opening it</a></li>
+<li><a href="#35-arrivals-are-limited-by-free-hands-and-the-plane-pool">3.5 Arrivals are limited by free hands, and the plane pool</a></li></ul></li>
+<li><a href="#4-finished-work-leaving">4. Finished work leaving</a></li>
+<li><a href="#5-the-bin">5. The bin</a></li>
+<li><a href="#6-post-that-is-never-collected">6. Post that is never collected</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

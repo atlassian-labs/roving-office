@@ -1,0 +1,350 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://roving-office.local/schemas/aop-v0.schema.json",
+  "title": "Agent Office Protocol event (v0.1)",
+  "description": "One event emitted by a harness adapter. See docs/aop-spec.md.",
+  "type": "object",
+  "required": ["aop", "id", "ts", "type", "harness", "session"],
+  "additionalProperties": false,
+  "properties": {
+    "aop": { "type": "string", "pattern": "^0\\.[0-9]+$" },
+    "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "ts": { "type": "string", "format": "date-time" },
+    "seq": { "type": "integer", "minimum": 1 },
+    "type": { "$ref": "#/definitions/eventType" },
+    "harness": { "$ref": "#/definitions/harness" },
+    "session": { "$ref": "#/definitions/session" },
+    "project": { "$ref": "#/definitions/project" },
+    "payload": { "type": "object" },
+    "ext": { "type": "object" }
+  },
+  "allOf": [
+    { "if": { "properties": { "type": { "const": "session.start" } } }, "then": { "properties": { "payload": { "$ref": "#/definitions/payloads/sessionStart" } } } },
+    { "if": { "properties": { "type": { "const": "session.heartbeat" } } }, "then": { "properties": { "payload": { "$ref": "#/definitions/payloads/sessionHeartbeat" } } } },
+    { "if": { "properties": { "type": { "const": "session.end" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/sessionEnd" } } } },
+    { "if": { "properties": { "type": { "const": "turn.start" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/turnStart" } } } },
+    { "if": { "properties": { "type": { "const": "turn.title" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/turnTitle" } } } },
+    { "if": { "properties": { "type": { "const": "turn.end" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/turnEnd" } } } },
+    { "if": { "properties": { "type": { "const": "step.start" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/stepStart" } } } },
+    { "if": { "properties": { "type": { "const": "step.end" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/stepEnd" } } } },
+    { "if": { "properties": { "type": { "const": "tool.start" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/toolStart" } } } },
+    { "if": { "properties": { "type": { "const": "tool.end" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/toolEnd" } } } },
+    { "if": { "properties": { "type": { "const": "artifact.change" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/artifactChange" } } } },
+    { "if": { "properties": { "type": { "const": "permission.request" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/permissionRequest" } } } },
+    { "if": { "properties": { "type": { "const": "permission.resolve" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/permissionResolve" } } } },
+    { "if": { "properties": { "type": { "const": "notification" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/notification" } } } },
+    { "if": { "properties": { "type": { "const": "error" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/error" } } } },
+    { "if": { "properties": { "type": { "const": "context.compact" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/contextCompact" } } } },
+    { "if": { "properties": { "type": { "const": "job.queued" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/jobQueued" } } } },
+    { "if": { "properties": { "type": { "const": "job.claimed" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/jobClaimed" } } } },
+    { "if": { "properties": { "type": { "const": "job.dropped" } } }, "then": { "required": ["payload"], "properties": { "payload": { "$ref": "#/definitions/payloads/jobDropped" } } } }
+  ],
+  "definitions": {
+    "eventType": {
+      "description": "Receivers MUST ignore unknown types rather than rejecting them.",
+      "type": "string",
+      "enum": [
+        "session.start", "session.heartbeat", "session.end",
+        "turn.start", "turn.title", "turn.end", "step.start", "step.end",
+        "tool.start", "tool.end", "artifact.change",
+        "permission.request", "permission.resolve", "notification", "error", "context.compact",
+        "job.queued", "job.claimed", "job.dropped"
+      ]
+    },
+    "plan": {
+      "description": "The checklist for a turn. A hint, not a contract: entries may be skipped or never reached. Capped at 20 entries; a longer list is truncated rather than dropped.",
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "required": ["title"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "maxLength": 128 },
+          "title": { "type": "string", "maxLength": 80 },
+          "status": { "type": "string", "enum": ["pending", "active", "completed", "skipped", "failed", "cancelled"] }
+        }
+      }
+    },
+    "harness": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,31}$" },
+        "version": { "type": "string", "maxLength": 64 },
+        "variant": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,31}$" }
+      }
+    },
+    "session": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "parent_id": { "type": ["string", "null"], "maxLength": 128 },
+        "kind": { "type": "string", "enum": ["main", "subagent", "background", "remote"], "default": "main" },
+        "label": { "type": "string", "maxLength": 60 },
+        "actor": { "type": "string", "maxLength": 60 },
+        "actor_color": { "type": "string", "maxLength": 40 },
+        "actor_avatar": { "type": "string", "maxLength": 512, "pattern": "^(?:https?://|/(?!/))" },
+        "cwd": { "type": "string", "maxLength": 512 },
+        "agent_type": { "type": "string", "maxLength": 64 }
+      }
+    },
+    "project": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+        "name": { "type": "string", "maxLength": 80 },
+        "repo": {
+          "type": "object",
+          "properties": {
+            "remote": { "type": "string", "maxLength": 256 },
+            "branch": { "type": "string", "maxLength": 128 },
+            "commit": { "type": "string", "maxLength": 64 }
+          }
+        },
+        "workitem": {
+          "type": "object",
+          "required": ["key"],
+          "properties": {
+            "key": { "type": "string", "maxLength": 64 },
+            "url": { "type": "string", "maxLength": 512 },
+            "title": { "type": "string", "maxLength": 200 }
+          }
+        },
+        "scene": {
+          "description": "Explicit scene/office override; wins over every derived key. See spec 3.4.3.",
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"
+        }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "properties": {
+        "input_tokens": { "type": "integer", "minimum": 0 },
+        "output_tokens": { "type": "integer", "minimum": 0 },
+        "cached_tokens": { "type": "integer", "minimum": 0 },
+        "cost_usd": { "type": "number", "minimum": 0 }
+      }
+    },
+    "toolClass": {
+      "description": "Closed enum; unknown values MUST be treated as \"other\".",
+      "type": "string",
+      "enum": ["read", "search", "edit", "execute", "network", "knowledge", "scm", "agent", "wait", "other"]
+    },
+    "payloads": {
+      "sessionStart": {
+        "type": "object",
+        "properties": {
+          "source": { "type": "string", "enum": ["startup", "resume", "fork", "clear", "spawn", "attach"] },
+          "capabilities": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "redaction": { "type": "string", "enum": ["metadata", "summary", "full"], "default": "metadata" },
+          "model": { "type": "string", "maxLength": 128 },
+          "permission_mode": { "type": "string", "maxLength": 64 },
+          "transcript": { "type": "string", "maxLength": 512 },
+          "resumed": { "type": "boolean" },
+          "parent_tool_call_id": {
+            "description": "On a subagent session: the parent's agent-class tool.start that spawned it. Binds the ghost to that call. See spec 6.1.",
+            "type": "string",
+            "maxLength": 128
+          }
+        }
+      },
+      "sessionHeartbeat": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["working", "waiting", "idle", "error"] },
+          "idle_ms": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "sessionEnd": {
+        "type": "object",
+        "required": ["reason"],
+        "properties": {
+          "reason": { "type": "string", "enum": ["exit", "clear", "logout", "error", "killed", "timeout", "other"] },
+          "duration_ms": { "type": "integer", "minimum": 0 },
+          "usage": { "$ref": "#/definitions/usage" }
+        }
+      },
+      "turnStart": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "turn_id": { "type": "string", "maxLength": 128 },
+          "title": { "type": "string", "maxLength": 80 },
+          "prompt": { "type": "string", "maxLength": 2000 },
+          "prompt_chars": { "type": "integer", "minimum": 0 },
+          "trigger": { "type": "string", "enum": ["user", "queue", "schedule", "parent", "retry"] },
+          "origin": {
+            "type": "object",
+            "description": "Why this turn exists (spec §4.2). Additive — a receiver that ignores it renders exactly as before.",
+            "required": ["kind"],
+            "properties": {
+              "kind": { "type": "string", "enum": ["human", "schedule", "heartbeat", "queue", "parent", "retry", "maintenance", "webhook"] },
+              "name": { "type": "string", "maxLength": 80 },
+              "id": { "type": "string", "maxLength": 80 },
+              "schedule": { "type": "string", "maxLength": 40 },
+              "detail": { "type": "string", "maxLength": 200 }
+            }
+          },
+          "plan": { "$ref": "#/definitions/plan" }
+        }
+      },
+      "turnTitle": {
+        "type": "object",
+        "description": "The turn already in flight has a better name than the one it opened with (spec §4.2). Additive — a receiver that ignores it sees the title on turn.end as before.",
+        "required": ["title"],
+        "properties": {
+          "turn_id": { "type": "string", "maxLength": 128 },
+          "title": { "type": "string", "maxLength": 80 }
+        }
+      },
+      "stepStart": {
+        "type": "object",
+        "required": ["step_id"],
+        "properties": {
+          "step_id": { "type": "string", "maxLength": 128 },
+          "turn_id": { "type": "string", "maxLength": 128 },
+          "title": { "type": "string", "maxLength": 80 },
+          "index": { "type": "integer", "minimum": 1 },
+          "of": { "type": "integer", "minimum": 1 },
+          "plan": { "$ref": "#/definitions/plan" }
+        }
+      },
+      "stepEnd": {
+        "type": "object",
+        "required": ["step_id"],
+        "properties": {
+          "step_id": { "type": "string", "maxLength": 128 },
+          "status": { "type": "string", "enum": ["completed", "skipped", "failed", "cancelled"] },
+          "duration_ms": { "type": "integer", "minimum": 0 },
+          "summary": { "type": "string", "maxLength": 200 }
+        }
+      },
+      "turnEnd": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "turn_id": { "type": "string", "maxLength": 128 },
+          "status": { "type": "string", "enum": ["completed", "cancelled", "error", "blocked"] },
+          "title": { "type": "string", "maxLength": 80 },
+          "summary": { "type": "string", "maxLength": 200 },
+          "duration_ms": { "type": "integer", "minimum": 0 },
+          "tool_calls": { "type": "integer", "minimum": 0 },
+          "usage": { "$ref": "#/definitions/usage" }
+        }
+      },
+      "toolStart": {
+        "type": "object",
+        "required": ["tool_call_id", "tool_name", "tool_class"],
+        "properties": {
+          "tool_call_id": { "type": "string", "maxLength": 128 },
+          "tool_name": { "type": "string", "maxLength": 128 },
+          "tool_class": { "$ref": "#/definitions/toolClass" },
+          "target": { "type": "string", "maxLength": 200 },
+          "summary": { "type": "string", "maxLength": 200 },
+          "concurrent": { "type": "boolean" }
+        }
+      },
+      "toolEnd": {
+        "type": "object",
+        "required": ["tool_call_id", "status"],
+        "properties": {
+          "tool_call_id": { "type": "string", "maxLength": 128 },
+          "tool_name": { "type": "string", "maxLength": 128 },
+          "tool_class": { "$ref": "#/definitions/toolClass" },
+          "status": { "type": "string", "enum": ["ok", "error", "denied", "cancelled", "timeout"] },
+          "duration_ms": { "type": "integer", "minimum": 0 },
+          "error": { "type": "string", "maxLength": 200 },
+          "result_bytes": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "artifactChange": {
+        "type": "object",
+        "required": ["kind"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["file", "commit", "branch", "pr", "page", "workitem"] },
+          "path": { "type": "string", "maxLength": 512 },
+          "added": { "type": "integer", "minimum": 0 },
+          "removed": { "type": "integer", "minimum": 0 },
+          "url": { "type": "string", "maxLength": 512 }
+        }
+      },
+      "permissionRequest": {
+        "type": "object",
+        "required": ["request_id"],
+        "properties": {
+          "request_id": { "type": "string", "maxLength": 128 },
+          "tool_name": { "type": "string", "maxLength": 128 },
+          "tool_class": { "$ref": "#/definitions/toolClass" },
+          "target": { "type": "string", "maxLength": 200 },
+          "reason": { "type": "string", "maxLength": 200 }
+        }
+      },
+      "permissionResolve": {
+        "type": "object",
+        "required": ["request_id", "decision"],
+        "properties": {
+          "request_id": { "type": "string", "maxLength": 128 },
+          "decision": { "type": "string", "enum": ["allow", "deny", "defer", "always_allow"] },
+          "by": { "type": "string", "enum": ["user", "policy", "timeout", "agent"] }
+        }
+      },
+      "notification": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": { "type": "string", "maxLength": 200 },
+          "level": { "type": "string", "enum": ["info", "warn", "error"], "default": "info" }
+        }
+      },
+      "error": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": { "type": "string", "maxLength": 200 },
+          "kind": { "type": "string", "maxLength": 64 },
+          "recoverable": { "type": "boolean" }
+        }
+      },
+      "contextCompact": {
+        "type": "object",
+        "required": ["trigger"],
+        "properties": {
+          "trigger": { "type": "string", "enum": ["auto", "manual"] },
+          "tokens_before": { "type": "integer", "minimum": 0 },
+          "tokens_after": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "jobQueued": {
+        "type": "object",
+        "required": ["job_id", "title"],
+        "properties": {
+          "job_id": { "type": "string", "maxLength": 128 },
+          "title": { "type": "string", "maxLength": 80 },
+          "source": { "type": "string", "maxLength": 64 },
+          "url": { "type": "string", "maxLength": 512 },
+          "priority": { "type": "string", "enum": ["low", "normal", "high", "urgent"] }
+        }
+      },
+      "jobClaimed": {
+        "type": "object",
+        "required": ["job_id", "claimed_by"],
+        "properties": {
+          "job_id": { "type": "string", "maxLength": 128 },
+          "claimed_by": { "type": "string", "maxLength": 128 }
+        }
+      },
+      "jobDropped": {
+        "type": "object",
+        "required": ["job_id"],
+        "properties": {
+          "job_id": { "type": "string", "maxLength": 128 },
+          "reason": { "type": "string", "maxLength": 200 }
+        }
+      }
+    }
+  }
+}

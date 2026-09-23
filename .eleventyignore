@@ -1,0 +1,51 @@
+# Eleventy's input directory is `docs/`, and its output directory is inside it. Both of
+# those need saying out loud here, because the alternative is a build that renders its own
+# output and grows a copy of every page on each run.
+docs/site
+
+# The standalone pages: three generated HTML libraries that are whole documents with their
+# own <head>, their own theme toggle and their own module imports. They are served from
+# `docs/` directly — `server.cjs` falls back there for anything not in `docs/site` — so
+# they need no layout wrapped round them and would be broken by one.
+docs/*.html
+
+# Imagery, linked by the built pages rather than copied into them. Kept out of the build
+# so 5MB of PNGs are not walked on every run; the deploy recipes ship `docs/images` whole.
+docs/images
+
+# The sidebar is a plain module rather than an Eleventy data file, so that the config and
+# the directory data files can both import it. Eleventy ignores unknown extensions anyway;
+# this is belt and braces.
+docs/_nav.mjs
+
+# ---------------------------------------------------------------------------------------
+# Not published: internal material that stays in the repository and off the web.
+#
+# Everything below is about running *our* deployments — the hosting project, the machines,
+# the repository workspace behind them — or is a design record written for people with
+# access to the tracker it cites. The deployed site is public, and this set was found being
+# served from it, so the build stops here rather than at the reader.
+#
+# **This list is the only place the boundary is drawn**, and both other places that care
+# read it rather than repeating it: `test/docs.test.js` exempts these pages from the
+# "every page is built, and in the sidebar" checks, and `docs/_nav.mjs` simply does not
+# list them. Add a page here and it stops being published; that is the whole mechanism.
+#
+# The Markdown stays where it is on purpose. The repository is still private and nothing
+# here is a credential, so this list is only about it no longer reaching `docs/site` or
+# either deployed artifact. What must go with it is the committed HTML under
+# `docs/site/developer/`, because that directory is copied wholesale by `Dockerfile.fly`
+# and `bin/kaizen-build.sh`.
+#
+# Keeping it off the web is not the same as keeping it out of the public repository, and
+# both are wanted: `.exportignore` is the second list, and `test/public-surface.test.js`
+# asserts that everything named below is on it.
+docs/developer/publishing.md
+docs/developer/design/cloudflare-deployment.md
+docs/developer/design/fly-persistence-plan.md
+docs/developer/design/hosting-notes.md
+docs/developer/design/jira-coding-agent.md
+docs/developer/design/job-delivery-gaps.md
+docs/developer/design/kaizen-project-admin.md
+docs/developer/design/openclaw-open-questions.md
+docs/developer/design/origin-and-steps.md

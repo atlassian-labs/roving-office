@@ -1,0 +1,30 @@
+:root { color-scheme: light; font: 15px/1.5 system-ui, sans-serif; color: #27342f; background: #f1f1e9; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+#view { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+main { position: relative; max-width: 1450px; margin: auto; padding: 36px; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+h1 { font: 500 56px/1.1 Georgia, serif; margin: 8px 0 12px; letter-spacing: -2px; }
+p { margin: 0 0 12px; }
+.eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #69796e; }
+a { color: inherit; text-underline-offset: 4px; }
+.controls { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; padding: 20px 0; margin-bottom: 12px; border-bottom: 1px solid #ccd1c6; }
+label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
+select, button { border: 1px solid #bac5b8; border-radius: 7px; background: #fcfcf7; color: inherit; font: inherit; padding: 8px 12px; }
+button, select, input { cursor: pointer; }
+.check { flex-direction: row; align-items: center; min-height: 39px; }
+input[type=checkbox] { accent-color: #466a54; }
+#studies { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+article { border-bottom: 1px solid #ccd1c6; padding-bottom: 16px; min-width: 0; }
+.desk-view { height: 290px; touch-action: none; cursor: grab; border-radius: 12px; }
+.desk-view:active { cursor: grabbing; }
+.caption { display: flex; justify-content: space-between; align-items: start; gap: 12px; padding-top: 14px; }
+h2 { font-size: 16px; margin: 0 0 4px; font-weight: 600; }
+.number { font-size: 11px; color: #748073; padding-right: 6px; }
+article p { color: #687267; font-size: 12px; margin: 0; }
+.swatch { flex-shrink: 0; border: 0; width: 32px; height: 32px; padding: 0; background: none; }
+.assignment { margin-top: 9px; color: #5f7162; }
+footer { margin-top: 24px; color: #687267; font-size: 12px; }
+#error { background: #fff0eb; padding: 16px; }
+@media (max-width: 1050px) { #studies { grid-template-columns: repeat(2,minmax(0,1fr)); } main { padding: 24px; } }
+@media (max-width: 620px) { #studies { grid-template-columns: 1fr; } header { display: block; } h1 { font-size: 44px; } .desk-view { height: 320px; } }

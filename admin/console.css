@@ -1,0 +1,287 @@
+/*
+  The console's own styling, on the project's shared theme.
+
+  `assets/ui-theme.css` is loaded first by console.html and every colour, space, radius,
+  shadow and type size below comes from it — the same file reception, the office and the
+  generated documentation use. Nothing here restates a value the theme already holds.
+
+  **It deliberately does not import `styles.css`.** That file is the office's: a hundred
+  and fifty kilobytes of scene chrome, and its first rule is `html, body { overflow:
+  hidden; height: 100% }` for a full-viewport canvas — which is the one thing a long
+  scrolling page of charts must not inherit. So the handful of surfaces the console needs
+  are drawn here in the app's idiom instead of borrowed wholesale: reception's nav bar,
+  reception's card, reception's button, the panel's small-caps headings.
+
+  The series colours are the point of the exercise. They come from the theme's own
+  `--status-*` and `--conn-*` scales, which already encode what this product means by
+  working, waiting, delivering and live — so a bar is coloured by what it *means*, not
+  merely differently from its neighbour. The one colour deliberately avoided is a warm
+  orange: it is close enough to Claude's own brand colour to read as "the Claude bar" on
+  a page that draws a Claude bar a few pixels away.
+*/
+
+/* --- the page ----------------------------------------------------------- */
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--panel-solid);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Reception's header, so the way back to the office is where it always is. */
+.reception-nav {
+  max-width: 1180px; margin: auto;
+  padding: var(--space-6) var(--space-8);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-6);
+}
+.reception-brand {
+  display: inline-flex; align-items: center; gap: var(--space-3);
+  color: var(--text); text-decoration: none; font-size: 19px; font-weight: 700;
+}
+.reception-brand img { width: 40px; height: 40px; display: block; }
+.reception-nav nav { display: flex; align-items: center; gap: var(--space-4); }
+.nav-note {
+  font-size: var(--text-small); color: var(--muted);
+  font-family: var(--font-mono); font-feature-settings: var(--font-variants-mono);
+}
+
+main {
+  max-width: 1180px; margin: auto;
+  padding: var(--space-4) var(--space-8) var(--space-8);
+}
+
+h1 {
+  font-size: clamp(30px, 3.4vw, 42px); line-height: 1.08;
+  letter-spacing: -1.2px; font-weight: 720;
+  margin: 0 0 var(--space-3);
+}
+.lede {
+  font-size: 17px; line-height: 1.6; color: var(--muted);
+  max-width: 46ch; margin: 0 0 var(--space-8);
+}
+
+/* Section rules, in the office panels' small-caps idiom. */
+h2.section {
+  font-size: var(--text-small); font-weight: 650;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--muted);
+  margin: var(--space-8) 0 var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+h3 { font-size: var(--text-heading-small); font-weight: 650; margin: 0 0 var(--space-1); }
+
+button {
+  font: 600 var(--text-body) var(--font-sans);
+  font-feature-settings: var(--font-variants-sans);
+  min-height: 36px; padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-control);
+  background: var(--panel-solid); color: var(--text);
+  cursor: pointer;
+}
+button:hover { background: var(--surface-hovered); }
+
+/* --- the gate ----------------------------------------------------------- */
+
+.gate { max-width: 30rem; margin: 8vh auto; padding: 0 var(--space-8); }
+.gate-card {
+  padding: var(--space-6);
+  background: var(--panel-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-panel);
+}
+.gate-label { display: block; font-size: 18px; font-weight: 650; margin: 0 0 var(--space-2); }
+.gate-lede { margin: 0 0 var(--space-4); color: var(--muted); line-height: 1.6; }
+.gate-row { display: flex; gap: var(--space-3); align-items: stretch; }
+.gate-input {
+  min-width: 0; flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong); border-radius: var(--radius-control);
+  font: 500 16px var(--font-mono); font-feature-settings: var(--font-variants-mono);
+  background: var(--panel-solid); color: var(--text);
+}
+.gate-input::placeholder { color: var(--muted); opacity: 0.8; }
+.gate-go {
+  background: var(--brand); color: var(--on-bold); border-color: transparent;
+  min-height: 44px; padding: 10px 18px;
+}
+.gate-go:hover { background: var(--brand-hovered); }
+/* Neutral by default and red only when something was refused — reception's own
+   `.wz-hint` / `.wz-hint.bad` split. "Signed out." is not an error, and the first
+   version of this said it in the colour of one. */
+.gate-hint { min-height: 1.4em; margin: var(--space-2) 0 0; font-size: 13px; color: var(--muted); }
+.gate-hint.bad { color: var(--conn-offline); }
+
+/* --- the small print ---------------------------------------------------- */
+/*
+  What these numbers are not.
+
+  Not a warning panel. The content is the most trustworthy thing on the page — it is what
+  keeps every figure below it from being over-read — and a caution sticker would invite a
+  reader to dismiss it as boilerplate. So it reads as considered small print: the page's
+  own quiet type, one brand-coloured rule to say it is not decoration, and no icon.
+*/
+.smallprint {
+  border-left: 2px solid var(--brand);
+  background: var(--selected);
+  border-radius: 0 var(--radius-surface) var(--radius-surface) 0;
+  padding: var(--space-4) var(--space-6);
+  margin: 0 0 var(--space-8);
+}
+.smallprint h2 {
+  font-size: var(--text-small); font-weight: 650;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--muted); margin: 0 0 var(--space-3);
+}
+.smallprint ul { margin: 0; padding-left: var(--space-4); }
+.smallprint li { margin: 0 0 var(--space-2); color: var(--text); }
+.smallprint li:last-child { margin-bottom: 0; }
+.smallprint .foot { margin: var(--space-3) 0 0; font-size: var(--text-small); color: var(--muted); }
+
+/* --- headline numbers --------------------------------------------------- */
+/*
+  Two ranks, because the numbers are not equally important and a grid of identical tiles
+  says they are. The three the captain asked for stand up at display size; everything else
+  is a quieter run of figures underneath, still exact and still legible, but not competing.
+*/
+.headline {
+  display: grid; gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  margin: 0 0 var(--space-4);
+}
+.headline > * { min-width: 0; }
+.big {
+  padding: var(--space-4) var(--space-6);
+  background: var(--panel-solid);
+  border: 1px solid var(--border); border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-panel);
+  min-width: 0;
+}
+.big .n {
+  font: 700 clamp(34px, 3.6vw, 46px)/1.05 var(--font-mono);
+  /* `tnum` and `zero` from the theme: a column of figures wants fixed-width digits, and
+     `font-variant-numeric` is silently dropped under `font-feature-settings`, which the
+     `font` shorthand above resets — so the feature list is restated, as the theme's own
+     comment explains. */
+  font-feature-settings: var(--font-variants-mono);
+  letter-spacing: -1px;
+  color: var(--text);
+}
+.big .k { margin-top: var(--space-1); color: var(--muted); }
+.big .k b { color: var(--text); font-weight: 650; }
+
+/* The rest: a line of figures, not a wall of boxes. */
+.figures {
+  display: flex; flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin: 0 0 var(--space-6); padding: var(--space-4) 0 0;
+  border-top: 1px solid var(--border);
+  list-style: none;
+}
+.figures li { color: var(--muted); }
+.figures b {
+  color: var(--text); font-weight: 650;
+  font-family: var(--font-mono); font-feature-settings: var(--font-variants-mono);
+}
+
+/* --- panels ------------------------------------------------------------- */
+
+.card {
+  background: var(--panel-solid);
+  border: 1px solid var(--border); border-radius: var(--radius-surface);
+  padding: var(--space-6);
+  margin: 0 0 var(--space-4);
+}
+.card > h3 { margin-top: 0; }
+.card .why { margin: 0 0 var(--space-4); color: var(--muted); }
+.caveat {
+  margin: var(--space-4) 0 0; padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+  font-size: var(--text-small); color: var(--muted); line-height: 1.6;
+}
+
+/* `minmax(0, …)` on purpose: an auto track will not shrink below its widest unbreakable
+   child, and a long prop name inside one would push the grid past the viewport. */
+.grid {
+  display: grid; gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  margin: 0 0 var(--space-4);
+}
+.grid > * { min-width: 0; margin-bottom: 0; }
+
+/* --- charts ------------------------------------------------------------- */
+
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text {
+  font: 10px var(--font-sans); font-feature-settings: var(--font-variants-sans);
+  fill: var(--muted);
+}
+svg .axis { stroke: var(--border-strong); stroke-width: 1; }
+svg .zero { stroke: var(--border); stroke-width: 1; stroke-dasharray: 2 4; }
+svg .unit {
+  fill: var(--muted); font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.8px;
+}
+svg .tick { font-family: var(--font-mono); font-feature-settings: var(--font-variants-mono); }
+
+/*
+  The legend.
+
+  Swatches are tiny inline SVGs rather than styled elements, because this page is served
+  under a CSP with no `'unsafe-inline'` in `style-src` and that blocks `style` attributes
+  set from script — see `swatch()` in console.js. `svg { width: 100% }` above is meant for
+  the charts, so an 11-pixel chip has to opt out of it.
+*/
+.legend {
+  display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4);
+  margin: var(--space-3) 0 0; font-size: var(--text-small); color: var(--muted);
+}
+.legend span { display: inline-flex; align-items: center; gap: var(--space-1); }
+.legend svg { width: auto; flex: none; }
+
+/* --- ranked tables ------------------------------------------------------ */
+/*
+  `table-layout: fixed` is not tidying-up: it is what makes the column widths below mean
+  what they say. Under the default auto layout a cell's width is negotiated against its
+  content, so the bar column was squeezed to nothing in one card and overflowed another —
+  a percentage width is only reliably honoured in fixed layout.
+*/
+table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+th, td { text-align: left; padding: var(--space-2) var(--space-1); border-bottom: 1px solid var(--border); }
+th {
+  font-size: var(--text-small); font-weight: 650;
+  text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted);
+}
+tbody tr:last-child td { border-bottom: 0; }
+/* The name column takes whatever is left, and truncates rather than widening the table. */
+tbody td:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+td.n, th.n {
+  text-align: right; width: 4.5rem;
+  font-family: var(--font-mono); font-feature-settings: var(--font-variants-mono);
+}
+/*
+  `meter`, not `bar`. An earlier version called this cell `bar`, which is also reception's
+  header class — so the cell picked up its `display: flex`, which does not merely look
+  wrong: it takes the cell out of the table's column algorithm, and the width below was
+  ignored. Two unrelated things sharing one class name is the whole of that bug.
+*/
+td.meter, th.meter { width: 34%; padding-left: var(--space-3); padding-right: 0; }
+td.meter { line-height: 0; }
+/* Fills its cell and keeps its stated height: the global `height: auto` would scale a
+   100×7 viewBox stretched across a wide column into a bar two dozen pixels tall. */
+td.meter svg { width: 100%; height: 7px; }
+
+.empty { color: var(--muted); font-style: italic; margin: var(--space-2) 0; }
+
+@media (max-width: 880px) {
+  .reception-nav { padding: var(--space-4) var(--space-4); }
+  main { padding: var(--space-3) var(--space-4) var(--space-8); }
+  .gate { padding: 0 var(--space-4); }
+}

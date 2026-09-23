@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Solar geometry — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html" aria-current="page">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="solar-geometry" tabindex="-1">Solar geometry</h1>
+<p><em>Where the sun is, what season it is, and which way the room faces. The office runs on a
+real clock and, if you ask it to, a real place on earth.</em></p>
+<img src="../images/panels/scene-panel.png" width="736" alt="The scene panel: Building with all eight offices as buttons, an Auto button and Lights switch, Time with a Now button and scrubber, the four Seasons beneath it, an Orientation compass card and a Location sun map.">
+<p><em>Press <strong><code>S</code></strong> for the scene panel. Everything on this page is one of these dials — Time, Season, Orientation, Location and Lights.</em></p>
+<p>Everything here is on the scene panel (<code>S</code>), and none of it needs a rebuild — the Time
+scrubber, the Orientation compass, the Location map and the Lights switch all take effect
+on the next frame.</p>
+<h2 id="where-the-sun-is" tabindex="-1">Where the sun is</h2>
+<p>Height comes from the season and position from the clock: the sun climbs a sine arch from
+sunrise to sunset, peaking at whatever that season allows — 62° in summer, 22° in winter —
+and sweeps 180° across the same window.</p>
+<p><strong>Orientation</strong>, in the scene panel, is the compass that turns the room under all of that.
+It is a compass <em>card</em> — the kind that floats in a binnacle — so the card carries the
+bearings and turns while the index at the top stays put. North is the red arrow, and the
+handle is on it.</p>
+<p>It replaced a slider for a reason worth keeping: a bearing is an angle on a circle, 359°
+and 1° are two degrees apart, and a track laid out in a line puts them at opposite ends of
+the one control that most needs to keep turning.</p>
+<p>The same north appears as a small compass in the bottom-right while the room is turned or
+the camera swings around it. It combines the room bearing with the camera angle, so it
+points at north <em>on screen</em> rather than merely repeating the Orientation card. It never
+appears over a panel, and once turning settles it fades away.</p>
+<h2 id="where-on-earth-it-is" tabindex="-1">Where on earth it is</h2>
+<p><strong>Location</strong>, beside Orientation, drops the office somewhere real. Give a scene a latitude
+and the sun is worked out from the sky over that latitude instead of the authored arch.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>London, 51.5°N</th>
+<th>Sydney, 33.9°S</th>
+<th>Reykjavík, 64.2°N</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Summer noon</td>
+<td>62° up, due <strong>south</strong></td>
+<td>80° up, due <strong>north</strong></td>
+<td>49° up, due south</td>
+</tr>
+<tr>
+<td>Summer day</td>
+<td>03:48–20:12</td>
+<td>04:52–19:08</td>
+<td>02:56–23:04</td>
+</tr>
+<tr>
+<td>Autumn day</td>
+<td>07:28–16:32</td>
+<td>06:46–17:14</td>
+<td>08:32–15:28</td>
+</tr>
+<tr>
+<td>Winter day</td>
+<td>08:12–15:48</td>
+<td>07:08–16:52</td>
+<td>10:14–13:46</td>
+</tr>
+</tbody>
+</table>
+<p>A season becomes a position in the year rather than a set of numbers, and the hemisphere
+turns it over — so the same <strong>Summer</strong> means June in London and December in Sydney.</p>
+<p><strong>Winter afternoons now end when they really end.</strong> There used to be a fixed 06:00–20:00
+window, precisely to prevent that, on the reasoning that a day ending at four reads as a
+broken scene. With a real place on the map it reads as Reykjavík, where the sun sets at
+13:46 in December and the office finishes the working day under its own lamps. Past the
+polar circles the sun stops rising and setting altogether, and both the midnight sun and
+the polar night are shown as themselves rather than clamped into a sunrise that never
+came.</p>
+<p><strong>Crossing the equator turns the room half a turn.</strong> A northern noon sun is due south and
+a southern one due north, so the same room facing the same way is lit from the front on
+one side of the equator and from behind on the other — pick Sydney at a bearing that
+suited London and the office goes dark, correctly and uselessly. Moving the pin across the
+line adds 180° to the orientation, which puts midday back where it was. It is a turn, not
+a reset: whatever bearing you chose travels with you, and dragging the pin back turns the
+room back.</p>
+<p>The clock is read as <strong>local solar time</strong> — noon is the sun on the meridian — so longitude
+does not bend the light.</p>
+<p><strong>The map shades its night side, and it moves.</strong> Scrubbing Time walks the band across the
+map, and where the pin sits inside it, the office is in the dark. At an equinox the curve
+straightens into a pair of meridians, which is what an equinox is.</p>
+<p><strong>It is a sun map, not a world map.</strong> There is no coastline data here and none that could
+be fetched, and inventing one would look authoritative and be wrong. What it draws instead
+is the lines that decide the light — the equator, the tropics, the polar circles — with a
+dozen named places to find a latitude by, which is the job a coastline would have been
+doing.</p>
+<h2 id="after-dark" tabindex="-1">After dark</h2>
+<p>The whole rig follows the world clock, so the office lights itself as evening comes in.
+The lamps track how <em>low</em> the sun is rather than whether it has set, which gives a gradual
+dusk instead of a snap.</p>
+<p>How many fittings there are is the building's call, since a warehouse and a tower floor
+are not lit alike: from the warehouse's four bright industrial pendants to the tower's
+eight cool panels, with the brownstone in between. Outside, the street lamps each lay down
+a pool of light on the road.</p>
+<p><strong>The ceiling fittings are invisible.</strong> The room is a cutaway with no lid, so housings
+would hang boxes in mid-air across your view of the floor. What you see is their effect on
+the boards.</p>
+<p>The scene panel's <strong>Lights</strong> switch overrides all of it at once. It has three states
+rather than being a plain on/off, because the lamps normally follow the clock and a
+two-state switch would either lose that or leave no way back to it: <code>Auto</code> follows the
+clock, <code>On</code> and <code>Off</code> force it.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="buildings.html">Buildings and themes</a> — the eight buildings this light falls on</li>
+<li><a href="the-room.html">The room, prop by prop</a> — what the light is falling on inside</li>
+<li><a href="keys.html">Keys and panels</a> — <code>S</code> for the scene panel, <code>L</code> to force the lights</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#where-the-sun-is">Where the sun is</a></li>
+<li><a href="#where-on-earth-it-is">Where on earth it is</a></li>
+<li><a href="#after-dark">After dark</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

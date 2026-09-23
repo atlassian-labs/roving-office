@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenClaw: names and faces — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html" aria-current="page">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="openclaw-names-colours-and-faces" tabindex="-1">OpenClaw: names, colours and faces</h1>
+<p><em>Your agents keep the identities they gave themselves.</em></p>
+<p>Every other harness hands the office a terminal tab, so the office
+<a href="../agent-names.html">invents a person</a> to stand for it. OpenClaw is
+the exception, because its agents have <strong>already told you who they are</strong>.</p>
+<p>Every workspace holds an <code>IDENTITY.md</code> the agent filled in during its bootstrap
+conversation, and the office reads it:</p>
+<pre><code class="language-markdown"># IDENTITY.md - Agent Identity
+
+- Name: Albus Dumbledclaw
+- Creature: Wizard
+- Vibe: AI schoolmaster and family logistics wizard
+- Emoji: 🧙
+- Colour: rebeccapurple
+- Avatar: avatars/albus.jpg
+</code></pre>
+<h2 id="the-name" tabindex="-1">The name</h2>
+<p><code>IDENTITY.md</code> is read first; the config block is the fallback. In order: the workspace
+file, then an identity block in your config, then a plainer name field, then the agent id
+if it reads as a word — which is how <code>main</code> ends up as <strong>Main</strong>.</p>
+<p>The workspace comes first because <strong>that is the answer that is actually filled in.</strong> <code>main</code>
+— usually the busiest desk in the building — typically has no identity block in the config
+at all, but its workspace has always been through bootstrapping.</p>
+<p><strong>A name you have already written is kept exactly as it is:</strong></p>
+<table>
+<thead>
+<tr>
+<th>The name it found</th>
+<th>In the office</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Albus Dumbledclaw</code></td>
+<td><strong>Albus Dumbledclaw</strong></td>
+</tr>
+<tr>
+<td><code>Paige Turner</code></td>
+<td><strong>Paige Turner</strong></td>
+</tr>
+<tr>
+<td><code>Florence Nightingclaw</code></td>
+<td><strong>Florence Nightingclaw</strong></td>
+</tr>
+<tr>
+<td><code>Bobster</code></td>
+<td><strong>Bobster Flaky-Mender</strong> → <strong>Bobster Docs-Verifier</strong></td>
+</tr>
+<tr>
+<td><em>(nothing anywhere)</em></td>
+<td><strong>Aarav Flaky-Mender</strong> — generated, like every other harness</td>
+</tr>
+</tbody>
+</table>
+<p>The office usually writes the surname itself, as the job in hand. <strong>It stops doing that the
+moment you have supplied a surname of your own</strong>, because those names are the joke — Paige
+<em>Turner</em>, Florence <em>Nightingclaw</em> — and overwriting them with <code>Docs-Verifier</code> would delete
+the better line and take the credit for it.</p>
+<p>A single-word identity is treated as a first name and <em>does</em> get a job, so <code>Bobster</code> still
+tells you what he is up to.</p>
+<p>An agent id is only used when it reads as a word on its own: <code>main</code> becomes Main, but
+<code>code-reviewer</code> does not become Code-reviewer, because a room of characters called that is
+worse than a room of plausible strangers.</p>
+<h3 id="if-a-name-looks-wrong" tabindex="-1">If a name looks wrong</h3>
+<pre><code class="language-bash">node bin/aop-openclaw-install.cjs --status
+</code></pre>
+<pre><code>Cast:      who the office will call each agent
+           main         Bobster McClaw, wearing Rich red / crimson
+                        ~/.openclaw/workspace/IDENTITY.md
+           sideline     Sideline Cruston, wearing Field green / pitch green
+                        ~/.openclaw/workspace-sideline/IDENTITY.md
+</code></pre>
+<p>It names the <strong>file</strong> each answer came from, because an identity that is wrong is nearly
+always an <code>IDENTITY.md</code> read from the wrong directory. The Gateway log says the same thing
+as it happens.</p>
+<h3 id="three-things-to-expect" tabindex="-1">Three things to expect</h3>
+<p><strong>A name may arrive a beat late.</strong> The agent id comes with the agent context, not the
+session, so a character can be Aarav for one event and Albus from the next.</p>
+<p><strong>Two sessions of one agent are the same colleague</strong>, so they deliberately share a name. The
+rule that stops two anonymous tabs both being Ada does not apply to a name somebody chose.</p>
+<p><strong>Helpers are not copies.</strong> A subagent that is one of your own configured agents — Albus,
+invoked by Sideline — keeps its name, colour and face, because it really is somebody else.
+But OpenClaw also runs helper threads <em>as the spawning agent</em>, and naming those after their
+parent put four identical Sidelines in the room with nothing to tell them apart. A helper is
+Sideline's, not a second Sideline, so it gets a character of its own.</p>
+<h2 id="the-colour" tabindex="-1">The colour</h2>
+<p>Everyone in the office wears a shirt from a palette — pleasant, and meaningless, since it is
+redrawn every time they arrive. Put a <code>Colour</code> in an <code>IDENTITY.md</code> and that agent wears it
+<strong>in every session</strong>, so the colour becomes something you recognise across a restart.</p>
+<p><strong>Write it however you already write it.</strong> Real agents do not specify colours, they describe
+them, and the office reads descriptions:</p>
+<pre><code class="language-markdown">- Colour: Rich red / crimson
+- Colour: Bright tangerine / golden-orange
+- Colour: Warm library yellow / marigold
+- Colour: Lavender / healthcare purple
+- Colour: Field green / pitch green
+</code></pre>
+<p>Every one of those lands on a shirt. Behind it is a table of 12,005 colour names — which
+knows <code>tangerine</code>, <code>marigold</code>, <code>field green</code>, <code>oxblood</code> and <code>stormy sea</code> — and a fitting
+step that pulls whatever it finds into the range the office's own shirts occupy.</p>
+<p><strong>That second half is the one doing the quiet work.</strong> The <em>ideal</em> of <code>crimson</code> is nearly
+black, and <code>marigold</code> is a highlighter. Dropped into this room unaltered they read as a
+rendering fault, so the hue is kept and the lightness and vividness are made wearable.</p>
+<p>Adjectives are read too, so <code>deep teal</code>, <code>muted olive</code> and <code>pale sage</code> differ from the plain
+colour even where the table has no entry for them. Where a description offers alternatives,
+the office takes the side it can explain <em>completely</em>: <code>Warm library yellow / marigold</code>
+becomes marigold, not a mouthful of olive.</p>
+<h3 id="want-an-exact-colour-give-a-hex" tabindex="-1">Want an exact colour? Give a hex</h3>
+<pre><code class="language-markdown">- Colour: Rich red / crimson (#b03a3a)
+</code></pre>
+<p>A hex is honoured exactly and <strong>never adjusted</strong>, because it is a decision rather than a
+description — words for whoever reads the file, the hex for the office. <code>#c1440e</code>, <code>c1440e</code>
+(the hash is easy to forget), <code>rgb(193 68 14)</code> and <code>hsl(20 87% 41%)</code> all count.</p>
+<p>A bare colour <em>word</em> does not: <code>teal</code> is a description like any other and gets fitted, since
+the CSS keyword is nobody's shirt.</p>
+<p>A line with no colour in it at all is quietly ignored and the palette decides, so nothing
+breaks if you use the field as a mood board. <code>Colour: the vibe of a Tuesday</code> costs nothing
+but the wish.</p>
+<p>Where a colour was chosen it appears as a <strong>Colour</strong> row in the agent's detail panel,
+showing what you wrote next to the swatch it resolved to. <strong>That pairing is the point:</strong> the
+words are yours and the swatch is what the office made of them, so a disagreement is visible
+rather than mysterious. Agents wearing a palette colour get no row, because there is nothing
+to tell you.</p>
+<h2 id="the-face" tabindex="-1">The face</h2>
+<pre><code class="language-markdown">- Avatar: avatars/florence-nightingclaw.jpg
+</code></pre>
+<p>An avatar shows up in the agent's detail panel, beside their name. The path is relative to
+the agent's workspace — the directory the <code>IDENTITY.md</code> is in — and an absolute path, a
+<code>~/</code> path or an <code>http(s)</code> URL all work.</p>
+<p><strong>The picture is copied to the office, once.</strong> It has to be: the file is on the gateway and
+the office is a browser somewhere else, so there is nothing to link to. The plugin hashes
+it, asks the office whether it already has that picture, and uploads it only if not — so a
+gateway restart costs one small question per agent rather than an upload. It never happens
+inside a hook, so an agent is never waiting on it.</p>
+<p>Two things to expect:</p>
+<ul>
+<li><strong>The face arrives a few events late.</strong> The upload has to finish before there is a URL to
+send, so a session is usually named and dressed before it has a portrait. Open the panel
+again a moment later.</li>
+<li><strong>PNG, JPEG, GIF and WebP only.</strong> An <code>.svg</code> is refused on purpose: it is a document that
+can carry script, and the office would be serving it from its own origin.</li>
+</ul>
+<p>If a picture never appears, the usual answer is the plainest one — the path does not point at
+a file that exists.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="openclaw.html">OpenClaw</a> — installing it, and the troubleshooting table</li>
+<li><a href="../agent-names.html">The room, prop by prop</a> — how everyone else gets named</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#the-name">The name</a><ul><li><a href="#if-a-name-looks-wrong">If a name looks wrong</a></li>
+<li><a href="#three-things-to-expect">Three things to expect</a></li></ul></li>
+<li><a href="#the-colour">The colour</a><ul><li><a href="#want-an-exact-colour-give-a-hex">Want an exact colour? Give a hex</a></li></ul></li>
+<li><a href="#the-face">The face</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

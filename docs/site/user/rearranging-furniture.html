@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rearranging the furniture — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html" aria-current="page">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="rearranging-the-furniture" tabindex="-1">Rearranging the furniture</h1>
+<p><em>Press <code>E</code>, drag the desks about, and watch everybody's route bend round them.</em></p>
+<p>The office keeps running while you do it. Nothing is paused — agents go on walking,
+sitting and fetching coffee while the room changes around them. Freezing would have been
+easier and would also have hidden the one thing worth watching, which is the paths
+adjusting.</p>
+<h2 id="driving-it" tabindex="-1">Driving it</h2>
+<table>
+<thead>
+<tr>
+<th>Key or control</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>E</strong></td>
+<td>Enter or leave edit mode</td>
+</tr>
+<tr>
+<td><strong>Esc</strong></td>
+<td>Leave edit mode</td>
+</tr>
+<tr>
+<td>Click a prop</td>
+<td>Select it. Clicking a monitor selects the whole desk</td>
+</tr>
+<tr>
+<td>Drag</td>
+<td>Move it, snapped. The panel shows live <code>x, z</code></td>
+</tr>
+<tr>
+<td>Hold <strong>Alt</strong> while dragging</td>
+<td>Move it freely, ignoring the snap</td>
+</tr>
+<tr>
+<td><strong>[</strong> and <strong>]</strong></td>
+<td>Turn the selection 90°. Nearly everything turns. The floor lamp says it does not — a pole under a round shade looks the same from every side</td>
+</tr>
+<tr>
+<td><strong>←</strong> <strong>→</strong> <strong>↑</strong> <strong>↓</strong></td>
+<td>Nudge one snap along the room's own axes — the last few centimetres a drag cannot hit</td>
+</tr>
+<tr>
+<td><strong>⌘D</strong> / <strong>Ctrl-D</strong></td>
+<td>Duplicate: the same kind, turned the same way, as near the original as the room allows</td>
+</tr>
+<tr>
+<td><strong>⌫</strong> or <strong>Delete</strong></td>
+<td>Take the selection out of the room</td>
+</tr>
+<tr>
+<td><strong>P</strong></td>
+<td>Show or hide the route ribbons</td>
+</tr>
+<tr>
+<td><strong>⌘Z</strong> / <strong>Ctrl-Z</strong></td>
+<td>Undo, sixty steps deep</td>
+</tr>
+<tr>
+<td><strong>Add item…</strong></td>
+<td>What to bring in, under five tabs. <a href="#the-add-item-menu">More below</a></td>
+</tr>
+<tr>
+<td>Swatches</td>
+<td>The colours the selection can be painted — the rug, the couch and the armchair</td>
+</tr>
+<tr>
+<td>Snap scrubber</td>
+<td>The grid to snap to, <code>¼</code> by default. Three stops, placed at their own values along the track rather than evenly, so the run from <code>½</code> to <code>1</code> is twice the run from <code>¼</code> to <code>½</code>. Let go at <code>¾</code> and it settles on the nearer stop</td>
+</tr>
+<tr>
+<td><strong>Copy</strong> / <strong>Paste</strong></td>
+<td>The layout to and from the clipboard</td>
+</tr>
+<tr>
+<td><strong>Download</strong></td>
+<td>The layout as a file, named after it — <code>cosy-corner.json</code></td>
+</tr>
+<tr>
+<td>Drop zone</td>
+<td>Drag a layout <code>.json</code> onto it, or click to pick one. Dragged <em>text</em> counts too</td>
+</tr>
+<tr>
+<td><strong>Reset</strong></td>
+<td>Back to the room as authored</td>
+</tr>
+<tr>
+<td><strong>Random</strong></td>
+<td>A whole new office from a fresh seed — desks, teams, stations, lounge, planting and colours, laid out and checked before it arrives. It is an ordinary edit, so <strong>⌘Z</strong> puts the old room back. The panel prints the office's name and its seed, because <a href="generated-offices.html">the seed is the only way back</a> to a room you liked</td>
+</tr>
+</tbody>
+</table>
+<p><code>?edit=1</code> on the office URL opens edit mode on load:</p>
+<pre><code>https://therovingoffice.com/office/TEST-0000/?edit=1
+</code></pre>
+<h2 id="what-you-are-looking-at" tabindex="-1">What you are looking at</h2>
+<p>Five overlays, and between them the only answer to &quot;did that actually work?&quot; that does not
+involve waiting for an agent to walk past.</p>
+<img src="../images/screens/overlays-paths.png" width="780" alt="A close view of the office floor in edit mode: a blue outline round the floor each desk blocks, pale ribbons tracing where three agents are walking, and a ring under each of them.">
+<p><em>Close up, with the panel out of the way. The blue rectangles are the floor each prop
+blocks — <strong>wider than the models look</strong>, which is the surprise — and the pale ribbons are
+where people are actually walking. Nobody has stopped working.</em></p>
+<img src="../images/screens/editing.png" width="1000" alt="The whole office in edit mode with the editor strip across the bottom of the screen: Add item, the Selected panel, a snap-grid scrubber, a Paths On/Off switch, and the layout row of Copy, Paste, Download, Reset and Random.">
+<p><em>And the strip along the bottom, which is everything you can do to the room.</em></p>
+<ul>
+<li><strong>Walking areas</strong>, in grey — the standing room people need to use each item.</li>
+<li><strong>Item footprints</strong>, in blue — the floor occupied by movable props, including
+the clearance they need. These cells match the blue swatch in the legend.</li>
+<li><strong>A selection ring</strong> under whatever you are holding, tinted green or red by whether you
+may drop it there.</li>
+<li><strong>The route ahead</strong> of every walker, in green. Drop a desk across somebody's line and the
+ribbon bends round it in the same frame.</li>
+<li><strong>The route just walked</strong>, in blue, kept after the walk ends and fading out over twenty
+seconds.</li>
+</ul>
+<p><strong>Green is where somebody is going; blue is where they have been.</strong> Routes use
+stronger colours than the footprint cells, so they remain visible across rugs and
+selected items. The editor's colours stay the same in sunshine and at night.</p>
+<p>The blue fades for two reasons: it stops a long session silting up into a cat's cradle of
+every journey anybody has made, and since brightness tracks age, a glance says <em>when</em>. The
+bright blue is the walk that just finished; the faint one is several errands ago.</p>
+<p><strong>Paths</strong> or <strong><code>P</code></strong> hides the route ribbons for a clearer look at the room, and the preference survives leaving
+edit mode and coming back. A toggle that forgets is a toggle you stop trusting.</p>
+<p>Worth separating the last two from the first: walking areas say where access is
+<em>possible</em>, the ribbons say where it is actually <em>happening</em>, and those are different
+questions. A doorway can be perfectly walkable and still be one nobody's route goes
+through any more — which is the kind of thing you want to find out while you are still
+moving furniture.</p>
+<h2 id="a-drop-can-be-refused" tabindex="-1">A drop can be refused</h2>
+<p>Furniture that overlaps other furniture, leaves the floor, or fences off the coffee machine
+is not a layout worth having. So the ring is tinted while you drag, the panel says why, and
+a refused drop reverts to where the prop came from.</p>
+<table>
+<thead>
+<tr>
+<th>The panel says</th>
+<th>What is wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hanging off the floor</code></td>
+<td>The footprint has left the walkable floor</td>
+</tr>
+<tr>
+<td><code>overlapping desk:desk-4</code></td>
+<td>The footprint intersects another prop's</td>
+</tr>
+<tr>
+<td><code>nowhere left to stand at it</code></td>
+<td>Its own approach point is no longer standable</td>
+</tr>
+<tr>
+<td><code>Coffee machine can no longer be reached</code></td>
+<td>Nobody can get from the door to some station</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The last one is the one worth having.</strong> It catches the mistake that is invisible while
+you are making it: furniture that does not overlap anything and is comfortably on the
+floor, but which has quietly walled a station into a pocket nobody can get into.</p>
+<p>It only reports what <em>your</em> change broke. A room that arrived already stranded — imported,
+hand-edited, or saved before a station existed — can still be edited, which is the only way
+anybody could fix such a room by hand. It says so in the status line when you open edit
+mode.</p>
+<h2 id="the-add-item-menu" tabindex="-1">The Add-item menu</h2>
+<p><em>ADD ITEM</em> sits above five tabs — <strong>Furniture</strong>, <strong>Desks</strong>, <strong>Jobs</strong>, <strong>Plants</strong>,
+<strong>Other</strong> — and that block does not move: the rows scroll under it, so which tab you are on
+is never scrolled away.</p>
+<p><strong>A row is a picture, a name and a plus.</strong> The picture is the prop's own portrait, out of
+the same set as the <a href="../item-movements.html">Item Library</a>, so you pick out a side table by looking at one rather
+than by reading the words &quot;Side table&quot;.</p>
+<p><strong>Choosing one adds it</strong> — at the nearest spot to the middle of the room that the drop
+check accepts, turned if that is what fits — and selects it. There is no Add button: there
+was nothing else you might have wanted after choosing &quot;Couch&quot; from a menu headed Add item.</p>
+<p><strong>Each required job carries its state.</strong> A chip beside the section heading reads <em>one needed
+✓</em>, or <em>one needed — none yet</em>. Hover it for what covers it. A tab holding a job nobody is
+doing wears an amber dot, so the thing wanting attention is visible without opening every
+tab to hunt for it.</p>
+<p>That chip is why a section can be <strong>empty and still drawn</strong>. A room with its one coat stand
+has no coat stand to add, and &quot;one needed ✓&quot; is exactly the useful thing to say in that
+space.</p>
+<p><strong>Intake and dispatch wear lozenges</strong>, blue in and green out. The Jobs tab is the only place
+a single prop can do <em>both</em> — the post does — and the only place the room insists on one of
+each.</p>
+<p><strong>Some rows explain rather than add.</strong> The mailbox cannot be added, but it is the thing
+doing the job, and the reason there may only be one belongs beside it. The <strong>delivery
+person</strong> is there too: he is one of the ways work arrives and is not furniture — no
+footprint, nothing to drag, he walks on from off-stage and leaves. A section about how work
+arrives that left him out would be telling half the story.</p>
+<p><strong>Two rows are switches rather than items</strong>, in a dashed outline and wearing the same
+On/Off switch as Paths along the panel: the delivery person, and the <strong>bird post</strong>. The
+bird post's outline holds a little more — a row of species under the switch, in the same
+lozenges as Copy and Paste a size down. <strong>Mixed roster</strong> is the shifts as they come
+(mostly the owl at night, and you might spot a raven if you look hard); pick a species
+instead and every flight is that bird, day and night. Both switches are saved with the
+room and undone by <strong>⌘Z</strong> like any other change.</p>
+<h2 id="what-the-panel-tells-you-about-the-selection" tabindex="-1">What the panel tells you about the selection</h2>
+<p><strong>Selected</strong> holds everything about the thing you have hold of, with its name in the
+heading — <code>SELECTED – DESK #1</code>.</p>
+<p>Under it: <code>Position</code> — <code>(12.00, 8.00) facing 90°</code> — then its colours if it has any, its two
+buttons, and the keys that apply. That key row is written from the selection: pick the floor
+lamp and it reads <code>Drag move</code> without the rotate keys.</p>
+<p>Select a <strong>desk</strong> and two more rows appear: <code>Assigned to</code>, naming whoever works there —
+<code>Ada</code>, or <code>No one</code> — and <code>Desk marker</code>, identifying its coloured marker style. A desk is
+booked as its occupant walks in and stays theirs until they walk out, so a desk with dark
+screens and no chair pulled out may still be somebody's — they are at the coffee machine.
+Before deleting a desk, that is exactly what you want to know.</p>
+<p>First names only, because the row is two inches wide. <code>No one</code> rather than a blank, because
+an unclaimed desk is a real answer and a blank reads as the panel not having looked.</p>
+<h2 id="what-moves-and-what-does-not" tabindex="-1">What moves, and what does not</h2>
+<p>Everything on the floor is draggable, dressing included — twenty-two props in the stock
+office. The five desks (each a group: monitors, keyboard, chair, its plant, its seat and
+the direction its occupant faces all travel with it), the eight stations, the comfort
+furniture, and all five floor plants.</p>
+<p>The plants turn too. A plant's footprint is a square either way, so the heading changes
+nothing about where people walk — but a monstera's leaves point somewhere, and which way a
+fig leans is the difference between a plant in a corner and a plant in the way.</p>
+<p>Deliberately <strong>not</strong> movable, each for a reason:</p>
+<table>
+<thead>
+<tr>
+<th>Not movable</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The wall clock</td>
+<td>It is on a wall, not on the floor</td>
+</tr>
+<tr>
+<td>Window troughs</td>
+<td>They sit on the sills, and a sill that moved would leave them in mid-air</td>
+</tr>
+<tr>
+<td>The logo statues</td>
+<td>Same reason — sill objects, not floor furniture</td>
+</tr>
+<tr>
+<td>Walls, windows, door, floor</td>
+<td>Not furniture. The doorway in particular is where the paths reach out to the street</td>
+</tr>
+<tr>
+<td>The street, the park, the skyline</td>
+<td>Not in the room</td>
+</tr>
+</tbody>
+</table>
+<h2 id="six-rugs-and-six-sofas" tabindex="-1">Six rugs, and six sofas</h2>
+<p>Three kinds have a choice about how they look: six colours for the rug — sage, clay, sand,
+slate, plum and ink — and six for the upholstery, shared by the couch and the armchair:
+terracotta, moss, navy, mustard, charcoal and blush. They are drawn as swatches rather than
+a list of names, because the thing being chosen is a colour and &quot;Plum&quot; is a word you have
+to picture.</p>
+<p><strong>The important entry is the first one, Auto</strong>, which is not a colour: it is the absence of
+a choice, and it is what everything starts as. A room nobody has asked goes on following
+its scene and its season. Choosing a colour overrides that and keeps overriding it, which
+is the point of having chosen. It is drawn as a labelled pill rather than an empty swatch,
+because an empty swatch reads as a seventh colour — black.</p>
+<p><strong>What is not chosen is derived.</strong> A rug's border is its body a shade darker. A sofa's seat
+cushions are its body lifted toward white, and the cushion at your back is an accent chosen
+to go with it.</p>
+<h2 id="how-many-of-a-thing-the-room-may-have" tabindex="-1">How many of a thing the room may have</h2>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>How many</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Desks</td>
+<td>1 to 24</td>
+<td>A desk is a seat for one agent</td>
+</tr>
+<tr>
+<td>Couch, side table, standing desk, floor lamp</td>
+<td>0 to 24</td>
+<td>There is no answer to how many sofas an office should have except however many fit</td>
+</tr>
+<tr>
+<td>Floor plants</td>
+<td>0 to 24</td>
+<td>A room with no plants is a sadder room and a valid one</td>
+</tr>
+<tr>
+<td>Bookshelf, telescope</td>
+<td>Any number, but at least one <em>between them</em></td>
+<td>Looking something up does not have to happen in a particular place. An agent walks to the nearest and uses <em>that</em> one</td>
+</tr>
+<tr>
+<td>Mailbox, inbox</td>
+<td>At most 1 each</td>
+<td>A room with two outboxes has an unanswerable question about which one the post is in</td>
+</tr>
+<tr>
+<td>Coffee machine, water cooler, bin, coat stand</td>
+<td>At most 1 each</td>
+<td>Physically singular, and nothing is gained by a second</td>
+</tr>
+<tr>
+<td>Printer</td>
+<td>Any number</td>
+<td>It does real work now, so a second one at the far end of a big room is worth having</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-minimum-is-a-job-not-a-kind" tabindex="-1">The minimum is a job, not a kind</h3>
+<p>The maximum is a question about props. The minimum is a question about <strong>work</strong>. The room
+keeps whatever it needs to be able to do four jobs:</p>
+<table>
+<thead>
+<tr>
+<th>The room must be able to…</th>
+<th>Provided today by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>intake</strong> work</td>
+<td>the mailbox, the inbox, the printer</td>
+</tr>
+<tr>
+<td><strong>dispatch</strong> finished work</td>
+<td>the mailbox, the printer (as a fax)</td>
+</tr>
+<tr>
+<td><strong>look things up</strong></td>
+<td>the bookshelf, the telescope</td>
+</tr>
+<tr>
+<td><strong>say who is in</strong></td>
+<td>the coat stand</td>
+</tr>
+</tbody>
+</table>
+<p>…and two it can go without: <strong>get a drink</strong> and <strong>throw work away</strong>. A room without them is
+a poorer office and a working one — a break happens without a cup, and failed work closes
+at the desk instead of being carried to the bin.</p>
+<p>What that means in practice:</p>
+<ul>
+<li><strong>A second of anything frees the first.</strong> Two bookshelves and neither is load-bearing;
+add anything that can deliver and the mailbox is free to leave.</li>
+<li><strong>A refusal names the job</strong>, not the furniture: <em>&quot;The office needs somewhere to deliver
+finished work&quot;</em> rather than <em>&quot;the office needs its Mailbox&quot;</em> — which read as arbitrary
+because it was.</li>
+</ul>
+<p>The comfort furniture is the exception, and it is worth being clear why nought is safe there
+and not for a desk. Nothing walks to a couch out of necessity: resting is an idle pastime,
+and an agent who finds every cushion taken goes for a drink instead. An office with no couch
+is an office where nobody sits down, which is duller and works. A desk <em>is</em> a seat for an
+agent, so a room with none is a room nobody can work in.</p>
+<h3 id="the-headcount-is-the-desk-count" tabindex="-1">The headcount is the desk count</h3>
+<p>One desk, one agent. <strong>Add a desk and somebody files in to sit at it</strong>; delete one and the
+room drains to its new size as shifts end, rather than keeping a crowd standing.</p>
+<p>Deleting a desk somebody is <em>sitting at</em> is allowed, and worth watching: they stand up where
+they were, and if the room has a spare desk they are given it there and then. You can watch
+the <code>Assigned to</code> row move with them.</p>
+<p>If nothing is free they wait, which is honest rather than an oversight — the same state as
+an agent who arrived to find every desk taken. They work standing up until one comes free.
+Nobody is ever double-booked onto one desk to paper over it.</p>
+<h2 id="where-a-new-piece-lands" tabindex="-1">Where a new piece lands</h2>
+<p>Nowhere you chose, which is the one compromise in it: asking for a position would need a
+click, and a click in this mode already selects something. So the floor is swept instead,
+nearest the middle first, and the piece goes in at the first spot the drop check accepts —
+the same check a drag is held to, so nothing can arrive somewhere a drag could not have put
+it. Then you drag it where you meant.</p>
+<p>A piece gets <strong>turned if that is what fits</strong>. The stock room is tight and a desk is nearly
+three units wide, so at a fixed facing there is genuinely nowhere for one.</p>
+<p><strong>Delete a desk, add a desk, and it goes back in the hole</strong> — the spot the last deletion
+left is tried before anything else.</p>
+<p>A room with no room left says so. Twelve desks, a couch, a rug and seven stations with
+walkable standing room at each is about what this floor holds; the thirteenth desk is
+refused because every position at every facing either overlaps something, leaves its own
+standing room unstandable, or walls something off.</p>
+<h2 id="saving-and-sharing-what-you-made" tabindex="-1">Saving and sharing what you made</h2>
+<p>An arrangement is kept with the scene, and it travels: <strong><a href="layouts.html">layouts</a></strong> covers
+saving one, sending it to somebody, and the plain-text file it becomes — including
+<a href="layouts.html#an-example-to-take-apart">an example you can download and drop straight back in</a>.</p>
+<h2 id="what-is-not-here" tabindex="-1">What is not here</h2>
+<p>Lifting props off the floor, moving wall-mounted or window props, resizing footprints, and
+editing the room shell. Also multi-select, dragging a desk with its neighbours, and choosing
+<em>where</em> a new prop lands rather than taking the first spot that fits.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="generated-offices.html">Generated offices</a> — where <strong>Random</strong> gets a room from, and why
+every seed produces one that works</li>
+<li>The file format, the sweep, and how to bake a layout into the source are in the
+<a href="../developer/editor.html">developer docs</a></li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#driving-it">Driving it</a></li>
+<li><a href="#what-you-are-looking-at">What you are looking at</a></li>
+<li><a href="#a-drop-can-be-refused">A drop can be refused</a></li>
+<li><a href="#the-add-item-menu">The Add-item menu</a></li>
+<li><a href="#what-the-panel-tells-you-about-the-selection">What the panel tells you about the selection</a></li>
+<li><a href="#what-moves-and-what-does-not">What moves, and what does not</a></li>
+<li><a href="#six-rugs-and-six-sofas">Six rugs, and six sofas</a></li>
+<li><a href="#how-many-of-a-thing-the-room-may-have">How many of a thing the room may have</a><ul><li><a href="#the-minimum-is-a-job-not-a-kind">The minimum is a job, not a kind</a></li>
+<li><a href="#the-headcount-is-the-desk-count">The headcount is the desk count</a></li></ul></li>
+<li><a href="#where-a-new-piece-lands">Where a new piece lands</a></li>
+<li><a href="#saving-and-sharing-what-you-made">Saving and sharing what you made</a></li>
+<li><a href="#what-is-not-here">What is not here</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

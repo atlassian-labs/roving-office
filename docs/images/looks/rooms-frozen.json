@@ -1,0 +1,2876 @@
+[
+ {
+  "seed": "tune-14",
+  "name": "Four Quads",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "Four Quads",
+   "seed": "tune-14",
+   "reason": "10 desks in two teams of 6 and 4, clusters of desks, screens meeting in the middle, off a street across the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to 2 bookshelves. The break end has coffee, kept away from the quiet desks. Loading Bay: industrial greys against the brick and the deep sage.",
+   "desks": {
+    "desk-1": {
+     "x": 14.83,
+     "z": 8.9,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 20.17,
+     "z": 8.9,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 14.83,
+     "z": 6.1,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 20.17,
+     "z": 6.1,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 4.16,
+     "z": 17.1,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-6": {
+     "x": 9.5,
+     "z": 17.1,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-7": {
+     "x": 14.84,
+     "z": 17.1,
+     "facing": 3.14,
+     "standing": true
+    },
+    "desk-8": {
+     "x": 21.5,
+     "z": 17.1,
+     "facing": 3.14,
+     "standing": true
+    },
+    "desk-9": {
+     "x": 9.5,
+     "z": 8.9,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-10": {
+     "x": 9.5,
+     "z": 6.1,
+     "facing": 3.14,
+     "standing": false
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 1.5,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 6.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "inbox": {
+     "kind": "inbox",
+     "x": 24.6,
+     "z": 1.5,
+     "facing": -1.57
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 19.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "bookshelf-2": {
+     "kind": "bookshelf",
+     "x": 16,
+     "z": 1.05,
+     "facing": 0
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 25,
+     "z": 18.8,
+     "facing": 3.14
+    }
+   },
+   "furniture": {
+    "rug": {
+     "kind": "rug",
+     "x": 12.5,
+     "z": 16,
+     "facing": 0,
+     "color": "slate"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "snake",
+     "x": 1.5,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.37,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "fig",
+     "x": 8.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.28,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "fern",
+     "x": 1,
+     "z": 7.5,
+     "facing": 0,
+     "scale": 1.01,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-86",
+  "name": "Four Benches",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "Four Benches",
+   "seed": "tune-86",
+   "reason": "9 desks in two teams of 5 and 4, benches all facing one way, off a street down the length of the room. Work comes and goes by 2 printers and a stack of stock, with no courier. Lookups go to 3 bookshelves and a telescope at the window. The break end has coffee, kept away from the quiet desks. Loading Bay: industrial greys against the brick and the deep sage.",
+   "desks": {
+    "desk-1": {
+     "x": 17.5,
+     "z": 4.36,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 17.5,
+     "z": 9.5,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 17.5,
+     "z": 14.64,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 24.5,
+     "z": 9.5,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 7.5,
+     "z": 4.36,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-6": {
+     "x": 7.5,
+     "z": 9.5,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-7": {
+     "x": 7.5,
+     "z": 14.64,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-8": {
+     "x": 24.5,
+     "z": 4.36,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-9": {
+     "x": 24.5,
+     "z": 14.64,
+     "facing": -1.57,
+     "standing": false
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2,
+     "facing": 1.57
+    },
+    "printer": {
+     "kind": "printer",
+     "x": 2.5,
+     "z": 19.05,
+     "facing": 3.14
+    },
+    "printer-2": {
+     "kind": "printer",
+     "x": 1.28,
+     "z": 11,
+     "facing": 1.57
+    },
+    "inbox": {
+     "kind": "inbox",
+     "x": 1.65,
+     "z": 6.5,
+     "facing": 1.57
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 20.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "bookshelf-2": {
+     "kind": "bookshelf",
+     "x": 20.5,
+     "z": 19.2,
+     "facing": 3.14
+    },
+    "bookshelf-3": {
+     "kind": "bookshelf",
+     "x": 1.75,
+     "z": 14.5,
+     "facing": 1.57
+    },
+    "telescope": {
+     "kind": "telescope",
+     "x": 1.3,
+     "z": 9,
+     "facing": 1.57
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 0.85,
+     "z": 17.5,
+     "facing": 1.57
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 11,
+     "z": 18.8,
+     "facing": 3.14
+    }
+   },
+   "furniture": {},
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "monstera",
+     "x": 24.5,
+     "z": 18.5,
+     "facing": 0,
+     "scale": 1.66,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "monstera",
+     "x": 10.5,
+     "z": 1.5,
+     "facing": 0,
+     "scale": 1.48,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "monstera",
+     "x": 9,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.41,
+     "seasonal": true
+    },
+    "plant-4": {
+     "kind": "snake",
+     "x": 25,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.43,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": false
+   }
+  }
+ },
+ {
+  "seed": "tune-47",
+  "name": "The Loft Row Room",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "The Loft Row Room",
+   "seed": "tune-47",
+   "reason": "8 desks in two teams of 5 and 3, benches all facing one way, off a street down the length of the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to a bookshelf and a telescope at the window. The break end has coffee and one thing to sit on, kept away from the quiet desks. Yard in April: the service yard greening up under the loading doors.",
+   "desks": {
+    "desk-1": {
+     "x": 14.75,
+     "z": 2.5,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 14.75,
+     "z": 7.75,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 14.75,
+     "z": 13,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 21.75,
+     "z": 5.12,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 21.75,
+     "z": 10.38,
+     "facing": -1.57,
+     "standing": true
+    },
+    "desk-6": {
+     "x": 4.75,
+     "z": 6.5,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-7": {
+     "x": 4.75,
+     "z": 11.75,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-8": {
+     "x": 4.75,
+     "z": 17,
+     "facing": -1.57,
+     "standing": false
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2.5,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 7,
+     "z": 1.05,
+     "facing": 0
+    },
+    "inbox": {
+     "kind": "inbox",
+     "x": 24.6,
+     "z": 18.5,
+     "facing": -1.57
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 18,
+     "z": 1.05,
+     "facing": 0
+    },
+    "telescope": {
+     "kind": "telescope",
+     "x": 21,
+     "z": 1,
+     "facing": 1.57
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 25,
+     "z": 0.85,
+     "facing": 0
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 20.5,
+     "z": 18.8,
+     "facing": 3.14
+    }
+   },
+   "furniture": {
+    "couch": {
+     "kind": "couch",
+     "x": 19,
+     "z": 14.5,
+     "facing": 0,
+     "color": "moss"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 22,
+     "z": 14,
+     "facing": 1.57
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "fig",
+     "x": 25,
+     "z": 8.5,
+     "facing": 0,
+     "scale": 1.4,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "fig",
+     "x": 14,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.41,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "fig",
+     "x": 7,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.3,
+     "seasonal": true
+    },
+    "plant-5": {
+     "kind": "monstera",
+     "x": 25,
+     "z": 16,
+     "facing": 0,
+     "scale": 1.36,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-37",
+  "name": "Five Islands",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "Five Islands",
+   "seed": "tune-37",
+   "reason": "11 desks in two teams of 6 and 4, with one desk on their own, one block of desks in the middle of the floor, off a street down the length of the room. Work comes and goes by a post box and a printer, and the courier calls. Lookups go to a bookshelf and a telescope at the window. The break end has water, kept away from the quiet desks. Yard in April: the service yard greening up under the loading doors.",
+   "desks": {
+    "desk-1": {
+     "x": 14.4,
+     "z": 15.28,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 14.4,
+     "z": 10,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 14.4,
+     "z": 4.72,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 11.6,
+     "z": 15.28,
+     "facing": 4.71,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 11.6,
+     "z": 10,
+     "facing": 4.71,
+     "standing": false
+    },
+    "desk-6": {
+     "x": 11.6,
+     "z": 4.72,
+     "facing": 4.71,
+     "standing": false
+    },
+    "desk-7": {
+     "x": 21.6,
+     "z": 8.64,
+     "facing": 4.71,
+     "standing": false
+    },
+    "desk-8": {
+     "x": 21.6,
+     "z": 3.36,
+     "facing": 4.71,
+     "standing": false
+    },
+    "desk-9": {
+     "x": 21.6,
+     "z": 16,
+     "facing": 4.71,
+     "standing": true
+    },
+    "desk-10": {
+     "x": 2.4,
+     "z": 9,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-11": {
+     "x": 2.4,
+     "z": 14.36,
+     "facing": 1.57,
+     "standing": false
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2.5,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 8,
+     "z": 1.05,
+     "facing": 0
+    },
+    "printer": {
+     "kind": "printer",
+     "x": 25,
+     "z": 19.05,
+     "facing": 3.14
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 24.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "telescope": {
+     "kind": "telescope",
+     "x": 1.3,
+     "z": 5,
+     "facing": 1.57
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 0.85,
+     "z": 19,
+     "facing": 1.57
+    },
+    "waterCooler": {
+     "kind": "waterCooler",
+     "x": 7.5,
+     "z": 19.2,
+     "facing": 3.14
+    }
+   },
+   "furniture": {
+    "rug": {
+     "kind": "rug",
+     "x": 20.5,
+     "z": 11,
+     "facing": 0,
+     "color": "sage"
+    },
+    "rug-2": {
+     "kind": "rug",
+     "x": 3.5,
+     "z": 15.5,
+     "facing": 1.57,
+     "color": "sage"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "fig",
+     "x": 15.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.37,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "fern",
+     "x": 1,
+     "z": 1,
+     "facing": 0,
+     "scale": 0.98,
+     "seasonal": false
+    },
+    "plant-3": {
+     "kind": "fern",
+     "x": 10,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.25,
+     "seasonal": true
+    },
+    "plant-4": {
+     "kind": "bush",
+     "x": 25,
+     "z": 10.5,
+     "facing": 0,
+     "scale": 1.28,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-53",
+  "name": "The Paperless Floor",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "The Paperless Floor",
+   "seed": "tune-53",
+   "reason": "9 desks in one team, one long back-to-back run down the room, off a street across the room. Work comes and goes by a printer, with no courier. Lookups go to a bookshelf and a telescope at the window. The break end has coffee, water and one thing to sit on, kept away from the quiet desks. Indian Summer: the same boards gone amber with the trees outside.",
+   "desks": {
+    "desk-1": {
+     "x": 10.34,
+     "z": 8.4,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 15.66,
+     "z": 8.4,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 20.98,
+     "z": 8.4,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 10.34,
+     "z": 5.6,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 15.66,
+     "z": 5.6,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-6": {
+     "x": 20.98,
+     "z": 5.6,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-7": {
+     "x": 3,
+     "z": 15.6,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-8": {
+     "x": 8,
+     "z": 15.4,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-9": {
+     "x": 17,
+     "z": 15.4,
+     "facing": 0,
+     "standing": true
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2.5,
+     "facing": 1.57
+    },
+    "printer": {
+     "kind": "printer",
+     "x": 25,
+     "z": 19.05,
+     "facing": 3.14
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 1.75,
+     "z": 18.5,
+     "facing": 1.57
+    },
+    "telescope": {
+     "kind": "telescope",
+     "x": 6.5,
+     "z": 1.3,
+     "facing": 0
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 23,
+     "z": 18.8,
+     "facing": 3.14
+    },
+    "waterCooler": {
+     "kind": "waterCooler",
+     "x": 25.2,
+     "z": 14.5,
+     "facing": -1.57
+    }
+   },
+   "furniture": {
+    "armchair": {
+     "kind": "armchair",
+     "x": 13,
+     "z": 18.5,
+     "facing": 1.57,
+     "color": "terracotta"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 13,
+     "z": 16,
+     "facing": 1.57
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 13,
+     "z": 16.5,
+     "facing": 0,
+     "color": "sand"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "fig",
+     "x": 24.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.38,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "bush",
+     "x": 25,
+     "z": 9,
+     "facing": 0,
+     "scale": 1.36,
+     "seasonal": true
+    },
+    "plant-4": {
+     "kind": "fern",
+     "x": 17.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.25,
+     "seasonal": true
+    },
+    "plant-5": {
+     "kind": "snake",
+     "x": 9.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.33,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": false
+   }
+  }
+ },
+ {
+  "seed": "tune-28",
+  "name": "The Amber Bench",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "The Amber Bench",
+   "seed": "tune-28",
+   "reason": "6 desks in one team, benches all facing one way, off a street down the length of the room. Work comes and goes by a post box and a printer, and the courier calls. Lookups go to 2 bookshelves. The break end has water and two things to sit on, kept away from the quiet desks. 7 plants, which is as many as the corners will take. Indian Summer: the same boards gone amber with the trees outside.",
+   "desks": {
+    "desk-1": {
+     "x": 20.5,
+     "z": 13.82,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 20.5,
+     "z": 8.5,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 20.5,
+     "z": 3.18,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 13.5,
+     "z": 13.82,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 13.5,
+     "z": 8.5,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-6": {
+     "x": 13.5,
+     "z": 3.18,
+     "facing": 1.57,
+     "standing": false
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2.5,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 1.25,
+     "z": 5,
+     "facing": 1.57
+    },
+    "printer": {
+     "kind": "printer",
+     "x": 1.28,
+     "z": 14.5,
+     "facing": 1.57
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 13.5,
+     "z": 19.2,
+     "facing": 3.14
+    },
+    "bookshelf-2": {
+     "kind": "bookshelf",
+     "x": 22.5,
+     "z": 19.2,
+     "facing": 3.14
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 0.85,
+     "z": 18.5,
+     "facing": 1.57
+    },
+    "waterCooler": {
+     "kind": "waterCooler",
+     "x": 0.95,
+     "z": 10.5,
+     "facing": 1.57
+    }
+   },
+   "furniture": {
+    "armchair": {
+     "kind": "armchair",
+     "x": 6,
+     "z": 16,
+     "facing": 1.57,
+     "color": "mustard"
+    },
+    "armchair-2": {
+     "kind": "armchair",
+     "x": 6,
+     "z": 13,
+     "facing": 1.57,
+     "color": "mustard"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 3.5,
+     "z": 12.5,
+     "facing": 1.57
+    },
+    "floorLamp": {
+     "kind": "floorLamp",
+     "x": 4.5,
+     "z": 10.5
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 6,
+     "z": 16,
+     "facing": 0,
+     "color": "sand"
+    },
+    "rug-2": {
+     "kind": "rug",
+     "x": 21,
+     "z": 8.5,
+     "facing": 0,
+     "color": "sand"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "monstera",
+     "x": 1.5,
+     "z": 8.5,
+     "facing": 0,
+     "scale": 1.7,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "snake",
+     "x": 25,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.36,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "bush",
+     "x": 11,
+     "z": 1.5,
+     "facing": 0,
+     "scale": 1.59,
+     "seasonal": true
+    },
+    "plant-4": {
+     "kind": "fig",
+     "x": 1,
+     "z": 17,
+     "facing": 0,
+     "scale": 1.33,
+     "seasonal": false
+    },
+    "plant-5": {
+     "kind": "monstera",
+     "x": 18.5,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.38,
+     "seasonal": true
+    },
+    "plant-6": {
+     "kind": "snake",
+     "x": 18.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.43,
+     "seasonal": true
+    },
+    "plant-7": {
+     "kind": "monstera",
+     "x": 11,
+     "z": 18.5,
+     "facing": 0,
+     "scale": 1.51,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-74",
+  "name": "The Curtain-Wall Spine",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "The Curtain-Wall Spine",
+   "seed": "tune-74",
+   "reason": "8 desks in one team, one long back-to-back run down the room, off a street across the room. Work comes and goes by a post box and a printer, and the courier calls. Lookups go to 2 bookshelves. The break end has coffee, kept away from the quiet desks. Tower in October: warm upholstery against the cool glass.",
+   "desks": {
+    "desk-1": {
+     "x": 20.23,
+     "z": 12.85,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 14.91,
+     "z": 12.85,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 9.59,
+     "z": 12.85,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 4.27,
+     "z": 12.85,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 20.23,
+     "z": 15.65,
+     "facing": 6.28,
+     "standing": false
+    },
+    "desk-6": {
+     "x": 14.91,
+     "z": 15.65,
+     "facing": 6.28,
+     "standing": false
+    },
+    "desk-7": {
+     "x": 9.59,
+     "z": 15.65,
+     "facing": 6.28,
+     "standing": false
+    },
+    "desk-8": {
+     "x": 4.27,
+     "z": 15.65,
+     "facing": 6.28,
+     "standing": false
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 3.5,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 6.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "printer": {
+     "kind": "printer",
+     "x": 19.5,
+     "z": 1.2,
+     "facing": 0
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 24.5,
+     "z": 18.5,
+     "facing": -1.57
+    },
+    "bookshelf-2": {
+     "kind": "bookshelf",
+     "x": 13.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 24,
+     "z": 0.85,
+     "facing": 0
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 22.5,
+     "z": 1.45,
+     "facing": 0
+    }
+   },
+   "furniture": {
+    "rug": {
+     "kind": "rug",
+     "x": 20.5,
+     "z": 15.5,
+     "facing": 0,
+     "color": "clay"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "snake",
+     "x": 1,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.23,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "fern",
+     "x": 1,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.02,
+     "seasonal": false
+    },
+    "plant-3": {
+     "kind": "fig",
+     "x": 16.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.56,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-55",
+  "name": "The Frosted Cloister",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "The Frosted Cloister",
+   "seed": "tune-55",
+   "reason": "3 desks in one team, desks at the walls, the floor left open, off a street across the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to a bookshelf and a telescope at the window. The break end has coffee, water and one thing to sit on, kept away from the quiet desks. Night Shift: a tower floor lit by its own panels most of the day.",
+   "desks": {
+    "desk-1": {
+     "x": 15.14,
+     "z": 18.5,
+     "facing": 3.14,
+     "standing": true
+    },
+    "desk-2": {
+     "x": 10,
+     "z": 18.5,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 4.86,
+     "z": 18.5,
+     "facing": 3.14,
+     "standing": false
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 6.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "inbox": {
+     "kind": "inbox",
+     "x": 10.5,
+     "z": 1.25,
+     "facing": 0
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 19.5,
+     "z": 19.2,
+     "facing": 3.14
+    },
+    "telescope": {
+     "kind": "telescope",
+     "x": 15,
+     "z": 1.3,
+     "facing": 0
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 25.2,
+     "z": 1,
+     "facing": -1.57
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 17.5,
+     "z": 1.45,
+     "facing": 0
+    },
+    "waterCooler": {
+     "kind": "waterCooler",
+     "x": 22,
+     "z": 1.05,
+     "facing": 0
+    }
+   },
+   "furniture": {
+    "couch": {
+     "kind": "couch",
+     "x": 22.5,
+     "z": 6.5,
+     "facing": 0,
+     "color": "charcoal"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 23.5,
+     "z": 4.5,
+     "facing": 0
+    },
+    "floorLamp": {
+     "kind": "floorLamp",
+     "x": 19,
+     "z": 6
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 22,
+     "z": 6,
+     "facing": 1.57,
+     "color": "ink"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "bush",
+     "x": 25,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.3,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "bush",
+     "x": 1,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.45,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "fig",
+     "x": 20,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.48,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-12",
+  "name": "The Ground-Floor Observatory",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "The Ground-Floor Observatory",
+   "seed": "tune-12",
+   "reason": "5 desks in two teams of 3 and 2, benches all facing one way, off a street across the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to a telescope at the window. The break end has coffee, water and one thing to sit on, kept away from the quiet desks. First Frost: a warm room with a cold street through the glass.",
+   "desks": {
+    "desk-1": {
+     "x": 3.53,
+     "z": 13.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 8.75,
+     "z": 13.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 13.97,
+     "z": 13.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 16.14,
+     "z": 5.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 21.36,
+     "z": 5.75,
+     "facing": 0,
+     "standing": false
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2.5,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 6.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "inbox": {
+     "kind": "inbox",
+     "x": 9.5,
+     "z": 1.25,
+     "facing": 0
+    },
+    "telescope": {
+     "kind": "telescope",
+     "x": 21,
+     "z": 1.3,
+     "facing": 0
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 25,
+     "z": 0.85,
+     "facing": 0
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 22.5,
+     "z": 18.8,
+     "facing": 3.14
+    },
+    "waterCooler": {
+     "kind": "waterCooler",
+     "x": 17.5,
+     "z": 19.2,
+     "facing": 3.14
+    }
+   },
+   "furniture": {
+    "couch": {
+     "kind": "couch",
+     "x": 23,
+     "z": 13.5,
+     "facing": 0,
+     "color": "navy"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 20,
+     "z": 13.5,
+     "facing": 1.57
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 22.5,
+     "z": 13.5,
+     "facing": 1.57,
+     "color": "clay"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "snake",
+     "x": 1,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.31,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "bush",
+     "x": 25,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.24,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "bush",
+     "x": 19,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.4,
+     "seasonal": true
+    },
+    "plant-4": {
+     "kind": "fig",
+     "x": 15,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.38,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-2",
+  "name": "The Corner Telescope Room",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "The Corner Telescope Room",
+   "seed": "tune-2",
+   "reason": "6 desks in one team, one long back-to-back run down the room, off a street down the length of the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to a telescope at the window. The break end has coffee and one thing to sit on, kept away from the quiet desks. Nothing green in it at all. Glasshouse: grey concrete with something growing on every surface.",
+   "desks": {
+    "desk-1": {
+     "x": 16.85,
+     "z": 2.9,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 16.85,
+     "z": 8.25,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 16.85,
+     "z": 13.6,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 19.65,
+     "z": 2.9,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 19.65,
+     "z": 8.25,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-6": {
+     "x": 19.65,
+     "z": 13.6,
+     "facing": 1.57,
+     "standing": true
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 6.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "inbox": {
+     "kind": "inbox",
+     "x": 11.5,
+     "z": 1.25,
+     "facing": 0
+    },
+    "telescope": {
+     "kind": "telescope",
+     "x": 1.3,
+     "z": 8,
+     "facing": 1.57
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 25.2,
+     "z": 19,
+     "facing": -1.57
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 1,
+     "z": 18.8,
+     "facing": 3.14
+    }
+   },
+   "furniture": {
+    "couch": {
+     "kind": "couch",
+     "x": 1.5,
+     "z": 13,
+     "facing": 1.57,
+     "color": "blush"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 2,
+     "z": 16,
+     "facing": 0
+    },
+    "sideTable-2": {
+     "kind": "sideTable",
+     "x": 1.5,
+     "z": 10,
+     "facing": 0
+    },
+    "floorLamp": {
+     "kind": "floorLamp",
+     "x": 5.5,
+     "z": 13
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 3.5,
+     "z": 12.5,
+     "facing": 1.57,
+     "color": "sage"
+    }
+   },
+   "decor": {},
+   "plants": {},
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-76",
+  "name": "Two Benches",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "Two Benches",
+   "seed": "tune-76",
+   "reason": "5 desks in two teams of 3 and 2, benches all facing one way, off a street across the room. Work comes and goes by 2 post boxes and a stack of stock, and the courier calls. Lookups go to a bookshelf and a telescope at the window. The break end has coffee, water and one thing to sit on, kept away from the quiet desks. Rooftop Spring: chimney pots and blossom, everything pale.",
+   "desks": {
+    "desk-1": {
+     "x": 2.55,
+     "z": 14.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 7.75,
+     "z": 14.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 12.95,
+     "z": 14.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 18.15,
+     "z": 6.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 23.35,
+     "z": 6.75,
+     "facing": 0,
+     "standing": true
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2.5,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 6.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "mailbox-2": {
+     "kind": "mailbox",
+     "x": 15.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "inbox": {
+     "kind": "inbox",
+     "x": 11.5,
+     "z": 1.25,
+     "facing": 0
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 24.5,
+     "z": 3.5,
+     "facing": -1.57
+    },
+    "telescope": {
+     "kind": "telescope",
+     "x": 20.5,
+     "z": 1.3,
+     "facing": 0
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 25.2,
+     "z": 1,
+     "facing": -1.57
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 25,
+     "z": 18.8,
+     "facing": 3.14
+    },
+    "waterCooler": {
+     "kind": "waterCooler",
+     "x": 20,
+     "z": 19.2,
+     "facing": 3.14
+    }
+   },
+   "furniture": {
+    "couch": {
+     "kind": "couch",
+     "x": 23,
+     "z": 14,
+     "facing": 0,
+     "color": "blush"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 20,
+     "z": 14,
+     "facing": 1.57
+    },
+    "floorLamp": {
+     "kind": "floorLamp",
+     "x": 23,
+     "z": 18
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 22.5,
+     "z": 14.5,
+     "facing": 1.57,
+     "color": "sand"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "monstera",
+     "x": 18,
+     "z": 1.5,
+     "facing": 0,
+     "scale": 1.67,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "monstera",
+     "x": 9,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.36,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "bush",
+     "x": 18,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.41,
+     "seasonal": true
+    },
+    "plant-4": {
+     "kind": "bush",
+     "x": 18.5,
+     "z": 16,
+     "facing": 0,
+     "scale": 1.48,
+     "seasonal": false
+    },
+    "plant-5": {
+     "kind": "snake",
+     "x": 22.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.22,
+     "seasonal": false
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-71",
+  "name": "The Midsummer Quad",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "The Midsummer Quad",
+   "seed": "tune-71",
+   "reason": "8 desks in two teams of 4 and 4, clusters of desks, screens meeting in the middle, off a street across the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to a bookshelf. The break end has coffee, water and two things to sit on, kept away from the quiet desks. Quatorze Juillet: shutters open, limestone bleached, the whole city out.",
+   "desks": {
+    "desk-1": {
+     "x": 17.89,
+     "z": 7.9,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 23.11,
+     "z": 7.9,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 17.89,
+     "z": 5.1,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 23.11,
+     "z": 5.1,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 15.89,
+     "z": 17.1,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-6": {
+     "x": 21.11,
+     "z": 17.1,
+     "facing": 3.14,
+     "standing": true
+    },
+    "desk-7": {
+     "x": 4.5,
+     "z": 17.1,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-8": {
+     "x": 9.5,
+     "z": 17.1,
+     "facing": 3.14,
+     "standing": false
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 9,
+     "z": 1.05,
+     "facing": 0
+    },
+    "inbox": {
+     "kind": "inbox",
+     "x": 12.5,
+     "z": 1.25,
+     "facing": 0
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 14.5,
+     "z": 4.5,
+     "facing": 4.71
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 0.85,
+     "z": 19,
+     "facing": 1.57
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 6.5,
+     "z": 1.45,
+     "facing": 0
+    },
+    "waterCooler": {
+     "kind": "waterCooler",
+     "x": 10.5,
+     "z": 1.05,
+     "facing": 0
+    }
+   },
+   "furniture": {
+    "armchair": {
+     "kind": "armchair",
+     "x": 9,
+     "z": 10,
+     "facing": 0,
+     "color": "navy"
+    },
+    "armchair-2": {
+     "kind": "armchair",
+     "x": 7,
+     "z": 7,
+     "facing": 1.57,
+     "color": "navy"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 6.5,
+     "z": 10,
+     "facing": 0
+    },
+    "floorLamp": {
+     "kind": "floorLamp",
+     "x": 12,
+     "z": 9.5
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 7,
+     "z": 7,
+     "facing": 0,
+     "color": "sand"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "bush",
+     "x": 25,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.38,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "fig",
+     "x": 1,
+     "z": 17.5,
+     "facing": 0,
+     "scale": 1.4,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "bush",
+     "x": 25,
+     "z": 16.5,
+     "facing": 0,
+     "scale": 1.42,
+     "seasonal": true
+    },
+    "plant-4": {
+     "kind": "snake",
+     "x": 1,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.07,
+     "seasonal": false
+    },
+    "plant-7": {
+     "kind": "fern",
+     "x": 1,
+     "z": 10,
+     "facing": 0,
+     "scale": 0.94,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-11",
+  "name": "The Green Lookout",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "The Green Lookout",
+   "seed": "tune-11",
+   "reason": "4 desks in one team, one long back-to-back run down the room, off a street across the room. Work comes and goes by a printer, with no courier. Lookups go to a telescope at the window. The break end has coffee, water and two things to sit on, kept away from the quiet desks. Yard in April: the service yard greening up under the loading doors.",
+   "desks": {
+    "desk-1": {
+     "x": 21.61,
+     "z": 5.6,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 16.39,
+     "z": 5.6,
+     "facing": 3.14,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 21.61,
+     "z": 8.4,
+     "facing": 6.28,
+     "standing": true
+    },
+    "desk-4": {
+     "x": 16.39,
+     "z": 8.4,
+     "facing": 6.28,
+     "standing": false
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2,
+     "facing": 1.57
+    },
+    "printer": {
+     "kind": "printer",
+     "x": 24.97,
+     "z": 17,
+     "facing": -1.57
+    },
+    "telescope": {
+     "kind": "telescope",
+     "x": 8.5,
+     "z": 1.3,
+     "facing": 0
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 25.2,
+     "z": 18.5,
+     "facing": -1.57
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 1.5,
+     "z": 18.8,
+     "facing": 3.14
+    },
+    "waterCooler": {
+     "kind": "waterCooler",
+     "x": 6,
+     "z": 19.2,
+     "facing": 3.14
+    }
+   },
+   "furniture": {
+    "couch": {
+     "kind": "couch",
+     "x": 12,
+     "z": 17,
+     "facing": 1.57,
+     "color": "moss"
+    },
+    "couch-2": {
+     "kind": "couch",
+     "x": 7.5,
+     "z": 15.5,
+     "facing": 0,
+     "color": "moss"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 4.5,
+     "z": 16,
+     "facing": 1.57
+    },
+    "floorLamp": {
+     "kind": "floorLamp",
+     "x": 16,
+     "z": 17
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 7.5,
+     "z": 16,
+     "facing": 0,
+     "color": "sage"
+    },
+    "rug-2": {
+     "kind": "rug",
+     "x": 17.5,
+     "z": 6.5,
+     "facing": 0,
+     "color": "sage"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "monstera",
+     "x": 6.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.38,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "snake",
+     "x": 15.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.26,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "fig",
+     "x": 11.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.63,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": false
+   }
+  }
+ },
+ {
+  "seed": "tune-84",
+  "name": "Rings and a Paperless Floor",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "Rings and a Paperless Floor",
+   "seed": "tune-84",
+   "reason": "7 desks in three teams of 3, 2 and 2, desks at the walls, the floor left open, off a street down the length of the room. Work comes and goes by a printer, with no courier. Lookups go to 2 bookshelves. The break end has coffee, water and one thing to sit on, kept away from the quiet desks. Night Shift: a tower floor lit by its own panels most of the day.",
+   "desks": {
+    "desk-1": {
+     "x": 17.41,
+     "z": 1.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 22.59,
+     "z": 1.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 2.85,
+     "z": 17.18,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 2.85,
+     "z": 12,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-5": {
+     "x": 2.85,
+     "z": 6.82,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-6": {
+     "x": 23.4,
+     "z": 8.41,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-7": {
+     "x": 23.4,
+     "z": 13.59,
+     "facing": -1.57,
+     "standing": true
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 1,
+     "facing": 1.57
+    },
+    "printer": {
+     "kind": "printer",
+     "x": 10.5,
+     "z": 19.05,
+     "facing": 3.14
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 24.5,
+     "z": 17.5,
+     "facing": -1.57
+    },
+    "bookshelf-2": {
+     "kind": "bookshelf",
+     "x": 20.5,
+     "z": 19.2,
+     "facing": 3.14
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 11,
+     "z": 0.85,
+     "facing": 0
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 16,
+     "z": 18.8,
+     "facing": 3.14
+    },
+    "waterCooler": {
+     "kind": "waterCooler",
+     "x": 8.5,
+     "z": 19.2,
+     "facing": 3.14
+    }
+   },
+   "furniture": {
+    "couch": {
+     "kind": "couch",
+     "x": 16,
+     "z": 13,
+     "facing": 1.57,
+     "color": "charcoal"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 15.5,
+     "z": 10,
+     "facing": 0
+    },
+    "floorLamp": {
+     "kind": "floorLamp",
+     "x": 17.5,
+     "z": 9.5
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 16,
+     "z": 13,
+     "facing": 0,
+     "color": "ink"
+    },
+    "rug-2": {
+     "kind": "rug",
+     "x": 4,
+     "z": 11.5,
+     "facing": 1.57,
+     "color": "ink"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "monstera",
+     "x": 6.5,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.39,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": false
+   }
+  }
+ },
+ {
+  "seed": "tune-27",
+  "name": "The Palm Court",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "The Palm Court",
+   "seed": "tune-27",
+   "reason": "3 desks in one team, benches all facing one way, off a street across the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to 2 bookshelves. The break end has coffee, water and two things to sit on, kept away from the quiet desks. 6 plants, which is as many as the corners will take. Quatorze Juillet: shutters open, limestone bleached, the whole city out.",
+   "desks": {
+    "desk-1": {
+     "x": 10.99,
+     "z": 2.25,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 16.25,
+     "z": 2.25,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 21.51,
+     "z": 2.25,
+     "facing": 0,
+     "standing": true
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 6.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "inbox": {
+     "kind": "inbox",
+     "x": 1.65,
+     "z": 17.5,
+     "facing": 1.57
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 24.5,
+     "z": 8.5,
+     "facing": -1.57
+    },
+    "bookshelf-2": {
+     "kind": "bookshelf",
+     "x": 11.5,
+     "z": 19.2,
+     "facing": 3.14
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 24.5,
+     "z": 18.8,
+     "facing": 3.14
+    },
+    "waterCooler": {
+     "kind": "waterCooler",
+     "x": 19.5,
+     "z": 19.2,
+     "facing": 3.14
+    }
+   },
+   "furniture": {
+    "armchair": {
+     "kind": "armchair",
+     "x": 9,
+     "z": 10,
+     "facing": 0,
+     "color": "navy"
+    },
+    "armchair-2": {
+     "kind": "armchair",
+     "x": 13,
+     "z": 9.5,
+     "facing": 0,
+     "color": "navy"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 9.5,
+     "z": 7.5,
+     "facing": 0
+    },
+    "floorLamp": {
+     "kind": "floorLamp",
+     "x": 6.5,
+     "z": 8
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 13,
+     "z": 9.5,
+     "facing": 0,
+     "color": "sand"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "fern",
+     "x": 25,
+     "z": 1,
+     "facing": 0,
+     "scale": 0.99,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "snake",
+     "x": 8,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.32,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "bush",
+     "x": 22.5,
+     "z": 18.5,
+     "facing": 0,
+     "scale": 1.6,
+     "seasonal": true
+    },
+    "plant-4": {
+     "kind": "bush",
+     "x": 24.5,
+     "z": 11,
+     "facing": 0,
+     "scale": 1.57,
+     "seasonal": true
+    },
+    "plant-5": {
+     "kind": "monstera",
+     "x": 8.5,
+     "z": 18.5,
+     "facing": 0,
+     "scale": 1.76,
+     "seasonal": true
+    },
+    "plant-6": {
+     "kind": "fern",
+     "x": 1,
+     "z": 1,
+     "facing": 0,
+     "scale": 0.96,
+     "seasonal": false
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-80",
+  "name": "The Narrow Bench",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "The Narrow Bench",
+   "seed": "tune-80",
+   "reason": "2 desks in one team, benches all facing one way, off a street across the room. Work comes and goes by a post box and a printer, and the courier calls. Lookups go to 2 bookshelves. The break end has coffee and four things to sit on, kept away from the quiet desks. High Summer: warm brownstone wood under a leafy July street.",
+   "desks": {
+    "desk-1": {
+     "x": 8.14,
+     "z": 12.5,
+     "facing": 3.14,
+     "standing": true
+    },
+    "desk-2": {
+     "x": 2.86,
+     "z": 12.5,
+     "facing": 3.14,
+     "standing": false
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2.5,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 7,
+     "z": 1.05,
+     "facing": 0
+    },
+    "printer": {
+     "kind": "printer",
+     "x": 24.97,
+     "z": 16,
+     "facing": -1.57
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 1.75,
+     "z": 15.5,
+     "facing": 1.57
+    },
+    "bookshelf-2": {
+     "kind": "bookshelf",
+     "x": 12,
+     "z": 19.2,
+     "facing": 3.14
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 25.2,
+     "z": 19,
+     "facing": -1.57
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 1.15,
+     "z": 19,
+     "facing": 1.57
+    }
+   },
+   "furniture": {
+    "couch": {
+     "kind": "couch",
+     "x": 7.5,
+     "z": 17.5,
+     "facing": 1.57,
+     "color": "terracotta"
+    },
+    "couch-2": {
+     "kind": "couch",
+     "x": 15.5,
+     "z": 17,
+     "facing": 1.57,
+     "color": "terracotta"
+    },
+    "armchair": {
+     "kind": "armchair",
+     "x": 16,
+     "z": 13,
+     "facing": 3.14,
+     "color": "terracotta"
+    },
+    "armchair-2": {
+     "kind": "armchair",
+     "x": 5,
+     "z": 18.5,
+     "facing": 3.14,
+     "color": "terracotta"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 13.5,
+     "z": 15.5,
+     "facing": 1.57
+    },
+    "sideTable-2": {
+     "kind": "sideTable",
+     "x": 18.5,
+     "z": 12.5,
+     "facing": 3.14
+    },
+    "floorLamp": {
+     "kind": "floorLamp",
+     "x": 13,
+     "z": 13
+    },
+    "floorLamp-2": {
+     "kind": "floorLamp",
+     "x": 19.5,
+     "z": 17
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 16.5,
+     "z": 13,
+     "facing": 0,
+     "color": "sage"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "fern",
+     "x": 25,
+     "z": 1,
+     "facing": 0,
+     "scale": 0.98,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "monstera",
+     "x": 19,
+     "z": 1.5,
+     "facing": 0,
+     "scale": 1.73,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "fig",
+     "x": 10,
+     "z": 1,
+     "facing": 0,
+     "scale": 1.56,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-19",
+  "name": "Reading Room and a Clearing House",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "Reading Room and a Clearing House",
+   "seed": "tune-19",
+   "reason": "4 desks in one team, clusters of desks, screens meeting in the middle, off a street down the length of the room. Work comes and goes by 2 post boxes, a printer and a stack of stock, and the courier calls. Lookups go to 3 bookshelves and a telescope at the window. The break end has coffee, water and one thing to sit on, kept away from the quiet desks. Zinc and Limestone: pale plaster under a zinc roof, green velvet, Paris.",
+   "desks": {
+    "desk-1": {
+     "x": 15.1,
+     "z": 2.86,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 15.1,
+     "z": 8.14,
+     "facing": -1.57,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 17.9,
+     "z": 2.86,
+     "facing": 1.57,
+     "standing": false
+    },
+    "desk-4": {
+     "x": 17.9,
+     "z": 8.14,
+     "facing": 1.57,
+     "standing": true
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 2.5,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 6.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "mailbox-2": {
+     "kind": "mailbox",
+     "x": 8.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "printer": {
+     "kind": "printer",
+     "x": 1.28,
+     "z": 18,
+     "facing": 1.57
+    },
+    "inbox": {
+     "kind": "inbox",
+     "x": 21.5,
+     "z": 19,
+     "facing": 3.14
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 23.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "bookshelf-2": {
+     "kind": "bookshelf",
+     "x": 1.75,
+     "z": 7,
+     "facing": 1.57
+    },
+    "bookshelf-3": {
+     "kind": "bookshelf",
+     "x": 24.5,
+     "z": 15.5,
+     "facing": -1.57
+    },
+    "telescope": {
+     "kind": "telescope",
+     "x": 1.3,
+     "z": 10.5,
+     "facing": 1.57
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 1.15,
+     "z": 13.5,
+     "facing": 1.57
+    },
+    "waterCooler": {
+     "kind": "waterCooler",
+     "x": 4.5,
+     "z": 19.2,
+     "facing": 3.14
+    }
+   },
+   "furniture": {
+    "couch": {
+     "kind": "couch",
+     "x": 7.5,
+     "z": 16.5,
+     "facing": 1.57,
+     "color": "moss"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 5.5,
+     "z": 15,
+     "facing": 1.57
+    },
+    "floorLamp": {
+     "kind": "floorLamp",
+     "x": 7.5,
+     "z": 13
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 8,
+     "z": 16,
+     "facing": 0,
+     "color": "plum"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "fig",
+     "x": 25,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.66,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "fig",
+     "x": 25,
+     "z": 8.5,
+     "facing": 0,
+     "scale": 1.37,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "bush",
+     "x": 16,
+     "z": 19,
+     "facing": 0,
+     "scale": 1.48,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ },
+ {
+  "seed": "tune-17",
+  "name": "Cloister and a Reading Room",
+  "layout": {
+   "layout": 4,
+   "complete": true,
+   "name": "Cloister and a Reading Room",
+   "seed": "tune-17",
+   "reason": "3 desks in one team, desks at the walls, the floor left open, off a street down the length of the room. Work comes and goes by 2 post boxes, a printer and a stack of stock, and the courier calls. Lookups go to 3 bookshelves. The break end has coffee and two things to sit on, kept away from the quiet desks. Night Shift: a tower floor lit by its own panels most of the day.",
+   "desks": {
+    "desk-1": {
+     "x": 12.72,
+     "z": 1.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-2": {
+     "x": 18,
+     "z": 1.75,
+     "facing": 0,
+     "standing": false
+    },
+    "desk-3": {
+     "x": 23.28,
+     "z": 1.75,
+     "facing": 0,
+     "standing": true
+    }
+   },
+   "stations": {
+    "coatStand": {
+     "kind": "coatStand",
+     "x": 0.85,
+     "z": 1.5,
+     "facing": 1.57
+    },
+    "mailbox": {
+     "kind": "mailbox",
+     "x": 6.5,
+     "z": 1.05,
+     "facing": 0
+    },
+    "mailbox-2": {
+     "kind": "mailbox",
+     "x": 1.25,
+     "z": 6,
+     "facing": 1.57
+    },
+    "printer": {
+     "kind": "printer",
+     "x": 20.5,
+     "z": 19.05,
+     "facing": 3.14
+    },
+    "inbox": {
+     "kind": "inbox",
+     "x": 1.65,
+     "z": 10,
+     "facing": 1.57
+    },
+    "bookshelf": {
+     "kind": "bookshelf",
+     "x": 24.5,
+     "z": 8,
+     "facing": -1.57
+    },
+    "bookshelf-2": {
+     "kind": "bookshelf",
+     "x": 24.5,
+     "z": 13.5,
+     "facing": -1.57
+    },
+    "bookshelf-3": {
+     "kind": "bookshelf",
+     "x": 1.75,
+     "z": 18.5,
+     "facing": 1.57
+    },
+    "bin": {
+     "kind": "bin",
+     "x": 25.2,
+     "z": 19,
+     "facing": -1.57
+    },
+    "coffee": {
+     "kind": "coffee",
+     "x": 1.15,
+     "z": 16,
+     "facing": 1.57
+    }
+   },
+   "furniture": {
+    "couch": {
+     "kind": "couch",
+     "x": 6.5,
+     "z": 17.5,
+     "facing": 1.57,
+     "color": "charcoal"
+    },
+    "armchair": {
+     "kind": "armchair",
+     "x": 5.5,
+     "z": 13,
+     "facing": 3.14,
+     "color": "navy"
+    },
+    "sideTable": {
+     "kind": "sideTable",
+     "x": 4.5,
+     "z": 16,
+     "facing": 1.57
+    },
+    "floorLamp": {
+     "kind": "floorLamp",
+     "x": 2.5,
+     "z": 13
+    },
+    "rug": {
+     "kind": "rug",
+     "x": 5.5,
+     "z": 13,
+     "facing": 0,
+     "color": "ink"
+    }
+   },
+   "decor": {},
+   "plants": {
+    "plant-1": {
+     "kind": "bush",
+     "x": 25,
+     "z": 17.5,
+     "facing": 0,
+     "scale": 1.28,
+     "seasonal": true
+    },
+    "plant-2": {
+     "kind": "monstera",
+     "x": 16,
+     "z": 18.5,
+     "facing": 0,
+     "scale": 1.76,
+     "seasonal": true
+    },
+    "plant-3": {
+     "kind": "snake",
+     "x": 1,
+     "z": 8,
+     "facing": 0,
+     "scale": 1.33,
+     "seasonal": true
+    },
+    "plant-4": {
+     "kind": "snake",
+     "x": 1,
+     "z": 4.5,
+     "facing": 0,
+     "scale": 1.33,
+     "seasonal": true
+    },
+    "plant-5": {
+     "kind": "fig",
+     "x": 25,
+     "z": 11,
+     "facing": 0,
+     "scale": 1.42,
+     "seasonal": true
+    }
+   },
+   "channels": {
+    "courier": true
+   }
+  }
+ }
+]

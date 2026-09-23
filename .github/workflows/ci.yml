@@ -1,0 +1,87 @@
+# Verification, and nothing else.
+#
+# This workflow is the whole of CI for the public repository. It runs the same npm
+# scripts a contributor runs from a checkout, and nothing a contributor cannot run —
+# that rule is what keeps it honest: if a check is worth a build failure it is worth
+# being runnable locally.
+#
+# **It holds no credential and deploys nothing, deliberately.** A public repository
+# takes pull requests from forks, and a job that touches a deploy token while running
+# code from a fork hands that token to whoever wrote the diff. So: `pull_request`
+# rather than `pull_request_target` (the latter runs the base branch's workflow with
+# the base repository's secrets, which is the trap), read-only permissions, and no
+# secrets referenced anywhere below. Deployment is a maintainer action from a
+# checkout.
+#
+# **One guard is not in this file and cannot be.** "Require approval for all external
+# contributors" is a repository setting, under Settings → Actions → General →
+# Fork pull request workflows. Turn it on; a workflow cannot require its own approval.
+#
+# The suite is plain `node:test` with no browser and no services — the scene checks
+# run headlessly against the vendored three.js — so this needs nothing but Node.
+# ESLint 10 sets the floor at Node ^20.19 || ^22.13 || >=24, hence the matrix.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Read-only, and stated rather than inherited: the repository default may be
+# read-write, and a workflow that needs nothing should ask for nothing.
+permissions:
+  contents: read
+
+# A second push to the same branch makes the first run's answer worthless.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, test, probe, pack (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['24', '26']
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      # There are no runtime dependencies at all — every entry in the lockfile is
+      # development tooling — so this installs the test and docs toolchain only.
+      - run: npm ci
+
+      - run: npm run lint
+
+      # 87 files, ~978 tests. Also asserts the committed docs site and the
+      # third-party inventory are not stale, so a forgotten `npm run docs` or
+      # `node bin/gen-third-party.mjs` fails here rather than in review.
+      - run: npm test
+
+      # Builds every building and season in Node and asserts no pair of surfaces
+      # contests a plane worse than the recorded baseline. The scene dresses itself
+      # at random, so the probe seeds it and the numbers are identical every run:
+      # this step failing means a real new pair, not an unlucky sample. A deliberate
+      # geometry change re-records with --record=test/coplanar-baseline.json.
+      - run: npm run probe -- --sweep --assert=test/coplanar-baseline.json
+
+      # Packs the OpenClaw plugin and runs the artifact from a temp directory, so a
+      # change that breaks the vendored seam cannot land silently.
+      - run: npm run pack:openclaw
+
+      # Builds the Claude and Codex plugins as distribution artifacts, unpacks each
+      # into a temp directory with no checkout above it, and fires a real hook at a
+      # loopback receiver. `npm test` asserts the committed marketplace *matches*;
+      # this asserts it *runs* — the only check that catches a published plugin whose
+      # hooks resolve to paths that existed only on the machine that built it.
+      - run: npm run pack:plugins

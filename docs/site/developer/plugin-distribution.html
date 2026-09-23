@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Publishing the plugins — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html" aria-current="page">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="publishing-the-plugins" tabindex="-1">Publishing the plugins</h1>
+<p><em>How the Claude Code and Codex plugins reach somebody who has never cloned this
+repository — and what is still missing before they do.</em></p>
+<p>Every route in <a href="protocol/aop-harness-adapters.html">Adapter notes</a> installs out of a
+checkout. <code>npm run connect:claude</code> adds <code>./</code> as a Claude marketplace;
+<code>npm run connect:codex</code> stages a copy of the checkout and adds <em>that</em>. Both are right
+while you are editing a mapper, and neither is any use to a person who has an office URL
+and nothing else.</p>
+<p><code>npm run pack:plugins</code> builds what that person installs. It is <code>bin/aop-plugin-pack.cjs</code>,
+and it deliberately follows the shape of
+<a href="adapters/openclaw.html"><code>bin/aop-openclaw-pack.cjs</code></a>: an explicit staging
+list, the version stamped from <code>package.json</code>, an audit that refuses an artifact reaching
+outside itself, and a <code>--verify</code> that runs the result from a temp directory with no
+checkout above it.</p>
+<pre><code class="language-bash">npm run pack:plugins          # build both artifacts, then install and fire a real hook
+npm run pack:plugins:check    # fail if the committed half has drifted (npm test runs it)
+</code></pre>
+<h2 id="the-two-hosts-want-different-things-and-that-shapes-everything" tabindex="-1">The two hosts want different things, and that shapes everything</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Claude Code</th>
+<th>Codex</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Marketplace source</td>
+<td>any HTTPS URL to a JSON file</td>
+<td>a local path, <code>owner/repo</code>, or a Git URL</td>
+</tr>
+<tr>
+<td>Plugin source</td>
+<td><code>archive</code> — a zip over HTTPS, pinnable with a SHA-256</td>
+<td>the repository the marketplace is in</td>
+</tr>
+<tr>
+<td>So the artifact is</td>
+<td><strong>one file</strong>, plus the JSON that pins it</td>
+<td><strong>a whole repository tree</strong></td>
+</tr>
+<tr>
+<td>Can it be published today?</td>
+<td>yes — the site serves it</td>
+<td>no: it needs a public Git repository</td>
+</tr>
+</tbody>
+</table>
+<p>That difference is the whole design. Claude can be handed a marketplace with no
+repository anywhere in the picture, so <code>plugins/claude/</code> is two files and the site serves
+them. Codex cannot: it clones, so there has to be something to clone.</p>
+<h3 id="claude-a-url-cannot-mean-" tabindex="-1">Claude: a URL cannot mean <code>./</code></h3>
+<p><code>.claude-plugin/marketplace.json</code> says <code>&quot;source&quot;: &quot;./&quot;</code>, which resolves against the
+marketplace root — the checkout. Fetched from a URL there is no checkout for <code>./</code> to
+mean, so the hosted manifest is <strong>generated</strong> with the source replaced:</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;roving-office&quot;,
+  &quot;plugins&quot;: [{
+    &quot;name&quot;: &quot;roving-office&quot;,
+    &quot;version&quot;: &quot;0.15.0&quot;,
+    &quot;source&quot;: {
+      &quot;source&quot;: &quot;archive&quot;,
+      &quot;url&quot;: &quot;https://therovingoffice.com/plugins/claude/roving-office-0.15.0.zip&quot;,
+      &quot;sha256&quot;: &quot;…&quot;
+    }
+  }]
+}
+</code></pre>
+<p>Generated rather than hand-maintained because of that digest. A copy edited by hand would
+be wrong the first time anybody changed a mapper, and being wrong means Claude <em>refuses</em>
+the install — the digest is verified on every download.</p>
+<h3 id="codex-the-tree-is-the-artifact" tabindex="-1">Codex: the tree is the artifact</h3>
+<p><code>plugins/codex/</code> is a complete distribution repository: <code>.agents/plugins/marketplace.json</code>
+at the root — the first of the four paths Codex looks in, and the only host-neutral one —
+with the plugin beside it and <code>&quot;source&quot;: &quot;./&quot;</code>, which is correct here for exactly the
+reason it is wrong above.</p>
+<p>Nothing serves a clone, so it is gitignored and rebuilt on every push. Publishing it is a
+<code>git push</code> into a public repository, and that repository is
+<strong><a href="#what-is-still-missing">the one thing this build cannot stand in for</a></strong>.</p>
+<h2 id="what-is-in-an-artifact-and-what-is-not" tabindex="-1">What is in an artifact, and what is not</h2>
+<p><code>RUNTIME</code> in the packer is the list, and it is a small fraction of <code>bin/</code>: the hook
+entry point, the Node launcher, the adapter, <code>aop-core.cjs</code>, the mappers the host
+actually needs, <code>hooks/hooks.json</code> and the logo. The office generators, the probe and the
+screenshot tools are a contributor's toolkit and several of them import the vendored
+three.js — none of that belongs on a stranger's machine.</p>
+<p>Each artifact also carries three generated files:</p>
+<ul>
+<li><strong><code>FILES.json</code></strong> — every other file with its size, mode and SHA-256. This is the
+&quot;explicit file list&quot; a published runtime artifact needs: names alone would say what was
+<em>meant</em> to be there, and the digests make it a statement about the bytes.</li>
+<li><strong><code>NOTICE</code></strong> — version, copyright, and the fact that the artifact bundles no
+third-party code, which the staging list and the audit together actually establish.</li>
+<li><strong><code>README.md</code></strong> — the install commands, where the endpoint comes from, and what
+redaction defaults to.</li>
+</ul>
+<p>The mapper the <em>other</em> host needs is left out, and <code>bin/mappers/codex-cli.cjs</code> keeps its
+state machine in <code>claude-code.cjs</code> — so the Codex artifact ships both. That is the kind of
+mistake <code>--verify</code> exists to catch: an artifact missing a required module passes every
+static check and dies on its first hook.</p>
+<h3 id="the-notices-it-does-not-carry" tabindex="-1">The notices it does <em>not</em> carry</h3>
+<p><code>THIRD_PARTY_NOTICES.txt</code> is not in either artifact, and that is deliberate. It is the
+<em>browser application's</em> notices — the vendored 3D library and the colour table — and its
+own first paragraph says as much: &quot;These notices apply to those components only and do not
+license this project, its fonts, logos or artwork.&quot; None of that software is in a plugin
+artifact, so shipping a file of notices for it would be misleading rather than thorough.</p>
+<p>What makes that a fact rather than a hope is <code>auditDependencies</code>: every bare specifier in
+the payload has to be a Node builtin. <code>auditTree</code> only answers the <em>relative</em> half of the
+question — a bare specifier in a checkout is a package that is really there, and in an
+artifact it is one that is not. So the generated <code>NOTICE</code> says the artifact contains this
+project's own code and its logo and no third-party software, and the build refuses to
+produce one where that is untrue.</p>
+<p><code>third-party/components.json</code> describes both artifacts as distributions
+(<code>claude-plugin-archive</code>, <code>codex-plugin-marketplace</code>) and lists <code>bin/aop-plugin-pack.cjs</code>
+among the distribution recipes whose bytes are recorded as evidence. <code>assets/logo-256.png</code>
+is the only tracked component inside them, and its release rights are an open gate — the
+same gate as the missing licence below.</p>
+<h2 id="why-pluginsclaude-is-committed" tabindex="-1">Why <code>plugins/claude/</code> is committed</h2>
+<p>Generated output in the repository is exactly what <code>.gitignore</code> argues against, and
+<code>docs/site</code> is the precedent for doing it anyway: <strong>neither deploy target may build.</strong>
+<code>bin/kaizen-build.sh</code> is a file copy of the checkout and <code>Dockerfile.fly</code> runs no
+<code>npm install</code> at all — read either one; the reason is in their comments. So a marketplace
+assembled at deploy time would exist on one target and 404 on the other.</p>
+<p>So it is committed, both recipes ship it, and <code>npm test</code> guards it. The rule is: <strong>what
+the site serves is committed; what needs a repository that does not exist yet is not.</strong></p>
+<p>That only works because the archive is <strong>byte-reproducible</strong>. <code>bin/lib/zip.cjs</code> stores
+rather than deflates — zlib's output depends on the zlib version Node was built against,
+so a deflated entry is reproducible on one machine and not the next — and stamps one fixed
+timestamp on every entry. A digest that moved on a rebuild would fail the drift check on a
+checkout nobody had edited, and would republish an identical plugin under a new identity.</p>
+<h2 id="bump-the-version-every-time" tabindex="-1">Bump the version. Every time</h2>
+<p>The rule in <a href="https://github.com/atlassian-labs/roving-office/blob/main/AGENTS.md">Working agreements</a> applies with full force here, because a
+published install is a snapshot like every other: both hosts cache by version, and an
+update offered the version it already holds does nothing at all, silently. <code>--check</code>
+refuses a build where <code>package.json</code> and the two plugin manifests disagree.</p>
+<h2 id="nothing-relies-on-the-executable-bit" tabindex="-1">Nothing relies on the executable bit</h2>
+<p><code>hooks/hooks.json</code> says <code>sh &quot;${CLAUDE_PLUGIN_ROOT}/bin/aop-plugin-hook.sh&quot;</code>, and that
+script <code>exec sh</code>s the Node launcher rather than running it directly. A local install
+copies the plugin and modes survive; a published Claude install is unpacked from a zip by
+the host, and whether a stored unix mode reaches disk is the extractor's business. The
+failure it prevents is the worst kind this adapter has — a hook that cannot be executed
+fails <em>silently</em>, because a non-blocking hook's failure is not the agent's problem, so the
+only symptom is an office that stays empty.</p>
+<p>The modes are set in the archive anyway. Belt and braces.</p>
+<h2 id="what---verify-actually-proves" tabindex="-1">What <code>--verify</code> actually proves</h2>
+<p>An audit proves no import escapes the artifact and no file names the machine that built
+it. Neither proves the thing works — a file can be present, correct and still be the
+wrong version of itself. So <code>--verify</code>:</p>
+<ol>
+<li>Extracts the archive into a temp directory, and cross-checks it against <code>unzip -t</code>
+when one is on <code>PATH</code>.</li>
+<li>Reads the command out of the artifact's own <code>hooks/hooks.json</code> and runs it through a
+shell, with the host's plugin-root variables set, <code>HOME</code> pointed at a scratch
+directory so the run cannot see or disturb the office on this machine, and <code>AOP_URL</code>
+pointed at a loopback receiver it opened.</li>
+<li>Fires <code>SessionStart</code> <em>and</em> <code>UserPromptSubmit</code>, because the mapper holds the
+introduction at session start and releases it on the first real event — a check that
+fired only the first would assert that a working adapter sends nothing.</li>
+<li>Asserts <code>session.start</code> and <code>turn.start</code> arrive, and that every event names the
+harness the artifact was cut for.</li>
+<li>Where <code>codex</code> is on <code>PATH</code>, does the whole thing again through a <em>real</em> Codex install
+into a throwaway <code>CODEX_HOME</code>, and then fires the hook from the cache Codex wrote.</li>
+</ol>
+<h2 id="what-is-still-missing" tabindex="-1">What is still missing</h2>
+<p><code>npm run pack:plugins</code> produces artifacts. It publishes nothing, and three things stand
+between these artifacts and an installable plugin:</p>
+<ul>
+<li><strong>A public Git repository for Codex.</strong> <code>plugins/codex/</code> is ready to be its contents;
+there is nowhere to push it yet. Everything up to that boundary is built and verified,
+including a real <code>codex plugin marketplace add</code> against the generated tree.</li>
+<li><strong>Office pairing.</strong> Installing a plugin does not tell it which office to feed. The
+adapter reads <code>~/.roving-office/endpoint.json</code> or <code>AOP_URL</code>, and there is no published
+way to write either without a checkout. A short-lived pairing code is new functionality
+and separate work.</li>
+<li><strong>A licence.</strong> There is no <code>LICENSE</code> at the root of this repository, so no artifact
+carries one, and the generated <code>NOTICE</code> says so. The packer picks one up the moment it
+lands; until then it prints a warning on every build.</li>
+</ul>
+<p>And one thing that is not missing so much as <em>owed to existing installs</em>:</p>
+<ul>
+<li><strong>Migrating the settings route.</strong> Somebody who installed with
+<code>npm run connect:claude:settings</code> has fifteen hooks in <code>~/.claude/settings.json</code> naming
+an absolute path into their checkout. Installing the published plugin beside those would
+send every event twice — two <code>tool.start</code>s with the same <code>tool_call_id</code>, and a room that
+double-counts. A migration has to: recognise our own hooks by the <code>aop-send.cjs</code> marker
+and remove <em>only</em> those, leaving every other hook in the file untouched and every
+matcher unedited; delete the <code>hooks</code> block and the file itself if nothing else is in
+them, so an uninstall is indistinguishable from never having run; and back the file up
+first. <code>bin/aop-claude-install.cjs</code>'s <code>planSettings</code> already does exactly this for
+<code>--uninstall</code>, so the work is wiring, not invention. It is not implemented here.</li>
+</ul>
+<p>Anthropic's and OpenAI's own directories are a later step again: the recommendation is to
+run our own marketplace first and submit for discovery afterwards.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="protocol/aop-harness-adapters.html">Adapter notes</a> — what each harness can actually tell us</li>
+<li><a href="adapters/claude-code.html">The Claude Code adapter</a> and <a href="adapters/codex.html">the Codex adapter</a></li>
+<li><a href="getting-the-code.html">Getting the code</a> — the checks this build is one of</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#the-two-hosts-want-different-things-and-that-shapes-everything">The two hosts want different things, and that shapes everything</a><ul><li><a href="#claude-a-url-cannot-mean-">Claude: a URL cannot mean ./</a></li>
+<li><a href="#codex-the-tree-is-the-artifact">Codex: the tree is the artifact</a></li></ul></li>
+<li><a href="#what-is-in-an-artifact-and-what-is-not">What is in an artifact, and what is not</a><ul><li><a href="#the-notices-it-does-not-carry">The notices it does not carry</a></li></ul></li>
+<li><a href="#why-pluginsclaude-is-committed">Why plugins/claude/ is committed</a></li>
+<li><a href="#bump-the-version-every-time">Bump the version. Every time</a></li>
+<li><a href="#nothing-relies-on-the-executable-bit">Nothing relies on the executable bit</a></li>
+<li><a href="#what---verify-actually-proves">What --verify actually proves</a></li>
+<li><a href="#what-is-still-missing">What is still missing</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

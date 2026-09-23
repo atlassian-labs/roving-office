@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Connect your agents — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html" aria-current="page">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="connect-your-agents" tabindex="-1">Connect your agents</h1>
+<p><em>One command per harness, then your real sessions walk in through the door.</em></p>
+<img src="../images/panels/source-picker.png" width="736" alt="The Choose sources dialog: six harness tiles, each with its mark, a one-line description and a badge reading either Connect to use or Ready to explore.">
+<p><em>A new keycard opens this panel automatically. Press <strong><code>D</code></strong> to return to it. Test Data is ticked and ready; the rest want a one-line install.</em></p>
+<p>An office opens on <strong>Test Data</strong> — invented agents, so the room is busy immediately. To
+watch your own instead, tick the harness feeding them and install its adapter. The
+<strong>connect your agents via plugins</strong> link in the panel opens these instructions in
+a new tab, keeping your office open.</p>
+<p>Tick more than one to put two crews in the same room. Keep Test Data ticked alongside a
+live feed while you are still getting the adapter working.</p>
+<table>
+<thead>
+<tr>
+<th>Harness</th>
+<th>Install it with</th>
+<th>Page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Test Data</strong></td>
+<td>Nothing to do — it is the default</td>
+<td><a href="sources/test-data.html">Test Data</a></td>
+</tr>
+<tr>
+<td><strong>Rovo CLI</strong></td>
+<td><code>npm run connect:rovo</code></td>
+<td><a href="sources/rovo-cli.html">Rovo CLI</a></td>
+</tr>
+<tr>
+<td><strong>Claude Code</strong></td>
+<td><code>npm run connect:claude</code></td>
+<td><a href="sources/claude-code.html">Claude Code</a></td>
+</tr>
+<tr>
+<td><strong>Cursor</strong></td>
+<td><code>npm run connect:cursor</code></td>
+<td><a href="sources/cursor.html">Cursor</a></td>
+</tr>
+<tr>
+<td><strong>Codex</strong></td>
+<td><code>npm run connect:codex</code></td>
+<td><a href="sources/codex.html">Codex</a></td>
+</tr>
+<tr>
+<td><strong>OpenClaw</strong></td>
+<td><code>npm run connect:openclaw</code></td>
+<td><a href="sources/openclaw.html">OpenClaw</a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Then start a <em>new</em> agent session.</strong> Every harness reads its hooks when a session starts,
+so anything already open keeps posting wherever it was told at launch.</p>
+<p>Jira's cloud coding agent is not in the picker — it has no hooks to install, and it runs
+where the office cannot be reached from.</p>
+<h2 id="is-it-working-read-the-pill" tabindex="-1">Is it working? Read the pill</h2>
+<p>The pill beside the office name says which sources are feeding the room and whether they
+are alive:</p>
+<table>
+<thead>
+<tr>
+<th>It says</th>
+<th>It means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>connecting…</strong></td>
+<td>Reaching for the feed.</td>
+</tr>
+<tr>
+<td><strong>live</strong></td>
+<td>Events are arriving.</td>
+</tr>
+<tr>
+<td><strong>listening</strong></td>
+<td>Connected, nothing has happened yet.</td>
+</tr>
+<tr>
+<td><strong>no adapter</strong></td>
+<td>Nothing is pushing events. You have not installed one, or the session predates it.</td>
+</tr>
+<tr>
+<td><strong>no source</strong></td>
+<td>Nothing is ticked.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>An empty room is ambiguous, which is why the pill exists.</strong> A live harness can
+legitimately show an empty office for minutes at a stretch, and without the pill your
+first assumption would always be that the app is broken.</p>
+<p>Several feeds in one room can disagree, and usually do — Claude Code live while the Rovo
+adapter is missing is a normal Tuesday. The pill stays one line and puts the disagreement
+in the tooltip: it names the set, takes the best state any feed has reached, and counts
+the rest beside it, so you get <strong><code>live · 2 of 3</code></strong>. Hover for the breakdown by name.</p>
+<h2 id="changing-the-set-while-people-are-standing-in-the-room" tabindex="-1">Changing the set while people are standing in the room</h2>
+<p>Nothing is torn down to do it, and <strong>a feed you did not touch is not touched</strong>. Tick
+Claude Code on in a room where three Rovo agents are working and the Rovo feed keeps
+running, its people keep working, and the new feed is live by the time the dialog has
+closed.</p>
+<p>What does change, changes the way it would in a real office:</p>
+<ul>
+<li><strong>A source that arrives</strong> starts on the spot, and its agents walk in through the door
+like anybody else.</li>
+<li><strong>A source that goes</strong> stops, and its characters get up and leave — desk handed back,
+coat off the stand, lift called, out the door. They are not deleted where they stand.
+Unticking a source is a decision about a feed, and the person it was drawing was at a
+desk a second ago.</li>
+<li><strong>A source ticked off and straight back on is a new feed</strong>, never the old one resumed.
+Its newcomers cannot be mistaken for the crowd still walking to the lift.</li>
+</ul>
+<p>Only the picker in <em>your</em> hands does this. A change somebody else makes to the same scene
+arrives the next time you open it.</p>
+<h2 id="how-much-of-your-prompt-the-office-is-told" tabindex="-1">How much of your prompt the office is told</h2>
+<p>By default, <strong>none of it</strong>. The office gets tool names, classes, paths, durations and
+counts — no free text at all, so a desk label reads &quot;Working&quot; rather than what you asked
+for.</p>
+<p>The first <code>connect:</code> command you run writes a settings file at
+<code>~/.roving-office/settings.json</code>. To see your prompts on the desks, change one value:</p>
+<pre><code class="language-json">{ &quot;redaction&quot;: &quot;summary&quot; }
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>The office is told</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>metadata</code> <em>(default)</em></td>
+<td>Everything in the table below. No free text from you or the model.</td>
+</tr>
+<tr>
+<td><code>summary</code></td>
+<td>Adds prompt-derived titles, summaries, notification messages, tool error messages, and what a search or a page fetch was for — the pattern, the query, the whole URL — each truncated to 200 characters.</td>
+</tr>
+<tr>
+<td><code>full</code></td>
+<td>Adds full prompt text, capped at 2 000 characters. Needs <code>&quot;includePrompts&quot;: true</code> as a second, deliberate opt-in.</td>
+</tr>
+</tbody>
+</table>
+<p>It is a file rather than an environment variable on purpose: a hook inherits the
+environment of the session that spawned it, so a variable would mean restarting
+everything, while this file is read per event and your very next tool call already obeys
+it.</p>
+<h3 id="what-the-default-actually-sends" tabindex="-1">What the default actually sends</h3>
+<p>The three modes above are each other's superset, so this is the floor: everything here
+leaves your machine at <code>metadata</code> too, and there is no setting short of not connecting
+that stops it. It is a longer list than &quot;no free text&quot; suggests, which is why it is
+written out rather than summarised.</p>
+<table>
+<thead>
+<tr>
+<th>Sent even at <code>metadata</code></th>
+<th>What that looks like</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tool activity</strong></td>
+<td>Each tool's name and kind, how long it took, how many bytes came back, and whether it failed. Not the results, and not the arguments except as the four rows below describe.</td>
+</tr>
+<tr>
+<td><strong>File paths</strong></td>
+<td>The paths the tools touched, shortened — relative to the directory you are working in where they sit under it, otherwise with your home directory written as <code>~</code> — and cut off at 200 characters. Shortened is not hidden: a path under your home directory still names every folder below it. <!-- redaction:target-path --> The name of a saved prompt or command you ran goes the same way, because you named it rather than typed it into a conversation. <!-- redaction:target-name --></td>
+</tr>
+<tr>
+<td><strong>What a command runs</strong></td>
+<td>The program and, for a handful of tools whose subcommands are their identity, a word or two more: <code>ingest.sh</code>, <code>gcloud auth</code>, <code>git commit</code>. Never the whole command line, never a quoted string, never an assignment, and nothing after a word that reads like a credential. <!-- redaction:target-command --></td>
+</tr>
+<tr>
+<td><strong>That a search happened, and not what you searched for</strong></td>
+<td>A grep, a file search or a web search sends the fact of it and nothing else — no pattern and no query. The office animates the trip to the bookshelf without being told the question. <!-- redaction:target-search --></td>
+</tr>
+<tr>
+<td><strong>The host a page was fetched from</strong></td>
+<td>For a page fetch, <code>docs.example.com</code> — the site and nothing else. Not the path, and <strong>not the query string</strong>, which is where an access token in a URL would be. <!-- redaction:target-network --></td>
+</tr>
+<tr>
+<td><strong>The directory you are working in</strong></td>
+<td>Shortened the same way, so your account name does not travel — but every folder below your home folder does, which is the project's name and where you keep it. A directory that is <em>not</em> under your home folder has nothing to shorten and goes as the absolute path it is.</td>
+</tr>
+<tr>
+<td><strong>Your repository</strong></td>
+<td>Just <code>host/owner/repo</code> — <code>bitbucket.org/you/your-repo</code> — and never the URL you cloned with. So a remote with a password or an access token written into it (the <code>https://user:token@host/…</code> form) does not send the credential: only those three parts are sent, and a remote that cannot be reduced to them sends nothing at all. A remote that is a local directory is treated as the path it is, and shortened like one.</td>
+</tr>
+<tr>
+<td><strong>The branch, and the repository's name</strong></td>
+<td>The current branch, and the name the office files your sessions under — the last part of the remote, or of the folder if there is no remote.</td>
+</tr>
+<tr>
+<td><strong>How long your prompt was</strong></td>
+<td>A character count. Never the words.</td>
+</tr>
+<tr>
+<td><strong>Which harness, and how you ran it</strong></td>
+<td>Its name, version, and whether it was the terminal, a desktop app or an SDK.</td>
+</tr>
+<tr>
+<td><strong>The shape of the work</strong></td>
+<td>Step numbers and their status, and how many items a plan has — &quot;Step 2 of 5&quot;, never what step 2 says.</td>
+</tr>
+<tr>
+<td><strong>Scheduled jobs</strong></td>
+<td>For a run started by a schedule rather than by you: the job's name, its id and its schedule, as the operator wrote them. Not its description.</td>
+</tr>
+<tr>
+<td><strong>An agent's identity</strong></td>
+<td>Where your harness lets you name an agent, its name, its colour and the address of its avatar image. Truncated, but not redacted at any setting.</td>
+</tr>
+<tr>
+<td><strong>Session identifiers</strong></td>
+<td>The ids of the session and of any parent session, and the kind of agent — for example that a subagent is a research one.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Withheld at <code>metadata</code>, and this is what the setting buys you:</strong> your prompts, the
+desk labels derived from them (every desk reads <em>&quot;Working&quot;</em> instead), the title your
+harness generated for the session, tool error messages, the titles of individual steps,
+summaries, notification text, a scheduled job's description, and what a search or a page
+fetch was looking for — search patterns, web queries, and everything in a URL after its
+host. File contents, tool results, transcripts, diffs, environment variables and secrets
+are never sent at any setting.</p>
+<p><strong>A desk says what is being worked on, not what is being asked.</strong> At <code>metadata</code> a trip
+to the bookshelf carries the <em>file</em> — <em>&quot;researching AopSource.js&quot;</em> — because a path is
+on the list above. A search or a web fetch carries the trip and not the question, so the
+character walks over and looks something up without the office being told what. Raising
+the mode to <code>summary</code> is what adds the pattern, the query and the whole URL.</p>
+<p><strong>Two things are never sent, whatever the mode.</strong> Your account name, because a path under
+your home folder is written <code>~/…</code> before it goes; and any credential embedded in a git
+remote, because only <code>host/owner/repo</code> is sent and never the URL you cloned with. Neither
+needs anything from you — no setting to change and no remote to go and check first.</p>
+<p>That is not the same as anonymity, and the difference is worth being precise about: a
+shortened path still names every folder below your home folder, so <em>&quot;which repository, on
+which branch, in which directory, doing what with which tools&quot;</em> is exactly what the
+default sends. What it withholds is the words — yours and the model's — and who you are on
+your own machine.</p>
+<blockquote>
+<p><strong>Anything on a public URL should be treated as public.</strong> The default is not anonymous:
+read the table above and decide before you hand a keycard round. Redaction also happens
+on <em>your</em> machine, before anything is sent — which is the good news and the catch. The
+office never receives what was dropped, so nothing downstream can leak it; equally,
+tightening the setting later does nothing about what already went.</p>
+</blockquote>
+<h2 id="one-office-per-repository" tabindex="-1">One office per repository</h2>
+<p>Which office your sessions land in is derived from the git <strong>remote</strong>, not the directory —
+so every worktree and every clone of one repository shares a single room.</p>
+<p>If a repository is named differently from the office you want it in, map it in
+<code>~/.roving-office/projects.json</code>, which is created for you and never overwritten:</p>
+<pre><code class="language-json">{ &quot;aliases&quot;: { &quot;bitbucket.org/you/your-repo&quot;: &quot;the-roving-office&quot; } }
+</code></pre>
+<h2 id="when-agents-leave" tabindex="-1">When agents leave</h2>
+<p>A character is only removed when the office concludes the session is gone — and
+<strong>idleness is not evidence of death.</strong> A hook is dead between events, so quiet is the
+normal state of a session that is very much alive and waiting on you.</p>
+<p>So there are two clocks. An adapter that promises to say goodbye gets <strong>30 minutes</strong> of
+silence, the timer being only a backstop for a process killed mid-sentence. Anything that
+makes no such promise is cleared after <strong>5 minutes</strong>.</p>
+<p>If you see somebody walk out while you are still thinking, that is the five-minute clock —
+which means their adapter never said it would announce its own exit.</p>
+<h3 id="and-the-blue-cone-of-light" tabindex="-1">And the blue cone of light</h3>
+<p>Being retired is only the <em>start</em> of leaving: the character hands their desk back, takes
+their coat off the stand, calls the lift and walks out, and every step of that crosses a
+room with other people in it. So there is a third clock. <strong>Thirty seconds after being told
+to go home, anybody who has not managed it is beamed up</strong> — a cone of blue light comes
+down out of the sky, they rise into it, and they are gone. Everything the door would have
+given back is given back the same way.</p>
+<p>It exists because a departure can be blocked, and because of one blocker in particular:
+<strong>a browser stops drawing frames for a tab nobody is looking at, and the walk out only
+advances on a drawn frame.</strong> The clocks keep running in a background tab regardless, so a
+window left behind another one for a few hours filled up with a whole night's worth of
+arrivals, every one of them told to leave and not one able to take a step.</p>
+<p>If you ever look up to see the office being cleared out in a shower of blue cones, that is
+what you are watching — and it means the window had been out of sight for a while. Ask for
+reduced motion and there is no cone, just an empty patch of floor.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#is-it-working-read-the-pill">Is it working? Read the pill</a></li>
+<li><a href="#changing-the-set-while-people-are-standing-in-the-room">Changing the set while people are standing in the room</a></li>
+<li><a href="#how-much-of-your-prompt-the-office-is-told">How much of your prompt the office is told</a><ul><li><a href="#what-the-default-actually-sends">What the default actually sends</a></li></ul></li>
+<li><a href="#one-office-per-repository">One office per repository</a></li>
+<li><a href="#when-agents-leave">When agents leave</a><ul><li><a href="#and-the-blue-cone-of-light">And the blue cone of light</a></li></ul></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

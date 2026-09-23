@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cursor — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html" aria-current="page">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="cursor" tabindex="-1">Cursor</h1>
+<p><em>An observer only: it watches Cursor Agent and never blocks or rewrites anything it does.</em></p>
+<h2 id="install-it" tabindex="-1">Install it</h2>
+<pre><code class="language-bash">npm run connect:cursor
+npm run connect:cursor:status
+npm run disconnect:cursor
+</code></pre>
+<p>The installer adds itself alongside any hooks you already have, backs the file up first,
+and never touches hooks it did not install. <strong>Cursor reloads its hook configuration on its
+own</strong>, so there is no restart step — but a session already in flight will not pick the
+adapter up mid-turn.</p>
+<p>Point an office at <strong>Cursor</strong> (press <code>D</code>) and give an agent something to do.</p>
+<h2 id="what-you-get" tabindex="-1">What you get</h2>
+<p>Arrivals and departures, prompts starting turns, tool work, and file edits showing up as
+work produced.</p>
+<p><strong>Checklists work.</strong> Cursor's todo list becomes a plan in the office: the active item is
+the step in hand, finishing it moves to the next, and a multi-part job stays visible as its
+actual sequence rather than one undifferentiated block.</p>
+<p>Anything Cursor grows in future that the office does not recognise keeps the session
+present without pretending to more meaning than that — so a new Cursor release cannot make
+your agents vanish from the room.</p>
+<h2 id="what-to-know" tabindex="-1">What to know</h2>
+<p><strong>Cursor hook data can include prompt text and tool results</strong>, so the
+<a href="../connect-your-agents.html#how-much-of-your-prompt-the-office-is-told">redaction setting</a>
+is doing real work here. It applies before anything leaves your machine.</p>
+<p><strong>No subagents.</strong> A fan-out looks like one busy person.</p>
+<h2 id="if-nothing-shows-up" tabindex="-1">If nothing shows up</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nothing at all</td>
+<td>Start a new Cursor session. The office is also only fed while it is running</td>
+</tr>
+<tr>
+<td>Desk labels all read &quot;Working&quot;</td>
+<td>The default redaction. That is it working as designed</td>
+</tr>
+<tr>
+<td>Shell commands counted twice</td>
+<td>This is guarded against — shell boundary hooks are only used where the generic one is missing. Report it if you see it</td>
+</tr>
+</tbody>
+</table>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../connect-your-agents.html">Connect your agents</a> — redaction, office routing, and when agents leave</li>
+<li>The hook-to-event mapping is in the <a href="../../developer/adapters/cursor.html">developer docs</a></li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#install-it">Install it</a></li>
+<li><a href="#what-you-get">What you get</a></li>
+<li><a href="#what-to-know">What to know</a></li>
+<li><a href="#if-nothing-shows-up">If nothing shows up</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

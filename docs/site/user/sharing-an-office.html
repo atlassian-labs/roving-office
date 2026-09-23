@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sharing an office — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html" aria-current="page">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="sharing-an-office" tabindex="-1">Sharing an office</h1>
+<p><em>Put the sessions running on your laptop into a room somebody else can open.</em></p>
+<p>Two different things get called sharing, and only one of them needs a command.</p>
+<p><strong>Handing out a keycard needs nothing.</strong> The keycard in an office URL is the half that is
+safe to send: it opens the room for watching and <strong>cannot write to it</strong>. Send someone the
+link and they are in the room with you.</p>
+<p><strong>And you can take it back.</strong> Click the keycard at the top of the office for everything
+that decides who is in the room: the link, the headcount, a
+<a href="#put-a-passcode-on-an-office">passcode</a>, and
+<a href="#close-an-office-when-the-link-has-gone-too-far">closing the office</a> — plus the offices
+this browser remembers, and a button to open one more.</p>
+<p><strong>Filling a hosted office from your own machine</strong> is the other one, and it needs one
+command. A remote office cannot tell your adapters where to post — it has no access to your
+home directory — so something local has to do it on the office's behalf.</p>
+<h2 id="point-this-machine-at-a-hosted-office" tabindex="-1">Point this machine at a hosted office</h2>
+<pre><code class="language-bash"># 1. cut an office up there, and aim this machine's adapters at it
+npm run connect:remote -- https://therovingoffice.com
+
+# 2. check where events are going — expect `mode: remote`
+npm run connect:remote:status
+</code></pre>
+<p>That prints the office URL to open, and stores the office's <strong>write token</strong> locally. That
+is the only copy there will ever be: no route will tell you that token again, and only its
+first few characters are ever printed, because terminal scrollback is a poor home for a
+credential.</p>
+<p>While you still hold it you can cut another for a second machine, or revoke one you have
+lost. If you lose every token, the office is read-only for good and a fresh office is the
+answer.</p>
+<p>To staff the same office from a second machine, read the token out of that file and pass
+it across:</p>
+<pre><code class="language-bash">node bin/aop-connect.cjs &lt;url&gt; --office ABCD-1234 --token &lt;write-token&gt;
+</code></pre>
+<p>Now open the office URL and give an agent something to do. People should walk in within a
+second or two. An office made this way starts out watching the live harnesses rather than
+Test Data, because connecting a machine and then finding invented agents in the room is a
+half-finished job.</p>
+<p>When you are done, hand the machine back:</p>
+<pre><code class="language-bash">npm run disconnect:remote
+</code></pre>
+<h2 id="claude-code-needs-a-nudge" tabindex="-1">Claude Code needs a nudge</h2>
+<p>Claude runs a <em>copy</em> of the plugin taken at install time and cached by version, so an
+update offering a version it already holds does nothing at all:</p>
+<pre><code class="language-bash">node bin/aop-claude-install.cjs --status     # says whether the copy has drifted
+claude plugin marketplace update roving-office
+claude plugin update roving-office@roving-office
+</code></pre>
+<p>Then <strong>restart the sessions</strong>, as always.</p>
+<h2 id="when-nothing-shows-up" tabindex="-1">When nothing shows up</h2>
+<p>A hook may never make an agent wait and may never print, which is what makes this safe and
+also what makes it quiet. Two things follow.</p>
+<p><strong>Nothing is lost while the host is away.</strong> Events spool locally and drain when it comes
+back — through one outage, 94 queued events arrived the moment a working endpoint did. A
+flaky office is a <em>delayed</em> office, not a lossy one, so an empty room is worth a minute's
+patience before it is worth debugging.</p>
+<p><strong>Tell the platform's failures apart from the office's by their wording</strong>, because the
+status code will not do it for you. The office answers in its own JSON shape; the host
+answers in its. Something like <code>403 sandbox ingress policy missing</code> or <code>502 bridge token was rejected</code> is the gateway between you and a perfectly good office — not a bad token.</p>
+<p><strong>A <code>200</code> from a health check does not mean posting works.</strong> Only a real post succeeding
+does.</p>
+<p>The one failure that is genuinely yours to fix looks identical from outside: <strong>a
+redeployed or restarted host forgets the token</strong>, and hooks then fail forever, silently.
+<code>npm run connect:remote:status</code> shows a spool that never drains. The fix is to cut a new
+office.</p>
+<h2 id="put-a-passcode-on-an-office" tabindex="-1">Put a passcode on an office</h2>
+<p>A link travels in ways a passcode does not. It ends up in a screenshot with the address
+bar in it, in a channel with two hundred people in it, in browser history on a shared
+machine, in a bookmark synced to a personal account. That is the ordinary leak, and it is
+ordinary precisely because a URL is what tooling copies by itself while a passcode is
+something a person has to type on purpose.</p>
+<p>So an office can ask for one. Click the keycard, choose <strong>Set a passcode</strong>, type it, and
+<strong>Lock the office</strong>. From then on anyone opening the link is asked for it once per
+browser, and a padlock appears beside the keycard so you can see at a glance that the
+room is locked.</p>
+<p><strong>Optional means optional.</strong> Offices have no passcode until you set one, and one that has
+none behaves exactly as it always did. The shared demo office refuses a passcode
+outright.</p>
+<p>Four things are worth knowing before you rely on it:</p>
+<ul>
+<li><strong>It does not replace redaction.</strong> A passcode is a door on the room. What your agents
+actually send is decided where they run — see
+<a href="connect-your-agents.html#how-much-of-your-prompt-the-office-is-told">redaction</a> — and a
+passcode changes that by nothing.</li>
+<li><strong>It cannot un-see anything.</strong> Setting one now does nothing about what somebody already
+read out of the room. For that, close the office.</li>
+<li><strong>A link and its passcode leaking together defeats it completely.</strong> Send them by
+different routes, or do not bother sending the passcode at all.</li>
+<li><strong>An unlocked office stays unlocked in that browser.</strong> That is the convenience — nobody
+wants to retype a passcode on every reload — and the cost is that a shared or kiosk
+machine keeps the room open. <strong>Changing the passcode locks every browser out again</strong>,
+including your own, which is the answer when a passcode has gone further than you meant.</li>
+</ul>
+<p>Take it off with <strong>Remove</strong> in the same dialog.</p>
+<h2 id="close-an-office-when-the-link-has-gone-too-far" tabindex="-1">Close an office when the link has gone too far</h2>
+<p><strong>Close this office</strong> is the one action that revokes everything at once: the link, every
+person currently watching, the rooms and their furniture, the event history, and every
+machine posting into it. The button asks once, and the second click does it.</p>
+<p>One thing is genuinely surprising and worth reading twice. <strong>A closed office does not
+produce an error for whoever kept your link.</strong> Visiting a keycard nobody is using <em>creates</em>
+an office there — that is how a shared link works before anyone has opened it — so the old
+link resolves to a brand-new empty room. Nobody is told they were cut off, which is a
+feature rather than an oversight: revocation that announces itself invites a conversation
+you may not want to have.</p>
+<p>It cannot be undone, and there is no reason to want to: an office is an address you throw
+away, and the answer to a lost one is another one.</p>
+<p>The demo office cannot be closed.</p>
+<h2 id="no-accounts-ever" tabindex="-1">No accounts, ever</h2>
+<p>There is no sign-up, no password, no email and no user store anywhere in this project, and
+there is not going to be. An office is an address you throw away; an account is the
+opposite of that.</p>
+<p>What stands in for one is a <strong>write token</strong>, minted with the office and kept by the
+browser that opened it. Holding it is the whole of owning an office. Say all of what that
+costs, plainly:</p>
+<ul>
+<li><strong>There is no recovery.</strong> Clear that browser's storage, or open the office from your
+phone, and you stop being its owner. The office keeps working and the keycard still
+opens it — you have simply lost the passcode and close controls. If you connected the
+office from a terminal you still have the token
+<a href="#point-this-machine-at-a-hosted-office">in that file</a> and can use it from there.</li>
+<li><strong>No cross-device ownership</strong>, and no list of your offices anywhere but that browser.</li>
+<li><strong>You can revoke a credential, never a person.</strong> A passcode shared with six people is
+removed from all six or from none.</li>
+<li><strong>Nobody is identified, so nobody can be audited.</strong> There is no record of who read the
+room.</li>
+</ul>
+<h2 id="before-you-hand-the-link-round" tabindex="-1">Before you hand the link round</h2>
+<blockquote>
+<p><strong>Treat a hosted office as public.</strong> Unless you have put a passcode on it, it answers
+unauthenticated requests. Redaction withholds the <em>words</em> by default — no prompts, no
+messages, no search queries — but it still sends your repository host, owner and name,
+the branch, which tools ran, and <strong>the file paths they touched</strong>. Those paths are
+shortened, not hidden: one under your home folder still names every folder below it.
+Read <a href="connect-your-agents.html#what-the-default-actually-sends">what the default actually sends</a>
+and set your redaction before you share, not after. A passcode is a door, not
+redaction.</p>
+</blockquote>
+<p><strong>A hosted office is a demonstration, not a filing cabinet.</strong> It does not reliably
+remember offices, scenes or furniture across a redeploy. If you want a room that keeps
+what you gave it, run one <a href="install.html">on your own machine</a>.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#point-this-machine-at-a-hosted-office">Point this machine at a hosted office</a></li>
+<li><a href="#claude-code-needs-a-nudge">Claude Code needs a nudge</a></li>
+<li><a href="#when-nothing-shows-up">When nothing shows up</a></li>
+<li><a href="#put-a-passcode-on-an-office">Put a passcode on an office</a></li>
+<li><a href="#close-an-office-when-the-link-has-gone-too-far">Close an office when the link has gone too far</a></li>
+<li><a href="#no-accounts-ever">No accounts, ever</a></li>
+<li><a href="#before-you-hand-the-link-round">Before you hand the link round</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

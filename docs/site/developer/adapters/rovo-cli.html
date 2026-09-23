@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rovo CLI — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html" aria-current="page">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="rovo-cli-adapter" tabindex="-1">Rovo CLI adapter</h1>
+<p><em>Installing it is <a href="../../user/sources/rovo-cli.html">Rovo CLI</a>. This is the mapper.</em></p>
+<p><code>bin/mappers/rovo-cli.cjs</code>, over the shared <code>bin/aop-send.cjs</code>. The measurements behind
+everything here are in <a href="../protocol/aop-harness-adapters.html#4-rovo-cli">adapter notes §4</a>.</p>
+<h2 id="the-eight-hooks" tabindex="-1">The eight hooks</h2>
+<p><code>on_session_start</code>, <code>on_user_prompt</code>, <code>on_tool_start</code>, <code>on_tool_end</code>,
+<code>on_tool_permission</code>, <code>on_complete</code>, <code>on_error</code>, <code>on_session_end</code> — and the installer wires
+up all eight.</p>
+<p>Between them they cover <a href="../protocol/aop-spec.html#9-conformance-levels">L1</a>'s tool events
+and the whole session and turn lifecycle, plus <code>error</code>.</p>
+<p><strong>The one L0 event it does not declare is <code>session.heartbeat</code></strong>, because Rovo has no
+periodic hook to send one from. The mapper emits one only as a fallback when it meets a
+hook name it does not recognise, which is enough to keep that character from being reaped.</p>
+<p><code>on_session_end</code> is the one that changes how the room behaves: because it fires, the
+adapter declares <code>session.end</code> in its capabilities, and a Rovo character gets the
+<a href="../../user/connect-your-agents.html#when-agents-leave">30-minute leash rather than the five-minute one</a>.
+Early notes here predicted only implicit spawn and TTL reaping; that turned out to be
+wrong, and in a better direction.</p>
+<h2 id="one-slot-per-event-and-it-is-contested" tabindex="-1">One slot per event, and it is contested</h2>
+<p><strong>Rovo runs only the first command of an event.</strong> If a slot is already taken, the installer
+takes it and re-runs the displaced command via <code>aop-send --chain</code>, so existing telemetry
+keeps working; <code>--uninstall</code> puts it back. It refuses to guess about anything else.</p>
+<p>The traffic goes the other way too: because the first slot is the only slot worth having,
+<em>another</em> tool's installer will take it from us just as readily — and an office that was
+working stops showing tool work with nothing broken and nothing logged.
+<code>connect:rovo:status</code> names what each missing hook costs.</p>
+<h2 id="update_todo-steps-read-at-the-start" tabindex="-1"><code>update_todo</code> → steps, read at the <em>start</em></h2>
+<p>The plan is read from <code>on_tool_start</code>'s arguments, because <code>on_tool_end</code> carries results
+and <strong>no arguments</strong>.</p>
+<p>It understands both of the tool's dialects: a whole list, and a <code>merge: true</code> patch that
+names only what changed. The second is easy to get wrong in a way that looks fine — a list
+of three reported as <em>2 of 2</em>, and a part just ticked off drawn as one struck out — so
+<a href="../protocol/aop-harness-adapters.html#46-update_todo-steps-and-why-it-fires-at-the-start">adapter notes §4.6</a>
+keeps the measurements.</p>
+<p>Consequence worth expecting rather than debugging: <strong>no tool hooks, no checklist.</strong> If that
+slot belongs to another command the office sees a session that arrives, sits and delivers,
+with no parts and no tool work in between.</p>
+<p>The last plan is copied into job history before the live checklist is cleared, which is
+what makes a finished round read <em>Done (5/5)</em> with all five parts still listed.</p>
+<h2 id="titles-are-local-best-effort-enrichment" tabindex="-1">Titles are local, best-effort enrichment</h2>
+<p>At <code>summary</code> and <code>full</code> the adapter prefers the concise title Rovo already generated for
+its own session list over quoting the prompt, read from
+<code>~/.rovo/sessions/&lt;id&gt;/metadata.json</code>. <strong>It does not call another model.</strong></p>
+<p>Title generation can finish <em>after</em> the first prompt hook, so <code>on_complete</code> carries it
+again and the completed job is retitled in place.</p>
+<h2 id="hooks-are-a-tui-feature" tabindex="-1">Hooks are a TUI feature</h2>
+<p>They do not fire under <code>rovo serve</code> at all, and in headless <code>rovo run</code> only the
+session-scoped ones do — so a <code>run</code> that demonstrably executed a shell tool produces
+<code>on_session_end</code> and no <code>on_tool_start</code>.</p>
+<h2 id="no-subagents" tabindex="-1">No subagents</h2>
+<p>Rovo has no subagent hook, so a Rovo office can never show ghosts. See
+<a href="claude-code.html">Claude Code</a> for the feed that carries them.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../protocol/aop-harness-adapters.html#4-rovo-cli">Adapter notes §4</a> — payload shapes, and the two mechanisms considered</li>
+<li><a href="../protocol/aop-spec.html">The AOP spec</a> — the wire format</li>
+<li><a href="../extending.html#add-a-harness-adapter">Extending the office</a> — writing another one</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#the-eight-hooks">The eight hooks</a></li>
+<li><a href="#one-slot-per-event-and-it-is-contested">One slot per event, and it is contested</a></li>
+<li><a href="#update_todo-steps-read-at-the-start">update_todo → steps, read at the start</a></li>
+<li><a href="#titles-are-local-best-effort-enrichment">Titles are local, best-effort enrichment</a></li>
+<li><a href="#hooks-are-a-tui-feature">Hooks are a TUI feature</a></li>
+<li><a href="#no-subagents">No subagents</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

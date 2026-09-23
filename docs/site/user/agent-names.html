@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent names — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html" aria-current="page">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="agent-names" tabindex="-1">Agent names</h1>
+<p><em>Why somebody is called <code>Chen Palette-Tidier</code>, and why their surname keeps changing.</em></p>
+<img src="../images/panels/agents-roster.png" width="256" alt="The agents panel listing agents by full name — a first name and a job-derived surname — each with a status dot and the job they are on.">
+<p><em>Four sessions, four names. The surnames come from what each one is actually doing.</em></p>
+<p>A terminal tab is a person, so the office gives it a person's name. It is one of the
+quieter pleasures of watching the room: you stop thinking of them as sessions within about
+a minute.</p>
+<p>A terminal tab is a person, so it gets a person's name — <code>Chen Palette-Tidier</code> — in two
+halves:</p>
+<ul>
+<li><strong>First name</strong> is derived from the session, never random, so the same tab is the same
+colleague across a reload, an office switch and a replay. It never changes, and two tabs
+in one room never share one.</li>
+<li><strong>Surname is the job</strong>, and it moves with the work: a noun and a verb welded into
+something a person could plausibly be called. Before the first prompt it comes from the
+git branch; after that, every new job earns a new one, because a colleague whose name
+still describes last week is worse than no name at all.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>The job in hand</th>
+<th>Becomes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&quot;Research how cats sleep&quot;</td>
+<td><code>Cat-Researcher</code></td>
+</tr>
+<tr>
+<td>&quot;Bake some sourdough bread&quot;</td>
+<td><code>Sourdough-Baker</code></td>
+</tr>
+<tr>
+<td>&quot;Refactor the palette code&quot;</td>
+<td><code>Palette-Tidier</code></td>
+</tr>
+<tr>
+<td>&quot;Fix the nav grid around the couch&quot;</td>
+<td><code>Nav-Mender</code></td>
+</tr>
+<tr>
+<td>&quot;Look at the naming protocol&quot;</td>
+<td><code>Naming-Reader</code></td>
+</tr>
+</tbody>
+</table>
+<p>Verbs map to jobs — <em>fix</em> → Mender, <em>investigate</em> → Sleuth, <em>write</em> → Scribe, <em>optimise</em> →
+Tuner, <em>deploy</em> → Shipper — in every form people type them, so &quot;shipping the globe&quot; is a
+Shipper too.</p>
+<p><strong>A surname is never technical.</strong> Identifiers, paths, flags, versions and acronyms are
+struck out before a noun is chosen, so nobody is called <code>AopSource-Builder</code> or
+<code>SSE-Mender</code>. If a job is jargon all the way down the name falls back to the bare job —
+<code>Chen Mender</code> — which is a real surname and an honest one. Adverbs go the same way: &quot;grow
+the plants faster&quot; is about plants, and <code>Faster-Gardener</code> is a name about nothing.</p>
+<p>Two brakes stop this becoming a flicker. Only a whole instruction — a verb and something
+plain for it to act on — earns a new surname, so &quot;yes, carry on&quot; leaves the name alone.
+And a name is only double-barrelled if it fits the pill: <code>Shan Sourdough-Bak…</code> has lost
+the word that made it a person, so it is <code>Shan Baker</code> instead.</p>
+<p>Under the default redaction no prompt ever arrives, so the branch-derived surname simply
+stays. The naming can only ever use something the office was already told.</p>
+<h2 id="where-you-see-them" tabindex="-1">Where you see them</h2>
+<p>Above their head on the floating name tag, in the agents roster (<code>A</code>), and at the top of
+the detail panel when you click somebody. First names only in the narrow places — a
+surname earns nothing in a two-inch row.</p>
+<p>Every source is named this way, <a href="sources/test-data.html">Test Data</a> included, so the default
+office demonstrates the naming rather than opting out of it. Telling a simulated agent from
+a real one is the job of the mark each one wears, not of the name.</p>
+<p><strong>OpenClaw is the exception</strong>, because its agents have already told you who they are — see
+<a href="sources/openclaw-identity.html">names, colours and faces</a>.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="watching.html">Watching the office</a> — reading the room, of which the names are a part</li>
+<li><a href="the-room.html">The room, prop by prop</a> — where they all walk to</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#where-you-see-them">Where you see them</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

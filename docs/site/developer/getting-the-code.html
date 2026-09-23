@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Getting the code — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html" aria-current="page">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="getting-the-code" tabindex="-1">Getting the code</h1>
+<p><em>Run a checkout, install public development tooling, and check your changes.</em></p>
+<h2 id="what-you-need" tabindex="-1">What you need</h2>
+<p><strong>Node.js 24 and npm, and a browser.</strong> Nothing else — no database, no hosted service, no
+account.</p>
+<p>Node 24 is what CI runs, what both deployment images use, and the only version these
+checks are proved against. The development tooling would accept older Node than that —
+ESLint 10 sets its floor at <code>^20.19 || ^22.13 || &gt;=24</code> — so an older runtime will very
+likely work and simply is not tested; if a check fails on one, try 24 before reporting it.
+Anything newer than 24 is fine.</p>
+<h2 id="get-it-and-run-it" tabindex="-1">Get it and run it</h2>
+<p>Start from a checkout or an extracted source archive. The repository clone command is:</p>
+<pre><code class="language-bash">git clone https://github.com/atlassian-labs/roving-office.git
+cd roving-office
+node server.cjs 8081     # no build step; 8080 is usually taken
+</code></pre>
+<p>Edit a file, reload the tab. Three.js is vendored under <code>vendor/three</code>, modules load
+straight off disk, and there is nothing to compile.</p>
+<p>Open <code>http://localhost:8081/office/TEST-0000/</code> for a <strong>Test Data</strong> office. It simulates
+agents locally and needs no agent account and no installed adapter. Once you have the
+source, everything on this page runs with no credential and no access to any hosted
+service.</p>
+<p><strong>One server per worktree is the normal state of things.</strong> A server started with a bare
+<code>node server.cjs</code> is <strong>private</strong>: it does not write <code>~/.roving-office/endpoint.json</code>, so it
+cannot redirect the hooks feeding an office somebody is watching, and it prints the
+<code>AOP_URL</code> / <code>AOP_TOKEN</code> pair that points a single shell at it. Name a port and you get that
+port or an error, never a quiet substitution.</p>
+<p><code>npm run serve</code> is the other one — it <em>publishes</em>, and it is how the office you actually
+work in gets fed.</p>
+<h2 id="check-it" tabindex="-1">Check it</h2>
+<pre><code class="language-bash">npm ci          # development tooling from the public npm registry
+npm test
+npm run lint
+npm run probe -- --sweep --assert=test/coplanar-baseline.json
+npm run pack:openclaw
+npm run pack:plugins
+</code></pre>
+<p>These six are the whole of local verification, and they are exactly the commands
+<code>.github/workflows/ci.yml</code> runs, by the same names. They need no credentials and no
+running external service, so a green run here is a green run there.</p>
+<p><strong>CI is these six and nothing else</strong> — no deployment step, no secret, no credential. See
+<a href="developing.html#what-ci-runs">What CI runs</a> for why that is a boundary rather than a
+simplification, and for the one guard that lives in the repository settings instead of in
+the workflow file.</p>
+<p>Three of them are worth understanding rather than just running:</p>
+<p><strong>The probe</strong> builds every building and season headlessly and asserts that no two surfaces
+contest a plane worse than the recorded baseline. Almost every graphical glitch in this
+scene has turned out to be that same bug. It is <strong>deterministic</strong> — the scene dresses itself
+at random, so the probe seeds it — which means a red probe is a <em>real</em> red probe. Do not
+re-run it hoping, and do not widen the baseline to make it green. See
+<a href="coplanar-probe.html">the coplanar-face probe</a>.</p>
+<p><strong><code>pack:openclaw</code></strong> packs the plugin and runs the artifact from a temp directory, so a
+change that breaks the vendored seam cannot land silently. It is the one people forget.</p>
+<p><strong><code>pack:plugins</code></strong> does the same for the Claude Code and Codex plugins, which are the two
+that strangers install: it builds each as a distribution artifact, unpacks it somewhere
+with no checkout above it, and fires a real hook at a loopback receiver. <code>npm test</code> also
+asserts that the committed marketplace under <code>plugins/claude/</code> still matches this
+checkout, because the site serves those files and no deploy target may build them. See
+<a href="plugin-distribution.html">publishing the plugins</a>.</p>
+<p><code>npm test</code> also covers the documentation: it checks that
+<a href="npm-scripts.html">the npm script reference</a> still matches <code>package.json</code>, that every
+Markdown page has been built into <code>docs/site</code>, and that <strong>every internal link and anchor
+resolves</strong>. If you edited a doc, run <code>npm run docs</code>.</p>
+<p>That link check also runs at the end of <code>npm run docs</code>, which is where you want to meet
+it — a moved page or a renamed heading fails the build seconds after you did it, naming
+the file. It lives in <code>bin/lib/check-doc-links.mjs</code>, one function behind both call sites,
+and its header says why both are needed.</p>
+<h2 id="installing-development-tooling" tabindex="-1">Installing development tooling</h2>
+<p>The project <code>.npmrc</code> defaults to <code>https://registry.npmjs.org/</code>, and <code>package-lock.json</code>
+pins public tarball URLs and integrity hashes. <code>npm ci</code> installs the locked versions
+without regenerating the lockfile. No npm account or company registry is needed.</p>
+<p>If your machine has custom npm configuration, a user-level scoped registry or an
+environment override can still take precedence for that scope. For a clean check,
+point npm's <code>--userconfig</code> and <code>--globalconfig</code> at <strong>separate empty files</strong>, set
+<code>--registry=https://registry.npmjs.org/</code>, use an empty directory for <code>--cache</code>, and
+remove inherited npm/auth/proxy environment overrides in that process. Do not change
+your normal npm configuration or copy credentials into this repository.</p>
+<p>When updating dependencies, keep the public URLs, review changed versions and
+integrity hashes, and repeat the checks above. A lockfile generated against a private
+mirror makes other contributors depend on that mirror.</p>
+<h2 id="maintaining-third-party-evidence" tabindex="-1">Maintaining third-party evidence</h2>
+<p><a href="https://github.com/atlassian-labs/roving-office/blob/main/third-party/inventory.json">The dependency inventory</a> records locked npm
+packages, vendored code, assets and the evidence available for their licenses. Its
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/third-party/components.json">component records</a> describe provenance and which
+artifacts contain each component. Missing evidence remains an open review item;
+the inventory does not grant permission to redistribute a component.</p>
+<p>After changing dependencies, vendored files, asset provenance or distribution
+recipes, install the locked dependencies and regenerate the evidence:</p>
+<pre><code class="language-bash">npm ci
+node bin/gen-third-party.mjs
+</code></pre>
+<p>Review the inventory and <a href="https://github.com/atlassian-labs/roving-office/blob/main/THIRD_PARTY_NOTICES.txt">runtime notices</a> in the
+diff. When updating colour names, run <code>npm run colours</code> first so the pinned data
+and its upstream license are updated together. <code>npm test</code> checks the inventory
+offline to catch stale evidence and notices; run <code>node bin/gen-third-party.mjs --check</code>
+for that check alone. Changes to this documentation still require <code>npm run docs</code>.</p>
+<p><strong>Visual assets have a second record, and it is the one to read first.</strong>
+<a href="visual-assets.html">Visual assets and their rights</a> gives every asset that ships —
+first-party artwork, fonts and other parties' brand marks alike — its source and its
+release basis in prose,
+and its last section is the checklist for adding or changing one. It exists because the
+inventory answers <em>what is this file</em> and the question that actually blocks a release is
+<em>may we publish it</em>. Some of the brand marks are other companies' trademarks that this
+project may use but cannot sublicense, so they are named in <a href="https://github.com/atlassian-labs/roving-office/blob/main/NOTICE"><code>NOTICE</code></a> as
+excluded from the code licence grant: a permissive licence disclaims trademarks but not
+copyright in artwork, which is why the exclusion is written down rather than inferred.
+Take vendor artwork from the vendor, unaltered, and record where you got it — a source
+comment is not provenance.</p>
+<h2 id="what-has-no-dependencies-and-what-does" tabindex="-1">What has no dependencies, and what does</h2>
+<p>The <strong>server needs no npm runtime install</strong>: it uses Node's built-in modules. The
+browser app includes vendored Three.js and derived <code>color-name-list</code> data. These are
+third-party dependencies even though they are committed to the repository and need no
+runtime download. <code>npm ci</code> installs development tooling only: ESLint, Eleventy and
+their supporting packages.</p>
+<p>That distinction is why <code>Dockerfile.fly</code> runs no <code>npm install</code> at all, and why
+<code>docs/site/</code> is committed rather than built at deploy time: a deploy copies files, so
+anything it serves has to already be a file.</p>
+<h2 id="for-anything-visual-look-at-the-scene" tabindex="-1">For anything visual, look at the scene</h2>
+<p>The scene is the product, so a unit test cannot tell you it looks right. A headless
+screenshot takes seconds and catches what no assertion can —
+<a href="developing.html#look-at-the-scene">developing on it</a> has the recipe and, more importantly,
+its traps. <code>npm run map</code> and <code>npm run portrait</code> re-render the documentation imagery.</p>
+<h2 id="before-you-open-a-pull-request" tabindex="-1">Before you open a pull request</h2>
+<p>Work is tracked one issue at a time — one issue per piece of work, moved to In Progress
+when you start and Done when it lands. Branch from <code>main</code>, open a pull request, let the
+pipeline go green.</p>
+<p><strong>If your change touches the shared plugin files</strong> — <code>hooks/</code>, <code>bin/aop-send.cjs</code>,
+<code>bin/aop-node.sh</code>, <code>bin/aop-plugin-hook.sh</code>, <code>bin/mappers/</code>, <code>.claude-plugin/</code>,
+<code>.codex-plugin/</code> — <strong>bump the plugin version.</strong> Claude and Codex both run a copied snapshot
+keyed on that version, so an update offered a version it already holds does nothing at all,
+however far the files have drifted. <a href="https://github.com/atlassian-labs/roving-office/blob/main/AGENTS.md">AGENTS.md</a> explains the trap;
+<a href="adapters/claude-code.html#changing-the-plugin-means-bumping-the-version">the Claude adapter</a>
+explains the mechanism.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="developing.html">Developing on it</a> — the loop, the tools, and the traps</li>
+<li><a href="architecture.html">Architecture</a> — the map, and its file tree is kept true</li>
+<li><a href="extending.html">Extending the office</a> — the four recipes</li>
+<li><a href="npm-scripts.html">Every npm script</a> — the rest of the commands</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#what-you-need">What you need</a></li>
+<li><a href="#get-it-and-run-it">Get it and run it</a></li>
+<li><a href="#check-it">Check it</a></li>
+<li><a href="#installing-development-tooling">Installing development tooling</a></li>
+<li><a href="#maintaining-third-party-evidence">Maintaining third-party evidence</a></li>
+<li><a href="#what-has-no-dependencies-and-what-does">What has no dependencies, and what does</a></li>
+<li><a href="#for-anything-visual-look-at-the-scene">For anything visual, look at the scene</a></li>
+<li><a href="#before-you-open-a-pull-request">Before you open a pull request</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+.git
+.github
+.claude
+.claude-plugin
+.worktrees
+.kaizen
+.output
+node_modules
+docs
+# ...except the docs that are pages: they are served by the app, not read in the
+# repository. See Dockerfile.fly, which copies them, and bin/kaizen-build.sh.
+!docs/*.html
+# ...the built documentation site, which is served at /docs. Only the site: the markdown
+# it was generated from stays out, since nothing reads it at runtime.
+#
+# Both the directory and its contents are re-included, and the single-level forms are
+# spelled out beside the `**` ones deliberately. `docs` above excludes the whole tree, and
+# a parent directory that stays excluded is a directory the build never walks into — so
+# the exceptions have to name each level they descend through. The previous version of
+# this file enumerated `docs/images`, `docs/images/objects` and `docs/images/objects/*` for
+# exactly that reason, and this is that lesson kept rather than tidied away: a wrong guess
+# here is a deployed office whose documentation is entirely 404, and nothing local says so.
+!docs/site
+!docs/site/*
+!docs/site/**
+# ...and all the doc imagery, which the served prose and the editor's add menu both need.
+!docs/images
+!docs/images/*
+!docs/images/**
+# ...and the downloadable examples the docs link at.
+!docs/examples
+!docs/examples/*
+!docs/examples/**
+# The Codex half of the plugin distribution. `plugins/claude` is served and ships; this
+# is a Git repository's worth of files waiting for a Git repository, it is gitignored, and
+# nothing serves a clone. bin/kaizen-build.sh drops it from the Kaizen artifact too.
+plugins/codex
+inspo
+bin
+hooks
+AGENTS.md
+README.md
+.DS_Store
+Dockerfile.fly
+.dockerignore
+fly.toml

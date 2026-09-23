@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rovo CLI — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html" aria-current="page">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="rovo-cli" tabindex="-1">Rovo CLI</h1>
+<p><em>Atlassian's terminal agent. Built, and it says goodbye properly.</em></p>
+<h2 id="install-it" tabindex="-1">Install it</h2>
+<pre><code class="language-bash">npm run connect:rovo:dry     # show exactly what would change, change nothing
+npm run connect:rovo         # install (backs your config up first)
+npm run connect:rovo:status  # what is wired up, and what actually runs
+npm run disconnect:rovo      # remove, restoring any hook it displaced
+</code></pre>
+<p>Then <strong>start a new Rovo session.</strong> Rovo reads its hooks once, at session start, so an
+installed hook does nothing for terminals that are already open.</p>
+<p>Point an office at <strong>Rovo CLI</strong> (press <code>D</code>), and the next thing you ask an agent to do
+walks into the room.</p>
+<h2 id="what-you-get" tabindex="-1">What you get</h2>
+<p>Arrivals, tool work, research trips, deliveries, errors and departures — the whole session
+and turn lifecycle.</p>
+<p><strong>A Rovo character sits at their desk through 30 minutes of quiet</strong> rather than the
+five-minute fallback, because Rovo tells the office when a session really ends. Quiet is
+the normal state of a session that is waiting on you, and this adapter knows the
+difference.</p>
+<h3 id="checklists" tabindex="-1">Checklists</h3>
+<p>Ask for something with parts and Rovo writes itself a todo list. The office reads it: a
+checklist in the detail panel, the part in hand on the desk label, and a count-first line
+where a line is all there is room for — <em>(2/5) Checking the result</em>.</p>
+<p>Nothing needs turning on, and a turn without a list looks exactly as it did before lists
+existed. A finished five-part job reads <strong>Done (5/5)</strong> under Recent jobs, and the row opens
+to show all five parts rather than reducing the work to a fraction.</p>
+<p>At the default redaction the parts are <strong>counted, not named</strong> — <em>Step 2 of 5</em> — because a
+todo item is a sentence the model wrote.</p>
+<h2 id="what-it-cannot-do" tabindex="-1">What it cannot do</h2>
+<p><strong>Subagents.</strong> Rovo has no subagent hook, so a Rovo office never shows a fan-out as
+anything but one busy person. <a href="claude-code.html">Claude Code</a> is the feed that carries them.</p>
+<p><strong>Hooks are a terminal feature.</strong> They do not fire under <code>rovo serve</code> at all, and in
+headless <code>rovo run</code> only the session-scoped ones do — so a <code>run</code> that demonstrably executed
+a shell tool produces an end-of-session event and no tool work.</p>
+<h2 id="if-nothing-shows-up" tabindex="-1">If nothing shows up</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agents arrive, sit and deliver, but no tool work or checklists</td>
+<td>Another tool has taken the tool-start hook slot. <code>connect:rovo:status</code> names what each missing hook costs</td>
+</tr>
+<tr>
+<td>Nothing at all, and no errors anywhere</td>
+<td>The office is not running. The adapter exits immediately when there is no office to post to — harmless, and it stays installed</td>
+</tr>
+<tr>
+<td>Desk labels all read &quot;Working&quot;</td>
+<td>That is the default redaction doing its job. <a href="../connect-your-agents.html#how-much-of-your-prompt-the-office-is-told">How to change it</a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rovo runs only the first command of an event</strong>, and the first slot is the only slot worth
+having. If you already have a hook there, the installer takes the slot and re-runs yours,
+so existing telemetry keeps working — and <code>disconnect</code> puts your command back. The traffic
+goes the other way too: another tool's installer will take the slot from us just as
+readily, and then an office that was working stops showing tool work with nothing broken
+and nothing logged. Taking it back is the same command that installed it.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../connect-your-agents.html">Connect your agents</a> — redaction, office routing, and when agents leave</li>
+<li><a href="../sharing-an-office.html">Sharing an office</a> — pointing these hooks at a hosted office</li>
+<li>The payload shapes and the measurements are in the <a href="../../developer/adapters/rovo-cli.html">developer docs</a></li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#install-it">Install it</a></li>
+<li><a href="#what-you-get">What you get</a><ul><li><a href="#checklists">Checklists</a></li></ul></li>
+<li><a href="#what-it-cannot-do">What it cannot do</a></li>
+<li><a href="#if-nothing-shows-up">If nothing shows up</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

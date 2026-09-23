@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Offices, keycards and scenes — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html" aria-current="page">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="offices-keycards-and-scenes" tabindex="-1">Offices, keycards and scenes</h1>
+<p><em>How an office is named, shared, and — if you are careless — lost.</em></p>
+<img src="../images/screens/reception.png" width="900" alt="Your offices: a keycard field with an Enter button, and an Open a new office button.">
+<p><em>The <a href="https://therovingoffice.com/offices">keycard page</a> lets you enter a keycard or open a room of your own.</em></p>
+<h2 id="a-keycard-is-the-whole-address" tabindex="-1">A keycard is the whole address</h2>
+<p>An office lives at <code>/office/&lt;keycard&gt;</code> and is named by that keycard and nothing else. No
+login, no account, and no list of offices anywhere. Eight characters:</p>
+<pre><code>https://therovingoffice.com/office/K7F2-9QBX
+</code></pre>
+<p><strong>Case and hyphens are yours to get wrong.</strong> <code>k7f2 9qbx</code> and <code>K7F29QBX</code> open the same
+office. The alphabet is the digits and A–Z without <code>I</code>, <code>L</code>, <code>O</code> or <code>U</code>, so <code>0</code>/<code>O</code> and
+<code>1</code>/<code>I</code> cannot be confused when a keycard is read aloud or copied off a screenshot — and
+dropping <code>U</code> means almost nothing rude can be spelled by accident. There are about 1.1
+trillion of them, and one is never handed out while it is in use.</p>
+<p>Which makes a keycard three things at once:</p>
+<ul>
+<li><strong>A way in.</strong> Visiting a keycard nobody has used <em>creates</em> the office there. A link
+works whether or not anyone has opened it yet, and there is no sign-up step to skip.</li>
+<li><strong>The only way back.</strong> Nothing lists offices, so the keycard <em>is</em> the office. Your
+browser remembers the ones you have visited — on the <a href="https://therovingoffice.com/offices">keycard
+page</a>, and behind the keycard inside any office —
+but that list lives in one browser and nowhere else. Clear your history and the room is
+gone, and so is your ability to close it or change its passcode.</li>
+<li><strong>Most of the privacy model.</strong> Public to anyone you send it to, invisible to everybody
+else. Two people holding different keycards cannot see each other's agents. If that is
+not enough for a particular room you can put a
+<a href="sharing-an-office.html#put-a-passcode-on-an-office">passcode</a> on it.</li>
+</ul>
+<h2 id="click-the-keycard" tabindex="-1">Click the keycard</h2>
+<p>The keycard sits at the top left of the office, and clicking it opens everything that is
+yours to decide about the room:</p>
+<ul>
+<li>
+<p><strong>This office</strong> — the link and <strong>Copy link</strong>. The whole link, not just the code,
+because what you paste into a chat should be something the other person can click.</p>
+</li>
+<li>
+<p><strong>Who is here</strong> — how many people are looking at this office right now, <em>including
+you</em>. It counts people rather than connections: reload the page and you are still one
+viewer, and two tabs are two.</p>
+</li>
+<li>
+<p><strong>Passcode</strong> — set one, change it, or take it off again. A padlock appears beside the
+keycard whenever the office has one.</p>
+</li>
+<li>
+<p><strong>Close this office</strong> — take the link back for good.</p>
+</li>
+<li>
+<p><strong>Your offices</strong> — the keycards this browser has been in, newest first. A row marked
+<em>passcode</em> is locked; one struck through and labelled <em>deleted</em> has gone, and is dropped
+from the list as you watch rather than quietly vanishing — the difference matters,
+because this list is the only record anywhere that your offices exist.</p>
+<p>Two ways out sit under the list, so neither needs a trip back to the keycard page:
+<strong>Open a new office</strong> cuts a fresh keycard and walks you into it, and the field beside
+it takes a keycard somebody sent you. It is the same field as the <a href="https://therovingoffice.com/offices">keycard
+page</a> — case and hyphens are yours to get wrong
+there too — and <strong>Enter</strong> goes.</p>
+</li>
+</ul>
+<p><strong>Passcode and Close need the browser that opened the office.</strong> There are no accounts
+here, so there is nothing to sign in to: the office remembered itself in the browser that
+cut its keycard. Open the same office somewhere else and you can watch it, rearrange it
+and connect agents to it, but the passcode and the close button are greyed out with a line
+saying why. That is the trade for having no sign-up step — see
+<a href="sharing-an-office.html#no-accounts-ever">what you give up</a>.</p>
+<p><strong>An office nobody is watching, with no agents arriving, is deleted after thirty minutes.</strong>
+An open tab counts as watching, and so does any event from a harness — so a room being
+worked in unobserved is not swept away. The demo office at <code>/office/TEST-0000</code> is never
+deleted.</p>
+<h2 id="reception" tabindex="-1">Reception</h2>
+<p>The front door opens straight into the <strong>demo office</strong>. A small invitation at the
+bottom says “Watch. Play. Discover. (You can't break anything) If lost, type <code>?</code>”.
+Press <code>?</code> to see what you can do. The hint fades away after twenty seconds, or you
+can dismiss it sooner.</p>
+<p>It also gets out of the way the moment you open a panel — Scene, Developer, Edit
+Mode, an agent's detail panel, the keycard dialog, the datasources picker or the
+shortcuts card. It sits
+in the same place as the strips along the bottom, and an invitation printed over the
+thing you just opened is no longer an invitation. If a panel is already open when the
+office loads — because you left it open last time — the hint does not appear at all.
+Dismissing it is for that visit only; open the office again with nothing showing and
+it says hello again.</p>
+<p>Each visit opens the demo in a <strong>random building and season</strong>, at your local time.
+Every browser runs its <strong>own simulated agents</strong>. Furniture, building, season and
+lighting experiments affect only your view. Refresh to start fresh with another
+random look. The shared starting rooms cannot be renamed, deleted or repointed at
+live agents.</p>
+<p>Choose <strong>Open your own office</strong> in the scene menu, or visit the
+<a href="https://therovingoffice.com/offices">keycard page</a> for the offices this browser
+remembers. Use a personal office to connect real agents and save an arrangement.
+When you open one with a new keycard, <strong>Choose sources</strong> appears automatically so
+you can select your agents' sources and follow the plugin connection instructions.
+It opens once for the new office; press <code>D</code> to bring it back later.</p>
+<h2 id="scenes-one-office-several-rooms" tabindex="-1">Scenes: one office, several rooms</h2>
+<p>An office is a set of <strong>scenes</strong>, and a scene is one room: a building, a season, and the
+sources filling it. A new office starts with exactly one, its look rolled at random and
+its agents simulated, so there is something to look at before you have decided anything.</p>
+<p><strong>New scene</strong> at the foot of the dropdown adds another — again a random building and
+season, again full of invented agents. Press <code>D</code> or click the pill to point any scene at a
+live harness instead.</p>
+<p>Hover a scene and you get a pencil and a trash can:</p>
+<ul>
+<li><strong>The pencil</strong> turns the row into a text field holding the name it was already showing,
+so a name is edited where it is read. <strong>Enter</strong> or a click elsewhere keeps it,
+<strong>Escape</strong> puts it back, and emptying the field hands the scene back to the name its
+feeds imply.</li>
+<li><strong>The trash can asks first.</strong> The first click arms it, the second removes the room. A
+scene is a set of choices somebody made, and one stray click in a menu is not a way to
+lose them. The last scene has no trash can at all — an office keeps at least one room.</li>
+</ul>
+<p><strong>Scenes are stored with the office, on the server.</strong> Everyone holding the keycard sees
+the same rooms; the one <em>you</em> were last standing in is remembered by your browser.</p>
+<p><strong>One scene is active at a time.</strong> Switching tears the current room down and builds the
+new one, then re-points the panels at the new feed. Your camera framing survives the swap.
+Offscreen scenes keep accumulating state, and a second browser window on the same keycard
+is how you watch two of them at once.</p>
+<h2 id="a-scene-is-a-project-never-a-harness" tabindex="-1">A scene is a project, never a harness</h2>
+<p>Three Rovo CLI terminals open on the same repository are three characters in <strong>one</strong> room.
+A Claude Code session in that repository joins them. The harness an agent came from is a
+<em>costume</em> — a coat colour and a glyph on the name tag — not a building.</p>
+<p>Worktrees and branches of one repository collapse into the same room too, because what
+identifies a room is the remote. Which branch somebody is on shows up as a detail on that
+character instead.</p>
+<h2 id="the-demo-office-says-no-politely" tabindex="-1">The demo office says no, politely</h2>
+<p><code>TEST-0000</code> is shared with everybody and its scenes are authored, so it is not a room to
+point at your own agents. Rather than refusing, it redirects: the row at the foot of the
+dropdown reads <strong>Open your own office</strong> and cuts you a fresh keycard, and the source
+picker shows all the harnesses but disables the ones needing an adapter, with the same
+offer as a link.</p>
+<p>A control that would not have meant anything is turned into the one that does, instead of
+being left there to be clicked at.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#a-keycard-is-the-whole-address">A keycard is the whole address</a></li>
+<li><a href="#click-the-keycard">Click the keycard</a></li>
+<li><a href="#reception">Reception</a></li>
+<li><a href="#scenes-one-office-several-rooms">Scenes: one office, several rooms</a></li>
+<li><a href="#a-scene-is-a-project-never-a-harness">A scene is a project, never a harness</a></li>
+<li><a href="#the-demo-office-says-no-politely">The demo office says no, politely</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

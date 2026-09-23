@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Visual assets and their rights — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html" aria-current="page">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="visual-assets-source-and-release-basis" tabindex="-1">Visual assets: source and release basis</h1>
+<p>Every visual asset that ships with The Roving Office, where it came from, and on what
+basis it is published. Some of them are other companies' brand assets that this project's
+code licence does not and cannot cover; those are named again in
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/NOTICE"><code>NOTICE</code></a>, which is the short, legally operative version. This page is the
+longer one, for whoever is changing an asset.</p>
+<p><strong>Read the split first, because it is the whole point.</strong> The code is under the Apache
+License 2.0 (<a href="https://github.com/atlassian-labs/roving-office/blob/main/LICENSE"><code>LICENSE</code></a>), whose section 2 grants downstream recipients the
+right to reproduce, prepare derivative works of and distribute the work — a right this
+project holds in its own code and does <em>not</em> hold in another company's logo. Section 6
+disclaims trademarks, but it does not disclaim copyright in artwork, so an asset the
+project may <em>use</em> but may not <em>sublicense</em> has to be excluded explicitly rather than left
+to be inferred. That is what the carve-out in <code>NOTICE</code> is for.</p>
+<p>Machine-readable provenance, per-file hashes and per-distribution scope live in
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/third-party/components.json"><code>third-party/components.json</code></a> and the generated
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/third-party/inventory.json"><code>third-party/inventory.json</code></a>. Licence texts that must
+travel with a copy are in <a href="https://github.com/atlassian-labs/roving-office/blob/main/THIRD_PARTY_NOTICES.txt"><code>THIRD_PARTY_NOTICES.txt</code></a> and
+<code>vendor/</code>. This page is the human-readable index over the same facts.</p>
+<hr>
+<h2 id="1-covered-by-the-projects-own-licence" tabindex="-1">1. Covered by the project's own licence</h2>
+<p>First-party work. Authored for this project, owned by Atlassian as the releasing entity,
+and published under Apache-2.0 like the rest of the tree.</p>
+<table>
+<thead>
+<tr>
+<th>Asset</th>
+<th>Where</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Project logo and icon set</td>
+<td><code>assets/logo.png</code>, <code>assets/logo-256.png</code>, <code>assets/logo-64.png</code>, <code>assets/icon-512.png</code>, <code>assets/icon-192.png</code>, <code>assets/apple-touch-icon.png</code>, <code>favicon.ico</code></td>
+<td>An isometric cutaway office in a rounded-hex silhouette. Cut from the scene's own render — the method is in <a href="developing.html">Developing on it</a></td>
+</tr>
+<tr>
+<td>Spot illustrations</td>
+<td><code>assets/airmail.svg</code>, <code>assets/arrivals.svg</code>, <code>assets/breather.svg</code>, <code>assets/curiosity.svg</code></td>
+<td>Hand-authored flat illustrations: a paper plane, a reception scene, a mug, a telescope</td>
+</tr>
+<tr>
+<td>UI theme</td>
+<td><code>assets/ui-theme.css</code></td>
+<td>Hand-authored CSS custom properties. Its colour values come from <code>@atlaskit/tokens</code> — see §4</td>
+</tr>
+<tr>
+<td>In-house source glyphs</td>
+<td><code>src/ui/marks.js</code> — <code>cursorMark</code>, <code>testDataMark</code>, <code>plusMark</code></td>
+<td>Original geometry: a cursor chevron, a die, a plus. Not any vendor's logo. Cursor's tile is deliberately an original glyph rather than Cursor's mark</td>
+</tr>
+<tr>
+<td>The room, and every prop in it</td>
+<td><code>src/scene/</code>, <code>src/plan/</code></td>
+<td>Original geometry, apart from the two brand-mark standees in §3</td>
+</tr>
+<tr>
+<td>Scene renders and screenshots</td>
+<td><code>docs/images/**</code></td>
+<td>Own renders and own screenshots — except the four in §5, which reproduce a mark</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-third-party-artwork-under-a-licence-that-permits-redistribution" tabindex="-1">2. Third-party artwork under a licence that permits redistribution</h2>
+<p>One asset. It is the only third-party mark in the tree that ships on an actual grant
+rather than on an approval.</p>
+<table>
+<thead>
+<tr>
+<th>Asset</th>
+<th>Where</th>
+<th>Source</th>
+<th>Release basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenClaw lobster mascot</td>
+<td><code>src/ui/marks.js</code> — <code>openclawMark</code></td>
+<td><code>openclaw/openclaw</code> at tag <code>v2026.9.3</code>, <code>ui/public/favicon.svg</code></td>
+<td><strong>MIT</strong>, &quot;Copyright (c) 2026 OpenClaw Foundation&quot;. The licence grants <em>&quot;use, copy, modify, merge, publish, distribute, sublicense&quot;</em>, and requires the notice to travel with the copy — it does, in <code>THIRD_PARTY_NOTICES.txt</code>. Details and two evidence caveats in <a href="https://github.com/atlassian-labs/roving-office/blob/main/vendor/openclaw/README.md"><code>vendor/openclaw/README.md</code></a></td>
+</tr>
+</tbody>
+</table>
+<p>The lobster remains the OpenClaw Foundation's mark. MIT grants copyright permission, not
+trademark permission, and it is used here only to identify the corresponding product.</p>
+<h2 id="3-brand-assets-excluded-from-the-apache-20-grant" tabindex="-1">3. Brand assets — <strong>excluded from the Apache-2.0 grant</strong></h2>
+<p>These are trademarks reproduced to identify a product the office can connect to. The
+project may use them; it cannot pass on the right to redistribute them. <strong>They are
+therefore excluded from the Apache-2.0 grant and individually named in
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/NOTICE"><code>NOTICE</code></a>.</strong> Anyone forking this repository needs their own permission.</p>
+<p><strong>A copy and a modification are different things here, and which one an asset is decides
+what a sign-off has to name.</strong> The Claude Spark and the OpenAI Blossom picker tiles are
+their owners' own official published assets, copied path for path, with no recolouring and
+no rescaling. The Blossom's <code>viewBox</code> is trimmed to the bounds of its own artwork, which
+discards empty canvas the published file carries and moves no ink relative to any other
+ink; it is the same mark at a size that matches the ones beside it. Everything else in
+this section is a modification rather than a copy — the Rovo picker tile and the Rovo
+standee are one mark traced into flat polygons and then extruded into a solid, and the
+Jira logomark is a mark lifted out of an attribution lockup.</p>
+<table>
+<thead>
+<tr>
+<th>Asset</th>
+<th>Where</th>
+<th>Source</th>
+<th>Release basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Rovo logomark</strong> (picker tile)</td>
+<td><code>src/ui/marks.js</code> — <code>rovoMark</code>, built from <code>ROVO_SHAPES</code> in <code>src/rovo-mark.js</code></td>
+<td>Atlassian's own Rovo mark: the four-facet hexagon in four Atlassian brand colours (<code>#1868db</code>, <code>#bf63f3</code>, <code>#fca700</code>, <code>#82b536</code>). The polygon geometry is the very points the standee below is extruded from, turned into 2D SVG paths, so the tile and the statue are one artwork and cannot drift apart</td>
+<td>Approved by Atlassian Brand for use in this repository. Excluded from the grant</td>
+</tr>
+<tr>
+<td><strong>Rovo logomark standee</strong></td>
+<td><code>src/rovo-mark.js</code> — <code>ROVO_SHAPES</code>, extruded by <code>src/scene/standees.js</code>; portrait at <code>docs/images/objects/rovoLogo.png</code></td>
+<td>The same mark, flattened one polygon per facet for extrusion. The same polygons are the picker tile in the row above</td>
+<td>Approved by Atlassian Brand, covering the 3D extrusion. Excluded from the grant</td>
+</tr>
+<tr>
+<td><strong>Atlassian logo standee</strong></td>
+<td><code>src/scene/standees.js</code> — <code>ACE_SHAPES</code>; portrait at <code>docs/images/objects/aceLogo.png</code></td>
+<td>Atlassian logo kit, <code>Atlassian/Atlassian Mark/SVG/Atlassian mark brand RGB.svg</code>, from <a href="https://atlassian.design/">https://atlassian.design/</a></td>
+<td>Approved by Atlassian Brand, covering the 3D extrusion. Excluded from the grant</td>
+</tr>
+<tr>
+<td><strong>Jira logomark</strong> on the kanban board texture</td>
+<td><code>src/scene/kanban.js</code> — <code>KB_LOGO_GLYPH_D</code>; portrait at <code>docs/images/objects/kanbanBoard.png</code></td>
+<td>Jira attribution kit, <code>jira attribution/SVG/Jira_attribution_dark.svg</code>, from <a href="https://atlassian.design/">https://atlassian.design/</a></td>
+<td>Approved by Atlassian Brand. Excluded from the grant</td>
+</tr>
+<tr>
+<td><strong>Claude Spark</strong> (picker tile)</td>
+<td><code>src/ui/marks.js</code> — <code>claudeMark</code></td>
+<td>Anthropic press kit, <code>Claude logos/3 Claude Spark/SVG/Claude Spark - Clay.svg</code>, from <a href="https://www.anthropic.com/press-kit">https://www.anthropic.com/press-kit</a></td>
+<td><strong>No permission from Anthropic is held.</strong> Retained on the project owner's decision, accepting that a take-down request would be complied with. Excluded from the grant</td>
+</tr>
+<tr>
+<td><strong>OpenAI Blossom</strong> (picker tile, standing in for Codex)</td>
+<td><code>src/ui/marks.js</code> — <code>codexMark</code></td>
+<td>OpenAI logo kit, <code>OpenAI-logos/SVGs/OAI_OpenAI-Blossom_Black.svg</code>, from <a href="https://openai.com/brand">https://openai.com/brand</a></td>
+<td><strong>No permission from OpenAI is held.</strong> Retained on the same basis as the Spark. Excluded from the grant</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The last two rows mean what they say.</strong> Anthropic's and OpenAI's brand guidelines are
+approval-first: neither grants an affirmative licence to redistribute a mark, and a
+permission that was granted could not be passed downstream anyway. Both vendors expressly
+permit the product <em>name</em> in plain text, so <strong>a text label is the working fallback</strong> — if
+a take-down request arrives, replace the mark with the name and nothing else changes.</p>
+<p>For each owner's own usage guidance:</p>
+<ul>
+<li><strong>Atlassian</strong> — <a href="https://atlassian.design/foundations/logos">https://atlassian.design/foundations/logos</a> and
+<a href="https://www.atlassian.com/legal/trademark">https://www.atlassian.com/legal/trademark</a></li>
+<li><strong>Anthropic</strong> — <a href="https://www.anthropic.com/legal/trademark-guidelines">https://www.anthropic.com/legal/trademark-guidelines</a></li>
+<li><strong>OpenAI</strong> — <a href="https://openai.com/brand">https://openai.com/brand</a></li>
+<li><strong>OpenClaw</strong> — no brand guidance is published; the licence in §2 is the whole basis</li>
+</ul>
+<p>Product names — Rovo CLI, Claude Code, Codex, Cursor, OpenClaw — are used throughout the
+UI and the documentation to say which agent an office can listen to, and nothing more.</p>
+<h2 id="4-third-party-non-artwork-with-a-notice-obligation" tabindex="-1">4. Third-party non-artwork with a notice obligation</h2>
+<table>
+<thead>
+<tr>
+<th>Asset</th>
+<th>Where</th>
+<th>Source</th>
+<th>Release basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inter (Latin subset)</td>
+<td><code>assets/Inter-latin.woff2</code>, <code>docs/site/assets/Inter-latin.woff2</code></td>
+<td>Inter 4.1</td>
+<td><strong>OFL-1.1</strong>. <a href="https://github.com/atlassian-labs/roving-office/blob/main/vendor/inter/"><code>vendor/inter/</code></a></td>
+</tr>
+<tr>
+<td>JetBrains Mono (Latin subset)</td>
+<td><code>assets/JetBrainsMono-latin.woff2</code>, <code>docs/site/assets/JetBrainsMono-latin.woff2</code></td>
+<td>JetBrains Mono 2.304</td>
+<td><strong>OFL-1.1</strong>. <a href="https://github.com/atlassian-labs/roving-office/blob/main/vendor/jetbrains-mono/"><code>vendor/jetbrains-mono/</code></a></td>
+</tr>
+<tr>
+<td>Atlassian Design System tokens</td>
+<td>colour values in <code>assets/ui-theme.css</code></td>
+<td><code>@atlaskit/tokens</code> 16.11.3</td>
+<td><strong>Apache-2.0</strong>. Nothing from the package is bundled — only its colour values were transcribed. <a href="https://github.com/atlassian-labs/roving-office/blob/main/vendor/atlaskit-tokens/"><code>vendor/atlaskit-tokens/</code></a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-images-that-reproduce-a-mark" tabindex="-1">5. Images that reproduce a mark</h2>
+<p>Renders and screenshots inherit the basis of whatever they depict, so these four are
+tracked against the assets in §3 rather than as first-party artwork. <strong>Regenerate them
+whenever a mark or a standee changes</strong>, and note the object portraits are runtime app
+assets as well as documentation: <code>src/editor/kit-menu.js</code> fetches them live for the
+editor's add-item menu.</p>
+<table>
+<thead>
+<tr>
+<th>Image</th>
+<th>What it reproduces</th>
+<th>How to regenerate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docs/images/panels/source-picker.png</code></td>
+<td>All five picker marks at once</td>
+<td>Screenshot the picker; see <a href="developing.html">Developing on it</a> on harness pages</td>
+</tr>
+<tr>
+<td><code>docs/images/objects/rovoLogo.png</code></td>
+<td>The Rovo standee</td>
+<td><code>npm run portrait -- --id=rovoLogo</code></td>
+</tr>
+<tr>
+<td><code>docs/images/objects/aceLogo.png</code></td>
+<td>The Atlassian logo standee</td>
+<td><code>npm run portrait -- --id=aceLogo</code></td>
+</tr>
+<tr>
+<td><code>docs/images/objects/kanbanBoard.png</code></td>
+<td>The Jira logomark</td>
+<td><code>npm run portrait -- --id=kanbanBoard</code></td>
+</tr>
+</tbody>
+</table>
+<p>The scene renders under <code>docs/images/{looks,looks2,looks3,variety,maps,buildings,generated}/</code>
+are a separate question, because <code>src/scene/props.js</code> puts both standees on a window sill
+and so an interior render can contain one. Screening them all for the standees' own facet
+colours finds them at a handful of pixels each, behind sill planting, never legible as a
+mark — so they are treated as first-party renders. Re-screen after any standee change
+rather than assuming that holds.</p>
+<h2 id="6-not-shipped" tabindex="-1">6. Not shipped</h2>
+<p>Recorded so the question does not have to be re-asked.</p>
+<ul>
+<li><strong><code>inspo/</code></strong> — art-direction reference material. Gitignored, excluded again by
+<code>.dockerignore</code>, and tracked in no distribution.</li>
+<li><strong>User-uploaded avatars</strong> — supplied by an operator at runtime and served back to their
+own office. Not a project asset; covered by the hosted service's own terms.</li>
+<li><strong><code>vendor/three/</code>, <code>vendor/color-name-list/</code></strong> — code, not artwork. See
+<code>third-party/inventory.json</code>.</li>
+</ul>
+<hr>
+<h2 id="adding-or-changing-a-visual-asset" tabindex="-1">Adding or changing a visual asset</h2>
+<ol>
+<li><strong>Establish where it came from</strong> before it lands, and record it — an asset whose
+provenance is a source comment is an asset somebody has to research again later. Two
+of the marks above were once byte-verified copies taken from a stock icon site whose
+terms forbid redistribution, and the comment beside them said, accurately, that
+commercial use was permitted. Accurate and insufficient.</li>
+<li><strong>Take vendor artwork from the vendor</strong>, not from an icon site or a search result, and
+copy it unaltered. Most owners require exactly that, and a recolour to suit a panel is
+the alteration their guidance names.</li>
+<li><strong>Add a row to <code>third-party/components.json</code></strong> with its source, its release basis and
+the distributions it reaches, then run <code>node bin/gen-third-party.mjs</code>. <code>npm test</code>
+fails if the generated inventory and notices have drifted.</li>
+<li><strong>If a licence requires its notice to travel</strong>, vendor the licence text under
+<code>vendor/&lt;name&gt;/LICENSE</code> with a <code>README.md</code> recording the version and the exact source,
+and set <code>runtimeNotice: true</code> on the row.</li>
+<li><strong>If it is somebody else's brand asset</strong>, add it to §3 above <em>and</em> to
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/NOTICE"><code>NOTICE</code></a>. It is excluded from the Apache-2.0 grant, and the exclusion
+has to be written down to exist.</li>
+<li><strong>Regenerate any image that reproduces it</strong> — §5 is the list, and the rule is the same
+for a new one.</li>
+</ol>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#1-covered-by-the-projects-own-licence">1. Covered by the project's own licence</a></li>
+<li><a href="#2-third-party-artwork-under-a-licence-that-permits-redistribution">2. Third-party artwork under a licence that permits redistribution</a></li>
+<li><a href="#3-brand-assets-excluded-from-the-apache-20-grant">3. Brand assets — excluded from the Apache-2.0 grant</a></li>
+<li><a href="#4-third-party-non-artwork-with-a-notice-obligation">4. Third-party non-artwork with a notice obligation</a></li>
+<li><a href="#5-images-that-reproduce-a-mark">5. Images that reproduce a mark</a></li>
+<li><a href="#6-not-shipped">6. Not shipped</a></li>
+<li><a href="#adding-or-changing-a-visual-asset">Adding or changing a visual asset</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

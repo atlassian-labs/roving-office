@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The furniture editor — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html" aria-current="page">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="the-furniture-editor" tabindex="-1">The furniture editor</h1>
+<p><em>The seams, the algorithms and the file format. How to <strong>use</strong> it is
+<a href="../user/rearranging-furniture.html">rearranging the furniture</a>, which this page assumes you
+have read.</em></p>
+<h2 id="why-it-is-only-a-few-hundred-lines" tabindex="-1">Why it is only a few hundred lines</h2>
+<p>Because the room was already built to be moved. The layout lives in exactly one place
+(<code>src/layout.js</code>), every prop is already a single <code>THREE.Group</code> standing at its station
+coordinate, and the nav grid already derives itself from <code>obstacleFootprints()</code> in one
+cheap pass. So &quot;drag a desk and the paths adjust&quot; is really three steps:</p>
+<pre><code>move the group  -&gt;  write the number back into the layout  -&gt;  rebuild the grid
+</code></pre>
+<p>The work was never in the dragging. It was in the seams — the handful of values that
+used to be computed once at import and then baked, which had to become things that could
+be computed again.</p>
+<h2 id="which-keys-the-editor-dispatches-itself" tabindex="-1">Which keys the editor dispatches itself</h2>
+<p>Several of those bindings are dispatched by the editor rather than by the shortcut
+registry, and are registered with it for documentation only. <strong>⌘Z</strong> cannot go through the
+registry because the registry deliberately ignores anything held with ⌘, ctrl or alt so
+that browser and OS shortcuts keep working — and <strong>⌘D</strong> is dispatched beside it for the
+same reason. <strong>[</strong>, <strong>]</strong>, <strong>⌫</strong> and the arrows are only meaningful with something
+selected in a mode that is usually off, so binding them globally would put dead keys in
+the <strong>?</strong> panel.</p>
+<h3 id="the-add-item-menu" tabindex="-1">The Add-item menu</h3>
+<p>The key-to-portrait map is the one part of this somebody has to keep in step, because
+kit keys and catalogue ids only mostly agree — <code>desk:standing</code> is photographed as
+<code>standingDesk</code>, the coffee machine as <code>espressoMachine</code>, <code>plant:bush</code> as <code>leafyBush</code>.
+A missing picture costs a blank tile and nothing else, so <code>test/kit-portraits.test.js</code>
+insists every offered kind has one <em>and</em> that the file it names exists: a wrong name is
+invisible to review and <code>snakePlant</code> and <code>snake</code> are both plausible.</p>
+<p><strong>Grouped by the job, not by the family.</strong> A kind's own <code>roles</code> put it in a section, so
+a new kind lands in the right place with nothing else edited — give a telescope
+<code>roles: ['research']</code> and it appears under Research. That also fixes a class of bug by
+construction: the old picker matched keys against a fixed table and <em>dropped whatever it
+could not place</em>, which is how a standing desk once went missing from the menu entirely.
+A catch-all section last means nothing can fall through, and a test insists on it.</p>
+<p><strong>The sheet is parented to <code>document.body</code>.</strong> Not a style choice: <code>.dev-panel-body</code> sets
+<code>overflow: clip</code>, and load-bearingly so — it is what hides the divider a paired group
+wears when the group falls first on its line. A sheet inside the panel is therefore
+clipped to a strip an inch tall. CSS will not let one axis clip while the other is
+visible, so escaping the box is the only way out, and the position is computed from the
+trigger's own rect each time it opens.</p>
+<p>It also gets the keyboard right by construction, which the <code>&lt;select&gt;</code> did not: a select
+keeps focus after a choice and the editor's key handler stands aside for form fields, so
+the piece you had just added was selected in the room and deaf to <code>Del</code>, <code>[</code>, <code>]</code> and
+the arrows until you clicked elsewhere.</p>
+<h3 id="what-the-panel-asks-the-layout" tabindex="-1">What the panel asks the layout</h3>
+<p>The layout answers the questions behind all of it — <code>canTurnObject</code>, <code>canRemoveObject</code>
+and <code>kitKeyOf</code> — so the panel never learns what a rug is.</p>
+<h2 id="keeping-the-room-running-through-a-drop" tabindex="-1">Keeping the room running through a drop</h2>
+<p>Nothing is paused while the room is rearranged around the people in it, and keeping
+that honest is <code>AgentManager.relayout()</code>, called once per accepted drop, and the
+order inside it matters:</p>
+<ol>
+<li><strong>The walkable map is rebuilt first</strong>, because the re-planning below asks it for routes.</li>
+<li><strong>Everybody sitting is re-seated</strong> — snapped to where their seat <em>now is</em>, rather than
+shifted by however far the prop moved, which is also right for a desk that was turned
+as well as moved. Without this an occupant stays behind, sitting on thin air, while
+their chair walks off across the room.</li>
+<li><strong>Every walker's route is recomputed</strong>, from the position they have just been put in.</li>
+</ol>
+<p>It returns how many walkers were left with no route at all. Zero is the normal answer;
+anything else is a layout that has fenced somebody in.</p>
+<h3 id="only-what-this-change-broke" tabindex="-1">Only what <em>this</em> change broke</h3>
+<p>Every refusal the panel reports is about the piece in hand. That is easy to state and was, for the
+reachability check, not true — and the way it failed is worth knowing, because it made
+the editor look like it had run out of floor.</p>
+<p>The check used to report the first standing place it could not reach, whoever owned it.
+So a room that already had one — imported, hand-edited, or saved before a station
+existed — reported that same fault against every candidate position of everything
+anybody added or moved afterwards, and refused all of it with <em>&quot;Nowhere in the room to
+put that&quot;</em>. Permanently, and while blaming whatever was in hand.</p>
+<p>Adding a <strong>rug</strong> was the tell. A rug's footprint is soft, so it blocks nothing and can
+strand nobody; a rug that cannot be added is proof the answer was never about the rug.</p>
+<p>So a gesture now takes a baseline first — which standing places nobody can reach <em>before</em>
+it starts — and reports only what it newly breaks. Three consequences worth knowing:</p>
+<ul>
+<li>A room with a stranded station can still be edited, which is the only way anybody could
+fix such a room by hand. The offending prop can be dragged out even though it is
+standing on the fault.</li>
+<li>A piece that blocks nothing skips the reachability check entirely. Not a shortcut: the
+nav grid ignores soft rectangles when it is built, so the answer cannot differ.</li>
+<li>The baseline is measured at the <em>start</em> of a gesture, never per position. Measure it
+mid-drag and it would quietly forgive the very fault being checked for.</li>
+</ul>
+<p>A room that is already stranded says so in the status line when you open edit mode,
+because it no longer announces itself by everything mysteriously failing.</p>
+<h2 id="the-overlays-are-chrome-not-scenery" tabindex="-1">The overlays are chrome, not scenery</h2>
+<p>The five overlays are chrome rather than scenery, so none of them is themed, none casts or
+receives shadow, and each sits at a different height above the floor and rugs. Coplanar overlays z-fight, which is exactly what <a href="coplanar-probe.html">the
+coplanar probe</a> exists to catch. The two ribbons get a rung each for a
+reason that shows up constantly in practice: people walk back the way they came, so a
+route crosses its own history all the time.</p>
+<p>Footprint and walking-area cells use solid Atlassian palette colours with
+<code>toneMapped: false</code>. Their legend uses those same sRGB values: neither sunlight,
+renderer exposure nor the floor beneath can tint them. Routes use bolder green and
+blue and sit above <code>CHROME_HEIGHTS.ring</code>, including where a selection crosses a rug.
+The history ribbon still fades with age.</p>
+<h3 id="why-the-ribbons-are-rebuilt-every-frame" tabindex="-1">Why the ribbons are rebuilt every frame</h3>
+<p>They are redrawn from scratch once a frame while edit mode is open, rather than when
+something changes. That is the cheaper thing to <em>reason about</em> and it costs nothing that
+matters — a few dozen vertex writes into buffers allocated once.</p>
+<p>It is also the only version that is reliably correct, because a route changes far more
+often than the layout does: on every step of ordinary walking, when a walker steps round
+a colleague, when an action list is interrupted, and when an accepted drop re-plans the
+room. A redraw that has to be <em>told</em> about each of those is a redraw that will one day
+miss one, and a stale ribbon is worse than no ribbon — it points confidently at somewhere
+nobody is going.</p>
+<p>The one thing they do not do is preview. The ribbons are drawn from the live walkable
+map, not the throwaway grid used to vet a drag, so they move when you release rather than
+under the cursor. Until a drop is accepted nobody has been asked to walk anywhere new,
+and showing otherwise would be showing a room that is about to be undone.</p>
+<h2 id="where-a-layout-lives" tabindex="-1">Where a layout lives</h2>
+<p>A layout belongs to a <strong>scene</strong>, next to that scene's season and building, and is stored
+on the server the same way they are: an opaque blob on the scene record, PATCHed to
+<code>/office/&lt;keycard&gt;/api/scenes/&lt;id&gt;</code> and handed back to whoever opens the office next. The
+browser owns its meaning — the store keeps it whole, reads none of it, and enforces only
+a size cap, because <code>src/layout.js</code> already versions a blob, clamps a prop back into the
+room and forgives what it cannot understand, and a second opinion on the server would be
+one more thing to keep in step.</p>
+<p>Saving is <strong>debounced by half a second</strong> and fire-and-forget. A commit is cheap and
+frequent — every drop, every add, every undo — and a PATCH is neither, so nudging a desk
+into place is one save rather than nine. Nothing waits on it and nothing reports it: the
+room on screen is already right, so a failed save costs the <em>next</em> visitor the
+arrangement rather than this one, and there is no useful thing to say to somebody in the
+middle of moving a chair.</p>
+<p><strong>A scene nobody has rearranged has no layout stored, and gets the authored one back.</strong>
+That is a change from when the layout was a session-long singleton that followed you from
+room to room. It had to change: now that an edit is kept, carrying it into the next scene
+would mean opening a room and finding somebody else's furniture in it. Laying one room
+out and looking at it in another building is still there, one keystroke further away —
+<strong>Copy</strong> in the first, <strong>Paste</strong> in the second — or <strong>Download</strong> and a drop, if it is going
+further than one machine — which is the same blob travelling by hand instead of by
+accident.</p>
+<p><strong>Reset</strong> stores the authored layout rather than clearing the field. The distinction only
+shows up in the store, and both mean the same room.</p>
+<h3 id="it-moves-under-everyone-at-once" tabindex="-1">It moves under everyone at once</h3>
+<p>A scene change is pushed to every other tab watching that office, over an SSE stream of
+its own at <code>/office/&lt;keycard&gt;/api/stream</code>. Its own stream rather than the AOP bus, because
+that one carries <em>agent</em> events — a ring buffer, filtered by harness, replayed to rebuild
+a session somebody missed — and a layout edit is none of those things. Putting it through
+the bus would surface a moved desk in an agent's event log and then age it out of a buffer
+sized for tool calls.</p>
+<p>A tab is never told about its own edit. That is not only to save a pointless round trip:
+a tab that has already moved on to its next change would be dragged back to the previous
+one by its own echo. Each tab names itself with <code>?viewer=</code> on both its subscription and
+its change, and the broadcast skips it.</p>
+<p><strong>That id is per page load, not per browser session, and the difference is the whole
+feature.</strong> A browser copies <code>sessionStorage</code> into a tab duplicated from another — which
+is how anybody actually opens a second tab — so the id used for presence is <em>shared</em>
+between the two tabs you are looking at. Suppression on a shared id skips both of them,
+and two tabs side by side fall silent in both directions rather than one missing out.
+So <code>office.js</code> keeps two: <code>viewerId</code>, stored and stable across a reload, for counting
+who is in the room; and <code>connectionId</code>, never stored, minted once per page load, for
+telling two tabs apart. <code>test/office-identity.test.js</code> pins the pair by loading the
+module twice over one storage.</p>
+<ul>
+<li><strong><code>src/layout.js</code> itself</strong> is untouched. A stored layout is what an office is <em>showing</em>;
+the authored layout is what a fresh scene <em>starts from</em>, and <strong>Copy</strong> into the source
+is still how a room becomes the one everybody gets.</li>
+</ul>
+<h3 id="six-rugs-and-six-sofas" tabindex="-1">Six rugs, and six sofas</h3>
+<p>Three kinds have a choice about how they look. <code>RUG_COLORS</code> in <code>config.js</code> holds six for
+the floor — sage, clay, sand, slate, plum and ink — and <code>SOFA_COLORS</code> holds six for the
+upholstery, shared by the couch and the armchair: terracotta, moss, navy, mustard,
+charcoal and blush. The panel draws them as swatches rather than as a list of names,
+because the thing being chosen is a colour and &quot;Plum&quot; is a word you have to picture.</p>
+<p><strong>Auto</strong> is the absence of a choice rather than a colour, and it is what everything
+starts as. <code>COLORS.rugSage</code> and <code>COLORS.couch</code> are both part of the theme and the projects
+repaint them, so a room nobody has asked goes on following its scene and its season. What
+that means for the reader is in
+<a href="../user/rearranging-furniture.html#six-rugs-and-six-sofas">rearranging the furniture</a>.</p>
+<p><strong>What is not chosen is derived.</strong> A rug's border is its body a shade darker. A sofa's
+seat cushions are its body lifted toward white, and the cushion at your back is the
+accent named beside that colour in <code>SOFA_COLORS</code> — moss wants ochre and navy wants clay,
+which is a judgement rather than a hue rotation, so the pairs are written down.</p>
+<p>Both of those replaced literals that had come adrift. The rug's border was a fixed sage
+green beside a body colour the theme was free to change, so a room on a slate palette got
+a slate rug with a green edge. The sofa's seat cushions were a fixed terracotta under a
+body colour three of the four projects repaint — so the green velvet couch in the Paris
+scene sat on cushions off a different sofa entirely. Six choosable colours apiece would
+have been six more chances to have each of those arguments.</p>
+<h3 id="where-a-new-piece-lands" tabindex="-1">Where a new piece lands</h3>
+<p>Nowhere you chose, which is the one compromise in it: asking for a position would need a
+click, and a click in this mode already selects. So the floor is swept instead, nearest the
+middle first, at each quarter turn the piece has, and the piece goes in at the first spot the
+drop check accepts — the same check a drag is held to, so nothing can arrive somewhere a
+drag could not have put it. Then you drag it where you meant.</p>
+<p>Five details are worth knowing, because each was wrong at some point and pressing the
+button is what found them.</p>
+<p><strong>A piece gets turned if that is what fits.</strong> Only a piece with a front is offered the
+four headings; a lamp or a plant would be the same position tried four times.</p>
+<p><strong>The sweep runs coarse then fine</strong> — a one-unit lattice, then half that, then the snap
+itself — because the difference between &quot;nowhere for another desk&quot; and one that slots in
+against a wall can be a fraction of a unit. It used to stop at half a unit while drags
+landed on multiples of the quarter-unit snap, so there were positions you could put a
+piece with the mouse that <strong>Add</strong> could never find. Going all the way down to the snap
+costs about four times the candidates: measured on the authored room, a search that
+finds nowhere goes from 58 ms to 136 ms.</p>
+<p><strong>A piece is never offered a position it could not fit in.</strong> The sweep knows the piece's
+own half-extents, so it skips anywhere the piece would hang off the floor rather than
+generating the position and having the drop check refuse it. This mattered most for the
+rug, which at 9 by 7 can only have its centre inside x 4.5–21.5, z 3.5–16.5 — four
+candidates in seven were being made only to be thrown away.</p>
+<p><strong>Delete a desk, add a desk, and it goes back in the hole.</strong> The sweep tries the spot the
+last deletion left before it tries the lattice at all. Without that it hunted outwards
+from the middle of the room and could easily report there was nowhere — the floor was
+provably free, since a desk had been standing on it a moment earlier, but the hole was
+often not on the lattice: a desk dragged to 1.75 sits between the cells of every pass.
+The offer is still only a suggestion, held to the same checks as any other candidate, so
+deleting a side table and adding a couch does not wedge the couch into the gap.</p>
+<p><strong>One piece is brought in and then moved</strong>, rather than a fresh one made and unmade at each
+candidate, and that is the fix for a bug that made <strong>Add</strong> look broken: it would place a
+piece in one spot and then insist there was nowhere for another. Ids count <em>past</em> what
+exists rather than into gaps, so every one of those short-lived records was called <code>desk-6</code>
+— and the props layer, matching by name, kept the prop it had already built for the first
+one. That prop stayed where the first candidate put it, reading a record nothing would ever
+write to again, and reported <em>its</em> seat and standing room for every position tried
+afterwards. So the room answered every later candidate with the geometry of the first, and
+refused it. Moving one piece is what dragging does, and it cannot go stale; the props layer
+also now compares the record rather than the name, so an impostor is rebuilt (<code>syncProps</code>).</p>
+<p>Measured on the stock room, with the props actually built: each of the next seven desks is
+found in 5–25 ms, and a room with no room left says so in about 20.</p>
+<p>That last case is real rather than a bug to chase. Twelve desks, a couch, a rug and seven
+stations with walkable standing room at each is about what 26 by 19 units holds; the
+thirteenth desk is refused because every position at every facing either overlaps something,
+leaves its own standing room unstandable, or walls something off.</p>
+<h2 id="how-many-of-a-thing-the-room-may-have" tabindex="-1">How many of a thing the room may have</h2>
+<p>Furniture can be added and deleted, and the interesting question is not how but <em>how
+many</em>. It used to have an answer nobody had written: <code>STATIONS</code> was a keyed object, one
+entry per kind, so &quot;one mailbox&quot; was not a rule but a consequence of a mailbox being a
+<em>key</em> — and &quot;five desks&quot; was a five-entry array that everything downstream iterated, so
+five was never a limit at all, only what the room was authored with.</p>
+<p>Both are now written down in the kind tables in <code>src/layout.js</code>, because the editor has
+to be able to ask. The limits themselves are tabulated in
+<a href="../user/rearranging-furniture.html#how-many-of-a-thing-the-room-may-have">rearranging the furniture</a>.</p>
+<h3 id="the-minimum-is-a-job-not-a-kind" tabindex="-1">The minimum is a job, not a kind</h3>
+<p>The maximum is a question about props. The minimum is a question about <strong>work</strong>, and
+it was asked the wrong way for a long time:
+the last of <em>every kind</em> of station was undeletable, so the room insisted on keeping a
+printer that has nothing to do — while a second bookshelf quietly made the first one
+disposable. The rule was never &quot;the office needs a bookshelf&quot; but &quot;the office needs one
+of each kind it happens to own&quot;, which is nobody's decision. It is the same shape as the
+maximum problem above, one layer down.</p>
+<p>So a station kind declares what it is <em>for</em>, and the room keeps whatever it needs to be
+able to do those jobs. Which four are required, and which two are optional, is
+<a href="../user/rearranging-furniture.html#the-minimum-is-a-job-not-a-kind">tabulated for the reader</a>.</p>
+<p>What that changes in practice:</p>
+<ul>
+<li><strong>The bin, the machines and the inbox can all be deleted</strong>, none of which was true
+before. The inbox can go because the post can also be collected from. The printer was
+on this list too until it was given
+both of the post's jobs — so it is now kept for the same reason anything is, and the
+<em>mailbox</em> became deletable in its place.</li>
+<li><strong>A second of anything frees the first</strong>, which is the rule the reader is given.</li>
+<li><strong>A new kind can cover an existing job with no rule changing.</strong> This one has since
+happened: the telescope, added later,
+looks things up out of the window, and the bookshelf became optional the day it landed
+— with no rule anywhere hearing the word &quot;telescope&quot;. It was a prop, a role and a
+placement, and the paragraph that predicted it needed no edit.</li>
+<li><strong>A refusal names the job.</strong> <em>&quot;The office needs somewhere to deliver finished work&quot;</em>,
+not &quot;the office needs its Mailbox&quot; — which read as arbitrary because it was.</li>
+</ul>
+<p><code>canRemoveObject()</code> is still the one place that decides, and both the <strong>⌫</strong> key and the
+pruning half of an imported layout go through it — so a blob cannot do by omission what
+the editor would refuse on a keypress. See <a href="../user/concepts.html">the jobs system</a> for the
+concepts behind the roles.</p>
+<h3 id="the-headcount-is-the-desk-count" tabindex="-1">The headcount is the desk count</h3>
+<p>One desk, one agent thread, and now literally: <code>agentCapacity()</code> returns <code>DESKS.length</code>
+and the simulation asks it afresh each time somebody is due to arrive. Add a desk in the
+editor and somebody files in to sit at it; delete one and the room drains to its new size
+as shifts end, rather than keeping a crowd standing.</p>
+<p>This used to be a <code>maxAgents: 5</code> written beside each project in <code>src/projects.js</code>, next to
+a desk list that happened to be five long, with nothing keeping the two in step. It is
+gone. What a project still says is <code>startCount</code> — how many are in when the doors open —
+which is a different question and a matter of taste.</p>
+<h3 id="the-wall-clock-which-used-to-be-two-objects-sharing-one-number" tabindex="-1">The wall clock, which used to be two objects sharing one number</h3>
+<p><code>DECOR.wallClock.z</code> used to be written as <code>STATIONS.coffee.z</code>, which is a perfectly
+reasonable thing to write when the coffee machine cannot move: it says &quot;the clock is
+above the coffee machine&quot; in one short line. The moment the coffee machine <em>can</em> move it
+becomes a bug, because dragging the machine across the room drags a clock off the wall
+with it.</p>
+<p>So the clock now has its own <code>x</code>, <code>y</code> and <code>z</code>, written out in full, with a comment
+recording that it <em>happens</em> to sit above the coffee machine rather than being defined by
+it. This is the shape of most of the work in the seams, and it is worth recognising the
+pattern: <strong>a value derived from another object's position is a value that will move when
+that object does</strong>, whether or not you meant it.</p>
+<h2 id="offsets-not-positions" tabindex="-1">Offsets, not positions</h2>
+<p>The other half of the seams. Two kinds of value used to be authored as absolute points
+and baked once at import:</p>
+<ul>
+<li><strong>Approach points.</strong> <code>STATIONS.coffee.approach</code> was the absolute spot an agent stands
+to use the machine. A moved machine would have left its standing room behind.</li>
+<li><strong>Couch seats</strong>, and the point in front of each seat.</li>
+</ul>
+<p>Both are now stored as <strong>offsets from their prop's centre</strong>, and the absolute point is
+derived from centre + offset + facing. The offsets were computed from the numbers that
+were already authored, so nothing in the room changed position when they were converted.</p>
+<p>The authored literals still <em>read</em> as absolute points, because two coordinates you can
+check by eye are much easier to review than an offset. The conversion happens once on the
+way in — which is fine everywhere except when baking a layout back into the source, where
+it is the one thing to get right. See <a href="#baking-a-layout-in">Baking a layout in</a>.</p>
+<p>Deriving them is <code>reviseLayout()</code>, and it is called from exactly two places: once at
+import, replacing the loops that used to bake these values, and again after every edit.
+One function, so import-time and edit-time derivation cannot drift apart — if a dragged
+couch's seats are wrong, so are a freshly loaded one's, which is a bug you find
+immediately rather than in six months.</p>
+<p><code>obstacleFootprints()</code> needed no change at all. It was already derived.</p>
+<h2 id="one-serialisation-four-buttons" tabindex="-1">One serialisation, four buttons</h2>
+<p>A layout leaves by the <strong>clipboard</strong> or as a <strong>file</strong>, and comes back the same two ways —
+four buttons' worth of behaviour over exactly one serialisation, <code>onLayoutText</code> and
+<code>onLayoutApply</code> in <code>panel.js</code>. There is no textarea any more. There used to be one box
+serving as both outbox and inbox, with <strong>Export</strong> and <strong>Import</strong> either side of it, and
+the trouble with that was that neither label was true: Export also filled a box, and
+Import read the box rather than the clipboard everybody assumed it read.</p>
+<p><strong>The download is named after the layout</strong>, which is the one part of it worth a test
+(<code>test/editor-download-name.test.js</code>). A folder of <code>layout.json</code>, <code>layout (1).json</code>,
+<code>layout (2).json</code> is a folder nobody can read; and a name with a slash or a colon in it is
+a name a filesystem refuses, so it is slugged. An edit of the Default has no name yet and
+gets <code>office-layout.json</code> rather than a made-up one.</p>
+<h3 id="the-strip-is-narrower-than-the-window" tabindex="-1">The strip is narrower than the window</h3>
+<p>The panel sits between the roster and the inspector, not across the screen: opening the
+agent detail on a 1366px laptop leaves the strip about 770px while the <em>window</em> has not
+changed width at all. So the panel shrinks by asking about <strong>itself</strong> — a container query
+on <code>#editor-panel</code>, not a media query, because the viewport gives the same answer in both
+cases and would squeeze a panel with room to spare while leaving the cramped one alone.</p>
+<p>Under about 1040px the sections shrink in place rather than reflowing, which is what
+<code>strip.js</code> asks for: a group that drops to a second line takes everything after it along,
+so the same button ends up somewhere different depending on whether the inspector happens
+to be open, and a control you have to find again is worse than a smaller one. Snap gives
+up track length (three stops need less room than the clock's twenty-four hours), Paths
+puts On above Off, the drop zone shortens its sentence to <em>Drop a .json</em> — keeping the
+long one in its <code>title</code> — and the four buttons go two-by-two. Below about 820px each of
+those tightens once more, along with the gutters and the picker's width.</p>
+<p>The wrap is still underneath as a last resort, at around 700px instead of 1040px. It has
+to be: <code>.dev-panel-body</code> <strong>clips</strong> rather than scrolls, so a section pushed out of the box
+would be gone rather than merely out of sight.</p>
+<h2 id="the-blob" tabindex="-1">The blob</h2>
+<p><strong>Copy</strong> puts the layout on the clipboard, and <strong>Download</strong> puts the same text in a file.
+Which pieces there are, of what kind, where and facing which way — no sizes, no palette —
+rounded to two decimal places:</p>
+<pre><code class="language-json">{
+  &quot;layout&quot;: 4,
+  &quot;complete&quot;: true,
+  &quot;desks&quot;: {
+    &quot;desk-1&quot;: { &quot;x&quot;: 12, &quot;z&quot;: 8, &quot;facing&quot;: 3.14 },
+    &quot;desk-6&quot;: { &quot;x&quot;: 17.5, &quot;z&quot;: 14.5, &quot;facing&quot;: 0 }
+  },
+  &quot;stations&quot;: {
+    &quot;coffee&quot;:      { &quot;kind&quot;: &quot;coffee&quot;, &quot;x&quot;: 1.6, &quot;z&quot;: 16.8 },
+    &quot;bookshelf-2&quot;: { &quot;kind&quot;: &quot;bookshelf&quot;, &quot;x&quot;: 20.5, &quot;z&quot;: 6, &quot;facing&quot;: 3.14 }
+  },
+  &quot;furniture&quot;: {
+    &quot;couch&quot;:     { &quot;kind&quot;: &quot;couch&quot;, &quot;x&quot;: 20.5, &quot;z&quot;: 15.5, &quot;facing&quot;: 0 },
+    &quot;sideTable&quot;: { &quot;kind&quot;: &quot;sideTable&quot;, &quot;x&quot;: 23.4, &quot;z&quot;: 15.2, &quot;facing&quot;: 0 },
+    &quot;floorLamp&quot;: { &quot;kind&quot;: &quot;floorLamp&quot;, &quot;x&quot;: 17.8, &quot;z&quot;: 16.8 },
+    &quot;rug&quot;:       { &quot;kind&quot;: &quot;rug&quot;, &quot;x&quot;: 12, &quot;z&quot;: 8, &quot;facing&quot;: 0, &quot;color&quot;: null }
+  },
+  &quot;decor&quot;:  {},
+  &quot;plants&quot;: { &quot;plant-1&quot;: { &quot;kind&quot;: &quot;bush&quot;, &quot;x&quot;: 9.5, &quot;z&quot;: 1.6, &quot;scale&quot;: 1.4, &quot;seasonal&quot;: true } }
+}
+</code></pre>
+<p><strong>Version 4 moved the rug into the furniture.</strong> It was the last thing left in <code>decor</code>, on
+the reasoning that a room has <em>a</em> rug the way it has <em>a</em> floor — which was the shape making
+the rule again, exactly as a top-level <code>COUCH</code> once did. A reading corner and a meeting
+area want one each, and a room may want none. <code>decor</code> is empty now, and kept only as the
+seam a fixture that learns to move would come back through. A version 3 blob names its rug
+under <code>decor.rug</code>; that is read onto the first rug the room has, and skipped where the room
+no longer has one — a blob from before rugs could be counted is no evidence about how many
+there are.</p>
+<p><strong>Version 3 gathered the comfort furniture into one map.</strong> The couch had a top-level entry
+of its own and the side table and lamp sat among the <code>decor</code>, which was an accurate shape
+for three things there was exactly one of each of. Keyed by id like the desks and stations,
+the blob can now say there is a second couch.</p>
+<p>Note the lamp has no <code>facing</code> and only the rug has a <code>color</code>. A piece carries a heading
+only if it has a front to point — a couch and a table do, a pole under a round shade does
+not — and a colour only if its kind comes in colours. Both absences are the same thing the
+editor reads when it declines to offer a control.</p>
+<p>Two things changed at version 2, both so that the blob can describe furniture and not only
+positions.</p>
+<p><strong>Kinds travel.</strong> A blob that carried only coordinates could only describe the room it was
+exported from, prop for prop. Carrying the kind alongside is what lets one say <em>there is a
+second bookshelf here</em>, and be read into an office that has never had one — <code>applyLayout()</code>
+builds what it names. Plants moved from an array to a map keyed by id for the same reason:
+their identity used to be their position in the list, so inserting one silently renumbered
+every plant after it.</p>
+<p><strong><code>complete</code> is permission to delete.</strong> A blob from <strong>Copy</strong> or <strong>Download</strong> describes the
+whole room, so
+a piece it does not mention is a piece that is not there any more — that is how undoing an
+addition, and <strong>Reset</strong>, put furniture <em>away</em> rather than only back. A blob somebody typed
+is a different thing: six lines naming the two desks they wanted moved. Reading absence as
+deletion there would empty the room on the strength of a note about part of it, so a blob
+that does not claim to be complete may only move and add.</p>
+<p>Both older shapes still import — version 2's separate couch and decor entries, and version
+1's plants-as-an-array. Each remains a true description of the room it came from, so a v2
+couch is read onto the first couch in the room. Skipped rather than created where the room
+no longer has one: a v2 blob is silent about how many couches there are, so it is no
+evidence that one is missing.</p>
+<p><strong>Paste</strong> is deliberately forgiving, because the whole point of a portable format is
+that it gets hand-edited:</p>
+<ul>
+<li><strong>Unknown keys are ignored</strong> and missing ones left alone, so a blob from a future
+version still moves what it can, and a partial blob naming two desks moves two desks.</li>
+<li><strong>Every coordinate is clamped into the room</strong> by <code>LAYOUT_MARGIN</code>, rather than refused.</li>
+<li><strong>Anything that is not a finite number is left alone entirely</strong>, because &quot;put this desk
+at <code>NaN</code>&quot; has no sane clamp.</li>
+<li><strong>A facing within half a degree of a right angle is treated as that right angle.</strong> That
+is both what somebody typing <code>1.57</code> meant, and what makes a copy/paste round trip
+exactly lossless despite the blob being rounded for legibility.</li>
+</ul>
+<p>So a hand-edited blob cannot wedge the office, and the worst a bad one can do is put the
+furniture somewhere silly — which you can see, and undo.</p>
+<h2 id="baking-a-layout-in" tabindex="-1">Baking a layout in</h2>
+<p>A layout you want to keep goes into the source, by hand. Say you have dragged <code>desk-3</code>
+and the coffee machine and pressed <strong>Copy</strong>:</p>
+<pre><code class="language-json">{ &quot;layout&quot;: 4, &quot;complete&quot;: true,
+  &quot;desks&quot;:    { &quot;desk-3&quot;: { &quot;x&quot;: 8.25, &quot;z&quot;: 14.5, &quot;facing&quot;: 1.57 } },
+  &quot;stations&quot;: { &quot;coffee&quot;: { &quot;kind&quot;: &quot;coffee&quot;, &quot;x&quot;: 3.5, &quot;z&quot;: 16.8 } } }
+</code></pre>
+<p>(A copy names every prop in the room; the two that moved are the two shown here.)</p>
+<p><strong>A desk is the easy one.</strong> In the <code>DESKS</code> array, find the entry with <code>id: 'desk-3'</code> and
+write the numbers straight in:</p>
+<pre><code class="language-js">{ id: 'desk-3', x: 8.25, z: 14.5, facing: Math.PI / 2 },
+</code></pre>
+<p><code>facing</code> is radians, and the editor turns in 90° steps, so a copied facing is always
+<code>0</code>, <code>Math.PI / 2</code>, <code>Math.PI</code> or <code>-Math.PI / 2</code>. Write those rather than the rounded
+decimal from the blob. Paste treats a facing within half a degree of a right angle <em>as</em>
+that right angle, so a pasted <code>1.57</code> will behave — but <code>Math.PI / 2</code> in the source says
+what it means, and a source that says what it means is the point of baking.</p>
+<p><strong>A station needs one more edit, and this is the trap.</strong> Stations are built by a helper
+that takes the approach point as an <em>absolute</em> position and turns it into an offset on
+the way in:</p>
+<pre><code class="language-js">coffee: station('coffee', 1.6, 16.8, { x: 3.3, z: 16.8 }),
+//                        ^ centre     ^ where you stand to use it
+</code></pre>
+<p>The offset is <code>approach − centre</code>. So writing only the new centre leaves the approach
+point where it was, which changes the offset rather than moving it — and the offset is
+what the facing and the standing distance are derived from. Move the coffee machine from
+<code>x: 1.6</code> to <code>x: 3.5</code> and nothing else, and its approach offset collapses from 1.7 in
+front to 0.2 <em>behind</em>: the machine turns round to face the wall and its standing room
+lands inside it.</p>
+<p><strong>Move the approach point by the same delta as the centre.</strong> Here the centre moved
+<code>+1.9</code> in x, so the approach does too — <code>3.3 + 1.9 = 5.2</code>:</p>
+<pre><code class="language-js">coffee: station('coffee', 3.5, 16.8, { x: 5.2, z: 16.8 }),
+</code></pre>
+<p>That reproduces the runtime layout exactly. If you turned the station as well as moving
+it, place the approach point at the same distance along the new heading instead of
+shifting it — the distance is what has to survive, not the direction.</p>
+<p>The asymmetry is worth understanding rather than memorising. At runtime the offset <em>is</em>
+the stored thing, so dragging a station carries its standing room along for free. In the
+source the offset is written as two absolute points that happen to imply it, because that
+is much easier to read and to check by eye. Baking is the one moment those two
+representations meet, so it is the one moment you have to convert by hand.</p>
+<p>Then reload and press nothing. The room should come up exactly as you left it. If it does
+not, there are two likely culprits and both have been met above: an approach point that
+did not travel with its station, or a value still being computed from another object's
+position somewhere — the wall clock's bug, in a new place.</p>
+<p>A named-layouts <em>directory</em> the editor loaded from at startup is the obvious next step,
+and it is still not here. <strong>Download</strong> and the drop zone give a layout a life as a file
+without it: a file that a person carries, rather than one the app reads on boot. That
+distinction is the whole reason — a directory the editor loaded from would be a second
+source of truth for the layout, which is exactly what the last hundred lines of
+<code>layout.js</code> exist to avoid.</p>
+<h2 id="where-the-code-is" tabindex="-1">Where the code is</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>What it holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/layout.js</code></td>
+<td>The layout, a mutable singleton: <code>reviseLayout()</code>, <code>applyLayout()</code>, <code>layoutSnapshot()</code>, <code>resetLayout()</code>, and what may exist — <code>STATION_KINDS</code>, <code>FURNITURE_KINDS</code>, <code>PLANT_KINDS</code>, <code>addObject()</code>, <code>removeObject()</code>, <code>agentCapacity()</code></td>
+</tr>
+<tr>
+<td><code>src/scene/props.js</code> (+ <code>movables.js</code>, <code>props/</code>)</td>
+<td><code>userData.movable</code> tags, <code>handles.propsRoot</code>, a <code>relocate()</code> per prop, a builder per kind, and <code>sync()</code> — which builds what the layout has gained, unbuilds what it has lost, and rebuilds anything whose record the layout has replaced under the same name</td>
+</tr>
+<tr>
+<td><code>src/editor/editor.js</code></td>
+<td>Enter and leave, pick, drag, snap, rotate, undo, validate, commit</td>
+</tr>
+<tr>
+<td><code>src/editor/layouts.js</code></td>
+<td>The saved-layouts shelf: names, blobs and localStorage</td>
+</tr>
+<tr>
+<td><code>src/plan/</code></td>
+<td>What <strong>Random</strong> presses: a seed in, a whole layout out. <a href="layout-algorithm.html">The layout algorithm</a></td>
+</tr>
+<tr>
+<td><code>src/editor/gizmos.js</code></td>
+<td>The blocked cells, the footprints and the selection ring</td>
+</tr>
+<tr>
+<td><code>src/editor/path-trails.js</code></td>
+<td>The route ribbons: one strip per walker, ahead and behind</td>
+</tr>
+<tr>
+<td><code>src/editor/panel.js</code></td>
+<td>The panel: title, selection readout, furniture picker, snap, paths, Copy, Paste, Download, the drop zone, Reset, Random</td>
+</tr>
+<tr>
+<td><code>src/main.js</code></td>
+<td>The <strong>E</strong> binding, the editor's lifecycle across scene switches, <code>?edit=1</code></td>
+</tr>
+<tr>
+<td><code>src/agents/AgentManager.js</code></td>
+<td><code>relayout()</code> — rebuild, let go of vanished furniture, re-seat, re-plan — and <code>pathTrails()</code></td>
+</tr>
+<tr>
+<td><code>src/agents/states.js</code></td>
+<td><code>replan()</code>, and the route each walker remembers having walked</td>
+</tr>
+</tbody>
+</table>
+<p>Props self-register as movable, the same trick <code>userData.nightLight</code> already uses:</p>
+<pre><code class="language-js">props.add(movable(obj, `desk:${spec.id}`, {
+  label: spec.id, spec, relocate: () =&gt; handle.relocate(),
+}));
+</code></pre>
+<p>The editor raycasts against <code>propsRoot</code> and walks up to the nearest tagged ancestor,
+which is what makes clicking a monitor select the whole desk. It never needs a list of
+what is movable, so <strong>adding a movable prop is one call at the point you build it</strong> and
+no edit to the editor at all.</p>
+<p><code>relocate()</code> is the other half. Three handles bake world-space anchors that cannot be
+re-read from the layout — the desk (<code>seat</code>, <code>approach</code>, <code>sitRotation</code>, <code>chairFacing</code>), the
+couch (seats and approach), and the mailbox (<code>slot</code> and <code>pile</code>) — so each gets a
+<code>relocate()</code> that recomputes them. Everything else reads <code>STATIONS</code> live and needs
+nothing. That is what lets the room keep running instead of demanding a world rebuild
+per drop.</p>
+<h2 id="what-is-not-here" tabindex="-1">What is not here</h2>
+<p>The list is in
+<a href="../user/rearranging-furniture.html#what-is-not-here">rearranging the furniture</a>.</p>
+<p>One entry that used to be on it is no longer true, and is worth naming here because the
+sentence outlived the feature that removed it: a layout <strong>is</strong> persisted per scene, on the
+server, exactly as <em>Where a layout lives</em> above describes. What is per-browser is the shelf
+of <em>named</em> layouts, which is <code>localStorage</code> and deliberately local.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="layout-algorithm.html">The layout algorithm</a> — where <strong>Random</strong> gets a room from,
+and why every seed produces one that works</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#why-it-is-only-a-few-hundred-lines">Why it is only a few hundred lines</a></li>
+<li><a href="#which-keys-the-editor-dispatches-itself">Which keys the editor dispatches itself</a><ul><li><a href="#the-add-item-menu">The Add-item menu</a></li>
+<li><a href="#what-the-panel-asks-the-layout">What the panel asks the layout</a></li></ul></li>
+<li><a href="#keeping-the-room-running-through-a-drop">Keeping the room running through a drop</a><ul><li><a href="#only-what-this-change-broke">Only what this change broke</a></li></ul></li>
+<li><a href="#the-overlays-are-chrome-not-scenery">The overlays are chrome, not scenery</a><ul><li><a href="#why-the-ribbons-are-rebuilt-every-frame">Why the ribbons are rebuilt every frame</a></li></ul></li>
+<li><a href="#where-a-layout-lives">Where a layout lives</a><ul><li><a href="#it-moves-under-everyone-at-once">It moves under everyone at once</a></li>
+<li><a href="#six-rugs-and-six-sofas">Six rugs, and six sofas</a></li>
+<li><a href="#where-a-new-piece-lands">Where a new piece lands</a></li></ul></li>
+<li><a href="#how-many-of-a-thing-the-room-may-have">How many of a thing the room may have</a><ul><li><a href="#the-minimum-is-a-job-not-a-kind">The minimum is a job, not a kind</a></li>
+<li><a href="#the-headcount-is-the-desk-count">The headcount is the desk count</a></li>
+<li><a href="#the-wall-clock-which-used-to-be-two-objects-sharing-one-number">The wall clock, which used to be two objects sharing one number</a></li></ul></li>
+<li><a href="#offsets-not-positions">Offsets, not positions</a></li>
+<li><a href="#one-serialisation-four-buttons">One serialisation, four buttons</a><ul><li><a href="#the-strip-is-narrower-than-the-window">The strip is narrower than the window</a></li></ul></li>
+<li><a href="#the-blob">The blob</a></li>
+<li><a href="#baking-a-layout-in">Baking a layout in</a></li>
+<li><a href="#where-the-code-is">Where the code is</a></li>
+<li><a href="#what-is-not-here">What is not here</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

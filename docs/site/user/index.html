@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>What this is — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="what-this-is" tabindex="-1">What this is</h1>
+<p><em>An office full of characters, and the characters are your AI agents.</em></p>
+<p>The Roving Office is a soft-3D isometric office. The characters in it are agent sessions —
+Claude Code, Cursor, Codex, Rovo CLI, OpenClaw — one character per conversation. When an
+agent starts a piece of work somebody walks in and sits down at a desk. When it looks
+something up, they get up and go to the bookshelf. When it finishes, they carry the work
+to the mailbox and post it. When it fails, they crumple it up and bin it.</p>
+<p>That is the entire idea. The room <em>is</em> the status board, and nothing in it is a metaphor
+you have to decode.</p>
+<img src="../images/screens/office.png" width="875" alt="An isometric cutaway office on a street corner: characters at work, some seated at desks with lit monitors, one walking across the floor, a coffee machine, a bookshelf with a globe, a telescope at the window and a printer by the wall.">
+<p><em>One room, and everybody you can see is a real conversation somewhere.</em></p>
+<blockquote>
+<p><strong>See it now → <a href="https://therovingoffice.com/office/TEST-0000">the demo office</a></strong></p>
+<p>Nothing to install. That room runs on <em>simulated</em> agents, so it is already busy —
+people arriving, coffee breaks, parcels in the mailbox, somebody stooped over the
+telescope. <a href="https://therovingoffice.com/">Reception</a> will cut you an empty office of
+your own.</p>
+</blockquote>
+<p>It is not a fleet monitor and does not want to be. It holds about a dozen desks, and it is
+a way to watch a team work. It is also, deliberately, a bit silly: the coffee machine is a
+three-group espresso machine with cups warming on top, and one print in six overshoots the
+tray and lands on the floor. None of that tells you anything. It is there because an
+office with nothing to notice is a screensaver.</p>
+<h2 id="three-ways-in" tabindex="-1">Three ways in</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Just watch something</strong></td>
+<td><a href="watching.html">Watching the office</a> — two minutes, no install. What a job is, and how to read the room.</td>
+</tr>
+<tr>
+<td><strong>Run it yourself</strong></td>
+<td><a href="install.html">Install and run it</a> — one command, and the room opens already full of people.</td>
+</tr>
+<tr>
+<td><strong>Point it at your own agents</strong></td>
+<td><a href="connect-your-agents.html">Connect your agents</a> — one command per harness, then your real sessions walk in.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-rest-of-it" tabindex="-1">The rest of it</h2>
+<ul>
+<li><a href="keys.html">Keys and panels</a> — every shortcut, and every panel they open</li>
+<li><a href="offices-and-keycards.html">Offices, keycards and scenes</a> — how an office is named, shared and lost</li>
+<li><a href="rearranging-furniture.html">Rearranging the furniture</a> — drag the desks about; the paths re-route as you go</li>
+<li><a href="sharing-an-office.html">Sharing an office</a> — put your sessions in a room somebody else can open</li>
+<li><a href="concepts.html">Jobs: the one idea</a> — the thinking behind the whole thing</li>
+<li><a href="the-room.html">The room, prop by prop</a> · <a href="agent-names.html">Agent names</a> · <a href="buildings.html">Buildings and themes</a> · <a href="solar-geometry.html">Solar geometry</a> · <a href="generated-offices.html">Generated offices</a> · <a href="layouts.html">Layouts</a></li>
+</ul>
+<p>Want to change how it works rather than use it? That is the
+<a href="../developer/index.html">developer documentation</a>, which assumes you have the code.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#three-ways-in">Three ways in</a></li>
+<li><a href="#the-rest-of-it">The rest of it</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The source model — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html" aria-current="page">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="the-source-model" tabindex="-1">The source model</h1>
+<p><em>How several feeds share one room, and the two places a source's identity is not a
+string.</em></p>
+<p>What a source <em>is</em>, from a reader's side — the pill, the redaction modes, the two reaping
+clocks — is <a href="../user/connect-your-agents.html">connect your agents</a>. This is the browser-side
+model behind it. To add one, the recipe is
+<a href="extending.html#add-a-source">extending the office</a>.</p>
+<h2 id="an-office-holds-a-set-not-one" tabindex="-1">An office holds a set, not one</h2>
+<p><code>src/data/feeds.js</code> runs one feed per selected source and merges them, <strong>namespacing ids
+per source</strong> so two feeds cannot collide on a session id. That namespacing is what makes
+the picker's live behaviour safe: a source ticked off and straight back on is a new feed
+instance, so its newcomers cannot be mistaken for the crowd still walking to the lift.</p>
+<p>This follows from a source being a costume rather than a building — if the harness is not
+a room, there is no reason for one room to hold a single harness. See
+<a href="protocol/aop-spec.html#34-scenes-and-routing">the spec on scenes and routing</a>.</p>
+<p>Worth saying because it used to be otherwise: a change of sources rebuilt the world, so
+the building, the furniture, the mail in flight and <em>every</em> feed's agents went with it —
+an office emptied itself in order to add one source to itself.</p>
+<h2 id="capabilities-are-feature-detected-never-named" tabindex="-1">Capabilities are feature-detected, never named</h2>
+<p>A source that implements <code>sendJob</code> gets the <strong>T</strong> key. Nothing downstream ever asks what
+<em>kind</em> of source it is talking to, which is why <code>T</code> can vanish from the keyboard and from
+the <code>?</code> panel together with no source-specific branch anywhere.</p>
+<p>The vocabulary a source emits is listed with the recipe in
+<a href="extending.html#add-a-source">extending the office</a>.</p>
+<h2 id="a-mark-is-a-texture-so-currentcolor-cannot-help" tabindex="-1">A mark is a texture, so <code>currentColor</code> cannot help</h2>
+<p>A source's mark leads the floating name tag, leads each row of the agents panel, and names
+itself in full in the detail panel's <strong>Source</strong> row.</p>
+<p>Marks keep their own colours everywhere, <strong>including on the tag</strong>, where the mark is
+rasterised into a texture shared by every agent in the office. The two marks that ship
+monochrome are handed the source's accent to paint with, since <code>currentColor</code> has no
+cascade to read inside a texture — the same colour the panels give them.</p>
+<h2 id="the-office-does-not-route-on-project-id-yet" tabindex="-1">The office does not route on project id yet</h2>
+<p>An office id is derived from the git <strong>remote</strong>, not the directory, so every worktree and
+every clone of one repo shares a single office — <a href="protocol/aop-spec.html">spec §3.4.1</a>, on
+purpose.</p>
+<p>But <strong>every office fed by a harness currently sees every session from it.</strong> The project
+mapping in <code>~/.roving-office/projects.json</code> is carried in each event and is what that
+routing will use when <code>AopSource</code> starts filtering on it; it is not yet what puts an agent
+in a room.</p>
+<p>To see what a checkout resolves to:</p>
+<pre><code class="language-bash">node bin/aop-send.cjs --print-project    # office id, branch, redaction mode
+</code></pre>
+<h2 id="reception-loads-the-door-before-the-room" tabindex="-1">Reception loads the door before the room</h2>
+<p><code>src/wizard.js</code> imports nothing that draws, so the keycard field is live before three.js
+has been asked for. The scene is imported <strong>dynamically</strong> and faded in over a drawn office
+the page ships with, so if the scene fails to load the drawing stays and the door still
+works. See <code>src/scene/vignette.js</code>.</p>
+<p>That ordering is also the thing to remember when screenshotting reception: the vignette is
+a dynamic import, so it is not in a shutter-at-load screenshot. Same trap as
+<a href="prop-portraits.html">photographing a prop</a>.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="extending.html#add-a-source">Extending the office</a> — adding one</li>
+<li><a href="protocol/aop-spec.html">The AOP spec</a> — the wire format the live sources speak</li>
+<li><a href="protocol/aop-harness-adapters.html">Adapter notes</a> — what each harness can actually see</li>
+<li><a href="test-data.html">The Test Data source</a> — the one that makes its own weather</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#an-office-holds-a-set-not-one">An office holds a set, not one</a></li>
+<li><a href="#capabilities-are-feature-detected-never-named">Capabilities are feature-detected, never named</a></li>
+<li><a href="#a-mark-is-a-texture-so-currentcolor-cannot-help">A mark is a texture, so currentColor cannot help</a></li>
+<li><a href="#the-office-does-not-route-on-project-id-yet">The office does not route on project id yet</a></li>
+<li><a href="#reception-loads-the-door-before-the-room">Reception loads the door before the room</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Every npm script — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html" aria-current="page">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="every-npm-script" tabindex="-1">Every npm script</h1>
+<p><em>What each command in <code>package.json</code> does, and which of them you actually need.</em></p>
+<p>There is no build step here, so <code>package.json</code> is as close as this project gets to a
+Makefile: the scripts below are the whole interface to it. Most days you need four of
+them — <code>dev</code>, <code>test</code>, <code>lint</code>, <code>probe</code> — and the rest are there for the day you need
+exactly one of them.</p>
+<blockquote>
+<p><strong>This page is generated.</strong> <code>bin/gen-npm-scripts.mjs</code> writes it from <code>package.json</code>,
+where each script's description lives in a <code>scriptDocs</code> entry beside the command
+itself. Editing this file by hand is wasted keystrokes: <code>npm test</code> will notice, and the
+next <code>npm run docs</code> will overwrite you. Add a script, add its <code>scriptDocs</code> line, run
+<code>npm run docs</code>. The generator refuses to run if you forget either half.</p>
+</blockquote>
+<h2 id="run-it" tabindex="-1">Run it</h2>
+<p>No build step, so there is nothing to compile first. Edit a file, reload the tab.</p>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Runs</th>
+<th>What for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm run start</code></td>
+<td><code>node server.cjs</code></td>
+<td>Run the office on 8080. Same as <code>dev</code>; the name npm users expect.</td>
+</tr>
+<tr>
+<td><code>npm run serve</code></td>
+<td><code>node server.cjs --publish 8080</code></td>
+<td>Run the office <strong>and publish it</strong>: writes ~/.roving-office/endpoint.json, so every adapter on this machine feeds it. One of these at a time.</td>
+</tr>
+<tr>
+<td><code>npm run dev</code></td>
+<td><code>node server.cjs</code></td>
+<td>Run a private office on the first free port from 8080 to 8095. Touches no endpoint file, so it cannot steal adapters from the office someone is watching.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="check-it" tabindex="-1">Check it</h2>
+<p>Local checks and generation checks, using the same commands as the CI verification step. Internal deployment steps run separately and require maintainer access.</p>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Runs</th>
+<th>What for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm run probe</code></td>
+<td><code>node bin/coplanar-probe.js</code></td>
+<td>Hunt coplanar faces — two surfaces at identical depth, which is what almost every graphical glitch here turns out to be. <code>-- --sweep --assert=test/coplanar-baseline.json</code> is the CI form.</td>
+</tr>
+<tr>
+<td><code>npm run colours:check</code></td>
+<td><code>node bin/gen-colour-names.mjs --check</code></td>
+<td>Fail if the vendored colour table has drifted from what the generator would write.</td>
+</tr>
+<tr>
+<td><code>npm run pack:openclaw</code></td>
+<td><code>node bin/aop-openclaw-pack.cjs --verify</code></td>
+<td>Pack the OpenClaw plugin into dist/ and run the artifact from a temp dir. <code>--verify</code> is the point: it proves the vendored seam still works outside the repo.</td>
+</tr>
+<tr>
+<td><code>npm run pack:plugins:check</code></td>
+<td><code>node bin/aop-plugin-pack.cjs --check</code></td>
+<td>Fail if the committed Claude marketplace and archive have drifted from this checkout, or if the three manifests disagree about the version. Part of <code>npm test</code>.</td>
+</tr>
+<tr>
+<td><code>npm run docs:scripts:check</code></td>
+<td><code>node bin/gen-npm-scripts.mjs --check</code></td>
+<td>Fail if this page has drifted from package.json. Part of <code>npm test</code>, so it cannot be forgotten.</td>
+</tr>
+<tr>
+<td><code>npm run test</code></td>
+<td><code>node --test</code></td>
+<td>The whole suite — unit, reducer, scene, server, docs. Plain node:test, no browser, no services, seconds.</td>
+</tr>
+<tr>
+<td><code>npm run lint</code></td>
+<td><code>eslint .</code></td>
+<td>ESLint over everything it can read. Note it cannot read JavaScript inside HTML, so the standalone <code>docs/*.html</code> pages are checked by loading them and nothing else.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="connect-a-harness" tabindex="-1">Connect a harness</h2>
+<p>Each installs the hooks or plugin that make <em>your</em> sessions show up in the room. Every one of them has a <code>:dry</code> that changes nothing and a <code>:status</code> that says whether what is installed still matches this checkout.</p>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Runs</th>
+<th>What for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm run connect:rovo</code></td>
+<td><code>node bin/aop-rovo-install.cjs</code></td>
+<td>Install the Rovo CLI hooks that feed the office.</td>
+</tr>
+<tr>
+<td><code>npm run connect:rovo:dry</code></td>
+<td><code>node bin/aop-rovo-install.cjs --dry-run</code></td>
+<td>Show what installing the Rovo hooks would change, and change nothing.</td>
+</tr>
+<tr>
+<td><code>npm run connect:rovo:status</code></td>
+<td><code>node bin/aop-rovo-install.cjs --status</code></td>
+<td>Whether the Rovo hooks are installed, and whether they still match this checkout.</td>
+</tr>
+<tr>
+<td><code>npm run disconnect:rovo</code></td>
+<td><code>node bin/aop-rovo-install.cjs --uninstall</code></td>
+<td>Remove the Rovo CLI hooks.</td>
+</tr>
+<tr>
+<td><code>npm run connect:openclaw</code></td>
+<td><code>node bin/aop-openclaw-install.cjs</code></td>
+<td>Install the OpenClaw plugin from this checkout, as a link.</td>
+</tr>
+<tr>
+<td><code>npm run connect:openclaw:dry</code></td>
+<td><code>node bin/aop-openclaw-install.cjs --dry-run</code></td>
+<td>Show what installing the OpenClaw plugin would change, and change nothing.</td>
+</tr>
+<tr>
+<td><code>npm run connect:openclaw:status</code></td>
+<td><code>node bin/aop-openclaw-install.cjs --status</code></td>
+<td>Whether the OpenClaw plugin is installed, and against which checkout.</td>
+</tr>
+<tr>
+<td><code>npm run disconnect:openclaw</code></td>
+<td><code>node bin/aop-openclaw-install.cjs --uninstall</code></td>
+<td>Remove the OpenClaw plugin.</td>
+</tr>
+<tr>
+<td><code>npm run connect:claude</code></td>
+<td><code>node bin/aop-claude-install.cjs</code></td>
+<td>Install the Claude Code plugin that feeds the office.</td>
+</tr>
+<tr>
+<td><code>npm run connect:claude:settings</code></td>
+<td><code>node bin/aop-claude-install.cjs --settings</code></td>
+<td>Point Claude Code at the office through settings rather than the plugin — no version bump, no session restart.</td>
+</tr>
+<tr>
+<td><code>npm run connect:claude:dry</code></td>
+<td><code>node bin/aop-claude-install.cjs --dry-run</code></td>
+<td>Show what installing the Claude Code plugin would change, and change nothing.</td>
+</tr>
+<tr>
+<td><code>npm run connect:claude:status</code></td>
+<td><code>node bin/aop-claude-install.cjs --status</code></td>
+<td>Whether the Claude Code plugin is installed, and whether its snapshot has drifted from this checkout.</td>
+</tr>
+<tr>
+<td><code>npm run disconnect:claude</code></td>
+<td><code>node bin/aop-claude-install.cjs --uninstall</code></td>
+<td>Remove the Claude Code plugin.</td>
+</tr>
+<tr>
+<td><code>npm run connect:cursor</code></td>
+<td><code>node bin/aop-cursor-install.cjs</code></td>
+<td>Install the Cursor Agent hooks that feed the office.</td>
+</tr>
+<tr>
+<td><code>npm run connect:cursor:dry</code></td>
+<td><code>node bin/aop-cursor-install.cjs --dry-run</code></td>
+<td>Show what installing the Cursor hooks would change, and change nothing.</td>
+</tr>
+<tr>
+<td><code>npm run connect:cursor:status</code></td>
+<td><code>node bin/aop-cursor-install.cjs --status</code></td>
+<td>Whether the Cursor hooks are installed, and whether they still match this checkout.</td>
+</tr>
+<tr>
+<td><code>npm run disconnect:cursor</code></td>
+<td><code>node bin/aop-cursor-install.cjs --uninstall</code></td>
+<td>Remove the Cursor Agent hooks.</td>
+</tr>
+<tr>
+<td><code>npm run connect:codex</code></td>
+<td><code>node bin/aop-codex-install.cjs</code></td>
+<td>Install the Codex plugin that feeds the office.</td>
+</tr>
+<tr>
+<td><code>npm run connect:codex:dry</code></td>
+<td><code>node bin/aop-codex-install.cjs --dry-run</code></td>
+<td>Show what installing the Codex plugin would change, and change nothing.</td>
+</tr>
+<tr>
+<td><code>npm run connect:codex:status</code></td>
+<td><code>node bin/aop-codex-install.cjs --status</code></td>
+<td>Whether the Codex plugin is installed, and against which checkout.</td>
+</tr>
+<tr>
+<td><code>npm run disconnect:codex</code></td>
+<td><code>node bin/aop-codex-install.cjs --uninstall</code></td>
+<td>Remove the Codex plugin.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="point-this-machine-somewhere-else" tabindex="-1">Point this machine somewhere else</h2>
+<p>By default adapters feed the office on this machine. These three aim them at an office on a URL instead, and aim them back.</p>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Runs</th>
+<th>What for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm run connect:remote</code></td>
+<td><code>node bin/aop-connect.cjs</code></td>
+<td>Mint an office on a remote host and point this machine's adapters at it. Takes the host URL.</td>
+</tr>
+<tr>
+<td><code>npm run connect:remote:status</code></td>
+<td><code>node bin/aop-connect.cjs --status</code></td>
+<td>Where this machine's events are going, and whether anything is spooled waiting to drain.</td>
+</tr>
+<tr>
+<td><code>npm run disconnect:remote</code></td>
+<td><code>node bin/aop-connect.cjs --disconnect</code></td>
+<td>Hand this machine's adapters back to the local office.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="regenerate-what-is-generated" tabindex="-1">Regenerate what is generated</h2>
+<p>A handful of things in this repo are written by a script rather than by hand, because they are derived from something else and would drift if they were typed.</p>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Runs</th>
+<th>What for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm run portrait</code></td>
+<td><code>node bin/prop-portrait.js</code></td>
+<td>Photograph every catalogue object on its own, into docs/images/objects — the gallery in the kit. <code>-- --id=chair</code> for one, <code>-- --list</code> to see what there is.</td>
+</tr>
+<tr>
+<td><code>npm run map</code></td>
+<td><code>node bin/scene-map.js</code></td>
+<td>Photograph each theme's whole exterior from straight above, into docs/images/maps. <code>-- --theme=tower</code> for one.</td>
+</tr>
+<tr>
+<td><code>npm run colours</code></td>
+<td><code>node bin/gen-colour-names.mjs</code></td>
+<td>Rewrite src/agents/colour-names.js, the table that turns <code>burnt sienna</code> into a colour. Fetches a pinned list; run it about once a year.</td>
+</tr>
+<tr>
+<td><code>npm run docs</code></td>
+<td><code>node bin/gen-npm-scripts.mjs &amp;&amp; eleventy</code></td>
+<td>Regenerate this page, then build docs/site — the HTML served at /docs. Run it after editing any Markdown under docs/user or docs/developer.</td>
+</tr>
+<tr>
+<td><code>npm run docs:serve</code></td>
+<td><code>eleventy --serve --port 8091</code></td>
+<td>Build the docs and watch them on 8091, so a Markdown edit reloads the page.</td>
+</tr>
+<tr>
+<td><code>npm run docs:scripts</code></td>
+<td><code>node bin/gen-npm-scripts.mjs</code></td>
+<td>Rewrite this page from package.json alone. <code>npm run docs</code> does it for you; this is for when that is all you changed.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="anything-else" tabindex="-1">Anything else</h2>
+<p>Not yet filed under a heading above.</p>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Runs</th>
+<th>What for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm run shot</code></td>
+<td><code>node bin/office-shot.js</code></td>
+<td>Photograph a <strong>running</strong> office for the docs — it waits for people to walk in first, which a load-time screenshot cannot. Needs an office already up. <code>-- --out=x.png --hide-ui --wait=70000</code>.</td>
+</tr>
+<tr>
+<td><code>npm run plan</code></td>
+<td><code>node bin/office-plan.js</code></td>
+<td>Generate a whole office from a seed and print it as a plan you can read. <code>-- misty-quay-3100</code> for one, <code>-- --from=some.json</code> to draw a layout somebody made.</td>
+</tr>
+<tr>
+<td><code>npm run plan:sweep</code></td>
+<td><code>node bin/office-plan.js --sweep=2000 --quiet</code></td>
+<td>Generate two thousand offices and check every one against the gate and the scorecard. This is the test that the generator cannot make a room that does not work.</td>
+</tr>
+<tr>
+<td><code>npm run plan:gallery</code></td>
+<td><code>node bin/office-plan.js --gallery=24 --out=docs/office-seeds.html</code></td>
+<td>Draw two dozen seeds as a contact sheet, into docs/office-seeds.html — names, reasons, scorecards, and an <em>Open this office</em> link each.</td>
+</tr>
+<tr>
+<td><code>npm run plan:variety</code></td>
+<td><code>node bin/office-variety.js</code></td>
+<td>Rewrite docs/office-variety.html: thirty consecutive seeds to scroll past, each with its own name, reasons and scores. Take the pictures first with <code>npm run map -- --seed=variety-1 …</code> — this only writes the page.</td>
+</tr>
+<tr>
+<td><code>npm run sim</code></td>
+<td><code>node bin/sim-office.js</code></td>
+<td>Run one office headless and print what happened in it: errand times, detours, clipped frames, stuck walkers. The tool to reach for when a fitness number moves and nobody knows why.</td>
+</tr>
+<tr>
+<td><code>npm run fitness</code></td>
+<td><code>node bin/office-fitness.js --seeds=96 --minutes=3</code></td>
+<td>One number for the whole layout generator, over the tune seeds: the plan's scorecard, the office actually running, and a taste model fitted to human judgements. See docs/developer/tuning-the-layouts.md.</td>
+</tr>
+<tr>
+<td><code>npm run fitness:hold</code></td>
+<td><code>node bin/office-fitness.js --hold --seeds=96 --minutes=3</code></td>
+<td>The same number over the held-out seeds the tuning never optimises against. A gain that appears here is a gain; one that does not is a sample being learnt.</td>
+</tr>
+<tr>
+<td><code>npm run fitness:guard</code></td>
+<td><code>node bin/office-fitness.js --seeds=96 --minutes=3 --guard</code></td>
+<td>Exit non-zero if any floored component has fallen — the check that stops a room being made quicker to walk about by making it less like an office.</td>
+</tr>
+<tr>
+<td><code>npm run fitness:record</code></td>
+<td><code>node bin/office-fitness.js --seeds=96 --minutes=3 --record</code></td>
+<td>Rewrite test/fitness-floors.json from the current generator. Raises the ratchet, so run it deliberately and say why.</td>
+</tr>
+<tr>
+<td><code>npm run fitness:noise</code></td>
+<td><code>node bin/office-fitness.js --seeds=96 --minutes=3 --noise=6</code></td>
+<td>Measure the sampling error between disjoint seed sets of the same size. The smallest improvement worth believing.</td>
+</tr>
+<tr>
+<td><code>npm run pack:plugins</code></td>
+<td><code>node bin/aop-plugin-pack.cjs --verify</code></td>
+<td>Build the Claude and Codex plugins as distribution artifacts, then install and fire a hook from a temp directory with no checkout above it. Writes the hosted marketplace the site serves; <code>pack:plugins:check</code> is what asserts you committed it.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="getting-the-code.html">Getting the code</a> — the five commands that make up a full local check</li>
+<li><a href="developing.html">Developing on it</a> — the loop, the probe, and the traps</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#run-it">Run it</a></li>
+<li><a href="#check-it">Check it</a></li>
+<li><a href="#connect-a-harness">Connect a harness</a></li>
+<li><a href="#point-this-machine-somewhere-else">Point this machine somewhere else</a></li>
+<li><a href="#regenerate-what-is-generated">Regenerate what is generated</a></li>
+<li><a href="#anything-else">Anything else</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

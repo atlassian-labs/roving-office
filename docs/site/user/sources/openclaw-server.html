@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenClaw on a server — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html" aria-current="page">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="openclaw-on-a-server" tabindex="-1">OpenClaw on a server</h1>
+<p><em>Where the Gateway and the checkout are not the same machine. One command at each end.</em></p>
+<p>The <a href="openclaw.html#install-it">ordinary install</a> works from a checkout, so it only works
+where the Gateway <em>is</em> that checkout. A Gateway on a server needs an artifact instead.</p>
+<h2 id="in-the-checkout" tabindex="-1">In the checkout</h2>
+<pre><code class="language-bash">npm run pack:openclaw     # -&gt; dist/roving-office-openclaw-&lt;version&gt;.tgz
+                          #    dist/aop-openclaw-server.sh
+scp dist/roving-office-openclaw-*.tgz dist/aop-openclaw-server.sh &lt;host&gt;:
+</code></pre>
+<p><strong>Two files, because an artifact alone still leaves a dance to do by hand.</strong> The script does
+that dance, and it ships beside the tarball so there is nothing to remember on the far end.</p>
+<h2 id="on-the-server" tabindex="-1">On the server</h2>
+<pre><code class="language-bash">./aop-openclaw-server.sh roving-office-openclaw-0.13.0.tgz
+openclaw gateway restart       # the plugin only loads at Gateway startup
+</code></pre>
+<p>That mints a fresh office on therovingoffice.com, installs the tarball, writes every
+setting it needs — <strong>including the conversation-access flag that a manual install so easily
+misses</strong> — and prints the office URL to open.</p>
+<p>Its flags cover the things that vary:</p>
+<pre><code class="language-bash">./aop-openclaw-server.sh &lt;tgz&gt; --receiver http://office.internal:8080  # a receiver of your own
+./aop-openclaw-server.sh &lt;tgz&gt; --keycard AB12CD34 --token &lt;t&gt;          # an office that exists
+./aop-openclaw-server.sh &lt;tgz&gt; --scene build-box                       # name the room
+</code></pre>
+<p><strong>The tarball is a required argument</strong> rather than the newest match in the directory,
+because <em>which version is on that box</em> is the question that wastes the most time here — and
+a script that picks a file for you is a script that can answer it wrong.</p>
+<p>It refuses to run without <code>openclaw</code> on the PATH. Unlike the installers in the checkout,
+which shrug and print the commands for elsewhere, this script has no meaning anywhere but
+the Gateway host.</p>
+<h2 id="upgrading-later-is-the-same-command" tabindex="-1">Upgrading later is the same command</h2>
+<p>Ship a new tarball, run the script again, restart the Gateway.</p>
+<p><strong>It keeps the office it already had.</strong> The script used to mint a fresh one every run, which
+was defensible while an office was disposable — a deploy lost them all anyway, so a new
+keycard cost nothing that was not already gone.</p>
+<p>It is not defensible now. An office survives a deploy holding its scene layout, its
+furniture and its history, and it holds several named tokens rather than one that
+re-minting would revoke. A second run is almost always somebody shipping a new build to a
+box that is already wired up, and minting there would move that Gateway into an empty room
+<strong>while the room people had bookmarked went quiet.</strong></p>
+<p>The <strong>scene</strong> is treated the same way: a room name somebody chose is not re-guessed from
+the hostname on an upgrade.</p>
+<h2 id="or-configure-it-by-hand" tabindex="-1">Or configure it by hand</h2>
+<p>The whole configuration, in <code>~/.openclaw/openclaw.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;plugins&quot;: {
+    &quot;entries&quot;: {
+      &quot;roving-office&quot;: {
+        &quot;enabled&quot;: true,
+        &quot;hooks&quot;: { &quot;allowConversationAccess&quot;: true },
+        &quot;config&quot;: {
+          &quot;url&quot;: &quot;https://your-office/office/AB12CD34/aop/v0/events&quot;,
+          &quot;token&quot;: &quot;&lt;write-token&gt;&quot;,
+          &quot;scene&quot;: &quot;build-box&quot;
+        }
+      }
+    }
+  }
+}
+</code></pre>
+<p>That grain is right for a Gateway: it outlives every shell, so an environment variable would
+be the wrong place to tell it where to publish.</p>
+<p><strong>One ordering is load-bearing if you do it by hand: install before you configure.</strong>
+Installing the plugin writes its own config entry and would discard settings made first.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="openclaw.html">OpenClaw</a> — the ordinary install, and the troubleshooting table</li>
+<li><a href="../sharing-an-office.html">Sharing an office</a> — what a hosted office does and does not keep</li>
+<li>The packer and the link-install are in the <a href="../../developer/adapters/openclaw.html">developer docs</a></li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#in-the-checkout">In the checkout</a></li>
+<li><a href="#on-the-server">On the server</a></li>
+<li><a href="#upgrading-later-is-the-same-command">Upgrading later is the same command</a></li>
+<li><a href="#or-configure-it-by-hand">Or configure it by hand</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

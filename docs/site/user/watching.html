@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Watching the office — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html" aria-current="page">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="watching-the-office" tabindex="-1">Watching the office</h1>
+<p><em>For anyone looking at the room. Two minutes, no code.</em></p>
+<hr>
+<h2 id="what-you-are-looking-at" tabindex="-1">What you are looking at</h2>
+<p>An office. The characters in it are AI agents working in programs like Claude Code or
+Cursor — one character per conversation. When an agent starts a piece of work, somebody
+sits down at a desk. When it finishes, they get up and post it.</p>
+<p>Nothing here is a metaphor you have to decode. The room <em>is</em> the status board.</p>
+<img src="../images/screens/watching.png" width="1000" alt="The office with its panels open: the agents roster down the left listing agents with coloured status dots, a status legend beneath it, and the Job Delivery feed at the bottom of the panel. Characters are walking through the sunny room.">
+<p><em>The room and the panels say the same things. The panels are there for when you want a
+name or a timestamp; the room is there for when you just want to glance.</em></p>
+<h2 id="whats-a-job" tabindex="-1">What's a job?</h2>
+<p><strong>A job is one piece of work.</strong> You asked an agent for something; that's a job. It has
+a name, it starts, it ends.</p>
+<p>The name is on the desk. It's the first line of what you actually asked for — never a
+summary someone invented afterwards.</p>
+<p>One job at a time, per person. If an agent is doing six things, that's still one job
+with six parts to it.</p>
+<h2 id="how-work-arrives" tabindex="-1">How work arrives</h2>
+<p>Two ways, and <strong>the difference means nothing</strong> — it's just for variety:</p>
+<ul>
+<li>A <strong><a href="../item-movements.html#paperPlane">paper plane</a></strong> flies in through the window.</li>
+<li>A <strong><a href="../item-movements.html#courier">courier</a></strong> pulls up outside and lobs a parcel in through the door.</li>
+</ul>
+<p>Either way it lands in the <a href="../item-movements.html#mailbox">mailbox</a> by the wall. If the <a href="../item-movements.html#mailbox">mailbox</a> flag is up, there's work
+waiting. The window gets twice the share of the other ways in, so most work comes in
+over the desks — and about a third of <em>those</em> arrive by bird rather than paper plane
+(see <a href="work-and-post.html#sometimes-the-letter-comes-by-bird">Post, parcels and the bin</a>).</p>
+<p>Some work has a name on it — a request typed to one particular agent. That plane is
+tinted their colour, so you can see across the room who it's for, and only they will
+collect it. Unaddressed work goes to whoever gets there first.</p>
+<h2 id="how-an-agent-shows-what-its-doing" tabindex="-1">How an agent shows what it's doing</h2>
+<p>By where it is and what it's holding.</p>
+<p>The <strong>Status</strong> legend in the Agents panel groups related activities together.
+<strong>Moving</strong> contains <strong>Walking</strong> and <strong>Dancing</strong>, with a count for each. A dancing
+agent returns to Idle when the celebration finishes.</p>
+<table>
+<thead>
+<tr>
+<th>What you see</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Walking to the mailbox</td>
+<td>Fetching new work</td>
+</tr>
+<tr>
+<td>Sitting at a desk, screens lit</td>
+<td>Working</td>
+</tr>
+<tr>
+<td>At the bookshelf, book in hand</td>
+<td>Looking something up</td>
+</tr>
+<tr>
+<td>Stooped over the telescope at the window</td>
+<td>Looking something up <em>outside</em> — the web</td>
+</tr>
+<tr>
+<td>The globe on the shelf turning</td>
+<td>The same thing, in a room with no telescope</td>
+</tr>
+<tr>
+<td>Standing at the coffee machine or cooler</td>
+<td>Idling between jobs</td>
+</tr>
+<tr>
+<td>Carrying a parcel or an envelope</td>
+<td>Has work in hand, coming or going</td>
+</tr>
+<tr>
+<td>Walking to the mailbox holding work</td>
+<td>Finished — posting it</td>
+</tr>
+<tr>
+<td>Feeding a page into the printer</td>
+<td>Finished — faxing it out instead, if the machine is nearer</td>
+</tr>
+<tr>
+<td>Paper stacking up in the printer's output tray</td>
+<td>Copies of work the office sent, waiting to be picked up</td>
+</tr>
+<tr>
+<td>A sheet on the floor by the printer</td>
+<td>It overshot the tray. Somebody will get it</td>
+</tr>
+<tr>
+<td>Crumpling paper into the bin</td>
+<td>That job failed</td>
+</tr>
+</tbody>
+</table>
+<p>Coats on the stand by the door are a headcount: one per agent currently in. When
+everyone clocks off, the stand is bare.</p>
+<h2 id="how-a-job-ends" tabindex="-1">How a job ends</h2>
+<p><strong>Always somewhere you can see.</strong> Finished work is carried to whichever way out is nearer — the mailbox, or the printer as a fax — and sent.
+Failed work gets crumpled up and dropped in the bin.</p>
+<p>That's deliberate. If something fails at three in the morning, the crumpled paper is
+still in the bin when you look in the morning — and the panel keeps the record. Success
+and failure never look the same.</p>
+<h2 id="reading-the-room-at-a-glance" tabindex="-1">Reading the room at a glance</h2>
+<p>A few things worth noticing, because they tell you something a list of rows wouldn't:</p>
+<ul>
+<li><strong>Work piling up in the mailbox</strong> — jobs are arriving faster than anyone is picking
+them up.</li>
+<li><strong>Empty desks with the coat stand full</strong> — everyone's in, nobody's working.</li>
+<li><strong>Somebody who has been sitting there a very long time</strong> — a job that's been open a
+very long time. You notice it without looking for it.</li>
+<li><strong>A mug on a desk</strong> — they got up mid-job to fetch it. Its colour is the drink.</li>
+</ul>
+<h2 id="things-you-can-do" tabindex="-1">Things you can do</h2>
+<p>Scroll to zoom from the whole office into the details of an individual desk or chair.
+Hold <strong>Ctrl</strong>, <strong>⌘</strong> or <strong>Shift</strong> while dragging to bring the object you want into view.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Click anyone</td>
+<td>See their details at the top of the panel, followed by current work and recent jobs</td>
+</tr>
+<tr>
+<td><strong>Follow Along</strong> or <strong>F</strong></td>
+<td>Follow Along on the selected agent's shoulder</td>
+</tr>
+<tr>
+<td><strong>E</strong></td>
+<td><a href="rearranging-furniture.html">Rearrange the furniture</a>. The paths re-route as you drag</td>
+</tr>
+<tr>
+<td><strong>P</strong></td>
+<td>Show the routes people are walking</td>
+</tr>
+<tr>
+<td><strong>?</strong></td>
+<td><a href="keys.html">Every other key</a></td>
+</tr>
+</tbody>
+</table>
+<p>The office holds about a dozen desks. It's a way to watch a team work, not a way to
+monitor a fleet.</p>
+<hr>
+<p>Want the thinking behind it? <a href="concepts.html">Jobs: the one idea</a> covers the concepts.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#what-you-are-looking-at">What you are looking at</a></li>
+<li><a href="#whats-a-job">What's a job?</a></li>
+<li><a href="#how-work-arrives">How work arrives</a></li>
+<li><a href="#how-an-agent-shows-what-its-doing">How an agent shows what it's doing</a></li>
+<li><a href="#how-a-job-ends">How a job ends</a></li>
+<li><a href="#reading-the-room-at-a-glance">Reading the room at a glance</a></li>
+<li><a href="#things-you-can-do">Things you can do</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

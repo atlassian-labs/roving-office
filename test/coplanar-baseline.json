@@ -1,0 +1,13 @@
+{
+  "seed": 1,
+  "worst": {
+    "tide": 0.24,
+    "dune": 0.24,
+    "lantern": 0.24,
+    "canopy": 0.24,
+    "simple": 0.24,
+    "warehouse": 77.33,
+    "skyscraper": 2.81,
+    "mansard": 285.08
+  }
+}

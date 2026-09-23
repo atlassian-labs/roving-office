@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title }} — The Roving Office</title>
+  <meta name="description" content="{{ tagline }}" />
+  {# Absolute, like the app's own shell: these pages are served from several depths
+     under /docs and a relative icon would be looked for beside each one. #}
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="{{ '/assets/docs.css' | url }}" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      {%- for s in sections %}
+      <a href="{{ s.href | url }}"{% if s.id == section %} aria-current="page"{% endif %}>{{ s.label }}</a>
+      {%- endfor %}
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="{{ section }} documentation">
+      {%- for group in nav[section] %}
+      <h2>{{ group.label }}</h2>
+      <ul>
+        {%- for p in group.pages %}
+        <li>
+          <a href="{{ p.url | url }}"{% if p.url == page.url %} aria-current="page"{% endif %}>{{ p.title }}{% if p.external %} <span class="ext" aria-label="standalone page">↗</span>{% endif %}</a>
+        </li>
+        {%- endfor %}
+      </ul>
+      {%- endfor %}
+    </nav>
+
+    <main id="doc" class="doc">
+      {{ content | safe }}
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      {%- set contents = content | toc %}
+      {%- if contents %}
+      <h2>On this page</h2>
+      {{ contents | safe }}
+      {%- endif %}
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      {% if section == 'user' %}
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="{{ '/developer/index.html' | url }}">the developer docs</a> are the other door.
+      {% else %}
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="{{ '/user/index.html' | url }}">the user docs</a> are the other door.
+      {% endif %}
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="{{ '/assets/docs.js' | url }}"></script>
+</body>
+</html>

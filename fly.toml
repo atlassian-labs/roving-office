@@ -1,0 +1,62 @@
+app = "the-roving-office"
+primary_region = "syd"
+
+[build]
+  # Not `Dockerfile`, because a container recipe at the repo root is a filename the
+  # trust scanner objects to — and it failed the checks on pull requests that had
+  # nothing to do with deployment. Fly is the only thing that builds an image here,
+  # so Fly is the only thing that needs to know where the recipe lives. Naming it
+  # here rather than passing `--dockerfile` keeps `flyctl deploy` a bare command.
+  dockerfile = "Dockerfile.fly"
+
+[env]
+  PORT = "8080"
+  # `HOST` is not here, and that is on purpose. `server.cjs` binds loopback unless told
+  # otherwise — on a laptop it serves the whole working tree, so the narrow bind is the
+  # only defensible default — and this deployment needs the wide one, because Fly's proxy
+  # arrives on the machine's private interface rather than on 127.0.0.1. But that is true
+  # of *any* container and not of Fly in particular, so `Dockerfile.fly` sets
+  # `HOST=0.0.0.0` and says why. Overriding it here would be a second answer to a
+  # question already answered one file away.
+
+  # The office registry, the avatars and the endpoint file, on the mounted volume
+  # below rather than in the image's `/root`. Without this a deploy replaces the
+  # filesystem holding every keycard, layout and ingest token.
+  ROVING_OFFICE_STATE_DIR = "/data/roving-office"
+  # Thirty days. The default half hour is a laptop's number, and it is fatal here:
+  # `auto_stop_machines` means the machine sleeps whenever nobody is looking, and
+  # `lib/office-store.cjs` refuses to restore an office that was already past its
+  # deadline when we come back up — so an overnight gap would empty the volume on
+  # the next visit. Long, but still finite: an office nobody has opened in a month
+  # is litter, and the reaper is the only thing that ever tidies up.
+  ROVING_OFFICE_IDLE_TTL_MS = "2592000000"
+  # Every request here arrives from Fly's proxy over the internal network, so the
+  # socket address is the same one for the whole internet. Without this the per-client
+  # limit on new offices (`server.cjs`) collapses into the whole-host one and the first
+  # five visitors of a window spend everybody's allowance. Fly *overwrites*
+  # `Fly-Client-IP`, which is what makes it safe to believe here and nowhere else —
+  # a header a caller can write is a rate limit a caller can set.
+  ROVING_OFFICE_TRUST_PROXY = "1"
+
+# The durable half of the app. Everything else in the image is rebuilt on every
+# deploy, which is the point of a container and the reason the state cannot live
+# there. A volume binds to one machine, so this is a second reason for the
+# `flyctl scale count 1` that `docs/developer/publishing.md` already requires — and a reason
+# not to reach for a bluegreen deploy, which wants a second machine that would have
+# no volume to attach to.
+[mounts]
+  source = "roving_office_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1

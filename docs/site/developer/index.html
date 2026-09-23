@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Where to look — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="where-to-look" tabindex="-1">Where to look</h1>
+<p><em>Developer documentation. It assumes you have a checkout and something you want to change.</em></p>
+<p>If you only want to <em>use</em> the office — install it, connect a harness, read the room —
+that is <a href="../user/index.html">the user documentation</a>, and it assumes nothing but a browser.</p>
+<h2 id="the-one-constraint-worth-knowing-first" tabindex="-1">The one constraint worth knowing first</h2>
+<p><strong>There is no build step, and that is load-bearing.</strong> <code>index.html</code> carries an import map,
+three.js is vendored, and every module loads as an ES module straight off disk. The whole
+loop is <em>edit a file, reload the tab</em>.</p>
+<p>Please do not introduce one. The single exception is the documentation site you are reading,
+which Eleventy builds into <code>docs/site/</code> — it does not touch the app.</p>
+<h2 id="start-here" tabindex="-1">Start here</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="getting-the-code.html">Getting the code</a></td>
+<td>Clone it, run it, and the five commands that make up a full check</td>
+</tr>
+<tr>
+<td><a href="developing.html">Developing on it</a></td>
+<td>The loop, the headless screenshot recipe, and the traps</td>
+</tr>
+<tr>
+<td><a href="npm-scripts.html">Every npm script</a></td>
+<td>All forty-odd of them, generated from <code>package.json</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="how-it-works" tabindex="-1">How it works</h2>
+<p>Roughly in the order a change travels:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="architecture.html">Architecture</a></td>
+<td>How a keystroke becomes somebody walking across the room, and where every file lives</td>
+</tr>
+<tr>
+<td><a href="protocol/aop-spec.html">The AOP spec</a></td>
+<td>The wire format an adapter speaks</td>
+</tr>
+<tr>
+<td><a href="protocol/aop-harness-adapters.html">Adapter notes</a></td>
+<td>What each harness can actually see, measured</td>
+</tr>
+<tr>
+<td><a href="sources.html">The source model</a></td>
+<td>How several feeds share one room</td>
+</tr>
+<tr>
+<td><a href="physics.html">The physics of the office</a></td>
+<td>The movement rules, and the holes in them</td>
+</tr>
+<tr>
+<td><a href="scene-internals.html">Scene internals</a></td>
+<td>Where the constants live, and the rules that keep a facade still</td>
+</tr>
+<tr>
+<td><a href="job-delivery.html">Job delivery</a></td>
+<td>The mailbox, which is the most stateful corner of the system</td>
+</tr>
+<tr>
+<td><a href="editor.html">The furniture editor</a></td>
+<td>The seams, and the file format</td>
+</tr>
+<tr>
+<td><a href="layout-algorithm.html">The layout algorithm</a></td>
+<td>A seed in, a whole layout out</td>
+</tr>
+<tr>
+<td><a href="tuning-the-layouts.html">Tuning the layout generator</a></td>
+<td>How we found out whether the rooms it makes are any good: one number, a headless simulation, a taste model fitted to human judgement, and an autonomous loop</td>
+</tr>
+</tbody>
+</table>
+<h2 id="changing-it" tabindex="-1">Changing it</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="extending.html">Extending the office</a></td>
+<td>Add a prop, a building, a source or an adapter — each is one recipe</td>
+</tr>
+<tr>
+<td><a href="prop-portraits.html">Photographing a prop</a></td>
+<td>Getting your new thing into the gallery</td>
+</tr>
+<tr>
+<td><a href="coplanar-probe.html">The coplanar-face probe</a></td>
+<td>Finding the two surfaces you just put on one plane</td>
+</tr>
+</tbody>
+</table>
+<p>Every recipe in <strong>Extending</strong> ends the same way: <code>npm test</code>, the probe, and a look at the
+scene. The registries fail loudly if you forget a step, which is the whole safety story —
+you cannot add half a prop.</p>
+<h2 id="what-is-not-here" tabindex="-1">What is not here</h2>
+<p><strong>Design records and deployment runbooks live in the maintainers' own workspace</strong>, not in
+this repository. That covers the proposals behind decisions already shipped, evaluations
+of routes not taken, and the procedures for the hosted offices — access grants, project
+administration, the container and edge configuration.</p>
+<p>They are kept out for two reasons rather than one. Several of them describe behaviour the
+code no longer has, so a contributor reading one would be reading a plan rather than the
+system; and the operational ones cite infrastructure nobody outside the maintainers can
+reach, so they document a machine you cannot log into. <strong>Nothing you need in order to
+change this code is in them.</strong> Where a decision's reasoning is worth having, it belongs in
+a comment beside the code or on a page in this set — which is why <em>why</em> is a house rule
+below.</p>
+<p>If you go looking for a design record because a comment refers to one, ask on the issue
+tracker instead: the answer is either something that should have been written down here,
+in which case say so, or something about a deployment, in which case it is a maintainer's
+to answer.</p>
+<h2 id="two-house-rules" tabindex="-1">Two house rules</h2>
+<p><strong>Docs move with the code, in the same PR.</strong> The documentation is accurate because that is
+a rule, not a hope. If your change makes a doc wrong, the change is not done.</p>
+<p><strong>Comments say why.</strong> This codebase writes its reasons down next to the code they justify.
+When you move code the comments travel verbatim; when you change a decision, rewrite its
+justification rather than deleting it.</p>
+<p>The rest of the working agreement is in <a href="https://github.com/atlassian-labs/roving-office/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>, and the
+agent-facing version in <a href="https://github.com/atlassian-labs/roving-office/blob/main/AGENTS.md">AGENTS.md</a>.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#the-one-constraint-worth-knowing-first">The one constraint worth knowing first</a></li>
+<li><a href="#start-here">Start here</a></li>
+<li><a href="#how-it-works">How it works</a></li>
+<li><a href="#changing-it">Changing it</a></li>
+<li><a href="#what-is-not-here">What is not here</a></li>
+<li><a href="#two-house-rules">Two house rules</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

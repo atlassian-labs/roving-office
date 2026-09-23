@@ -1,0 +1,20 @@
+{
+  "name": "@roving-office/openclaw-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Publishes OpenClaw agent activity to a Roving Office receiver as Agent Office Protocol events.",
+  "type": "module",
+  "openclaw": {
+    "extensions": ["./index.mjs"],
+    "compat": {
+      "pluginApi": ">=2026.7.1-2",
+      "minGatewayVersion": "2026.7.1-2"
+    }
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.7.1-2"
+  },
+  "peerDependenciesMeta": {
+    "openclaw": { "optional": true }
+  }
+}

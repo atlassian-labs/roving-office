@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenClaw — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html" aria-current="page">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="openclaw-adapter" tabindex="-1">OpenClaw adapter</h1>
+<p><em>Installing it is <a href="../../user/sources/openclaw.html">OpenClaw</a>; the identity fields are
+<a href="../../user/sources/openclaw-identity.html">names, colours and faces</a>. This is the plugin.</em></p>
+<p>The only adapter that is a <strong>plugin</strong> rather than a shell command per event, because
+OpenClaw has a real in-process hook bus. That buys heartbeats — every other adapter is a
+process that lives forty milliseconds and cannot say &quot;still alive&quot; — and costs the
+permission events, which its approval flow runs the wrong way round to observe.</p>
+<p><a href="../protocol/aop-spec.html#9-conformance-levels">Conformance level L2</a>. The verified hook
+payloads, the publisher's design and the WebSocket route are in
+<a href="../protocol/aop-harness-adapters.html#5-openclaw">adapter notes §5</a>.</p>
+<p>Everything the plugin accepts — <code>url</code>, <code>token</code>, <code>scene</code>, <code>wrappedHarness</code>, <code>heartbeatMs</code>,
+<code>lingerMs</code>, <code>enabled</code> — is declared in <code>openclaw-plugin/openclaw.plugin.json</code>, and
+<code>openclaw plugins inspect roving-office</code> reads it back.</p>
+<h2 id="why-the-installer-takes-no---url-and---token" tabindex="-1">Why the installer takes no <code>--url</code> and <code>--token</code></h2>
+<p>It would be one flow with two implementations: minting an office, spelling the ingest path,
+and knowing that <code>enabled</code> and <code>allowConversationAccess</code> matter — done once in the
+installer and again in whatever a reader pasted out of a page. The
+<a href="../../user/sources/openclaw-server.html">server-side script</a> does all of it, once.</p>
+<h2 id="upgrading-a-server-install-keeps-its-office" tabindex="-1">Upgrading a server install keeps its office</h2>
+<p>Running the script again is the whole procedure — that part is in
+<a href="../../user/sources/openclaw-server.html">OpenClaw on a server</a>. What follows is the
+resolution order behind it, and the diagnostics for when it goes wrong.</p>
+<p><strong>It keeps the office it already had.</strong> The script used to mint a fresh one on every run,
+which was defensible while an office was disposable — a deploy lost them all anyway, so a
+new keycard cost nothing that was not already gone. It is not defensible now: an office
+survives a deploy holding its scene layout, its furniture and its history, and it holds
+several named ingest tokens rather than one that re-minting revokes.</p>
+<p>So the office is resolved in this order, and the same goes for the <strong>scene</strong> — a room name
+somebody chose is not re-guessed from the hostname on an upgrade:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--keycard</code> + <code>--token</code></td>
+<td>the office you named</td>
+</tr>
+<tr>
+<td><em>(nothing)</em></td>
+<td>the one this Gateway is already publishing to, read back out of <code>plugins.entries.roving-office.config</code></td>
+</tr>
+<tr>
+<td><em>(nothing, and none configured)</em></td>
+<td>a freshly minted one</td>
+</tr>
+<tr>
+<td><code>--new-office</code></td>
+<td>a fresh one anyway. The old one is <strong>left behind, not replaced</strong> — everything in it is still there for anyone holding its keycard.</td>
+</tr>
+</tbody>
+</table>
+<p>The config is read <strong>before</strong> the install, which is load-bearing and easy to undo:
+<code>openclaw plugins install</code> rewrites <code>plugins.entries.roving-office</code>, so the endpoint is gone
+by the time the install has finished. Read, install, write. And it is read from the file
+rather than with <code>openclaw config get</code>, which would be the stabler contract and is the wrong
+tool here — <code>config get</code> prints the config <em>redacted</em>, and the write token is exactly the
+field that comes back masked.</p>
+<p>That works because the script always installs with <code>--force</code>, and it has to: <code>plugins install</code> <strong>refuses to overwrite an existing install</strong>, stopping with <code>plugin already exists: … (delete it first)</code>. On a server every run after the first is a replacement, so the polite form is only ever right once.</p>
+<p>Not <code>openclaw plugins update</code>: that is for packages tracked against a registry, and this is a private scoped tarball no registry has heard of. <code>--force</code> is also incompatible with <code>--link</code>, which is fine — a linked plugin never needs replacing, because there is no copy to replace.</p>
+<p>Two things to check afterwards, because &quot;installed&quot; and &quot;running&quot; are different claims:</p>
+<pre><code class="language-bash">openclaw plugins inspect roving-office --runtime --json
+# install.resolvedVersion — did the version actually move?
+# diagnostics[]           — anything blocked? see the permission section above
+</code></pre>
+<p><strong><code>scene</code> is set for you, to the server's hostname.</strong> Rooms are normally derived from the git remote, and a Gateway working outside a repo has none — it would land in a room named after whatever directory it happened to be in. <code>scene</code> names the room outright (<a href="../protocol/aop-spec.html#343-the-scene-override">spec §3.4.3</a>), so all of that Gateway's work arrives in one place; the hostname is a better guess than a directory, and <code>--scene</code> overrides it when the hostname is not what you want to see over a desk.</p>
+<p><strong>Check the server can actually reach the office before anything else.</strong> A Gateway usually
+runs somewhere other than your laptop, so it is answering a different network's questions —
+and an office behind a corporate proxy, a VPN or an allowlisting edge returns <code>403</code> and an
+error page <em>before</em> the keycard or the token is ever looked at, which reads exactly like a
+bad token. One <code>curl</code> from the Gateway host settles which it is:</p>
+<pre><code class="language-bash">curl -sS -o /dev/null -w '%{http_code}\n' -X POST \
+  https://therovingoffice.com/office/AB12CD34/aop/v0/events \
+  -H 'Content-Type: application/x-ndjson' -H 'X-Roving-Office-Token: &lt;token&gt;' \
+  --data '{&quot;aop&quot;:&quot;0.1&quot;,&quot;id&quot;:&quot;probe&quot;,&quot;seq&quot;:1,&quot;at&quot;:&quot;2026-01-01T00:00:00Z&quot;,&quot;type&quot;:&quot;session.start&quot;,&quot;harness&quot;:{&quot;name&quot;:&quot;openclaw&quot;},&quot;session&quot;:{&quot;id&quot;:&quot;probe&quot;,&quot;cwd&quot;:&quot;/tmp&quot;},&quot;payload&quot;:{&quot;source&quot;:&quot;startup&quot;}}'
+# 202 -&gt; the network is fine; 403 -&gt; it is not, and no plugin setting will fix it
+</code></pre>
+<p>If it is <code>403</code>, host the receiver somewhere the agent can reach instead — <code>server.cjs</code> is an
+ordinary Node server and will run wherever you can put one.</p>
+<p><strong>The office is minted for you</strong> — the script POSTs this itself and reads the reply, so the token never goes through a clipboard. By hand, from <a href="https://therovingoffice.com/">reception</a> or over HTTP; the write token is returned once, at mint, and no route will tell you it again:</p>
+<pre><code class="language-bash">curl -sX POST https://therovingoffice.com/api/offices -d '{}'
+# -&gt; { &quot;keycard&quot;: &quot;AB12CD34&quot;, &quot;writeToken&quot;: &quot;…&quot;, … }
+</code></pre>
+<p><strong>No change is needed to the office server itself.</strong> Ingest has been harness-agnostic since it was written: the plugin posts the same gzipped NDJSON batches to the same per-office endpoint with the same write token as the hook adapters, and <code>harness.name</code> is a label the receiver stores rather than a list it checks. This was tested against a deployed office rather than assumed: a new adapter needs no redeploy.</p>
+<h2 id="what-the-packer-does-and-the-one-thing-it-costs" tabindex="-1">What the packer does, and the one thing it costs</h2>
+<p>The plugin shares two modules with the hook adapters, up in <code>bin/</code> — the same answers to &quot;which office does this directory belong to&quot; and &quot;how much may be said about it&quot;. A tarball has no <code>bin/</code> above it, so the packer <strong>vendors</strong> those two files and rewrites the one file that reaches for them (<code>lib/shared.mjs</code>, which exists to be that single seam). Everything else in the artifact is byte-identical to the checkout, so it can be reviewed by diffing.</p>
+<p>It also copies <code>bin/aop-openclaw-server.sh</code> out beside the tarball, verbatim rather than generated — for the same reason the rest of the artifact is byte-identical to the checkout, since a shell script written into a JS string is a shell script nobody will review.</p>
+<p>It then refuses to ship an artifact that reaches outside itself. Every relative <code>import</code> and <code>require</code> in the staged tree is resolved, and any that escapes the package is a hard failure — because the symptom otherwise appears far away, as an OpenClaw Gateway logging a module-not-found at startup, and looks like OpenClaw's fault. <code>--verify</code> goes further and <em>runs</em> the packed plugin from a temp directory with no checkout above it, because a vendored file can be present and still be the wrong one.</p>
+<p><strong>The cost is that a packed install is a snapshot</strong>, and snapshots go stale — the trap described below, arriving by the other door. The version is stamped from <code>package.json</code> so the artifact is at least traceable, but a server keeps running the copy it has until someone installs a new one. Where you can link, link.</p>
+<p>This stopped being hypothetical on the first real install. <code>0.3.0</code> went to a server, the run-lifecycle problem above was found and fixed, and the fix had to ship as <code>0.4.0</code> — because OpenClaw records <code>resolvedVersion</code> and an install of a version it already holds can legitimately do nothing. <strong>If you are replacing an artifact on a server, check the version moved</strong>, and confirm with <code>openclaw plugins inspect roving-office --runtime --json</code> (the <code>install.resolvedVersion</code> and <code>install.installedAt</code> fields say what is really loaded).</p>
+<h2 id="installed-as-a-link-not-a-copy" tabindex="-1">Installed as a link, not a copy</h2>
+<p><code>npm run connect:openclaw</code> runs <code>openclaw plugins install --link</code>, and the link is deliberate.</p>
+<p>OpenClaw will happily install from ClawHub, npm, git or a local path, and for a local path it offers a copy or a link. A copy would be the conventional choice and it is the wrong one here, for two reasons. The plugin <strong>shares</strong> <code>bin/lib/aop-core.cjs</code> with the hook adapters — one answer per machine to &quot;which office does this repo belong to&quot; and &quot;how much may this office be told&quot; — and a copy of the plugin directory alone would not carry it. And a copy is a snapshot, which is the trap the <a href="claude-code.html#changing-the-plugin-means-bumping-the-version">Claude Code plugin</a> has to work around with a version bump on every change: an update that offers the version it already holds does nothing at all, silently, however far the files have drifted. A link has no snapshot, so it cannot go stale and there is no ritual to forget.</p>
+<p>The price is that the checkout has to stay where it is — and that a Gateway with no checkout at all cannot use this route, which is what <code>npm run pack:openclaw</code> is for. <code>--status</code> prints the linked path and says so plainly if it no longer points at this checkout, so a moved directory is a visible fact rather than an empty room.</p>
+<h2 id="the-one-thing-the-plugin-cannot-see" tabindex="-1">The one thing the plugin cannot see</h2>
+<p><strong>There is no permission hook.</strong> OpenClaw's approval flow runs the other way round: a plugin <em>asks</em> for approval by returning <code>requireApproval</code> from <code>before_tool_call</code>. It cannot observe the approvals <strong>core</strong> raises for its own <code>exec</code> tool.</p>
+<p>That matters more than the count of missing events suggests, because <a href="../protocol/aop-spec.html#44-attention-and-interruptions">the spec</a> calls <code>permission.request</code> the single most valuable non-L0 event — it is the only reliable signal that an agent is <em>waiting on you</em>, which is exactly what a room full of characters is best at showing at a glance. So the plugin does not declare it in its capabilities, and an OpenClaw agent blocked on an approval looks, from the office, like an agent thinking hard.</p>
+<p>The Gateway WebSocket does carry <code>exec.approval.requested</code> / <code>.resolved</code>, and that is the one concrete reason to prefer it. It is the obvious next increment rather than a redesign: the mapping is already written down in <a href="../protocol/aop-harness-adapters.html#5-openclaw">adapter notes §5</a>, and the plugin's publisher would be reused as-is.</p>
+<p><strong>And the plugin never returns a decision.</strong> <code>before_tool_call</code>, <code>before_agent_run</code> and several others <em>can</em> block a call, rewrite its parameters or demand human approval. Every handler in this plugin returns <code>undefined</code>, always, and the test harness asserts it. A diorama does not get a vote on whether a tool call happens.</p>
+<h2 id="double-counting-and-why-it-has-not-bitten-yet" tabindex="-1">Double counting, and why it has not bitten yet</h2>
+<p>OpenClaw wraps Claude Code and Codex. So a machine with this plugin <strong>and</strong> our Claude Code plugin installed can see the same work twice: once as an OpenClaw session, once as a Claude Code session, standing at two desks.</p>
+<p>The plugin holds up its end — it stamps <code>harness.name = &quot;openclaw&quot;</code> and, when told which harness it is fronting, <code>ext.wrapped_harness</code>:</p>
+<pre><code class="language-json">{ &quot;plugins&quot;: { &quot;entries&quot;: { &quot;roving-office&quot;: { &quot;config&quot;: { &quot;wrappedHarness&quot;: &quot;claude-code&quot; } } } } }
+</code></pre>
+<p>It has to be told rather than sniffing, and that is the honest position: nothing in the hook payloads names the wrapped harness. <code>modelProviderId</code> is the provider (<code>anthropic</code>), not the harness, and guessing <code>claude-code</code> from it would be wrong for every session where OpenClaw drives Anthropic directly.</p>
+<p>The other end — the office <strong>de-duplicating</strong> on <code>session.cwd</code> plus overlapping time when two harnesses report the same <code>project.repo.commit</code> — is <strong>not built</strong>. Until it is, the mitigation is to run one or the other, which is what <code>wrappedHarness</code> is really for: it is a declaration, ready for a reducer that does not exist yet.</p>
+<h2 id="what-the-office-is-told" tabindex="-1">What the office is told</h2>
+<p>The same as every other source, and the same <a href="../protocol/aop-spec.html#10-privacy-and-redaction">redaction</a> settings in <code>~/.roving-office/settings.json</code> govern it — they are the office's, not a harness's, so one setting covers every harness on the machine.</p>
+<table>
+<thead>
+<tr>
+<th>OpenClaw hook</th>
+<th>Becomes</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>session_start</code></td>
+<td><code>session.start</code></td>
+<td><strong>deferred</strong> — see below</td>
+</tr>
+<tr>
+<td><code>session_end</code></td>
+<td><code>session.end</code></td>
+<td>its nine reasons collapse onto AOP's seven</td>
+</tr>
+<tr>
+<td><code>before_agent_run</code></td>
+<td><code>turn.start</code></td>
+<td>the desk label, and the first event that knows a directory</td>
+</tr>
+<tr>
+<td><code>agent_end</code></td>
+<td><code>turn.end</code></td>
+<td>with a duration and a tool-call count</td>
+</tr>
+<tr>
+<td><code>before_tool_call</code></td>
+<td><code>tool.start</code></td>
+<td>classified into the closed <code>tool_class</code> enum</td>
+</tr>
+<tr>
+<td><code>after_tool_call</code></td>
+<td><code>tool.end</code>, <code>artifact.change</code></td>
+<td>the artifact only on success</td>
+</tr>
+<tr>
+<td><code>subagent_spawned</code> / <code>subagent_ended</code></td>
+<td>child <code>session.start</code> / <code>session.end</code></td>
+<td>real <a href="../scene-internals.html#subagents-are-ghosts">ghosts</a>, bound to the tool call that spawned them</td>
+</tr>
+<tr>
+<td><code>before_compaction</code> + <code>after_compaction</code></td>
+<td><code>context.compact</code></td>
+<td>the pair, because each hook knows one of the two numbers</td>
+</tr>
+<tr>
+<td><code>cron_changed</code></td>
+<td><em>nothing, directly</em></td>
+<td>it names the scheduled jobs, so the <strong>turn</strong> they cause can say which one it is — see below</td>
+</tr>
+<tr>
+<td><em>a 15-second timer</em></td>
+<td><code>session.heartbeat</code></td>
+<td>the thing no hook adapter can do</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-a-scheduled-run-looks-like" tabindex="-1">What a scheduled run looks like</h3>
+<p><em>Verified 2026-09-02 by reading <code>dist/hook-types-*.d.ts</code>, <code>dist/server-cron-*.js</code>,
+<code>dist/run-executor.runtime-*.js</code> and <code>dist/embedded-agent-*.js</code> out of <code>npm pack openclaw</code>,
+at <strong>2026.7.1-2</strong> (the version the plugin targets) and again at <strong>2026.8.2</strong> (current). Every
+fact below holds on both.</em></p>
+<p>This is the answer the plan for carrying <em>why a job exists</em> onto the wire went looking for,
+and it is better than that plan assumed: <strong>a cron run already tells a plugin its job's name,
+id, schedule and outcome.</strong> Nothing needs to be inferred, and no new permission
+is needed to hear it.</p>
+<p><strong>1. The agent context names the job.</strong> <code>PluginHookAgentContext</code> — the <code>ctx</code> of
+<code>before_agent_run</code>, <code>agent_end</code>, <code>before_tool_call</code> and <code>after_tool_call</code> — carries two fields
+the mapper does not read today:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>For a cron run</th>
+<th>Declared</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ctx.trigger</code></td>
+<td><code>&quot;cron&quot;</code></td>
+<td><em>&quot;What initiated this agent run&quot;</em> — a closed enum, see below</td>
+</tr>
+<tr>
+<td><code>ctx.jobId</code></td>
+<td>the job's id</td>
+<td><em>&quot;Stable cron job identifier populated for cron-triggered runs&quot;</em></td>
+</tr>
+</tbody>
+</table>
+<p>Both are set together where the run is launched (<code>run-executor.runtime</code>, for the CLI-backed and
+embedded paths alike) and copied straight onto the hook context in <code>embedded-agent</code>, beside
+<code>runId</code>, <code>sessionId</code> and <code>workspaceDir</code>. So <code>ctx.jobId</code> is the <strong>correlation key</strong>, and it is on
+the same event that already becomes <code>turn.start</code>.</p>
+<p><strong>2. <code>ctx.trigger</code> is a closed six-member enum</strong>, not free text:</p>
+<pre><code class="language-ts">type EmbeddedRunTrigger = &quot;cron&quot; | &quot;heartbeat&quot; | &quot;manual&quot; | &quot;memory&quot; | &quot;overflow&quot; | &quot;user&quot;;
+</code></pre>
+<p>Which settles the old suspicion that a cron is drawn as a human request, and settles it the
+other way round from the guess. <code>TRIGGERS</code> in <code>lib/map.mjs</code> already maps
+<code>cron</code>, <code>heartbeat</code>, <code>manual</code> and <code>user</code>, so <strong>a cron is not being reported as a human
+request</strong> — the desk says <code>Working</code> because the <em>title</em> falls back, not because the trigger is
+wrong. The two genuinely unmapped values are <code>memory</code> and <code>overflow</code>, both of which silently
+become <code>'user'</code> today. Neither is a human asking for anything: they are the agent flushing
+memory and shedding context.</p>
+<p><strong>3. There is a <code>cron_changed</code> hook, and it carries the whole job.</strong> It is in
+<code>PLUGIN_HOOK_NAMES</code>, it is <strong>not</strong> in <code>CONVERSATION_HOOK_NAMES</code>, and so — unlike
+<code>before_agent_run</code> — it needs no <code>allowConversationAccess</code>. It fires with a <em>gateway</em> context,
+not an agent one:</p>
+<pre><code class="language-ts">cron_changed: (event: PluginHookCronChangedEvent, ctx: PluginHookGatewayContext) =&gt; void
+</code></pre>
+<table>
+<thead>
+<tr>
+<th><code>event.action</code></th>
+<th>When</th>
+<th>What comes with it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>started</code></td>
+<td>immediately before the run begins</td>
+<td><code>jobId</code>, <code>job</code>, <code>runAtMs</code></td>
+</tr>
+<tr>
+<td><code>finished</code></td>
+<td>after it ends</td>
+<td><code>jobId</code>, <code>job</code>, <code>status</code>, <code>error</code>, <code>summary</code>, <code>durationMs</code>, <code>sessionId</code>, <code>sessionKey</code>, <code>runId</code>, <code>delivered</code>, <code>nextRunAtMs</code>, <code>model</code>, <code>provider</code></td>
+</tr>
+<tr>
+<td><code>added</code>, <code>updated</code>, <code>removed</code></td>
+<td>the job definition changed</td>
+<td><code>jobId</code>, <code>job</code></td>
+</tr>
+</tbody>
+</table>
+<p>And <code>event.job</code> is the definition itself — <code>id</code>, <code>agentId</code>, <code>name</code>, <code>description</code>, <code>enabled</code>,
+<code>sessionTarget</code>, <code>payload.text</code>, and a discriminated <code>schedule</code>:</p>
+<pre><code class="language-ts">| { kind: &quot;cron&quot;;    expr?; tz?; staggerMs? }
+| { kind: &quot;at&quot;;      at? }
+| { kind: &quot;every&quot;;   everyMs?; anchorMs? }
+| { kind: &quot;on-exit&quot;; command?; cwd? }
+</code></pre>
+<p>Which is, field for field, the <code>origin</code> object that doc proposed: <code>name</code>, <code>id</code>, <code>schedule</code>.
+The operator's own words for the job, its id and its cron expression — <em>&quot;Hourly inbox
+triage&quot;</em>, <code>11111111-…</code> and <code>17 * * * *</code> in the example below — are all right there.</p>
+<p><strong>Two ordering facts that decide the design.</strong> <code>started</code> fires <em>before</em> the run, so a job
+cached on <code>cron_changed</code> is already in hand when <code>before_agent_run</code> arrives with the matching
+<code>ctx.jobId</code> — the lookup is local and synchronous, which is the only kind a hook may do. But
+<code>started</code> carries <strong>no <code>sessionId</code> or <code>sessionKey</code></strong> (only <code>finished</code> does), so the join has to
+run in that direction: <code>cron_changed</code> stashes the job by id; <code>before_agent_run</code> claims it by
+<code>ctx.jobId</code>. Going the other way would need a session the <code>started</code> event does not know.</p>
+<p><code>ctx.getCron()</code> on the gateway context is the backstop for a gateway that was already running
+jobs when the plugin loaded — <code>list({ includeDisabled })</code> returns the same <code>job</code> shapes. It is
+async, so it belongs in <code>gateway_start</code>, never in a hook.</p>
+<p><strong>4. The heartbeat is a different shape, and its answer is thinner.</strong> A heartbeat run is
+<code>ctx.trigger === &quot;heartbeat&quot;</code> with <strong>no <code>jobId</code></strong> — it is not a cron job. There is a
+<code>heartbeat_prompt_contribution</code> hook carrying <code>{ sessionKey, agentId, heartbeatName }</code>, so the
+<em>name</em> is available; but it is a prompt-injection hook, whose whole purpose is to return text
+to inject, and registering it means core will call and merge our result. Observing through it
+is possible (return nothing) but it is a decision hook by nature, and
+<a href="#the-one-thing-the-plugin-cannot-see">the plugin's rule</a> is that we never register for one to
+watch it.</p>
+<p>The checklist is not on any hook. It lives in <strong><code>HEARTBEAT.md</code> in the agent's workspace</strong> —
+the default prompt is <em>&quot;Read HEARTBEAT.md if it exists… Follow it strictly&quot;</em> — so the plugin
+has to read the checklist off a file rather than be handed it by a hook, which is the same
+trick <code>lib/identity.mjs</code> already plays on <code>IDENTITY.md</code> in the same directory. So a heartbeat <code>plan</code>
+is readable; <strong>which</strong> item is running is still not, and nothing found here changes that.</p>
+<p><strong>What is still missing</strong>, so it is not re-discovered later: there is no per-step signal for a
+cron or heartbeat run, and <code>payload.text</code> is the job's prompt rather than a description of its
+parts. Steps for OpenClaw remain the last unanswered stage of the step work, and remain
+unanswered.</p>
+<h3 id="so-a-scheduled-desk-says-what-it-is-doing" tabindex="-1">So a scheduled desk says what it is doing</h3>
+<p>Built on the above, and the reason the desk label stopped reading <code>Working</code>.</p>
+<p>The plugin keeps a table of <code>jobId → job</code>, filled from <code>cron_changed</code> and topped up at
+<code>gateway_start</code> from <code>getCron().list()</code> for the jobs that already existed. A <code>turn.start</code>
+then carries an <code>origin</code> (<a href="../protocol/aop-spec.html#origin-why-a-turn-exists">spec §4.2</a>) claimed from
+that table by <code>ctx.jobId</code>:</p>
+<pre><code class="language-jsonc">{ &quot;type&quot;: &quot;turn.start&quot;, &quot;payload&quot;: {
+    &quot;title&quot;: &quot;Hourly inbox triage&quot;,
+    &quot;trigger&quot;: &quot;schedule&quot;,
+    &quot;origin&quot;: { &quot;kind&quot;: &quot;schedule&quot;,
+                &quot;name&quot;: &quot;Hourly inbox triage&quot;,
+                &quot;id&quot;: &quot;11111111-2222-4333-8444-555555555555&quot;,
+                &quot;schedule&quot;: &quot;17 * * * *&quot; } } }
+</code></pre>
+<p>Three things about that are worth stating rather than leaving to be inferred.</p>
+<p><strong>The name survives <code>metadata</code>, which is the whole point.</strong> <code>resolveRedaction()</code> defaults to
+<code>metadata</code>, so a rule that treated an operator's job name as conversation content is what made
+every scheduled desk in every default install read <code>Working</code>. A cron job's name is typed into a
+scheduler config, not into a prompt — the same category of thing as a tool name or a file path,
+both of which <code>metadata</code> already sends. <a href="../protocol/aop-spec.html#10-privacy-and-redaction">Spec §10</a>
+carries the ruling as a row of its own. The job's <em>prompt</em> (<code>payload.text</code>) is a prompt like any
+other and never travels; only <code>name</code>, <code>id</code> and <code>schedule</code> do.</p>
+<p><strong>It needs <code>allowConversationAccess</code>, and that is not obvious.</strong> <code>ctx.jobId</code> rides on the agent
+context, and the only hook carrying it that we register is <code>before_agent_run</code> — a conversation
+hook. <code>PluginHookToolContext</code> has neither <code>jobId</code> nor <code>trigger</code>, so the turn synthesised from a
+tool call cannot be rescued <em>this</em> way. On an install that declined the permission, a cron run
+still appears; it just cannot say whose errand it is by this route — see
+<a href="#when-only-half-the-run-lifecycle-arrives">the next section</a> for the route that does not need
+the permission at all. One more entry for
+<a href="../../user/sources/openclaw.html#set-this-one-flag-or-desks-will-have-no-labels">the table above</a>.</p>
+<p><strong>An unmapped trigger is now omitted rather than called <code>user</code>.</strong> <code>memory</code> and <code>overflow</code> are
+the agent flushing memory and shedding context, and AOP's five-word <code>trigger</code> enum has no home
+for either. They used to arrive as <code>user</code> — drawn as a person asking for something, which is the
+same small lie as calling a 3am ingest &quot;Working&quot;. <code>trigger</code> is optional, so it is left out, and
+<code>origin.kind</code> says <code>maintenance</code>.</p>
+<h3 id="when-only-half-the-run-lifecycle-arrives" tabindex="-1">When only half the run lifecycle arrives</h3>
+<p><em>Measured on 2026-09-03, from the office's own buffer
+(<code>/office/&lt;keycard&gt;/aop/v0/state?after=0</code>) on a gateway running <code>openclaw</code> with the plugin
+installed and publishing happily.</em></p>
+<p>The section above assumed the run lifecycle is all-or-nothing: either
+<code>allowConversationAccess</code> is set and both hooks fire, or it is not and neither does. A live
+gateway disagreed. Four consecutive turns arrived carrying <code>turn.end</code> with a <code>turn_id</code>, a
+<code>duration_ms</code> and a tool count — which only <code>agent_end</code> produces — while every <code>turn.start</code>
+was the one synthesised inside <code>onToolStart</code>, payload <code>{&quot;title&quot;:&quot;Working&quot;}</code> and nothing else.
+<code>before_agent_run</code> was not arriving; <code>agent_end</code> was.</p>
+<p>Three signatures tell those two turns apart, and they are worth writing down because the
+office cannot show the difference and a busy agent looks identical:</p>
+<ol>
+<li><strong>The timestamp matches the tool call to the millisecond.</strong> A real <code>turn.start</code> precedes
+the first tool call by however long the model thought.</li>
+<li><strong><code>ext.openclaw.run_id</code> is set while <code>payload.turn_id</code> is not.</strong> Both are read off the same
+<code>ctx.runId</code> in <code>onAgentRun</code>, so that pair cannot occur on the real path — but <code>onToolStart</code>
+learns the run id and then emits a turn that has no id to give.</li>
+<li><strong><code>tool_calls</code> climbs across turns of one session</strong> — 14, then 16, then 20. The reset lived
+only in <code>onAgentRun</code>. That is fixed: the count now belongs to whichever handler opens the
+turn.</li>
+</ol>
+<p>Both dispatch sites for the hook are inside OpenClaw (<code>runEmbeddedAttemptBeforeAgentRun</code>, and
+the CLI runner), both are guarded by a <code>hookRunner</code> handed in by the caller, and the
+registration gate is per hook name but reads one flag for the whole conversation set
+(<code>dist/loader-*.js</code>, <code>conversationHookNameSet</code>) — so a permission that admits <code>agent_end</code> has
+admitted <code>before_agent_run</code> too, and the cause is further in than config. Root cause on the
+gateway is still open; what follows is the plugin not depending on the answer.</p>
+<p>What settles it, on the gateway host, in three commands. The hook dispatch line is logged at
+<code>debug</code> by OpenClaw itself, which is the one piece of evidence that separates <em>not registered</em>
+from <em>registered and never called</em>:</p>
+<pre><code class="language-bash">openclaw plugins inspect roving-office --runtime --json   # registered hooks, diagnostics[], resolvedVersion
+openclaw config get plugins.entries.roving-office         # allowConversationAccess, and whether it is installed twice
+OPENCLAW_LOG_LEVEL=debug openclaw logs --follow | grep -E '\[hooks\] running (before_agent_run|agent_end)'
+</code></pre>
+<p><code>openclaw logs</code> works over RPC, so none of that needs a shell on the box.</p>
+<p><strong>One more thing the same buffer showed, unrelated and worth its own look.</strong> In the
+interactive session every tool call arrived <strong>twice</strong> — same <code>tool_call_id</code>, about 55 ms
+apart, under two names (<code>openclawcron</code> and <code>cron</code>, <code>openclawmemory_search</code> and
+<code>memory_search</code>), the second <code>tool.end</code> missing its duration because the first had already
+taken the call off the in-flight table. Seven real calls became fourteen. The cron session's
+<code>exec</code> fired once, so this is the interactive path only, and the two payloads differ, so it is
+two dispatches rather than a duplicated publish. Whether that is a gateway wrapper announcing
+the call at two layers or the plugin being loaded twice is answered by the second command
+above. Not fixed here: de-duplicating on <code>tool_call_id</code> in the mapper would paper over a
+question worth answering, and would also hide a genuinely re-run tool call.</p>
+<p><strong>So a scheduled desk names its job without the run hook.</strong> <code>cron_changed</code> is <em>not</em> a
+conversation hook, and it carries the whole job. It cannot carry the join — <code>started</code> has no
+session — but two of its actions can be made to:</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Evidence</th>
+<th>Confidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ctx.jobId</code> on <code>before_agent_run</code></td>
+<td>the harness states the pairing</td>
+<td>certain, and preferred whenever it arrives</td>
+</tr>
+<tr>
+<td><code>finished</code> → <code>{ jobId, sessionId }</code></td>
+<td>the one cron event carrying a job and a session together</td>
+<td>certain, from the second tick of a <code>sessionTarget</code> job onwards</td>
+</tr>
+<tr>
+<td>a <code>started</code> tick claimed by a session</td>
+<td>one unclaimed tick, &lt; 60 s old, for this session's agent</td>
+<td>a join on the clock</td>
+</tr>
+<tr>
+<td>the tick whose job describes the work in hand</td>
+<td>the target of the first tool call, scored against each job's name and prompt</td>
+<td>a join on the evidence, and it <strong>declines on a tie</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The last two rows are the only inference in the chain, and both are fenced: the agent has to
+match where both ends know it, a claim is consumed so two sessions cannot take one tick, and
+an ambiguity that cannot be resolved yields no <code>origin</code> at all. A desk wearing the wrong
+errand's name is worse than a desk wearing none.</p>
+<p><strong>The fourth row is what makes the third one useful in practice</strong>, because two jobs for one
+agent on the same ten-minute anchor is not a corner case. Measured on 2026-09-03: Sideline's
+Rabbitohs and Utah watchers tick together, and the clock alone could only decline — so <em>both</em>
+desks lost their name, which is the failure this whole section exists to remove, arriving by
+another road. The run itself settles it. A tick's job was described by an operator who wrote a
+name and a prompt, and a run shelling out to <code>python3 rabbitohs_live_watch.py</code> has said which
+of the two descriptions it belongs to.</p>
+<p>Scored on the <em>words</em> of the target, not the string, because the two ends are written by
+different people: <code>rabbitohs_live_watch.py</code> and <em>&quot;Sideline Rabbitohs live watch&quot;</em> share three
+words and no substring. Only the named thing contributes — basenames, nothing under four
+letters, no interpreters, no flags — because a word two jobs share cannot tell them apart, and
+<code>watch</code> is in both of those names. The winner must be strict; a tie is the ambiguity we
+started with.</p>
+<p><code>payload.text</code> is read for this and, as everywhere else, never published. Reading a prompt to
+recognise a job is not the same act as forwarding it, and the test file holds that line with
+an assertion over the whole wire rather than over one field.</p>
+<p><strong>And a turn with no job to claim says what it is doing instead of that it is doing
+something.</strong> <code>Working</code> is true of every turn ever run. The first tool call is a worse label
+than a prompt and a much better one than that — <code>Running rabbitohs_live_watch.py</code> — and it is
+new on the wire nowhere: the same string is already travelling as the <code>tool.start</code> beside it.
+Only the classes whose target is a path or a command name it; a <code>search</code> target is the model's
+own query, which is free text, so those contribute the verb alone.</p>
+<p><strong>The desk drops the agent's own name off the front of the label.</strong> An operator who calls a job
+<em>&quot;Sideline Rabbitohs live watch&quot;</em> is naming the agent because a scheduler config has nowhere
+else to say whose errand it is — and the office has a character standing at the desk already
+wearing that name. So the sidebar reads <code>Sideline Cruston · Rabbitohs live watch</code>, twenty-eight
+characters instead of forty, while <code>origin.name</code> keeps the operator's words verbatim because
+that is the fact and repeat runs of one job group by it.</p>
+<p><strong>A job's <code>description</code> travels from <code>summary</code> up.</strong> It is the operator's own answer to <em>why
+this job exists</em>, which is exactly what a viewer wants and what the agent had to be asked for
+in a chat window. It goes in <code>origin.detail</code> — and <a href="../protocol/aop-spec.html#10-privacy-and-redaction">spec §10</a>
+holds <code>detail</code> back at <code>metadata</code>, where <code>name</code> gets through. A description is an operator's
+prose rather than a model's, which is a fair argument for letting it through too, but that is
+an argument for changing that row of the spec and not for an emitter quietly disagreeing with
+it. Left as the spec has it, and noted here as the open question it is.</p>
+<h2 id="identity-resolution-and-the-latch-that-bit" tabindex="-1">Identity resolution, and the latch that bit</h2>
+<p>The reader-facing rules are
+<a href="../../user/sources/openclaw-identity.html">names, colours and faces</a>. Two implementation
+facts belong here.</p>
+<p><strong>The default agent is the load-bearing detail</strong>, since it is the one whose workspace is
+plain <code>workspace</code> rather than <code>workspace-&lt;id&gt;</code>. It is <code>main</code> unless an entry in
+<code>agents.list</code> says <code>default: true</code>, and that constant is not an optimisation — inferring it
+from the config was a bug worth naming, because <code>main</code> is the agent most likely not to be in
+the config at all. Guessing &quot;whichever is listed first&quot; was wrong twice over: <code>main</code> was
+looked for in a <code>workspace-main</code> that does not exist and turned up nameless, while whoever
+happened to be listed first was handed <code>~/.openclaw/workspace</code> and read <strong>Main's</strong>
+<code>IDENTITY.md</code>. Two agents wearing the wrong name each, from one guess.</p>
+<p>Workspace paths follow OpenClaw's own rules, including the quirk that <code>OPENCLAW_STATE_DIR</code>
+moves every agent's workspace <strong>except</strong> the default one, which moves with
+<code>OPENCLAW_WORKSPACE_DIR</code>. <code>--status</code> resolves through the plugin's own <code>lib/identity.mjs</code>,
+so it cannot politely disagree with the room.</p>
+<p><strong>An identity belongs to an agent, not to a desk</strong>, and this one has already gone wrong. The
+bridge remembers who a session is so it is not re-reading files on every event, and the
+first version of that remembering was a <strong>latch</strong>: the first agent a session record ever saw
+got to name it, permanently. A session key handed out a second time, or a ghost respawned at
+an address a previous one had, therefore turned up wearing the <em>previous</em> occupant's name,
+shirt and face; the room filled with copies of whoever arrived first, and Bobster's work
+appeared under Sideline's name.</p>
+<p>The rule now is that the answer is kept beside the agent it was asked about, and a different
+agent at the desk <strong>drops all three fields together</strong> — keeping any one of them is the same
+bug, one field at a time.</p>
+<p>The colour fitting itself, including the two approaches that produced a green charcoal and a
+hot-pink oxblood, is in <code>src/agents/colour.js</code>.</p>
+<h2 id="sessionstart-waits-and-that-is-not-a-bug" tabindex="-1"><code>session.start</code> waits, and that is not a bug</h2>
+<p>OpenClaw's session hooks do not know where they are: the context is
+<code>{ agentId, sessionId, sessionKey }</code> and nothing else. Only the <em>agent</em> context carries
+<code>workspaceDir</code>, and that does not arrive until the first turn.</p>
+<p>Publishing immediately would file the session under no project at all — the office would
+seat a character in the <code>default</code> room and then meet the same session again, with a real
+project, in another. So the event is <strong>held</strong> until something knows a directory, then sent
+ahead of it with its original timestamp intact.</p>
+<p><a href="../adapters/rovo-cli.html">Rovo CLI</a> ends up in the same place for a different reason, and
+<a href="../protocol/aop-spec.html#7-loss-gaps-and-recovery">the spec</a> blesses it either way: a late
+arrival beats a phantom. A session that ends without ever running a turn is still announced,
+at the end, with no project — it existed, and it did nothing.</p>
+<h2 id="avatars-the-bytes-have-to-travel" tabindex="-1">Avatars: the bytes have to travel</h2>
+<p>The file is on the gateway and the office is a browser somewhere else, so there is nothing
+to link to. The plugin reads it, hashes it, asks the office whether it already holds that
+picture, and uploads only if not — so a gateway restart costs one small question per agent.
+It never happens inside a hook, so an agent is never waiting on it.</p>
+<p><code>.svg</code> is refused on purpose: it is a document that can carry script, and the office would
+be serving it from its own origin.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../protocol/aop-harness-adapters.html#5-openclaw">Adapter notes §5</a> — the verified payloads, the publisher, and the WebSocket route</li>
+<li><a href="../protocol/aop-spec.html">The AOP spec</a> — the protocol itself</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#why-the-installer-takes-no---url-and---token">Why the installer takes no --url and --token</a></li>
+<li><a href="#upgrading-a-server-install-keeps-its-office">Upgrading a server install keeps its office</a></li>
+<li><a href="#what-the-packer-does-and-the-one-thing-it-costs">What the packer does, and the one thing it costs</a></li>
+<li><a href="#installed-as-a-link-not-a-copy">Installed as a link, not a copy</a></li>
+<li><a href="#the-one-thing-the-plugin-cannot-see">The one thing the plugin cannot see</a></li>
+<li><a href="#double-counting-and-why-it-has-not-bitten-yet">Double counting, and why it has not bitten yet</a></li>
+<li><a href="#what-the-office-is-told">What the office is told</a><ul><li><a href="#what-a-scheduled-run-looks-like">What a scheduled run looks like</a></li>
+<li><a href="#so-a-scheduled-desk-says-what-it-is-doing">So a scheduled desk says what it is doing</a></li>
+<li><a href="#when-only-half-the-run-lifecycle-arrives">When only half the run lifecycle arrives</a></li></ul></li>
+<li><a href="#identity-resolution-and-the-latch-that-bit">Identity resolution, and the latch that bit</a></li>
+<li><a href="#sessionstart-waits-and-that-is-not-a-bug">session.start waits, and that is not a bug</a></li>
+<li><a href="#avatars-the-bytes-have-to-travel">Avatars: the bytes have to travel</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

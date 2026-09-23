@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cursor — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html" aria-current="page">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="cursor-adapter" tabindex="-1">Cursor adapter</h1>
+<p><em>Installing it is <a href="../../user/sources/cursor.html">Cursor</a>. This is the mapping.</em></p>
+<p>The smallest of the five adapters, and an <strong>observer only</strong>: it does not write hook output
+and does not block any action.</p>
+<h2 id="hook-aop" tabindex="-1">Hook → AOP</h2>
+<table>
+<thead>
+<tr>
+<th>Cursor hook</th>
+<th>AOP event</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sessionStart</code> / <code>sessionEnd</code></td>
+<td><code>session.start</code> / <code>session.end</code></td>
+</tr>
+<tr>
+<td><code>beforeSubmitPrompt</code></td>
+<td><code>turn.start</code></td>
+</tr>
+<tr>
+<td>generic tool hooks</td>
+<td><code>tool.start</code> / <code>tool.end</code></td>
+</tr>
+<tr>
+<td><code>afterFileEdit</code></td>
+<td><code>artifact.change</code></td>
+</tr>
+<tr>
+<td><code>preCompact</code></td>
+<td><code>context.compact</code></td>
+</tr>
+<tr>
+<td><code>stop</code></td>
+<td><code>turn.end</code></td>
+</tr>
+<tr>
+<td>anything unrecognised</td>
+<td><code>session.heartbeat</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shell boundary hooks are used only when a generic Shell hook is unavailable</strong>, which is
+what avoids double-counting a command.</p>
+<p><strong>An unknown hook becomes a heartbeat, deliberately.</strong> It keeps a live session present
+without claiming semantics the adapter cannot support — so a Cursor release that adds an
+event cannot make characters vanish from the room. That is the same instinct as the Rovo
+mapper's unrecognised-hook fallback.</p>
+<h2 id="todo_write-steps" tabindex="-1"><code>todo_write</code> → steps</h2>
+<p>Cursor's <code>TodoWrite</code> / <code>todo_write</code> tool becomes an AOP plan: the active todo starts a
+step, completing it ends that step, and the next active todo starts the next one. A
+multi-step job therefore stays visible as its actual sequence rather than one
+undifferentiated tool call.</p>
+<h2 id="installation" tabindex="-1">Installation</h2>
+<p>The installer adds commands <strong>alongside</strong> existing entries in <code>~/.cursor/hooks.json</code>, backs
+the file up before changing it, and does not touch hooks it did not install — the Claude
+shape rather than the Rovo one, because Cursor runs every matching hook.</p>
+<p>Cursor watches that file and reloads it automatically, so there is no restart step in the
+install.</p>
+<h2 id="redaction-matters-more-here" tabindex="-1">Redaction matters more here</h2>
+<p>Cursor hook data can include <strong>prompt text and tool results</strong>, so the adapter is doing real
+work at the <code>metadata</code> default. <a href="../protocol/aop-spec.html#10-privacy-and-redaction">Spec §10</a>
+is the contract; redaction happens on the machine, before anything leaves it.</p>
+<h2 id="no-subagents" tabindex="-1">No subagents</h2>
+<p>Cursor exposes no subagent lifecycle, so a Cursor office cannot show ghosts.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../protocol/aop-harness-adapters.html">Adapter notes</a> — the shared measurements</li>
+<li><a href="../protocol/aop-spec.html">The AOP spec</a> — the wire format</li>
+<li><a href="../extending.html#add-a-harness-adapter">Extending the office</a> — writing another one</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#hook-aop">Hook → AOP</a></li>
+<li><a href="#todo_write-steps">todo_write → steps</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#redaction-matters-more-here">Redaction matters more here</a></li>
+<li><a href="#no-subagents">No subagents</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

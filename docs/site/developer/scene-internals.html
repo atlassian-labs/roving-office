@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scene internals — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html" aria-current="page">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="scene-internals" tabindex="-1">Scene internals</h1>
+<p><em>The code side of the room and the buildings round it: where the constants live, which
+rules keep the facades still, and the measurements behind the things that look arbitrary.</em></p>
+<p>The reader-facing tours are <a href="../user/the-room.html">the room, prop by prop</a> and
+<a href="../user/buildings.html">buildings and themes</a>. This is everything those two pages
+deliberately leave out.</p>
+<h2 id="where-things-are-declared" tabindex="-1">Where things are declared</h2>
+<table>
+<thead>
+<tr>
+<th>What</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Projects and themes</td>
+<td><code>src/projects.js</code> (<code>BUILDINGS</code>, <code>THEMES</code>, <code>OUTSIDE_MODES</code>)</td>
+</tr>
+<tr>
+<td>The floor plan, footprints, stations</td>
+<td><code>src/layout.js</code></td>
+</tr>
+<tr>
+<td>Prop builders, and the registry</td>
+<td><code>src/scene/props/</code>, <code>props/index.js</code></td>
+</tr>
+<tr>
+<td>Facade and storey construction</td>
+<td><code>src/scene/building.js</code></td>
+</tr>
+<tr>
+<td>Ways in from the street</td>
+<td><code>src/scene/approach.js</code></td>
+</tr>
+<tr>
+<td>Outlooks</td>
+<td><code>src/scene/outlooks/</code>, <code>outlooks/index.js</code></td>
+</tr>
+<tr>
+<td>Statuses and their colours</td>
+<td><code>STATUS_GROUPS</code>, <code>JOB_COLORS</code> in <code>src/config.js</code></td>
+</tr>
+<tr>
+<td>Status wording</td>
+<td><code>src/ui/format.js</code></td>
+</tr>
+<tr>
+<td>The gallery's framing</td>
+<td><code>src/scene/catalogue.js</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>COLORS</code> is a <strong>mutable singleton</strong> that <code>applyPalette()</code> rewrites in place. Every builder
+reads <code>COLORS.x</code> at build time, so a theme swap needs no palette threading — but nothing
+may destructure <code>COLORS</code> at import time.</p>
+<p>The material cache in <code>scene/build.js</code> is keyed on colour, so it <strong>must</strong> be cleared
+between worlds, and teardown has to happen <em>before</em> the next build. Cached materials are
+shared by reference, so building first would leave the new world holding materials that
+teardown then disposes.</p>
+<h3 id="scene-reflections" tabindex="-1">Scene reflections</h3>
+<p>The main renderer bakes one reflection environment from broad warm and cool light panels.
+It lives for the renderer's lifetime, across world swaps, and gives existing materials
+something to reflect without adding lights to every frame. <code>applyTimeOfDay()</code> lowers its
+intensity after dark alongside the existing sky and fill light. The visible sky and sun
+still follow the clock, season and orientation.</p>
+<h3 id="reviewing-the-city-and-lighting-experiments" tabindex="-1">Reviewing the city and lighting experiments</h3>
+<p>The four-city comparison compares the city backgrounds and lighting against the
+pre-experiment snapshot. Both sides use the original furniture models. Its 24 pairs show
+each office, neighbourhood, street plan, evening, winter and a turned camera, with the
+same clock, season, camera and seeded dressing on both sides. The furniture experiments
+and object gallery that went with it were a separate branch and were not kept.</p>
+<p><strong>The page is not committed — build it when you want it.</strong> It is 7.7 MB of embedded
+renders and it is reproducible from the script below, so the script ships and the
+artifact does not.</p>
+<p>Build the gallery with <code>node bin/astra-comparison.js</code>. It compares two revisions —
+its own built-in baseline against <code>HEAD</code> by default — and writes
+<code>astra-city-comparison.html</code>.
+Use <code>--before=&lt;commit&gt;</code>, <code>--after=&lt;commit&gt;</code> and <code>--out=&lt;file.html&gt;</code> to override them.
+<code>--city=simple</code>, <code>warehouse</code>, <code>skyscraper</code> or <code>mansard</code> captures one city; the default
+<code>all</code> captures all four. <code>--quick</code> limits each city to its first three views.
+<code>--after=working</code> captures uncommitted source for iteration. Committed review artifacts
+use committed revisions. <code>--verify-only</code> checks the existing file's images and controls.
+The tool uses local Chrome and removes its temporary snapshots and renderer afterwards.
+The exported file contains its images and works offline.</p>
+<p>Scene records contain render-call and triangle counts, plus headless timing samples.
+Those timings compare the capture harness; they do not predict a user's frame rate or
+startup time.</p>
+<h3 id="four-garden-neighbourhoods" tabindex="-1">Four garden neighbourhoods</h3>
+<p><code>src/scene/outlooks/alder-layout.js</code> owns the street centres, plots, park, crossings,
+parking bays and pavement cuts. <code>alder.js</code> builds the shared kit, and <code>garden-districts.js</code>
+provides the Warehouse, Tower and Paris plots, roof styles and elevation offsets. The
+exterior dispatcher passes the building identity to the outlook alongside the season.</p>
+<p>Warehouse uses broad factory masses, instanced sawtooth roofs and a loading apron whose
+markings use the office facade's exported bay dimensions. Its driveway removes the kerb
+and raised pavement. Tower uses taller glass volumes on planted podiums, facade bands
+that preserve window proportions, and a short connection between two podium gardens.
+Paris uses four-wing courtyard blocks with a merged zinc roof ring, dormers and chimney
+pots; the church and iron tower occupy separate plots clear of the street grid.</p>
+<p>The existing office buildings and approaches keep their dimensions. The grounded
+Warehouse outlook is lowered by the exterior dispatcher. Tower keeps its existing
+street datum, while the Paris district meets the bottom of its two-storey staircase.</p>
+<p>The roads share one painted ground surface, so intersections cannot double up road slabs
+or leave floating lane markings. Each crossing lands on pavement and has a sloped kerb
+ramp at both ends. Paving is partitioned around ramps and parking bays; a painted rectangle
+on an unbroken raised pavement would leave the original kerb in the way.</p>
+<p>Building masses, roof planting, trees and paving use spatially grouped instances. The
+facades share one colour atlas and one night-window mask, with mipmaps for distant grids.
+The atlas provides window detail without a mesh for every window. Only nearby trees cast
+shadows; street lamps retain their inexpensive ground pools. The district adds no real
+lights or animation loop. Its canopy planting includes evergreen colour through winter.</p>
+<p><code>disposeSubtree()</code> releases instance buffers as well as geometry and materials. The
+coplanar probe expands instances to their world transforms, checking world-aligned surface
+normals so curved crowns' bounding boxes are not mistaken for planar walls. The layout
+tests also check all district plots against roads and planted setbacks, crossing landings,
+the loading-yard connection and non-overlapping pavement cuts. All four seasonal builds
+are checked for finite instance bounds, no added lights and released instance buffers.</p>
+<h2 id="canopy-house" tabindex="-1">Canopy House</h2>
+<p>The <code>canopy</code> building and native theme use <code>src/scene/canopy.js</code> for their oak floor,
+timber structure, tall glazing, living wall and basket pendants. The visual direction
+combines the supplied biophilic-office references with Pinterest's
+<a href="https://in.pinterest.com/pin/651192427409775227/">timber office</a> and
+<a href="https://www.pinterest.com/pin/467459636344017265/">planted coworking space</a>: large panes,
+warm wood, overhead greenery and nearby tree canopies. The geometry is procedural;
+reference photographs are not shipped as assets.</p>
+<p><code>environment.js</code> selects this shell while retaining the shared 26 × 20 floor, door
+position, stoop and prop anchors. The walls rise to 10.8 units. Shelves still support the
+existing window ornaments; the living wall leaves a clear mounting area for the clock.
+Permanent planters stay outside the editable floor. Agent entry, desk occupation and
+departure are covered by <code>test/canopy-building.test.js</code>.</p>
+<p><code>src/scene/outlooks/canopy-garden.js</code> supplies the <code>canopy-garden</code> outlook in all four
+seasons. A single textured plane holds the meadow and continuous path from the stoop.
+The 160-unit garden texture retains its world scale on a 2,000-unit surface; its grass
+fades to a plain border that clamps across the far field, hiding the former square edge.
+Nearby trees cast shadows; distant trees and the three low pavilions do not. Seasonal
+colour changes preserve some evergreen foliage in winter.</p>
+<p><code>src/scene/canopy-planting.js</code> collects curved leaf geometry and tapered branches into
+static instance batches. The house and the near/far gardens each use one batch per
+material. There are no leaf animation callbacks, alpha-cutout textures, transmission
+passes or additional real lights. Tests cap the environment at 250 mesh objects and
+350,000 triangles, check finite instance bounds and verify instance-buffer disposal
+across every season. The shared six ceiling lights retain responsibility for interior
+illumination; pendant bulbs use the existing night-light emissive handling.
+World teardown also releases the sun's shadow render targets, so repeated building or
+season changes do not retain the previous world's shadow textures.</p>
+<p>Open <a href="/canopy-house.html">the interactive Canopy House preview</a> on a running checkout
+to inspect the actual scene modules at three camera positions, times of day and seasons.
+Use <strong>Scene → Building → Canopy House</strong> in a Test Data office to review agent behaviour.
+The preview is a separate camera viewer; it does not save an office or change its layout.</p>
+<h2 id="three-distinct-office-styles" tabindex="-1">Three distinct office styles</h2>
+<p>Tide Wharf (<code>tide</code>), Dune Atelier (<code>dune</code>) and Lantern Court (<code>lantern</code>) each own a
+shell, floor, palette, light specification and outlook. <code>src/office-styles/</code> contains
+their plain theme/building data so <code>projects.js</code> stays independent of Three.js.
+<code>src/scene/office-shells.js</code> maps the four custom ground-floor buildings, including
+Canopy House, to their geometry builders and entrance-portal dimensions.</p>
+<p><code>environment.js</code> supplies the working door and stoop once, then mounts the selected
+shell and floor. New architecture retains the shared floor dimensions, window ornament
+and mail-flight anchors, and wall-clock location. The existing furniture models and
+navigation remain common to every building. Selecting a building resolves its complete
+native palette and lighting, even when the active scene was authored for another one.</p>
+<p>The architecture carries most of the contrast: Tide uses a low glass-and-steel rhythm
+against blue water, Dune uses solid warm masses with deeply recessed arches, and Lantern
+uses dark timber grids and pale shoji screens around a restrained garden. Their outlooks
+are <code>tide-harbour</code>, <code>dune-courtyard</code> and <code>lantern-garden</code>; each meets the common street
+datum at the entrance and changes its dressing with the season. They use static meshes,
+instanced repeated details, procedural textures and the existing night-light system.
+Their scenery adds no real lights or animation callbacks.</p>
+<p>The settings extend around the visible sides of the room and into the distance: a
+continuous coast and harbour town for Tide, connected pedestrian alleys below layered
+dunes for Dune, and garden paths through planted islands and water for Lantern. Repeated
+boats, building details and planting are batched so density does not require a mesh per
+object. Each outlook owns terrain beyond the common ground plane to keep its boundary
+out of the review camera's range. The shared floor-clearance tests raycast the actual
+landscape surfaces, including instances, to catch scenery entering the working room.</p>
+<p>Open <a href="/office-collection.html">the three-office viewer</a> to switch buildings while keeping
+the camera, season and time of day fixed. Room, window and setting camera presets make
+the architecture comparable; links retain the chosen building, season, time and preset.
+The viewer uses the actual scene modules and renders one office at a time. It has no
+saved layout or adapter connection. In the working app, select a building with <code>S</code>.</p>
+<p><code>test/distinct-offices.test.js</code> checks native-theme switching, permanent floor clearance,
+agent entry/desk allocation/departure, and all four seasonal builds. It caps each
+environment at 250 mesh objects and 350,000 triangles, checks finite instance bounds and
+verifies texture and instance-buffer disposal. The shared coplanar sweep covers all
+eight buildings. Browser review also checks day/night legibility, mobile controls and
+resource counts after repeated switches.</p>
+<h2 id="the-rules-that-keep-a-facade-still" tabindex="-1">The rules that keep a facade still</h2>
+<p>Almost every graphical bug in this project has been a version of the same one. These were
+all learned the hard way.</p>
+<ul>
+<li><strong>Walls must be rotated into their face.</strong> Build a wall in local space (length along x,
+thickness along z) and then rotate the group; a builder that ignores its orientation puts
+side walls across the middle of the building.</li>
+<li><strong>Everything must sit at or in front of the wall face.</strong> These walls are solid boxes with
+no holes punched through them, so an element positioned &quot;recessed into a reveal&quot; ends up
+<em>inside</em> the backing and never renders at all. This silently made every window in the
+building invisible for two rounds: the reveal was added to cure z-fighting and instead
+buried the glazing 0.06 behind a face it could never show through.</li>
+<li><strong>No two surfaces may share a plane.</strong> Coplanar faces at identical depth fight in the
+depth buffer, and the facade shimmers and looks half-transparent as the camera moves.
+Both rules together mean every element needs its own <em>positive</em> offset from the wall
+face — hence the explicit depth ladder at the top of <code>building.js</code>
+(<code>D_SIGN</code> &lt; <code>D_GLASS</code> &lt; <code>D_BARS</code> &lt; <code>D_RING</code> &lt; <code>D_PIER</code> &lt; …). The
+<a href="coplanar-probe.html">coplanar probe</a> is how you find the pair you just created.</li>
+<li><strong>The plinth has to actually reach the ground.</strong> The street sits <code>STREET_Y</code> below the
+lowest floor plate, so the skirt under the bottom storey is sized from that shared
+constant. A fixed value leaves the building floating with a gap you can see straight
+under the walls through. Where there is no street to meet, <code>BASE_TO</code> in <code>environment.js</code>
+maps the aerial outlooks to their own floor. Without an entry, the tower stops in mid-air
+with daylight underneath it.</li>
+<li><strong>Anything that reaches the pavement needs the pavement's height.</strong> The external
+staircase drops <code>storeysBelow × STOREY_H</code> <em>plus</em> <code>|WALK_Y|</code>; the storey line alone left
+the bottom tread hanging a step above the ground. <code>WALK_Y</code> is exported from <code>exterior.js</code>
+for exactly this reason.</li>
+</ul>
+<p><code>punched</code>'s stone surround is a <strong>frame of four pieces</strong>, not one box, and that is the
+depth ladder biting again: <code>D_PIER</code> is in front of <code>D_GLASS</code>, so a solid surround is a slab
+hung over the opening and every window in the building goes dark. Same fault as the
+recessed reveal, reached from the other side.</p>
+<p>The curtain wall's verticals are one fin per column <em>per wall</em>, not per floor, so the grid
+can be as fine as the references without the mesh count following the floor count. Two
+things this gets right that the first pass did not: the fins must be <strong>in front of the
+spandrels they cross</strong> (<code>D_MULLION</code> &gt; <code>D_SPANDREL</code>) or the floor bands swallow them and the
+vertical line breaks up; and individual panes are drawn only where an office is lit, since
+a ribbon plus fins is visually identical everywhere else.</p>
+<p>Loading-bay positions are <strong>exported</strong> (<code>loadingBayFractions</code>, <code>loadingBayWidth</code>) so the
+yard markings outside line up with the doors rather than keeping a second copy of the
+numbers. The arcade's springing line is set low (<code>SPRING_Y</code> is <em>negative</em>) because a wider
+opening means a taller arch head, and a high impost would push the crown up through the
+signage band.</p>
+<h2 id="camera-and-landscape-boundaries" tabindex="-1">Camera and landscape boundaries</h2>
+<p>The main orthographic camera keeps enough distance from its target for the widest zoom
+and lowest allowed tilt. <code>camera-depth.js</code> moves the eye along its view axis and retains
+400 units of background depth beyond the target. This leaves the projected framing,
+zoom and picking unchanged, and repairs old saved views on restore. A short orbit can
+put the bottom of the near clipping plane below the ground: everything in front of it
+vanishes, leaving a straight strip of sky below even a very large sea. Increasing the
+water geometry alone cannot fix that.</p>
+<p>All eight outlooks also need terrain covering the full panned ground footprint. Alder,
+Foundry, Rue Dauphine and Kestrel share one 2,000-unit street plane whose UVs preserve the
+original 220-unit road atlas. Roads continue from its clamped edges, so intersections and
+lane widths do not stretch. Canopy uses the same approach for grass; Tide, Dune and
+Lantern already own extended terrain. These surface extensions keep their existing
+triangle counts and add no lights or animation callbacks. <code>landscape-coverage.test.js</code>
+raycasts the viewport corners across all buildings and seasons at the pan/orbit limits;
+the camera tests separately check depth clipping, saved framing and picking.</p>
+<h2 id="outlooks-two-things-the-retired-prototypes-taught" tabindex="-1">Outlooks: two things the retired prototypes taught</h2>
+<p><strong>The frame is smaller than it feels.</strong> The camera is orthographic with a frustum of about
+22, so the view at ground level runs roughly fifty units across. Every one of the retired
+prototypes' outlooks was first built with its far field sixty to a hundred and twenty units
+out — a pressure ridge, four mountains, an iron tower, all correct and all completely off
+screen. Distant scenery belongs within about fifty units of the room, and the horizon at
+forty to fifty-five.</p>
+<p><strong>A low wide box seen from above is a sheet of paper.</strong> Drifts, snow ridges and the folds
+along a slope were all boxes to begin with, and every one read as card lying on the ground.
+Flattened, stretched spheres cost the same and read as heaped snow — the same reasoning
+turned the neighbouring Paris blocks from flat plates into hipped roofs, using a four-sided
+cylinder for one mesh. When scaling one of those, <strong>put the scale on a parent group</strong>: a
+mesh's own scale is applied before its own quarter-turn, so scaling it directly turns a
+square roof into a diamond.</p>
+<h2 id="the-roofs-three-first-time-mistakes" tabindex="-1">The roof's three first-time mistakes</h2>
+<ul>
+<li><strong>The second plane needs a direction, not just a rotation.</strong> A quarter turn about y that
+sends the plane's <em>length</em> the right way (local <code>+x</code> to world <code>+z</code>) sends its <em>slope</em> the
+wrong way (local <code>+z</code> to world <code>−x</code>) — out over open ground with the ridge pointing away
+from the room. The rotation alone cannot satisfy both; it would need a mirror. So the
+slope direction is a parameter (<code>dir</code>), and the second plane slopes toward local <code>−z</code>.
+Built with the turn alone, the two planes end up in the same corner sloping across each
+other, which is exactly what the coplanar probe reported.</li>
+<li><strong>The planes must not run into each other.</strong> The left one starts past the corner, because
+the back one already covers that square.</li>
+<li><strong>A wide deck at the ridge is a flat roof.</strong></li>
+</ul>
+<h2 id="ways-in-are-one-api" tabindex="-1">Ways in are one API</h2>
+<p>Both the hinged door and the lift answer <code>requestOpen()</code>, which is why arriving and leaving
+is one piece of code rather than two. What differs is whether anybody has to wait: agent
+arrivals and departures are gated on <code>lift.ready</code> via the <code>waitUntil</code> action, so nobody is
+ever standing in an empty shaft.</p>
+<p>The courier is the one asymmetry. He rides the car too, but the post cannot depend on the
+ride: if the lift never comes a job still has to arrive, so
+<a href="job-delivery.html">job delivery</a> is not gated on it.</p>
+<p>The lift is a small state machine — <code>away → arriving → open → closing → departing</code>.</p>
+<h3 id="the-staircase-geometry-is-shared-on-purpose" tabindex="-1">The staircase geometry is shared on purpose</h3>
+<p>It lives in <code>src/scene/approach.js</code>, which owns both ways in from the street, rather than in
+the builder. <code>stairFlight(dropHeight)</code> works out the risers and hands back a descriptor —
+including <code>route</code>, the walkable line up it, and <code>descent</code>, the same line reversed — and
+<code>buildEnvironment</code> passes it straight out as <code>handles.stairs</code>.</p>
+<p>Three parties then agree by construction: the carpentry that puts the treads there, the
+courier (<code>scene/courier.js</code>), and the agent layer (<code>props.stairs</code> in <code>AgentManager</code>). A
+tread width changed in one place used to be able to leave the other two walking through the
+air.</p>
+<p>The route is <strong>four points, not one per tread</strong>, because the pitch is constant: the straight
+line through the tread noses <em>is</em> the flight, so interpolating along it puts feet on the
+treads the whole way up, and it stays right when the storey height changes and the step
+count with it. Heights are tread tops, since that is what is stood on.</p>
+<p>Agents walk it with the <code>follow</code> action (<code>agents/states.js</code>), which is <code>stepTo</code> for a line
+of points with heights. The nav grid is one flat plane and cannot express a climb, and there
+is nothing to find anyway — a flight of stairs is a route, not a choice.</p>
+<p><strong>Taking it in turns</strong>: the ordinary separation pass skips anybody on a route
+(<code>crowd.js</code>), and until a walker is actually on the flight <code>follow</code> keeps them off it. Only
+a walker who is <em>on</em> the flight can hold anybody up, and nothing can hold up a walker
+already on it — which is what keeps two people from deferring to each other forever and
+what makes the queue always drain. <code>test/stairs-queue.test.js</code> measures the flight the
+warehouse actually builds and holds both halves down.</p>
+<p><strong>An agent is not interruptible while arriving.</strong> Work is announced within a second or two
+of a spawn, and replacing the arrival list would leave somebody a storey down the stairs
+with only the room's flat floor plan under them — striding home through the air — or hidden
+in a lift shaft waiting for a car nobody is calling any more. <code>AgentManager._begin</code> queues
+behind an arrival rather than replacing it, and <code>rec.arriving</code> is what says so.</p>
+<p>The mansard's glazed-in stair is keyed off the <strong>building name</strong> rather than a data field,
+because it means moving part of a wall. It also means the mansard's back wall has no
+windows, so anything that stands on a back-wall sill has nowhere to stand —
+<code>windowTroughPlacements</code>'s exclusions and <code>logoPlacements</code> in <code>layout.js</code> are both that.</p>
+<h2 id="desks-and-why-they-are-booked-at-the-door" tabindex="-1">Desks, and why they are booked at the door</h2>
+<p>A desk is claimed as an agent walks in and released in exactly one place, when its owner
+leaves the building.</p>
+<p>Booking it per <em>job</em> meant handing it back between jobs, so an agent returning from the
+mailbox took whichever desk happened to be free. People visibly swapped seats, and because
+the search takes the first free desk, everyone piled onto the low-numbered ones while the
+far corner sat empty.</p>
+<p>There is one other way to lose a desk, and it is the editor deleting it out from under you.
+That is not a shift ending, so it is not treated as one: whoever was sitting there stands up
+and is handed a free desk immediately if the room has one — see
+<a href="editor.html#the-headcount-is-the-desk-count">the editor</a>. Who a desk belongs to is otherwise
+invisible, since a booked desk with dark screens looks exactly like a free one, which is
+why the editor names the occupant in its <code>Assigned to</code> row.</p>
+<h2 id="the-board-on-the-second-screen" tabindex="-1">The board on the second screen</h2>
+<p>Two things about it are deliberate.</p>
+<p>It is <strong>dark</strong> because the board is also its screen's emissive map, so a white theme would
+come through as a white rectangle — a lamp, not a screen. It borrows the code editor's night
+palette so the two monitors look like one machine.</p>
+<p>And there is <strong>one canvas per desk</strong> rather than one shared texture. Five canvases cost
+nothing, and it buys five boards with their own cards on their own schedule instead of five
+identical ones twitching in lockstep. The texture is only re-uploaded while a card is
+actually in flight, at 20Hz.</p>
+<h2 id="the-mid-job-coffee-run-lives-in-the-room-not-the-feed" tabindex="-1">The mid-job coffee run lives in the room, not the feed</h2>
+<p><code>AgentManager</code> counts seated working time and rolls for it, rather than the feed asking for
+it. A long stretch at a desk is the room's own observation, so it works for a live harness
+exactly as well as for Test Data.</p>
+<h2 id="statuses" tabindex="-1">Statuses</h2>
+<p><code>STATUS_GROUPS</code> in <code>src/config.js</code> holds the nine statuses, their four families, their
+colours and their wording; the flat list and the colour map are <strong>derived</strong> from it rather
+than kept alongside it. Some statuses carry an <code>alone</code> form for when they have to stand up
+in a roster row on their own — <code>drinking</code> reads &quot;drink&quot; under the Idle heading and &quot;Getting
+a drink&quot; beside a name.</p>
+<p>The colours a <em>job</em> is described with are a separate palette (<code>JOB_COLORS</code>, turned into
+words by <code>src/ui/format.js</code>) and deliberately not this one. A job's outcome and an agent's
+state are different questions, and one green answering both is how a panel starts lying.</p>
+<p><code>Agent.refreshTagVisibility</code> decides name-tag visibility on <strong>depth alone</strong>, since
+everywhere an agent can stand outside the room is behind the back wall.
+<code>AgentManager.update</code> calls it for everybody once a frame — it has to be as true of somebody
+standing still as of somebody walking.</p>
+<h2 id="subagents-are-ghosts" tabindex="-1">Subagents are ghosts</h2>
+<p><strong>Designed, not yet rendered.</strong> The events already arrive — the Claude adapter sends real
+child sessions with their parent link — and <code>AopSource</code> deliberately drops them
+(<code>TODO(ghosts)</code>) rather than spawn them as ordinary characters, because one fan-out would
+otherwise evict every real session from the room. What follows is the shape the scene owes
+them.</p>
+<p>A subagent does not walk in and does not take a desk. It <strong>materialises at its parent's
+workstation as a translucent clone of them</strong> — four people crowded around one screen, pair
+programming. The parent keeps the chair; each ghost pulls up a phantom copy of it, fanned in
+a shallow arc around the monitors and alternating sides as they arrive.</p>
+<p>Ghosts are 40% opaque at 0.85 scale, cast no shadow, wear their <code>agent_type</code> on the name tag
+instead of a person's name, and type on a phase offset so they do not move in lockstep.
+Crucially <strong>they never travel</strong>: a ghost doing a bookshelf-class lookup turns bookshelf-blue
+<em>in its seat</em>, because four characters pathfinding at once would destroy the one-screen
+reading. When a ghost finishes it slides a page onto the parent's desk and dissolves.</p>
+<p>The parent stays <code>working</code>, not <code>waiting</code> — it is not blocked on <em>you</em> — and carries a <code>×N</code>
+badge for its live ghosts. Four are drawn per desk; beyond that the desk shows a <code>+N</code> tally.</p>
+<p>Full rules in <a href="protocol/aop-spec.html#61-subagents-are-ghosts">the protocol spec</a>, and the
+feed that will drive them in <a href="adapters/claude-code.html">Claude Code</a>.</p>
+<h2 id="where-the-sun-is-and-the-history-behind-the-number" tabindex="-1">Where the sun is, and the history behind the number</h2>
+<p>Height comes from the season and position from the clock. Which way it sweeps <em>from</em> is the
+one number a person picks, and it took a while to get right.</p>
+<p>The room is a cutaway, so exactly two walls exist — the sage one at the back and the white
+one on the left — and the only faces of them anybody ever sees are the insides, pointing
+back at the camera. A wall like that is lit while the sun shares the camera's quadrant and
+backlit the moment it leaves, which makes &quot;light the room&quot; and &quot;throw shadows toward the
+viewer&quot; one tension pulling two ways.</p>
+<p>For a long time it was resolved entirely one way. The sun was pinned to the far side of the
+building so it would rake in through the windows, and it did — but it never came within 133°
+of the camera at any hour in any season, and at midday it sat 178° away, two degrees off
+dead behind. Both walls were backlit from dawn to dusk, and the brightest thing on screen
+was the pavement outside.</p>
+<p>It now sits 44° off the default heading at midday: everything on the floor keeps a lit side
+and a shaded one, and late afternoon still swings round behind the building, which is where
+a long warm rake belongs and where the lamps are already coming up to meet it.</p>
+<p>Orientation is a <strong>live</strong> control like Time and Lights rather than a structural one like
+Season and Building: nothing that gets <em>built</em> depends on which way the room faces, so the
+number is written onto the theme in hand and the next frame has it.</p>
+<h3 id="seasons-are-a-fraction-of-the-swing" tabindex="-1">Seasons are a fraction of the swing</h3>
+<p><code>sunTilt</code> is a fraction of the sun's full swing: +1 at midsummer, −1 at midwinter, with the
+hemisphere turning it over.</p>
+<p><strong>No season sits at 0.</strong> Spring and autumn did, which put them on the equinox exactly: the
+one day of the three months when the sun rises due east, sets due west, and gives everywhere
+on earth twelve hours. It is also the one day whose terminator is not a curve but a pair of
+straight meridians, so the map drew a flat vertical edge in two seasons out of four.</p>
+<p>They sit at ±0.71 now — the middle of a season is about forty-five days from the equinox,
+and the sun's declination a quarter of the way round the year is sin(45°) of its full swing.</p>
+<p>The night band on the map is drawn from the terminator's own identity,
+<code>tan φ = −cos(λ − λ₀) / tan δ</code>. Flattened onto a rectangle, the edge between day and night
+is very nearly a sine wave — the projection of a great circle.</p>
+<p><strong>There is no coastline data</strong> and none that could be fetched: no build step, no dependency,
+no network. Inventing one would look authoritative and be wrong, so the map draws the lines
+that decide the light instead — equator, tropics, polar circles — with a dozen named places
+to find a latitude by.</p>
+<h2 id="after-dark-two-mechanisms-and-why" tabindex="-1">After dark: two mechanisms, and why</h2>
+<p>Lamps ramp up on <code>lampOn</code> rather than <code>darkness</code>. <code>darkness</code> is capped through the day and
+then steps straight to 1 the moment the sun sets, so driving lamps from it snaps them on.
+<code>lampOn</code> tracks how <em>low</em> the sun is, reaching full at the horizon, which gives a gradual
+dusk.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>What it is</th>
+<th>Where it is used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fitting</strong></td>
+<td>A real <code>PointLight</code></td>
+<td>The office interior</td>
+</tr>
+<tr>
+<td><strong>Pool</strong></td>
+<td>A flat disc of additive glow on the ground</td>
+<td>Roads, and under each fitting</td>
+</tr>
+</tbody>
+</table>
+<p>The split is a <strong>measured</strong> decision, not a stylistic one. A forward renderer runs every
+light for every fragment of every lit surface, so lights are priced by count. Giving each of
+the nine street lamps its own light took the scene from 17.7fps to 8.8 in a software
+rasteriser; the nine pools cost 0.2fps.</p>
+<p>What decided it was asking what a street lamp actually has to light: a large, flat,
+featureless road, with no relief on it for a real light to model. A disc of glow sells that
+completely. The interior is the opposite — desks, plants and agents that need genuine
+shading — so it spends real fittings and the street spends none.</p>
+<p>Fittings are hidden outright in daylight rather than merely dimmed, which drops them from
+the renderer's light list so a daylit scene pays nothing for them. They register themselves
+in <code>userData.nightLight</code> and are gathered by one traversal in <code>collectNightLights()</code>; street
+lamps are built three calls deep inside the exterior, and threading a registry down through
+every intermediate builder would put lighting plumbing in a dozen signatures with no other
+interest in it.</p>
+<h2 id="crowding" tabindex="-1">Crowding</h2>
+<p>Any station can draw a crowd, so a station is a stretch of floor rather than a coordinate.
+Behind that sits an <strong>unconditional</strong> separation pass in <code>src/agents/crowd.js</code>, so however
+the walking worked out, no two bodies end a frame sharing space. Desks and couch seats never
+needed it, because those are booked before they are walked to — which was the clue.</p>
+<p>The rest of the movement rules are in <a href="physics.html">the physics of the office</a>.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="physics.html">The physics of the office</a> — the movement rules, and the holes in them</li>
+<li><a href="coplanar-probe.html">The coplanar-face probe</a> — finding the plane you just contested</li>
+<li><a href="extending.html">Extending the office</a> — adding a prop, a building or an outlook</li>
+<li><a href="prop-portraits.html">Photographing a prop</a> — the gallery tooling and its measurements</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#where-things-are-declared">Where things are declared</a><ul><li><a href="#scene-reflections">Scene reflections</a></li>
+<li><a href="#reviewing-the-city-and-lighting-experiments">Reviewing the city and lighting experiments</a></li>
+<li><a href="#four-garden-neighbourhoods">Four garden neighbourhoods</a></li></ul></li>
+<li><a href="#canopy-house">Canopy House</a></li>
+<li><a href="#three-distinct-office-styles">Three distinct office styles</a></li>
+<li><a href="#the-rules-that-keep-a-facade-still">The rules that keep a facade still</a></li>
+<li><a href="#camera-and-landscape-boundaries">Camera and landscape boundaries</a></li>
+<li><a href="#outlooks-two-things-the-retired-prototypes-taught">Outlooks: two things the retired prototypes taught</a></li>
+<li><a href="#the-roofs-three-first-time-mistakes">The roof's three first-time mistakes</a></li>
+<li><a href="#ways-in-are-one-api">Ways in are one API</a><ul><li><a href="#the-staircase-geometry-is-shared-on-purpose">The staircase geometry is shared on purpose</a></li></ul></li>
+<li><a href="#desks-and-why-they-are-booked-at-the-door">Desks, and why they are booked at the door</a></li>
+<li><a href="#the-board-on-the-second-screen">The board on the second screen</a></li>
+<li><a href="#the-mid-job-coffee-run-lives-in-the-room-not-the-feed">The mid-job coffee run lives in the room, not the feed</a></li>
+<li><a href="#statuses">Statuses</a></li>
+<li><a href="#subagents-are-ghosts">Subagents are ghosts</a></li>
+<li><a href="#where-the-sun-is-and-the-history-behind-the-number">Where the sun is, and the history behind the number</a><ul><li><a href="#seasons-are-a-fraction-of-the-swing">Seasons are a fraction of the swing</a></li></ul></li>
+<li><a href="#after-dark-two-mechanisms-and-why">After dark: two mechanisms, and why</a></li>
+<li><a href="#crowding">Crowding</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Desk nameplates · The Roving Office</title>
+  <script type="importmap">{"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/"}}</script>
+  <link rel="stylesheet" href="/src/review/desk-markers.css">
+</head>
+<body>
+  <canvas id="view" aria-hidden="true"></canvas>
+  <main>
+    <header>
+      <div><p class="eyebrow">The Roving Office / Desk nameplates</p>
+        <h1>Desk nameplates</h1><p>A little colour for every assigned desk. Drag a desk to turn it; scroll to look closer.</p></div>
+      <a href="/office/TEST-0000/">Try them in the office ↗</a>
+    </header>
+    <section class="controls" aria-label="Explore desk nameplates">
+      <label>Office <select id="building"></select></label>
+      <label>Light <select id="hour"><option value="12">Daylight</option><option value="17">Late afternoon</option><option value="21">Evening</option></select></label>
+      <label class="check"><input id="standing" type="checkbox"> Sit-stand desks</label>
+      <label class="check"><input id="mugs" type="checkbox" checked> Drinks on desks</label>
+      <label class="check"><input id="same-colour" type="checkbox"> Same colour</label>
+      <label class="check"><input id="assigned" type="checkbox" checked> All assigned</label>
+      <button id="reset">Reset views</button>
+    </section>
+    <section id="studies" aria-label="Five desks with blank nameplates"></section>
+    <footer>Every desk uses a blank nameplate, turned 30° beside the keyboard. It stays while its agent is away and disappears when the desk is released.<br>Press E and select a desk to see its assigned agent.</footer>
+    <p id="error" role="alert" hidden></p>
+  </main>
+  <script type="module" src="/src/review/desk-markers.js"></script>
+</body>
+</html>

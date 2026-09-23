@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<!--
+  The Item Library: every object the room is built from, one to a card, turnable.
+
+  The companion to the Character Movement Library, and the same page underneath: it
+  imports the real catalogue and builds each object with the builder the office uses,
+  so an object that changes in `src/scene/` changes here. Nothing is drawn for the page.
+
+  What it is for. This is now the *only* gallery of the kit. There used to be a second
+  one — a page of photographs in docs/user/the-kit.md, one fixed angle apiece — and it
+  was the same page twice: its section blurbs were literal copies of the catalogue's own
+  group blurbs, which this page already renders. It was folded in here, and the
+  reasoning that was genuinely about *taking* the pictures went to
+  docs/developer/prop-portraits.md.
+
+  A still cannot answer "what does the back of this look like, and which way is its
+  front?" — which is the question you have when you are laying a room out or deciding
+  whether a prop should be allowed to turn. So every card here spins, and every card can
+  be grabbed and turned by hand.
+
+  The framing is the catalogue's own (`viewFor`), so an object is presented here the way
+  it is presented in its portrait: its authored face, elevation and padding, fitted to
+  its own bounding box.
+
+  One renderer, scissored into each card's rectangle — see the Character Movement
+  Library for why, and for why a card paints no background of its own.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>The Roving Office — Item Library</title>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "/vendor/three/build/three.module.js",
+      "three/addons/": "/vendor/three/examples/jsm/"
+    }
+  }
+</script>
+<style>
+  /* Two palettes, one set of names. The renderer is alpha:true and no card paints a
+     background of its own, so the page's colour *is* the colour behind every object —
+     which is the whole point of the switch: kit that reads well on charcoal can
+     disappear on cream, and you want to find that out here rather than in a room. */
+  :root {
+    --bg: #14171b; --panel: #1c2027; --line: #2c323b;
+    --text: #e8e4da; --muted: #9aa2ad; --wood: #c8a06a;
+    --faint: #6d7681; --sep: #4a525c;
+    --btn: rgba(255,255,255,0.05); --btn-hover: rgba(255,255,255,0.1);
+  }
+  :root[data-theme="light"] {
+    --bg: #f2efe8; --panel: #fbfaf7; --line: #ded7c9;
+    --text: #22262b; --muted: #656c75; --wood: #8a6220;
+    --faint: #878e97; --sep: #b6afa2;
+    --btn: rgba(0,0,0,0.04); --btn-hover: rgba(0,0,0,0.09);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.55 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #stage { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+  .page { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+  header { margin-bottom: 10px; }
+  h1 { font-size: 22px; font-weight: 600; letter-spacing: 0.2px; margin: 0 0 6px; }
+  header p { margin: 0; color: var(--muted); max-width: 64ch; }
+  header code { color: var(--wood); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .sibling { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+  a { color: var(--wood); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  /* One line, every section, in the order they appear: a page of forty cards is mostly
+     scrolling, and this is the cheapest way to make it not be. */
+  .jump { margin: 20px 0 0; font-size: 12.5px; line-height: 2; }
+  .jump .sep { color: var(--sep); margin: 0 8px; }
+  section { scroll-margin-top: 16px; }
+  .count { color: var(--muted); font-size: 12.5px; }
+  .jump { margin-bottom: 26px; }
+  section { margin: 0 0 34px; }
+  .sec-head { margin: 0 0 4px; font-size: 12px; font-weight: 600; letter-spacing: 1.1px;
+    text-transform: uppercase; color: var(--wood); }
+  .sec-blurb { margin: 0 0 16px; font-size: 13px; color: var(--muted); max-width: 70ch; }
+  .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+  /* The card paints nothing behind the view: the canvas is one fixed sheet *behind* the
+     page, so anything opaque stacked over it hides the thing it is framing. */
+  .card { background: transparent; border: 1px solid var(--line); border-radius: 12px;
+    overflow: hidden; display: flex; flex-direction: column; }
+  .view { aspect-ratio: 1 / 1; background: transparent; cursor: grab; }
+  .view:active { cursor: grabbing; }
+  .view:focus-visible { outline: 2px solid var(--wood); outline-offset: -2px; }
+  .meta { padding: 10px 12px 12px; border-top: 1px solid var(--line); background: var(--panel); }
+  .row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  h2 { font-size: 13.5px; font-weight: 600; margin: 0; }
+  /* Every card is addressable, so docs/user can point at one object rather than at the
+     whole catalogue. Faint until wanted — the reader after a link is looking for exactly
+     this, and everyone else came to spin a chair. */
+  h2 .anchor { color: var(--muted); text-decoration: none; opacity: 0; padding-left: 6px;
+    font-weight: 400; }
+  .card:hover h2 .anchor, h2 .anchor:focus { opacity: 1; }
+  /* Where a deep link lands, so it is obvious which card you were sent to. `--wood` and
+     not a green: these two pages have their own palette and no `--sage` in it, which the
+     first version of this rule assumed and got a transparent border for. */
+  .card:target { border-color: var(--wood); box-shadow: 0 0 0 2px rgba(200, 160, 106, 0.28); }
+  .id { font-size: 10.5px; color: var(--muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .blurb { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+  .hint { margin: 7px 0 0; font-size: 10.5px; color: var(--faint); }
+  button { font: inherit; font-size: 11.5px; color: var(--muted); background: var(--btn);
+    border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px; cursor: pointer;
+    flex: 0 0 auto; transition: color .15s, background .15s; }
+  button:hover { color: var(--text); background: var(--btn-hover); }
+  button[data-on="false"] { color: var(--wood); border-color: var(--wood); }
+  button:focus-visible { outline: 2px solid var(--wood); outline-offset: 2px; }
+  /* The page's own controls, held at the top right against the title. The same shape
+     the scene panel uses: a pair of positions drawn as one switch, seam between them
+     rather than a gap, and the one in force filled rather than outlined. */
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 28px; }
+  .topbar header { flex: 1 1 auto; }
+  .controls { display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+    flex: 0 0 auto; padding-top: 2px; }
+  .seg { display: flex; flex-wrap: nowrap; }
+  .seg button { border-radius: 0; margin-left: -1px; }
+  .seg button:first-child { border-radius: 999px 0 0 999px; margin-left: 0; }
+  .seg button:last-child { border-radius: 0 999px 999px 0; }
+  .seg button[aria-pressed="true"] { color: var(--bg); background: var(--wood);
+    border-color: var(--wood); font-weight: 600; }
+  /* Drawn rather than typed: a sun and a moon as characters are an emoji on one
+     platform and a dingbat on the next, and these two have to look like a matched
+     pair. Same grid, same stroke, and `currentColor` so each takes the colour of the
+     position it is in — filled or outlined, light palette or dark. */
+  .icon { width: 13px; height: 13px; flex: 0 0 auto; }
+  /* Icons belong to the page's own controls. The Spin button inside a card sits in a
+     row of words and stays one. */
+  button { display: inline-flex; align-items: center; gap: 6px; }
+  #error { display: none; padding: 20px; margin: 0 0 20px; border-radius: 10px;
+    background: #2a1512; color: #ffb4a8; white-space: pre-wrap;
+    font: 12px/1.5 ui-monospace, monospace; }
+
+  /* The Add-item menu's own lozenges, so a reader of the docs can tell at a glance what
+     a thing is *for* and what can be done to it. Same words and same three hues as the
+     editor (see `.kit-tag` in styles.css): blue for work coming in, green for work going
+     out, amber for "this one comes in colours". Repeated here rather than shared because
+     these pages carry their own stylesheet — but the *data* is not repeated: the tags are
+     read out of `kitItems()` and `KIT_PORTRAITS`, so a kind that changes job changes its
+     lozenge here without anybody editing this page. */
+  .tags { display: inline-flex; flex-wrap: wrap; gap: 3px 4px; vertical-align: middle; }
+  .tag {
+    display: inline-block; padding: 1px 6px;
+    font-size: 9.5px; letter-spacing: 0.03em; border-radius: 999px;
+  }
+  .tag-intake { color: #7fb2d9; background: rgba(127, 178, 217, 0.16); }
+  .tag-dispatch { color: #8ba888; background: rgba(139, 168, 136, 0.16); }
+  .tag-colour { color: #e8ab52; background: rgba(232, 171, 82, 0.16); }
+  :root[data-theme="light"] .tag-intake { color: #2f6d9e; background: rgba(47, 109, 158, 0.13); }
+  :root[data-theme="light"] .tag-dispatch { color: #46704a; background: rgba(70, 112, 74, 0.13); }
+  :root[data-theme="light"] .tag-colour { color: #8a5a12; background: rgba(138, 90, 18, 0.13); }
+  .row { gap: 8px; }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+<div class="page">
+  <div class="topbar">
+  <header>
+    <h1>Item Library</h1>
+    <p>
+      Every object the room is built from, turnable — and the only gallery of them there
+      is. Each is built by the same builder the office uses, so a prop that changes and a
+      page that is reloaded cannot disagree.
+    </p>
+    <p>
+      The whole room is made of primitives: boxes, cylinders, the odd icosahedron. No
+      models, no textures loaded from disk, nothing downloaded. That is easy to say and
+      hard to picture, which is what this page is for.
+    </p>
+    <p>
+      Not here: walls, floors, the storeys below, the skyline. Those are arrangements
+      rather than objects — a wall is only a wall in the presence of the room it closes —
+      and they have their own pictures in
+      <a href="/docs/user/buildings.html">buildings and themes</a>. The door, the lift and
+      the window <em>are</em> here, because each is a made thing that a wall merely holds.
+      What each object is <em>for</em>, rather than what it is, is
+      <a href="/docs/user/the-room.html">the room, prop by prop</a>.
+    </p>
+    <p class="sibling">Looking for the people instead?
+      <a href="/docs/character-movements.html">Character Movement Library</a></p>
+  </header>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Colour scheme">
+      <button type="button" data-theme-choice="light" aria-pressed="false"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="3.1"/><path d="M8 1.3v1.5M8 13.2v1.5M14.7 8h-1.5M2.8 8H1.3M12.7 3.3l-1.1 1.1M4.4 11.6l-1.1 1.1M12.7 12.7l-1.1-1.1M4.4 4.4L3.3 3.3"/></svg>Light</button>
+      <button type="button" data-theme-choice="dark" aria-pressed="true"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M13.3 9.7A5.9 5.9 0 0 1 6.3 2.7 5.9 5.9 0 1 0 13.3 9.7Z"/></svg>Dark</button>
+    </div>
+    <button type="button" id="spin-all" data-on="false"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.4 8A5.4 5.4 0 1 1 11.8 4.2"/><path d="M13.7 2.1v3.3h-3.3"/></svg><span class="label">Spin all</span></button>
+    <span class="count" id="count"></span>
+  </div>
+  </div>
+  <nav class="jump" id="jump"></nav>
+  <pre id="error"></pre>
+  <div id="groups"></div>
+</div>
+
+<script type="module">
+// Seeded before any scene module loads, so book colours and the lean of a cactus are
+// the same on every reload — the same reason the portrait tool seeds itself.
+let seed = 0x17e11;
+Math.random = function seeded() {
+  seed = (seed + 0x6d2b79f5) >>> 0;
+  let t = seed;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+// Dark or light, remembered across visits. Set before the scene modules load so the
+// page never shows a flash of the palette you did not choose. Duplicated in the
+// Character Movement Library: these two pages are standalone documents that ship as
+// bare HTML, and a shared file would not ship with them.
+const THEME_KEY = 'roving-office:docs-theme';
+// Two positions of one switch rather than a button that flips, which is how the scene
+// panel draws Lights: a control that says which of two states is in force reads at a
+// glance, where a button labelled with the state you are *not* in has to be worked out.
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+function setTheme(name) {
+  document.documentElement.dataset.theme = name;
+  // The floors live in the other module script, which has its own scope: an event is
+  // the seam between the page's chrome and the scene it is showing.
+  window.dispatchEvent(new CustomEvent('themechange', { detail: name }));
+  for (const b of themeButtons) {
+    b.setAttribute('aria-pressed', String(b.dataset.themeChoice === name));
+  }
+  try {
+    localStorage.setItem(THEME_KEY, name);
+  } catch { /* a private window: the choice simply will not outlive the tab */ }
+}
+let savedTheme = null;
+try {
+  savedTheme = localStorage.getItem(THEME_KEY);
+} catch { /* as above */ }
+setTheme(savedTheme === 'light' ? 'light' : 'dark');
+for (const b of themeButtons) {
+  b.addEventListener('click', () => setTheme(b.dataset.themeChoice));
+}
+
+window.addEventListener('error', (e) => {
+  const el = document.getElementById('error');
+  el.style.display = 'block';
+  el.textContent += `${(e.error && e.error.stack) || e.message}\n\n`;
+});
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CATALOGUE, GROUPS, buildCatalogueObject, viewFor } from '/src/scene/catalogue.js';
+import { kitItems } from '/src/layout.js';
+import { KIT_PORTRAITS, ROLE_TAGS } from '/src/editor/kit-menu.js';
+
+/**
+ * The Add-item menu's lozenges, for a catalogue entry.
+ *
+ * A reader of this gallery should be able to tell what a thing is *for* — work coming
+ * in, work going out — and what can be done to it, without opening the editor to find
+ * out. So the tags are the editor's own, read out of the same two places it reads them:
+ * `kitItems()` for the roles and the palette, `ROLE_TAGS` for which roles get a lozenge
+ * at all.
+ *
+ * The join is `KIT_PORTRAITS` inverted. It maps a kit key to a catalogue id because the
+ * two namings only mostly agree — `desk:standing` is photographed as `standingDesk` —
+ * and this page has the id and wants the key, which is the same map read backwards.
+ * Reusing it means the one place those names are reconciled stays one place.
+ *
+ * Nothing is drawn for an entry with no kit key: most of this gallery is scenery — a
+ * street lamp, a paper plane — and scenery has no job to tag.
+ */
+const KEY_BY_ID = new Map(Object.entries(KIT_PORTRAITS).map(([key, id]) => [id, key]));
+const KIT_BY_KEY = new Map(kitItems().map((item) => [item.key, item]));
+
+function tagsFor(entryId) {
+  const item = KIT_BY_KEY.get(KEY_BY_ID.get(entryId));
+  if (!item) return '';
+  const tags = (item.roles ?? [])
+    .filter((role) => ROLE_TAGS[role])
+    .map((role) => `<span class="tag tag-${ROLE_TAGS[role].tone}">${ROLE_TAGS[role].label}</span>`);
+  if (item.colourable) tags.push('<span class="tag tag-colour">colourable</span>');
+  return tags.length ? `<span class="tags">${tags.join('')}</span>` : '';
+}
+
+/**
+ * How fast a card turns when it is spinning, in radians a second.
+ *
+ * Nothing spins until it is asked to. Forty-two turntables all going at once is a page
+ * that is hard to look at and harder to look at *one thing* on, and the first question
+ * anybody has of an object is what it looks like — not what it looks like mid-turn.
+ */
+const SPIN_RATE = 0.5;
+
+const renderer = new THREE.WebGLRenderer({
+  canvas: document.getElementById('stage'), antialias: true, alpha: true,
+});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setScissorTest(true);
+
+/**
+ * The box worth framing, which is not quite the box the object occupies.
+ *
+ * Lifted from the portrait tool, and for its reason: additively blended meshes are the
+ * pools of light that after-dark lighting lays on the ground, and a street lamp's pool
+ * is ten metres across. A box that contained it would frame an empty square with a lamp
+ * in the middle of it.
+ */
+function framingBox(root) {
+  const box = new THREE.Box3();
+  root.traverse((node) => {
+    if (!node.isMesh) return;
+    const materials = Array.isArray(node.material) ? node.material : [node.material];
+    if (materials.some((m) => m?.blending === THREE.AdditiveBlending)) return;
+    box.expandByObject(node);
+  });
+  return box.isEmpty() ? new THREE.Box3().setFromObject(root) : box;
+}
+
+const cards = [];
+const jump = [];
+/**
+ * The studio floor, which follows the page.
+ *
+ * A warm brown disc is right under a chair on charcoal and wrong on cream, where it
+ * reads as a hole rather than a floor. The switch is meant to show the kit on a light
+ * *scene*, not merely a light page, so the one surface the scene owns changes with it.
+ * Held by material rather than by mesh, because the material is what gets repainted.
+ */
+const floorMaterials = [];
+const FLOOR = { dark: 0x8a7358, light: 0xd8ceba };
+const floorColour = () => FLOOR[document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'];
+window.addEventListener('themechange', () => {
+  for (const m of floorMaterials) m.color.setHex(floorColour());
+});
+const groupsEl = document.getElementById('groups');
+let built = 0;
+let failed = 0;
+
+/**
+ * The order this page presents the groups in, which is not the catalogue's.
+ *
+ * The catalogue leads with the ways in, because that is how a room is described. A
+ * gallery is used for a different job — you are here to look at the things you put in a
+ * room — so it leads with the stations, and then with the people and the post, which are
+ * what the stations are *for*. The fittings, the doorways and the street come after.
+ * Page-local on purpose: reordering `GROUPS` itself would reorder the docs gallery,
+ * which is a document and reads in its own order.
+ */
+const ORDER = ['stations', 'people', 'furniture', 'screens', 'greenery', 'openings', 'outside'];
+const ordered = [...GROUPS].sort((a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id));
+
+for (const group of ordered) {
+  const entries = CATALOGUE.filter((e) => e.group === group.id);
+  if (!entries.length) continue;
+
+  const section = document.createElement('section');
+  section.id = `g-${group.id}`;
+  const head = document.createElement('h2');
+  head.className = 'sec-head';
+  head.textContent = group.label;
+  jump.push(`<a href="#g-${group.id}">${group.label}</a>`);
+  const blurb = document.createElement('p');
+  blurb.className = 'sec-blurb';
+  blurb.textContent = group.blurb;
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  section.append(head, blurb, grid);
+  groupsEl.appendChild(section);
+
+  for (const entry of entries) {
+    const el = document.createElement('div');
+    el.className = 'card';
+    /*
+     * The catalogue id *is* the anchor, so the docs can link at one object.
+     *
+     * Deliberately the id and not a slug of the label: `entry.id` is what the code already
+     * calls this thing, it is already printed on the card, and it survives somebody
+     * retitling "Aeron chair" — which a slug would not. So a link to `#chair` keeps working
+     * through a rename of the words beside it.
+     */
+    el.id = entry.id;
+    el.innerHTML = `
+      <div class="view" tabindex="0" role="img" aria-label="${entry.label}"></div>
+      <div class="meta">
+        <div class="row">
+          <h2>${entry.label}<a class="anchor" href="#${entry.id}" aria-label="Link to this object">#</a></h2>
+          ${tagsFor(entry.id)}
+          <button type="button" data-on="false">Spin</button>
+        </div>
+        <p class="id">${entry.id}</p>
+        <p class="blurb">${entry.blurb ?? ''}</p>
+        <p class="hint">drag to turn · scroll to zoom · double-click to reset</p>
+      </div>`;
+    grid.appendChild(el);
+
+    const scene = new THREE.Scene();
+    // The studio rig, not the room's: a soft fill, a warm key that casts, and a cool
+    // rim, because most of this kit is photographed against nothing and a single key
+    // turns a graphite chair into a silhouette.
+    scene.add(new THREE.HemisphereLight(0xdfe9ef, 0x9a8e7e, 0.9));
+    const key = new THREE.DirectionalLight(0xfff1dd, 1.5);
+    key.position.set(4, 7, 5);
+    key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    scene.add(key);
+    const rim = new THREE.DirectionalLight(0xbcd3dd, 0.5);
+    rim.position.set(-5, 3, -4);
+    scene.add(rim);
+
+    let subject = null;
+    try {
+      subject = buildCatalogueObject(entry.id);
+      built += 1;
+    } catch (err) {
+      failed += 1;
+      const note = el.querySelector('.blurb');
+      note.textContent = `Could not be built: ${err.message}`;
+      note.style.color = '#ffb4a8';
+    }
+
+    const view = el.querySelector('.view');
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.05, 200);
+    const controls = new OrbitControls(camera, view);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enablePan = false;
+    controls.maxPolarAngle = Math.PI * 0.495;
+
+    // A turntable the object sits on, so spinning turns the object and the orbit turns
+    // the camera. Two rotations that would otherwise fight over the same transform.
+    const turntable = new THREE.Group();
+    scene.add(turntable);
+
+    let home = { pos: new THREE.Vector3(3, 2, 3), target: new THREE.Vector3(0, 0.5, 0) };
+    if (subject) {
+      const view3 = viewFor(entry);
+      subject.position.set(0, 0, 0);
+      subject.rotation.y = view3.face;
+      subject.updateMatrixWorld(true);
+
+      // Framed from its own box, the way its portrait is: the object is dropped so it
+      // stands on the floor, and the camera pulled back far enough to hold the whole of
+      // it at the catalogue's own padding.
+      const box = framingBox(subject);
+      const size = box.getSize(new THREE.Vector3());
+      const centre = box.getCenter(new THREE.Vector3());
+      if (view3.grounded) subject.position.y -= box.min.y;
+      const groundedCentre = centre.clone();
+      if (view3.grounded) groundedCentre.y -= box.min.y;
+
+      const radius = Math.max(size.length() * 0.5, 0.35);
+      const dist = (radius * view3.pad) / Math.sin((30 * Math.PI / 180) / 2);
+      const az = view3.azimuth;
+      const el3 = view3.elevation;
+      home = {
+        pos: new THREE.Vector3(
+          groundedCentre.x + Math.sin(az) * Math.cos(el3) * dist,
+          groundedCentre.y + Math.sin(el3) * dist,
+          groundedCentre.z + Math.cos(az) * Math.cos(el3) * dist,
+        ),
+        target: groundedCentre,
+      };
+      turntable.add(subject);
+
+      // A floor to catch the shadow, which is most of what says an object is standing
+      // rather than floating. Sized to the subject so a desk and a succulent each get
+      // one that fits — and only for the things that stand: a wall clock hangs and a
+      // paper plane flies, and both are modelled around the origin rather than on top
+      // of it. Given a floor anyway, the clock came up sawn in half and the plane, which
+      // sits entirely below y=0, did not come up at all.
+      if (view3.grounded) {
+        const floorMaterial = new THREE.MeshStandardMaterial({ color: floorColour(), roughness: 0.98 });
+        floorMaterials.push(floorMaterial);
+        const floor = new THREE.Mesh(
+          new THREE.CircleGeometry(Math.max(radius * 1.9, 0.8), 40),
+          floorMaterial,
+        );
+        floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
+        floor.position.y = 0.001;
+        scene.add(floor);
+        const d = Math.max(radius * 2.2, 2);
+        Object.assign(key.shadow.camera, { left: -d, right: d, top: d, bottom: -d, near: 0.1, far: d * 6 });
+        key.shadow.camera.updateProjectionMatrix();
+        key.position.set(d * 0.6, d * 1.1, d * 0.8);
+      }
+    }
+
+    camera.position.copy(home.pos);
+    controls.target.copy(home.target);
+    controls.update();
+    view.addEventListener('dblclick', () => {
+      camera.position.copy(home.pos);
+      controls.target.copy(home.target);
+      turntable.rotation.y = 0;
+      controls.update();
+    });
+
+    const card = { entry, el: view, scene, camera, controls, turntable, spinning: false };
+    cards.push(card);
+
+    const button = el.querySelector('button');
+    button.addEventListener('click', () => {
+      card.spinning = !card.spinning;
+      button.textContent = card.spinning ? 'Stop' : 'Spin';
+      button.dataset.on = String(card.spinning);
+    });
+  }
+}
+
+document.getElementById('jump').innerHTML = jump.join('<span class="sep">·</span>');
+document.getElementById('count').textContent =
+  `${built} objects${failed ? `, ${failed} could not be built` : ''}`;
+
+/*
+ * Jump to a deep-linked card, now that the cards exist.
+ *
+ * The browser attempts this while the page is still parsing — before this script has built
+ * anything — so arriving at `#chair` would otherwise land at the top of the catalogue with
+ * no clue which object you were sent to. This is what makes the docs' deep links land.
+ */
+if (location.hash.length > 1) {
+  document.getElementById(decodeURIComponent(location.hash.slice(1)))
+    ?.scrollIntoView({ block: 'center' });
+}
+
+const all = document.getElementById('spin-all');
+all.addEventListener('click', () => {
+  const next = all.dataset.on !== 'true';
+  all.dataset.on = String(next);
+  // The label alone: the button's icon is a sibling of this span, and writing over the
+  // button's own text content would take the icon with it.
+  all.querySelector('.label').textContent = next ? 'Stop all' : 'Spin all';
+  for (const card of cards) {
+    card.spinning = next;
+    const b = card.el.parentElement.querySelector('button');
+    b.textContent = next ? 'Stop' : 'Spin';
+    b.dataset.on = String(next);
+  }
+});
+
+function resize() {
+  const w = renderer.domElement.clientWidth;
+  const h = renderer.domElement.clientHeight;
+  const ratio = renderer.getPixelRatio();
+  if (renderer.domElement.width !== w * ratio || renderer.domElement.height !== h * ratio) {
+    renderer.setSize(w, h, false);
+  }
+}
+
+let last = performance.now();
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min((now - last) / 1000, 0.05);
+  last = now;
+  resize();
+
+  const stage = renderer.domElement;
+  for (const card of cards) {
+    const r = card.el.getBoundingClientRect();
+    // A gallery is mostly off screen. Not drawn and not turned: a page of forty
+    // turntables should cost what is being looked at, not what exists.
+    if (r.bottom < 0 || r.top > stage.clientHeight || r.right < 0 || r.left > stage.clientWidth) {
+      continue;
+    }
+    if (card.spinning) card.turntable.rotation.y += dt * SPIN_RATE;
+    card.controls.update();
+    const bottom = stage.clientHeight - r.bottom;
+    renderer.setViewport(r.left, bottom, r.width, r.height);
+    renderer.setScissor(r.left, bottom, r.width, r.height);
+    card.camera.aspect = r.width / r.height;
+    card.camera.updateProjectionMatrix();
+    renderer.render(card.scene, card.camera);
+  }
+}
+requestAnimationFrame(frame);
+
+// Exposed for the harness that photographs this page; nothing here reads it.
+window.__cards = cards;
+</script>
+</body>
+</html>

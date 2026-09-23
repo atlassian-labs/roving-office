@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adapter notes — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html" aria-current="page">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="emitting-aop-from-the-five-harnesses" tabindex="-1">Emitting AOP from the five harnesses</h1>
+<p>Companion to <a href="./aop-spec.html"><code>aop-spec.md</code></a>. This is the research: what each harness actually exposes today, which mechanism to use, and what the adapter looks like. Every claim is tagged <strong>[verified locally]</strong>, <strong>[verified from source/docs]</strong> or <strong>[unverified]</strong> — see the appendix for how.</p>
+<p>Every source here is a harness on the user's own machine. <a href="#6-a-cloud-agent-is-not-a-harness">§6</a> covers why a cloud agent is not one, and what would have to change for it to be shown in the room at all.</p>
+<h2 id="0-the-headline" tabindex="-1">0. The headline</h2>
+<p>Four of the five harnesses (Claude Code, Codex CLI, Rovo CLI, Cursor) converge on the <strong>same primitive</strong>: <em>named lifecycle events that run a shell command with a JSON payload on stdin</em>. Two of them (Claude, Codex) have converged on almost the same event <strong>names</strong> as well. That means:</p>
+<blockquote>
+<p>One <code>aop-send</code> binary + one thin per-harness mapper covers Claude Code, Codex, Rovo and Cursor. OpenClaw is the odd one out: it has a real event bus, so it gets a long-lived bridge instead — which is strictly nicer.</p>
+</blockquote>
+<p>That prediction now has three data points, and the last one is the interesting one. <strong>Rovo CLI (§4), Claude Code (§2) and OpenClaw (§5) are all built.</strong> The second hook harness cost one mapper plus one installer, and the shared adapter needed no changes at all to accept it — only the <code>hook_event_name</code> fallback it already had, and a <code>lib/tool-classes.cjs</code> split out of the first mapper once there were two.</p>
+<p>OpenClaw then tested the other half of the prediction, that an event bus &quot;gets a long-lived bridge instead — which is strictly nicer&quot;. It is nicer, and specifically in four ways that all follow from one difference: <strong>a bridge is not dead between events.</strong> It batches (eight parallel tool calls are one request, not eight), it retries in its own process rather than through a spool hand-off, it keeps its per-session state in memory rather than in a JSON file, and — the one that changes what the office can show — <strong>it can heartbeat</strong>. §6 says hooks &quot;cannot heartbeat on their own (they are dead between events)&quot; and that the receiver's TTL is therefore what retires characters; a bridge closes that gap.</p>
+<p>What it did <em>not</em> need was a new transport. The bridge shares <code>bin/lib/aop-core.cjs</code> with the hook adapters — the endpoint, the project derivation, the redaction rules and the POST itself — and that shared file is where a real bug got fixed once instead of twice (§7.2).</p>
+<p>Claude Code event names (verified in the installed 2.1.246 binary) vs Codex (verified in <code>codex-rs/hooks/src/lib.rs</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Claude Code</th>
+<th>Codex CLI</th>
+<th>Rovo CLI</th>
+<th>OpenClaw (in-process)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SessionStart</code> / <code>SessionEnd</code></td>
+<td><code>SessionStart</code> / <code>SessionEnd</code></td>
+<td>— (derive from first event / <code>on_complete</code>)</td>
+<td><code>session_start</code> / <code>session_end</code></td>
+</tr>
+<tr>
+<td><code>UserPromptSubmit</code></td>
+<td><code>UserPromptSubmit</code></td>
+<td>— (derive from <code>on_tool_start</code>)</td>
+<td><code>before_agent_run</code></td>
+</tr>
+<tr>
+<td><code>PreToolUse</code> / <code>PostToolUse</code></td>
+<td><code>PreToolUse</code> / <code>PostToolUse</code></td>
+<td><code>on_tool_start</code> / <code>on_tool_end</code></td>
+<td><code>before_tool_call</code> / <code>after_tool_call</code></td>
+</tr>
+<tr>
+<td><code>PermissionRequest</code></td>
+<td><code>PermissionRequest</code></td>
+<td><code>on_tool_permission</code></td>
+<td><strong>— none</strong> (§5.2)</td>
+</tr>
+<tr>
+<td><code>Stop</code></td>
+<td><code>Stop</code></td>
+<td><code>on_complete</code></td>
+<td><code>agent_end</code></td>
+</tr>
+<tr>
+<td><code>SubagentStart</code> / <code>SubagentStop</code></td>
+<td><code>SubagentStart</code> / <code>SubagentStop</code></td>
+<td>—</td>
+<td><code>subagent_spawned</code> / <code>subagent_ended</code></td>
+</tr>
+<tr>
+<td><code>PreCompact</code> / <code>PostCompact</code></td>
+<td><code>PreCompact</code> / <code>PostCompact</code></td>
+<td>—</td>
+<td><code>before_compaction</code> / <code>after_compaction</code></td>
+</tr>
+<tr>
+<td><code>Notification</code>, <code>TeammateIdle</code></td>
+<td>—</td>
+<td><code>on_error</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>OpenClaw is in that table for the shape, not because it shares the mechanism: its hooks are function calls on an in-process bus, not shell commands with JSON on stdin. The names line up anyway, which is the same convergence the rest of the table shows.</p>
+<p>The overlap is not a coincidence — Codex's hooks crate mirrors Claude's design — and it is why AOP's event vocabulary was chosen to sit <em>just above</em> this shared shape rather than inventing something orthogonal.</p>
+<h2 id="1-capability-matrix" tabindex="-1">1. Capability matrix</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Claude Code</th>
+<th>Codex CLI</th>
+<th>Rovo CLI</th>
+<th>OpenClaw</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Push hooks (shell, stdin JSON)</td>
+<td>✅ 19 event names, 15 worth installing</td>
+<td>✅ 11 event names, 10 installed</td>
+<td>✅ 5 events (8 accepted)</td>
+<td>✅ <strong>40 in-process hooks</strong>, 10 installed</td>
+</tr>
+<tr>
+<td>Works in the interactive TUI</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Session visible before its first job</td>
+<td>✅ <code>SessionStart</code> at launch — but deliberately held, see §4.4</td>
+<td>✅ <code>SessionStart</code>, also held until work</td>
+<td>⬜ first job only (§4.4)</td>
+<td>⬜ <code>session_start</code> fires, but carries no <code>cwd</code>, so it is deferred (§5.5)</td>
+</tr>
+<tr>
+<td>Streaming event feed</td>
+<td>✅ <code>--output-format stream-json</code> (print mode only)</td>
+<td>✅ app-server JSON-RPC / exec-server</td>
+<td>✅ <code>rovo serve</code> SSE</td>
+<td>✅ WebSocket gateway</td>
+</tr>
+<tr>
+<td>Subagent visibility</td>
+<td>✅ <code>SubagentStart/Stop</code>, <code>agent_id</code>, <code>agent_type</code></td>
+<td>✅ <code>SubagentStart/Stop</code></td>
+<td>⬜ no hook</td>
+<td>✅ <code>subagent_spawned/ended</code>, <code>childSessionKey</code>, <code>agentId</code></td>
+</tr>
+<tr>
+<td>Parent link (for ghosts, spec §6.1)</td>
+<td>✅ <code>parent_tool_use_id</code></td>
+<td>◐ parent session yes, no spawning tool call</td>
+<td>⬜</td>
+<td>◐ parent session yes, spawning tool call <strong>inferred</strong> (§5.5)</td>
+</tr>
+<tr>
+<td>Permission/approval events</td>
+<td>✅ <code>PermissionRequest</code></td>
+<td>✅ <code>PermissionRequest</code></td>
+<td>✅ <code>on_tool_permission</code></td>
+<td>⬜ <strong>not via plugin</strong> — WebSocket only (§5.2)</td>
+</tr>
+<tr>
+<td>Heartbeat while idle</td>
+<td>⬜ dead between events</td>
+<td>⬜</td>
+<td>⬜</td>
+<td>✅ <strong>it is a timer</strong> (§5.6)</td>
+</tr>
+<tr>
+<td>Says a turn has <em>parts</em> (spec §4.2)</td>
+<td>✅ <code>TodoWrite</code>, always whole</td>
+<td>✅ <code>update_plan</code>, always whole</td>
+<td>✅ <code>update_todo</code>, whole <strong>or a merge by id</strong> (§4.6)</td>
+<td>◐ a heartbeat is one, but needs §5.6 discovery</td>
+</tr>
+<tr>
+<td>Packaged install (one command)</td>
+<td>✅ plugin + marketplace (a <em>copy</em>, §2.5)</td>
+<td>⬜ config.toml edit</td>
+<td>⬜ config.yml edit</td>
+<td>✅ plugin, installed as a <strong>link</strong> (§5.7)</td>
+</tr>
+<tr>
+<td>Telemetry side-door</td>
+<td>✅ OTel (<code>CLAUDE_CODE_ENABLE_TELEMETRY</code>)</td>
+<td>⬜</td>
+<td>⬜</td>
+<td>⬜</td>
+</tr>
+<tr>
+<td>Run lifecycle needs an operator opt-in</td>
+<td>⬜</td>
+<td>⬜</td>
+<td>⬜</td>
+<td>✅ <code>hooks.allowConversationAccess</code> (§5.3)</td>
+</tr>
+<tr>
+<td>Best AOP level reachable</td>
+<td><strong>L2</strong></td>
+<td><strong>L2</strong></td>
+<td><strong>L1</strong> (L2 via bridge)</td>
+<td><strong>L2</strong>, minus permissions</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-claude-code" tabindex="-1">2. Claude Code</h2>
+<p><strong>Built.</strong> <code>bin/mappers/claude-code.cjs</code> over the shared <code>bin/aop-send.cjs</code>, shipped as a plugin declared at the repo root (<code>.claude-plugin/plugin.json</code> + <code>hooks/hooks.json</code>) and installed by <code>bin/aop-claude-install.cjs</code> (<code>npm run connect:claude</code>). Fifteen hooks, L2, real ghosts.</p>
+<p><strong>Mechanism: a plugin that ships hooks.</strong> [verified locally]</p>
+<p>Hooks are the right surface: they fire in interactive sessions (unlike <code>stream-json</code>, which is <code>--print</code> only), they are per-event, and they carry a rich payload on stdin. Shipping them as a <strong>plugin</strong> means a user installs the integration with one command instead of hand-editing settings.</p>
+<h3 id="21-hook-events-available" tabindex="-1">2.1 Hook events available</h3>
+<p>All present in the installed binary, v2.1.246 [verified locally]: <code>PreToolUse</code>, <code>PostToolUse</code>, <code>UserPromptSubmit</code>, <code>Notification</code>, <code>Stop</code>, <code>SubagentStart</code>, <code>SubagentStop</code>, <code>PermissionRequest</code>, <code>PreCompact</code>, <code>PostCompact</code>, <code>SessionStart</code>, <code>SessionEnd</code>, <code>TeammateIdle</code>. Official docs list a wider set (<code>PostToolUseFailure</code>, <code>PostToolBatch</code>, <code>PermissionDenied</code>, <code>FileChanged</code>, <code>CwdChanged</code>, <code>StopFailure</code>, …) [verified from docs].</p>
+<h3 id="22-payloads-captured-verbatim" tabindex="-1">2.2 Payloads — captured, verbatim</h3>
+<p>Real stdin payloads from a probe session [verified locally]:</p>
+<pre><code class="language-json">{&quot;session_id&quot;:&quot;478c3346-…&quot;,&quot;transcript_path&quot;:&quot;/Users/mike/.claude/projects/-Users-mike-dev-roving-office/478c3346-….jsonl&quot;,&quot;cwd&quot;:&quot;/Users/mike/dev/roving-office&quot;,&quot;hook_event_name&quot;:&quot;SessionStart&quot;,&quot;source&quot;:&quot;startup&quot;}
+{&quot;session_id&quot;:&quot;478c3346-…&quot;,&quot;transcript_path&quot;:&quot;…&quot;,&quot;cwd&quot;:&quot;…&quot;,&quot;prompt_id&quot;:&quot;d16102d1-…&quot;,&quot;permission_mode&quot;:&quot;acceptEdits&quot;,&quot;hook_event_name&quot;:&quot;UserPromptSubmit&quot;,&quot;prompt&quot;:&quot;Run the bash command: echo hello-from-hooks…&quot;}
+{&quot;session_id&quot;:&quot;478c3346-…&quot;,&quot;transcript_path&quot;:&quot;…&quot;,&quot;cwd&quot;:&quot;…&quot;,&quot;prompt_id&quot;:&quot;d16102d1-…&quot;,&quot;hook_event_name&quot;:&quot;SessionEnd&quot;,&quot;reason&quot;:&quot;other&quot;}
+</code></pre>
+<p>So <code>session_id</code>, <code>cwd</code>, <code>permission_mode</code>, <code>prompt_id</code>, <code>hook_event_name</code>, <code>source</code>, <code>reason</code>, <code>prompt</code> are all confirmed present. <code>PreToolUse</code> adds <code>tool_name</code>, <code>tool_use_id</code>, <code>tool_input</code>; <code>PostToolUse</code> adds <code>tool_response</code>; subagent hooks add <code>agent_id</code> / <code>agent_type</code> [verified from docs, not captured locally — the probe session was unauthenticated so no model turn ran].</p>
+<h3 id="23-mapping" tabindex="-1">2.3 Mapping</h3>
+<table>
+<thead>
+<tr>
+<th>Hook</th>
+<th>AOP</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SessionStart</code></td>
+<td><code>session.start</code>, <strong>held</strong> until the session does something</td>
+<td><code>payload.source</code> ← <code>source</code>; <code>session.cwd</code> ← <code>cwd</code>. Held because not every Claude session is a conversation — see §4.4</td>
+</tr>
+<tr>
+<td><code>UserPromptSubmit</code></td>
+<td><code>turn.start</code></td>
+<td><code>turn_id</code> ← <code>prompt_id</code>; <code>title</code> ← Claude's generated session title when available — <code>payload.session_title</code> first, then the transcript's <code>ai-title</code> (<code>agent-name</code> fallback) — otherwise the first line of <code>prompt</code>, truncated</td>
+</tr>
+<tr>
+<td>any event mid-turn</td>
+<td><code>turn.title</code></td>
+<td>Once per turn, when a title that opened as a quote of the prompt (or a bare <code>Working</code>) can be replaced by the generated one — see §2.4b</td>
+</tr>
+<tr>
+<td><code>PreToolUse</code></td>
+<td><code>tool.start</code></td>
+<td><code>tool_call_id</code> ← <code>tool_use_id</code>; <code>tool_class</code> from the table in §2.4</td>
+</tr>
+<tr>
+<td><code>PostToolUse</code></td>
+<td><code>tool.end</code> (+ <code>artifact.change</code> for <code>Write</code>/<code>Edit</code>)</td>
+<td><code>path</code> ← <code>tool_input.file_path</code></td>
+</tr>
+<tr>
+<td><code>PostToolUse</code> of <code>TodoWrite</code></td>
+<td><code>step.end</code> and/or <code>step.start</code>, <strong>alongside</strong> the <code>tool.end</code></td>
+<td>The list in <code>tool_input.todos</code> is this harness's only statement that a turn has parts. See §2.4a</td>
+</tr>
+<tr>
+<td><code>PostToolUseFailure</code></td>
+<td><code>tool.end</code></td>
+<td><code>status: error</code></td>
+</tr>
+<tr>
+<td><code>PermissionRequest</code></td>
+<td><code>permission.request</code></td>
+<td><code>request_id</code> ← <code>tool_use_id</code></td>
+</tr>
+<tr>
+<td><code>PermissionDenied</code></td>
+<td><code>permission.resolve</code></td>
+<td><code>decision: deny</code></td>
+</tr>
+<tr>
+<td><code>Notification</code></td>
+<td><code>notification</code></td>
+<td><code>message</code> ← <code>message</code></td>
+</tr>
+<tr>
+<td><code>Stop</code> / <code>StopFailure</code></td>
+<td><code>turn.end</code></td>
+<td><code>status: completed</code> / <code>error</code></td>
+</tr>
+<tr>
+<td><code>SubagentStart</code> / <code>SubagentStop</code></td>
+<td><code>session.start</code> / <code>session.end</code> with <code>session.parent_id</code></td>
+<td><code>kind: subagent</code>, <code>agent_type</code> ← <code>agent_type</code>, <code>parent_tool_call_id</code> ← <code>parent_tool_use_id</code> → renders as a <strong>ghost</strong> at the parent's desk (spec §6.1). Held on the same rule as the main session, so a fan-out of subagents that do nothing renders as the one <code>Task</code> call it was</td>
+</tr>
+<tr>
+<td><code>PreCompact</code> / <code>PostCompact</code></td>
+<td><code>context.compact</code></td>
+<td><code>trigger</code> ← <code>trigger</code></td>
+</tr>
+<tr>
+<td><code>TeammateIdle</code></td>
+<td><code>session.heartbeat</code> with <code>status: idle</code></td>
+<td>Suppressed while a <code>session.start</code> is held: an idle timer is not work</td>
+</tr>
+<tr>
+<td><code>FileChanged</code></td>
+<td><code>artifact.change</code></td>
+<td><code>kind: file</code>, <code>path</code> ← <code>path</code></td>
+</tr>
+<tr>
+<td><code>SessionEnd</code></td>
+<td><code>session.end</code></td>
+<td><code>reason</code> ← <code>reason</code>. Suppressed, along with the held <code>session.start</code>, if the session never did anything</td>
+</tr>
+</tbody>
+</table>
+<p><strong>As built</strong>, three of those rows are deliberately <em>recognised but not installed</em> — <code>PostCompact</code>, <code>FileChanged</code> and (with <code>PostToolBatch</code> and <code>CwdChanged</code>) the rest of the wider set. Every hook is a process spawn on the agent's critical path, and each of these either duplicates an event already emitted (<code>PostCompact</code> after <code>PreCompact</code>, <code>FileChanged</code> after an <code>Edit</code>) or says something the next event says anyway (<code>CwdChanged</code>, since <code>project</code> is re-derived from <code>cwd</code> every time). The mapper handles them so that wiring one by hand behaves sensibly.</p>
+<p>Two further decisions the sketch above did not anticipate, both from the mapper:</p>
+<ul>
+<li><strong>Tool events carrying <code>agent_id</code> are attributed to the subagent</strong>, not to the parent, so a fan-out reads as five ghosts each doing their own thing rather than one character with five tool calls in flight. Turns, by contrast, always belong to the main session — a subagent never opens one.</li>
+<li><strong><code>artifact.change</code> is only emitted on success</strong>, and shell commands are read for what they produce: <code>git commit|push</code> → <code>kind: commit</code>, <code>git branch|switch -c</code> → <code>branch</code>, <code>gh pr create</code> → <code>pr</code>. A failed write changed nothing and must not walk to the outbox.</li>
+</ul>
+<h3 id="24a-todowrite-steps" tabindex="-1">2.4a <code>TodoWrite</code> → steps</h3>
+<p><code>TodoWrite</code> rewrites a whole todo list on every call, with exactly one item
+<code>in_progress</code>. That is a <code>plan</code> and a <code>step.start</code> in the shape spec §4.2 asks for, and
+and it was classed <code>other</code> and thrown away until the mapper learned better — the one signal this harness sends
+about a turn having parts was the one signal the office ignored.</p>
+<p>It stays <code>other</code> <strong>as a tool</strong>, because writing a list is desk work and moves nobody. The
+steps are emitted <em>in addition to</em> the <code>tool.end</code>, not instead of it.</p>
+<p>Three decisions worth knowing:</p>
+<ul>
+<li><strong>On <code>PostToolUse</code>, not <code>PreToolUse</code>.</strong> Until the call returns the list is a proposal,
+and a part announced from a write that then failed is a part the agent never started.
+(Rovo has to do the opposite, and §4.6 says why.)</li>
+<li><strong>Ids are hashed from the item's text</strong>, because Claude's todo items have none and
+their <em>position</em> is the one thing about a todo list that genuinely moves: an agent
+inserting a forgotten step at the top would otherwise renumber everything below it and
+the office would read that as five parts finishing at once.</li>
+<li><strong>The status a part ends in is read off the next list, not announced.</strong> An item now
+<code>completed</code> finished; one still <code>pending</code> was <strong>skipped</strong>; one that has vanished was
+<code>cancelled</code>. That skipped/completed distinction is the entire reason to emit <code>step.end</code>
+here — without it, a part passed over looks exactly like a part done.</li>
+<li><strong>Except for the last part, which no list ever follows.</strong> Reading the end off the
+<em>next</em> write works for every part but the final one, so the turn's own ending has to
+close it: <code>Stop</code>/<code>StopFailure</code> for Claude Code, <code>on_complete</code>/<code>on_error</code> for Rovo CLI,
+and <code>SubagentStop</code> for a ghost's own list. Skipping this cost nothing visible — the
+receiver clears the label at <code>turn.end</code> regardless — and lost every last part on the
+wire, along with its duration. One live session carried 192 events, a single
+<code>step.start</code> and not one <code>step.end</code>.</li>
+<li><strong>A part left <code>in_progress</code> at the end is genuinely ambiguous</strong>, and nothing here can
+resolve it: the agent finished and did not tick it, or it stopped half-done. The
+turn's own status is the only evidence available, so a clean stop reads <code>completed</code>,
+an error reads <code>failed</code>, and a dead session reads <code>cancelled</code>.</li>
+<li><strong>None of this state outlives its turn.</strong> The open part and the skip memory are reset
+when a turn starts, not when the session does — held per session, <code>activeId</code> survived
+into the next turn and its first list write closed a part belonging to the turn
+before, with a duration measured across the gap. A turn merely <em>re-announced</em> to a
+restarted receiver is not a fresh turn and resets nothing.</li>
+</ul>
+<p><code>activeForm</code> becomes the step <code>title</code> and <code>content</code> becomes the plan entry's, which is
+the distinction the tool itself draws: a checklist reads as a list of things to do, and
+the line naming what somebody is doing right now reads better in the other voice.</p>
+<p>At <code>metadata</code> redaction the titles go and the counters stay, so the office says
+&quot;Step 2 of 5&quot; (spec §10). A tool <em>name</em> is operator-authored and survives; a todo item
+is a sentence the model wrote.</p>
+<h3 id="24b-the-generated-title-and-why-it-needs-its-own-event-verified-2026-09-04-21260" tabindex="-1">2.4b The generated title, and why it needs its own event [verified 2026-09-04, 2.1.260]</h3>
+<p>Claude writes a short model-generated name for every session — the one its terminal tab
+shows, and the one a multiplexer like cmux picks up off the OSC title. It is a far better
+desk label than a quote of the request: <em>&quot;Cinematic office activity filming&quot;</em> against
+<em>&quot;Create a work item to &quot;Make great movies&quot;… and then switch to the branch/work…&quot;</em>.</p>
+<p>It is offered in two places, and the adapter reads both:</p>
+<ul>
+<li><strong><code>payload.session_title</code></strong>, on <code>UserPromptSubmit</code> and <code>SessionStart</code>. Free, and it
+cannot go stale.</li>
+<li><strong><code>{&quot;type&quot;:&quot;ai-title&quot;,&quot;aiTitle&quot;:…}</code></strong> in the transcript, via the bounded tail read in
+§2.5's transcript note. This is the only source available on a tool event, which is
+precisely the moment that matters.</li>
+</ul>
+<p><strong>The generation loses the race with the hook.</strong> Measured on one session: the prompt
+record at <code>03:12:24.476</code>, the <code>ai-title</code> record next, the first <code>assistant</code> text at
+<code>03:12:27.142</code> — so a second or two after <code>UserPromptSubmit</code> has already returned. There
+is no title to read when the turn opens, and there is no hook that fires when one lands.</p>
+<p>Which leaves the first turn of every session opening under a quote of the prompt. It was
+corrected at <code>turn.end</code>, which is right and far too late: a turn lasting an hour wore the
+quote for the hour. So the adapter carries the debt on the session — a <em>provisional</em>
+title — and discharges it on the next event of any kind, in practice the turn's first
+tool call, with one <code>turn.title</code> (spec §4.2). The office renames the job in hand; no
+second envelope arrives and no status changes.</p>
+<p>Two bounds, because the fallback source is a file read on the agent's critical path:
+a turn stops asking once it has been answered, and gives up after 8 events either way —
+a <code>-p</code> run, or a transcript so long the last <code>ai-title</code> has scrolled out of the tail,
+must not buy a read per tool call all turn. In the ordinary case exactly one read happens
+and it succeeds.</p>
+<p><strong>It is a session title, not a turn title.</strong> Claude generates it once, from the first
+prompt, and repeats the same string for the rest of the session, so this upgrade names a
+session's <em>opening</em> job and the later ones inherit it — which is what the receiver's
+<code>startsNewJob</code> already prefers for follow-up turns. Per-job naming would need the office
+to summarise, and it deliberately never does (spec §4.2).</p>
+<h3 id="24-tool-tool_class" tabindex="-1">2.4 Tool → <code>tool_class</code></h3>
+<p><code>Read</code>/<code>NotebookRead</code> → <code>read</code> · <code>Grep</code>/<code>Glob</code>/<code>ToolSearch</code> → <code>search</code> · <code>Write</code>/<code>Edit</code>/<code>NotebookEdit</code> → <code>edit</code> · <code>Bash</code>/<code>BashOutput</code> → <code>execute</code> (but <code>git commit|push</code>, <code>gh pr</code> → <code>scan the command and emit scm</code>) · <code>WebFetch</code>/<code>WebSearch</code> → <code>network</code> · <code>Task</code> → <code>agent</code> · <code>mcp__*</code> → <code>knowledge</code> · anything else → <code>other</code>.</p>
+<p>As built, the exact table lives in the mapper and the <em>guesses</em> live in <code>bin/mappers/lib/tool-classes.cjs</code>, shared with Rovo. That split is deliberate: tool <strong>names</strong> are per-harness, but the reasoning about an unfamiliar name is not — <code>mcp__…</code> is a knowledge lookup and <code>git push</code> is delivery whoever called them. Every harness permanently has an unknown-tool problem (MCP servers, plugins, new built-ins), so two copies of those regexes would have diverged the first time one was improved.</p>
+<h3 id="25-plugin-shape-as-built-verified-on-21246" tabindex="-1">2.5 Plugin shape [as built, verified on 2.1.246]</h3>
+<p>The sketch was a separate <code>roving-office-plugin/</code> directory with its own copy of the adapter. What shipped instead: <strong>the repo itself is the plugin</strong>, because the files a plugin needs are files the repo already has.</p>
+<pre><code>the-roving-office/
+├── .claude-plugin/plugin.json      # { &quot;name&quot;: …, &quot;version&quot;: &quot;0.1.1&quot; — bumped every change }
+├── .claude-plugin/marketplace.json # one entry, &quot;source&quot;: &quot;./&quot; — so the repo is its own marketplace
+├── hooks/hooks.json                # 15 events → the host-selecting wrapper
+├── bin/aop-plugin-hook.sh          # chooses Claude or Codex, then calls the launcher
+├── bin/aop-node.sh                 # finds a Node, execs the adapter (§2.7)
+└── bin/aop-send.cjs                # the shared adapter, already here for Rovo
+</code></pre>
+<p>Each of the fifteen commands is the host-selecting wrapper:</p>
+<pre><code>&quot;${CLAUDE_PLUGIN_ROOT}/bin/aop-plugin-hook.sh&quot;
+</code></pre>
+<p>The wrapper chooses <code>claude-code</code> here and <code>codex-cli</code> under Codex, then calls
+<code>aop-node.sh</code> and the shared adapter. That avoids a second manifest and a second
+copy of the adapter, either of which would drift. <code>${CLAUDE_PLUGIN_ROOT}</code> resolves
+to the plugin root in both hosts, so <code>bin/</code> and <code>bin/mappers/</code> come along for free.</p>
+<p><strong>No event-name argument</strong> in the command: Claude puts <code>hook_event_name</code> in the payload, which <code>aop-send</code> already falls back to, so one command string serves all fifteen events.</p>
+<p>Confirmed by <code>claude plugin details roving-office</code>:</p>
+<pre><code>Hooks (15)  SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, PostToolUseFailure,
+            PermissionRequest, PermissionDenied, Notification, Stop, StopFailure,
+            SubagentStart, SubagentStop, PreCompact, TeammateIdle, SessionEnd
+            (harness-only — no model context cost)
+Projected token cost   Always-on: ~0 tok
+</code></pre>
+<p>Zero tokens matters more than it looks: watching an agent must not change what the agent does, and a hooks-only plugin adds nothing to the model's context.</p>
+<h4 id="three-measured-behaviours-that-shaped-the-installer" tabindex="-1">Three measured behaviours that shaped the installer</h4>
+<ol>
+<li>
+<p><strong><code>claude plugin install</code> copies the plugin.</strong> The installed tree lands in <code>~/.claude/plugins/cache/&lt;marketplace&gt;/&lt;plugin&gt;/&lt;version&gt;/</code> and the registry records a <code>gitCommitSha</code>. So a plugin install is a <strong>snapshot</strong>: editing a mapper in the checkout changes nothing until <code>claude plugin marketplace update &lt;name&gt; &amp;&amp; claude plugin update &lt;plugin@market&gt;</code>. This is exactly the sort of thing that costs an afternoon, so <code>aop-claude-install.cjs --status</code> diffs the files that matter (<code>aop-send.cjs</code>, <code>lib/aop-core.cjs</code>, the mapper, <code>lib/tool-classes.cjs</code>, <code>lib/event-shape.cjs</code>, <code>aop-plugin-hook.sh</code>, <code>aop-node.sh</code>, <code>hooks.json</code> and <code>plugin.json</code>) against the snapshot and says so out loud.</p>
+<p><strong>And that refresh only works if the version moved</strong> [verified 2026-08-28]. The cache path is keyed on the version and <code>plugin update</code> compares versions, not contents: offered the version it already holds, it reports success and fetches nothing. A snapshot pinned at <code>11b9463</code> sat 43 commits behind a checkout that had said <code>0.1.0</code> throughout, and <code>marketplace update &amp;&amp; plugin update</code> — the command above, run twice — refreshed the marketplace record and left <code>installed_plugins.json</code> untouched at <code>lastUpdated</code> 2026-08-27. The registry is where you see it: <code>gitCommitSha</code> still yesterday's. Hence the working agreement to bump <code>.claude-plugin/plugin.json</code> on every plugin-affecting change, <code>--status</code> treating a version mismatch as stale whatever the files say, and the escape hatch when someone forgets: <code>claude plugin uninstall &lt;plugin@market&gt; &amp;&amp; claude plugin install &lt;plugin@market&gt;</code>, which forces a fresh copy at the same version.</p>
+</li>
+<li>
+<p><strong>Claude runs every matching hook</strong>, not just the first — the opposite of Rovo (§4.1). The installer therefore <em>adds</em> itself as its own group beside whatever is already configured and never edits anyone else's entry, and there is no <code>--chain</code> in the Claude path at all. Proved by installing beside a pre-existing <code>PreToolUse</code>/<code>PostToolUse</code> hook on this machine and watching both survive, with their matchers untouched.</p>
+</li>
+<li>
+<p><strong>Which is also the trap.</strong> Two active routes (plugin <em>and</em> settings hooks) mean every event is sent twice, with the same <code>tool_call_id</code>. The installer refuses to create that state and names the command that fixes it.</p>
+</li>
+</ol>
+<p>So there are three install routes, and they are not redundant:</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Command</th>
+<th>Trade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>marketplace</td>
+<td><code>/plugin marketplace add https://therovingoffice.com/plugins/claude/marketplace.json</code></td>
+<td>Needs no checkout, no Git and no npm — a zip pinned to its SHA-256. But a snapshot, and third-party marketplaces have auto-update off by default</td>
+</tr>
+<tr>
+<td>plugin</td>
+<td><code>npm run connect:claude</code></td>
+<td>One command, path-independent — but a snapshot, and it only exists on machines with a checkout</td>
+</tr>
+<tr>
+<td>settings</td>
+<td><code>npm run connect:claude:settings</code></td>
+<td>Live: an edited mapper applies to the next tool call — but the absolute path is stored verbatim, so moving the checkout breaks it</td>
+</tr>
+</tbody>
+</table>
+<p><code>--project</code> writes <code>.claude/settings.local.json</code> rather than <code>settings.json</code>: the command holds an absolute path to one machine's checkout, which is precisely what must not be committed for a teammate to inherit.</p>
+<p>The first route is what <code>npm run pack:plugins</code> builds — <code>bin/aop-plugin-pack.cjs</code>, which generates the hosted marketplace JSON and the archive it pins, and proves the artifact runs from a temp directory with no checkout above it. A URL-hosted marketplace <strong>cannot</strong> use the <code>&quot;source&quot;: &quot;./&quot;</code> that <code>.claude-plugin/marketplace.json</code> carries, since there is no checkout on the far end for <code>./</code> to resolve against; and Codex has no archive source at all, so its published marketplace has to be a repository. Both, and what is still missing before either is live, are in <a href="../plugin-distribution.html">publishing the plugins</a>.</p>
+<h3 id="26-alternatives-considered" tabindex="-1">2.6 Alternatives considered</h3>
+<ul>
+<li><strong><code>stream-json</code></strong> — richest feed by far: <code>--output-format stream-json</code> plus <code>--include-hook-events</code>, <code>--include-partial-messages</code>, <code>--forward-subagent-text</code>. Confirmed message families in the binary: <code>stream_event</code>, <code>tool_progress</code>, <code>thinking</code>, <code>task_started</code>, <code>task_completed</code>, <code>agent_progress</code>, <code>compact_boundary</code>, <code>hook_started</code>, <code>hook_response</code> [verified locally]. But it only exists in <code>--print</code> mode, so it cannot see the interactive sessions we most want to watch. Use it for a <strong>replay/demo mode</strong>, not the live path.</li>
+<li><strong>OTel</strong> — <code>CLAUDE_CODE_ENABLE_TELEMETRY=1</code> with <code>claude_code.tool_decision</code>, <code>claude_code.tool_result</code>, <code>claude_code.session.start</code>, … [OTEL_* env vars verified locally in the binary; event names verified from docs]. Attractive because it needs no plugin, but it is metrics-and-logs shaped, batched on an export interval, and has no per-tool-call correlation id worth the trouble. Interesting as a <em>second</em> source for a team-wide office, not for v0.</li>
+<li><strong>Transcript tailing</strong> — every hook payload hands us <code>transcript_path</code>. A long-lived <code>tail -f</code> remains too fragile for event detail, but the adapter now makes one narrow use of the file: a bounded, best-effort tail read for Claude's repeated <code>ai-title</code>, with <code>agent-name</code> only as a fallback. That priority matters because a user/custom agent name can change to an operational label while <code>ai-title</code> keeps describing the job. It never reads a path outside <code>~/.claude/projects/</code>, and metadata redaction skips the read entirely. <code>payload.session_title</code> says the same thing for free where it exists and is preferred; the read covers the events it does not ride on — see §2.4b.</li>
+</ul>
+<h3 id="27-claude-desktop-the-same-harness-a-different-path-verified-2026-08-27" tabindex="-1">2.7 Claude Desktop: the same harness, a different PATH [verified 2026-08-27]</h3>
+<p>Claude Desktop is not a fifth harness. Its <strong>local agent mode</strong> is this one: the app downloads a real claude-code (<code>~/Library/Application Support/Claude/claude-code/2.1.246/</code>) and drives it over the SDK, writing transcripts into the same <code>~/.claude/projects/</code> as a terminal session. Its work happens in a git worktree it cuts itself, at <code>&lt;repo&gt;/.claude/worktrees/&lt;slug&gt;</code> on branch <code>claude/&lt;slug&gt;</code>, which the adapter's git lookup resolves to the parent repo's remote — so the session lands in the right office with no special handling.</p>
+<p><strong>Cowork is a different animal, and §2.8 is about why.</strong> Do not read the rest of this section as covering it: the two look identical in the UI and share nothing below it.</p>
+<p>Sessions are told apart by <code>CLAUDE_CODE_ENTRYPOINT</code>, exported into every hook's environment, whose value is the same one the transcript records as <code>entrypoint</code>. The mapper turns it into the <code>harness.variant</code> of spec §4.7, so the office can say &quot;Claude Code - Desktop&quot; rather than filing three different things under one name:</p>
+<table>
+<thead>
+<tr>
+<th><code>CLAUDE_CODE_ENTRYPOINT</code></th>
+<th><code>harness.variant</code></th>
+<th>who</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cli</code></td>
+<td><code>cli</code></td>
+<td>a terminal session</td>
+</tr>
+<tr>
+<td><code>claude-desktop</code></td>
+<td><code>desktop</code></td>
+<td>Claude Desktop's local agent mode</td>
+</tr>
+<tr>
+<td><code>sdk-cli</code></td>
+<td><code>sdk</code></td>
+<td>a programmatic SDK run, <code>claude -p</code> among them</td>
+</tr>
+</tbody>
+</table>
+<p>Reading the env var rather than the transcript matters: the transcript would cost a file read on every hook to learn a fact that cannot change within a session.</p>
+<p>Two things about the spawn are worth knowing, both read out of the app bundle: it passes <code>settingSources: ['user']</code>, so <code>~/.claude/settings.json</code> — and the <code>enabledPlugins</code> in it — is read, while <em>project</em> and <em>local</em> settings are not; and it adds its own in-process SDK hooks, which sit alongside ours rather than replacing them. A plugin install therefore reaches Cowork; a <code>--settings --project</code> install does not.</p>
+<p><strong>And yet it emitted nothing.</strong> Every <code>claude-desktop</code> session was missing from the office while every <code>cli</code> session arrived. The cause is not Claude at all:</p>
+<pre><code>$ ps eww -p $(pgrep -f 'Claude.app/Contents/MacOS/Claude') | tr ' ' '\n' | grep ^PATH=
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+</code></pre>
+<p>A hook inherits the environment of the process that started the agent. A terminal session inherits a login shell, where a version manager has put <code>node</code> on PATH. A GUI application is started by <strong>launchd</strong>, whose PATH is the five directories above — and nvm, fnm, volta and asdf all install Node under <code>$HOME</code>. So <code>#!/usr/bin/env node</code> exits 127, every one of the fifteen hooks fails, and nothing says so, because a non-blocking hook's failure is not the agent's problem:</p>
+<pre><code>$ echo '{&quot;hook_event_name&quot;:&quot;SessionStart&quot;,...}' \
+    | env -i PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin HOME=$HOME \
+      ~/.claude/plugins/cache/roving-office/roving-office/0.1.0/bin/aop-send.cjs claude-code
+env: node: No such file or directory     # exit 127
+</code></pre>
+<p><code>git</code> survives this (it is <code>/usr/bin/git</code>); Node is the only casualty.</p>
+<p><strong>Fix: <code>bin/aop-node.sh</code>.</strong> Every hook command now names the launcher, which finds a Node in the places a version manager actually puts one, caches the answer in <code>~/.roving-office/node-path</code>, and <code>exec</code>s it. <code>npm run connect:claude:status</code> reports what a GUI session would resolve, because a status that only proves the terminal case proves the easy half.</p>
+<p>The general lesson for the harnesses still to be built: <strong>a GUI-launched harness gets launchd's PATH</strong>, so any adapter invoked as a bare interpreter shebang works in a terminal and fails in an app. OpenClaw (§5) turns out to be immune for a structural reason rather than a lucky one: its adapter is a plugin loaded <em>into</em> the Gateway's own Node process, so there is no interpreter to find and no PATH to inherit. The problem is specific to spawning a shell command per event, which is exactly what a bridge does not do.</p>
+<h3 id="28-cowork-out-of-reach-because-it-is-not-on-this-machine-verified-2026-08-27" tabindex="-1">2.8 Cowork: out of reach, because it is not on this machine [verified 2026-08-27]</h3>
+<p>Cowork looks like local agent mode and is nothing like it. <strong>It runs claude-code inside a Linux VM</strong>, so no host-side hook can observe it and §2.7's fix does not apply. The evidence, while a Cowork task was running:</p>
+<pre><code>~/Library/Application Support/Claude/
+├── vm_bundles/claudevm.bundle/
+│   ├── rootfs.img        10 GB, written continuously during the task
+│   ├── sessiondata.img
+│   ├── vmIP              172.16.10.3
+│   └── .cowork-adopted
+└── claude-code-vm/2.1.246/claude      # a second copy, for the guest
+
+$ ps ax | grep Virtualization
+… com.apple.Virtualization.VirtualMachine     # live, Apple Virtualization.framework
+</code></pre>
+<p>The giveaway is where the session is <em>not</em>. A Cowork prompt never appears in <code>~/.claude/projects/</code>, and the host's <code>claude-code-sessions/</code> and <code>local-agent-mode-sessions/</code> were weeks stale while the VM images were being written by the minute. The prompt text is inside <code>rootfs.img</code> — the guest's filesystem — and nowhere on the host.</p>
+<p>Three things block an office feed, and none is a bug:</p>
+<ol>
+<li><strong>The adapter is not in the guest.</strong> Our plugin lives in the host's <code>~/.claude/plugins/</code>; the guest has its own <code>$HOME</code> and has never heard of it.</li>
+<li><strong>The endpoint is not in the guest.</strong> <code>~/.roving-office/endpoint.json</code> carries the URL and token, and it is a host file. A guest hook would not know where to post or how to authenticate.</li>
+<li><strong><s>The receiver would refuse it anyway.</s></strong> This one has since dissolved. It read: <code>isLocal()</code> in <code>server.cjs</code> accepts only <code>127.0.0.1</code> and <code>::1</code>, and the guest is NAT'd behind gVisor, so a packet from the VM would arrive — if at all — from a non-loopback address. The receiver no longer gates on the network at all (§7.1): ingest needs a per-office write token, and where it came from is not the question being asked. The routing is still against you, since the host cannot even ping the guest, but the <em>policy</em> is not.</li>
+</ol>
+<p>So supporting Cowork is a feature, not a repair — but a smaller one than it was. The adapter still has to be installed <em>into the guest image</em> and an endpoint published <em>into</em> the guest; what is no longer needed is teaching the receiver to trust a named subnet, because it now trusts a token instead. The security decision that used to be attached to this — &quot;the token is protected by nothing but the loopback check&quot; — was made for its own reasons in §7.1, and the guest would present a write token like any other remote emitter.</p>
+<p>Until then, the honest position is that Cowork sessions are invisible to the office, and a Cowork user seeing an empty room is seeing the truth.</p>
+<h2 id="3-codex-cli" tabindex="-1">3. Codex CLI</h2>
+<p><strong>Built.</strong> <code>bin/mappers/codex-cli.cjs</code> over the shared <code>bin/aop-send.cjs</code>, shipped
+as <code>.codex-plugin/plugin.json</code> with the common <code>hooks/hooks.json</code>, and installed
+by <code>bin/aop-codex-install.cjs</code> (<code>npm run connect:codex</code>). Ten installed hook
+events, plans as steps, patches as artifacts and real subagent ghosts.</p>
+<p><strong>Mechanism: a plugin that ships hooks.</strong> [verified from the official hook
+contract and installed Codex 0.151.0]</p>
+<p>The shared fields are <code>session_id</code>, <code>transcript_path</code>, <code>cwd</code>,
+<code>hook_event_name</code> and <code>model</code>; turn hooks add <code>turn_id</code>, and tool hooks add
+<code>tool_name</code>, <code>tool_use_id</code>, <code>tool_input</code> and, after the call, <code>tool_response</code>.
+That is close enough to Claude for the Codex mapper to be a normaliser around
+the Claude state machine rather than a second copy of it. <code>Bash</code>,
+<code>apply_patch</code>, <code>update_plan</code>, <code>request_user_input</code>, <code>spawn_agent</code> and
+<code>view_image</code> are renamed before mapping. The plan array is reshaped into the
+shared todo-step dialect; the first touched patch path is extracted without
+retaining patch contents.</p>
+<p>The shared manifest also contains Claude-only names. Codex's <code>HookEventsToml</code>
+deserialiser ignores those unknown event keys, while Claude continues to load
+them, so one file preserves the richer Claude feed. <code>bin/aop-plugin-hook.sh</code>
+chooses <code>codex-cli</code> when Codex's <code>PLUGIN_ROOT</code> is present and <code>claude-code</code>
+otherwise.</p>
+<p>Two limits are structural. Codex has <code>PermissionRequest</code> but no resolution hook,
+and no notification or idle-heartbeat hook, so those capabilities are not
+declared. Hosted <code>WebSearch</code> is not exposed to tool hooks either. The legacy
+<code>notify</code> key is therefore no longer used: it would reduce a full lifecycle feed
+to one <code>agent-turn-complete</code> message for no benefit.</p>
+<p><code>PostToolUse</code> carries Bash's model-facing output but not its exit status, so a
+quiet failure and a quiet success are indistinguishable; the mapper reports
+completion without guessing from text. Subagent hooks carry <code>agent_id</code> and
+<code>agent_type</code>, but no parent tool-call id. They still make a real ghost under the
+parent session, just not one bound to the exact <code>spawn_agent</code> invocation.</p>
+<p>Hooks are trusted per command in <code>/hooks</code>. An administrator can set
+<code>allow_managed_hooks_only = true</code> in <code>requirements.toml</code> and exclude this local
+plugin; the installer checks the known policy locations and warns rather than
+claiming a silent install is healthy.</p>
+<p><strong>Streaming alternatives</strong> [verified from source, schemas unverified]: the <code>app-server</code> JSON-RPC protocol (<code>codex-rs/app-server-protocol</code>, what IDE clients use) and <code>exec-server</code> notifications <code>ExecOutputDeltaNotification</code>, <code>ExecClosedNotification</code>, <code>ExecExitedNotification</code>. A long-lived app-server bridge is probably the best Codex integration eventually; it is more work than hooks and the protocol is not documented publicly yet.</p>
+<h2 id="4-rovo-cli" tabindex="-1">4. Rovo CLI</h2>
+<p><strong>Built.</strong> <code>bin/aop-send.cjs</code> + <code>bin/mappers/rovo-cli.cjs</code>, installed by <code>bin/aop-rovo-install.cjs</code>. Two mechanisms exist and the recommendation is still <strong>both</strong>, but hooks turned out to reach further than this document first assumed — and to carry three constraints it did not know about.</p>
+<h3 id="41-push-eventhooks-in-rovoconfigyml-verified-on-202608251" tabindex="-1">4.1 Push: <code>eventHooks</code> in <code>~/.rovo/config.yml</code> [verified on 202608.25.1]</h3>
+<pre><code class="language-yaml">eventHooks:
+  logFile: /Users/mike/.rovo/event_hooks.log
+  events:
+  - name: on_tool_start
+    commands:
+    - command: /path/to/bin/aop-send.cjs rovo-cli on_tool_start
+</code></pre>
+<p><strong>Eight event names, not five.</strong> Beyond <code>on_tool_start</code>, <code>on_tool_end</code>, <code>on_tool_permission</code>, <code>on_complete</code> and <code>on_error</code>, the CLI's own binary registers <code>on_session_start</code>, <code>on_user_prompt</code> and <code>on_session_end</code>. Rovo accepts all eight in config, and <code>on_session_end</code> was observed firing. So Rovo is <strong>not</strong> confined to implicit spawn and TTL reaping: in an interactive session it gives an explicit <code>session.start</code>, a real <code>turn.start</code> and a clean <code>session.end</code>, which is a <em>complete</em> L1 rather than the partial one predicted here. (An earlier draft called this L2. It isn't — <a href="aop-spec.html#9-conformance-levels">§9</a> puts <code>artifact.change</code>, <code>context.compact</code>, <code>notification</code>, <code>permission.resolve</code> and <code>job.*</code> at that level, and Rovo has hooks for none of them. What changed was the floor, not the ceiling.)</p>
+<p><strong>The payload, captured verbatim:</strong></p>
+<pre><code class="language-json">{
+  &quot;session_id&quot;: &quot;b2b5e280-8b50-45d8-9346-7a3c2fa96774&quot;,
+  &quot;transcript_path&quot;: &quot;/var/folders/…/T/tmpa0_pvr2_/message_history.json&quot;,
+  &quot;cwd&quot;: &quot;/Users/you/src/roving-office&quot;,
+  &quot;timestamp&quot;: &quot;2026-08-26T13:40:08.084525+00:00&quot;,
+  &quot;hook_event_name&quot;: &quot;on_session_end&quot;,
+  &quot;attributes&quot;: {}
+}
+</code></pre>
+<p>Flat and consistent across events. <code>attributes</code> is empty for the session-scoped events and carries the interesting part for the rest — <strong>captured from a live interactive session</strong>, since tool hooks fire nowhere else:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th><code>attributes</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>on_session_start</code>, <code>on_session_end</code></td>
+<td><code>{}</code></td>
+</tr>
+<tr>
+<td><code>on_user_prompt</code></td>
+<td><code>{ user_prompt }</code> — note the name, not <code>prompt</code></td>
+</tr>
+<tr>
+<td><code>on_tool_start</code></td>
+<td><code>{ tool_calls: [ { tool_name, tool_args, tool_call_id } ] }</code></td>
+</tr>
+<tr>
+<td><code>on_tool_end</code></td>
+<td><code>{ tool_results: [ { tool_name, tool_call_id } ] }</code></td>
+</tr>
+<tr>
+<td><code>on_tool_permission</code></td>
+<td><code>{ tool_name }</code></td>
+</tr>
+<tr>
+<td><code>on_complete</code></td>
+<td><code>{ summary }</code>, sometimes <code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Those are arrays, and that matters.</strong> Rovo batches parallel tool calls into a <em>single</em> hook event, so four files read at once arrive as one <code>on_tool_start</code> with four entries. The mapper emits one <code>tool.start</code> per entry, flagged <code>concurrent</code> (spec §4.3) — one event per entry, not one per hook, or the office loses three quarters of the activity and can never balance its <code>tool.end</code>s.</p>
+<p>Earlier drafts of this adapter guessed a flat <code>{ tool_name, tool_call_id, args }</code> and shipped every tool as <code>tool_class: other</code> until real traffic proved otherwise. The flat shape is still accepted as a fallback, and payload <em>shapes</em> — keys and value types, never string contents — keep being recorded to <code>~/.roving-office/shapes-rovo-cli.ndjson</code>, so the next drift shows up as data rather than as a bug.</p>
+<p>Five hard constraints. The first two were known; the rest cost an evening:</p>
+<ol>
+<li><strong>Always exit 0.</strong> Rovo <em>disables</em> an event hook that exits non-zero — a failed POST would silently uninstall the integration.</li>
+<li><strong>Budget ~10 s max</strong> and spool on failure rather than retrying inline.</li>
+<li><strong>Only the first <code>command</code> of an event actually runs.</strong> The <code>/hooks</code> help implies commands run in parallel; they do not. Verified twice — an appended second command never executed and never appeared in Rovo's own <code>event_hooks.log</code>, while a sole command on a fresh event did. An installer must therefore <em>take</em> the first slot and re-run what it displaced itself, which is what <code>aop-send --chain '&lt;command&gt;'</code> is for. Appending politely means never being called at all.</li>
+<li><strong><code>eventHooks</code> is read once, at session start.</strong> There is no hot reload, so a freshly installed hook does nothing for sessions already running. Installers must say so or people will conclude the office is broken.</li>
+<li><strong>Hooks are a TUI-session feature.</strong> They do not fire under <code>rovo serve</code> at all, and in headless <code>rovo run</code> only the session-scoped ones fire — a <code>run</code> that demonstrably executed a shell tool produced <code>on_session_end</code> and no <code>on_tool_start</code>. Any attempt to capture tool payloads has to happen in a real interactive session.</li>
+</ol>
+<p>Mapping, as implemented:</p>
+<table>
+<thead>
+<tr>
+<th>Rovo hook</th>
+<th>AOP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>on_session_start</code></td>
+<td><code>session.start</code>, <code>source: startup</code>, with <code>capabilities</code></td>
+</tr>
+<tr>
+<td><code>on_user_prompt</code></td>
+<td><code>turn.start</code> — Rovo's generated session title when available, otherwise <code>user_prompt</code>; only when redaction ≥ <code>summary</code></td>
+</tr>
+<tr>
+<td><code>on_tool_start</code></td>
+<td>one <code>tool.start</code> <strong>per batched call</strong> (+ synthesised <code>turn.start</code> if none is open)</td>
+</tr>
+<tr>
+<td><code>on_tool_end</code></td>
+<td>one <code>tool.end</code> per result, with <code>tool_class</code>/<code>duration_ms</code> recovered from adapter state</td>
+</tr>
+<tr>
+<td><code>on_tool_permission</code></td>
+<td><code>permission.request</code> — no tool name available</td>
+</tr>
+<tr>
+<td><code>on_complete</code></td>
+<td><code>turn.end</code> status <code>completed</code></td>
+</tr>
+<tr>
+<td><code>on_error</code></td>
+<td><code>error</code>, then <code>turn.end</code> status <code>error</code></td>
+</tr>
+<tr>
+<td><code>on_session_end</code></td>
+<td><code>session.end</code>, reason <code>exit</code></td>
+</tr>
+</tbody>
+</table>
+<p>Any event naming a session we have not seen still emits an explicit <code>session.start</code> first, with <code>source: attach</code> — cheaper for the office than inferring, and the only place the adapter gets to declare its <code>capabilities</code>.</p>
+<p><strong>A receiver that has restarted is told the turn as well.</strong> The endpoint file carries the receiver's pid, so a changed <code>pid@url</code> means an office with an empty replay buffer that has never heard of us. Re-announcing <code>session.start</code> is not enough on its own: the office names a session and labels its desk from <code>turn.start.title</code>, and the title of a turn already in flight exists nowhere but in the adapter. A session mid-job would otherwise sit there nameless for as long as the job lasts — an hour of tool calls, with the one prompt that could have named it already gone. So a remembered title is repeated to the new receiver, using the same <code>turn_id</code> because it is the same turn. If the reintroduction happens to coincide with a prompt, only the new prompt's turn is sent; and a title we never heard (hooks installed mid-turn, or an upgrade mid-turn) stays <code>Working</code>, which the office knows to leave unnamed rather than name badly. <code>Working</code> is provisional like any other placeholder, though, so such a turn takes Claude's generated title the moment §2.4b can find one — a mid-turn arrival is named on its next tool call rather than staying anonymous to the end.</p>
+<p><strong>Rovo subagents ghost, but on a guess.</strong> Rovo has <code>invoke_subagents</code> and no subagent lifecycle hooks, so a fan-out would otherwise read as one busy character. When the tool arguments name the subagents, the mapper emits <strong>synthetic</strong> ghost sessions — <code>session.id = &lt;parent&gt;:&lt;tool_call_id&gt;:&lt;index&gt;</code>, <code>parent_id</code> set, <code>kind: subagent</code>, <code>agent_type</code> from the name — and dissolves all of them on the matching <code>on_tool_end</code>. They carry <code>ext.synthetic: true</code> so the office can render a guess more faintly than the truth. This depends on <code>subagent_names</code> surviving into the hook payload, which is exactly the unverified part.</p>
+<h3 id="42-closed-hook-payload-field-names-was-blocker-3" tabindex="-1">4.2 Closed: hook payload field names [was blocker #3]</h3>
+<p>Fully closed, by installing the adapter and reading what a real interactive session sent (§4.1). Every envelope field and every <code>attributes</code> key is now verified first-hand rather than inferred.</p>
+<p>The one field deliberately unused is <code>transcript_path</code>: the file is deleted when the turn ends. The useful title lives elsewhere: Rovo writes the concise heading shown in its own session list to <code>~/.rovo/sessions/&lt;id&gt;/metadata.json</code>. The mapper reads that file best-effort at <code>on_user_prompt</code> and <code>on_complete</code>; the latter matters because title generation can lose the race with the prompt hook, and lets the receiver retitle the one completed history entry instead of logging a second job.</p>
+<p>Two things still worth knowing. <code>on_tool_permission</code> carries only <code>tool_name</code> — no target, no reason — so the office can say <em>&quot;waiting on you, about bash&quot;</em> and no more. And <code>on_complete</code> is inconsistent about <code>summary</code>: the one real sample so far arrived as <code>{}</code>, so a turn may end with a status and nothing to say. The generated session title is the label to rely on when it exists, with the prompt as the first-hook fallback. And <code>on_error</code>'s payload has never been observed, because nothing errored during the probes; the mapper reads <code>error</code>/<code>error_message</code>/<code>message</code>/<code>reason</code> and falls back to a bare <code>&quot;Error&quot;</code>.</p>
+<h3 id="43-pull-the-rovo-serve-api-verified-locally" tabindex="-1">4.3 Pull: the <code>rovo serve</code> API [verified locally]</h3>
+<p><code>rovo serve &lt;PORT&gt;</code> runs a FastAPI app — this is what the Rovo web GUI talks to. Two SSE endpoints matter, and both were captured live:</p>
+<p><code>GET /v3/agent_lifecycle_events</code> — &quot;Stream lifecycle events from agent runs&quot;:</p>
+<pre><code>event: agent_run_start
+data: {'timestamp': 1787746794.056015, 'session_id': '2b169249-…'}
+
+event: agent_run_end
+data: {'timestamp': 1787746802.550284, 'session_id': '2b169249-…', 'task_status': 'TASK_COMPLETED'}
+
+: ping - 2026-08-26 12:20:07.011522+00:00
+</code></pre>
+<p>⚠️ Note the <strong>single quotes</strong>: that <code>data:</code> line is a Python dict repr, not valid JSON. An adapter must parse it leniently (or we file a bug — this looks like an accidental <code>str(dict)</code> instead of <code>json.dumps</code>).</p>
+<p><code>GET /v3/stream_chat</code> — per-turn streaming, captured event names: <code>user-prompt</code>, <code>part_start</code>, <code>part_delta</code>, <code>request-usage</code>, <code>close</code>. Part kinds from the OpenAPI schema: <code>text</code>, <code>thinking</code>, <code>tool-call</code>, <code>tool-return</code>, <code>builtin-tool-call</code>, <code>builtin-tool-return</code>, <code>user-prompt</code>, <code>system-prompt</code>, <code>retry-prompt</code>, <code>file</code>. <code>ToolCallPart</code> = <code>{ tool_name, args, tool_call_id, id, provider_name, provider_details, part_kind }</code>; <code>ToolReturnPart</code> = <code>{ tool_name, content, tool_call_id, metadata, timestamp, part_kind }</code>.</p>
+<p>Also useful: <code>GET /v3/sessions/list</code>, <code>GET /v3/sessions/current_session</code>, <code>GET /v3/status</code> (<code>cliVersion</code>, <code>workingDirectory</code>, <code>account</code>, <code>model</code>, <code>sessionFilepath</code>), <code>GET /v3/tools</code>, <code>GET /healthcheck</code>, <code>POST /shutdown</code>. Auth is HTTP Bearer, disableable with <code>--disable-session-token</code>.</p>
+<p>Mapping: <code>agent_run_start</code> → <code>turn.start</code>, <code>agent_run_end</code> → <code>turn.end</code> (<code>task_status: TASK_COMPLETED</code> → <code>completed</code>), <code>tool-call</code> part → <code>tool.start</code>, <code>tool-return</code> part → <code>tool.end</code>, <code>request-usage</code> → <code>usage</code> on the next <code>turn.end</code>.</p>
+<p>Re-probed while building the hooks adapter, on 202608.25.1: the lifecycle stream still emits single-quoted Python dict reprs, <code>stream_chat</code> still names its frames <code>user-prompt</code> / <code>part_start</code> / <code>part_delta</code> / <code>request-usage</code> / <code>close</code>, and one frame name not previously recorded showed up — <strong><code>on_call_tools_start</code></strong>. Tool calls appear as <code>part_kind: tool-call</code> with a real <code>tool_name</code>, which is exactly the field hooks are cagey about.</p>
+<p><strong>Recommendation:</strong> hooks for the everyday case (they work in the normal TUI, no extra process), plus an optional <code>serve</code> bridge for a richer feed when the user is happy to run <code>rovo serve</code>. The bridge is also the natural place to prototype AOP changes, because it is a normal long-lived process with real JSON.</p>
+<p>One caveat now measured: <strong><code>serve</code> fires no event hooks at all</strong>, so the two mechanisms do not double-count. They are alternatives, not overlapping feeds, and a future bridge can run alongside the hooks without de-duplication work.</p>
+<h3 id="44-when-a-session-becomes-visible-verified-2026-08-27" tabindex="-1">4.4 When a session becomes visible [verified 2026-08-27]</h3>
+<p><strong>Rovo announces itself at the first job, not at launch.</strong> A Rovo CLI sitting at a fully rendered prompt is invisible to the office — its desk stays empty until you ask for something. Claude Code is the opposite, firing <code>SessionStart</code> with <code>source: startup</code> the moment it opens.</p>
+<p>Measured two ways:</p>
+<ul>
+<li><strong>Idle launch.</strong> A Rovo CLI started in a repo and left untouched at its prompt for 14 seconds produced <em>no events at all</em>; the receiver's cursor never moved. The TUI had fully rendered — suggestion chips, input box — so this is not a boot race.</li>
+<li><strong>Live traffic.</strong> Across four independent sessions, <code>on_session_start</code> is followed by <code>on_user_prompt</code> within <strong>54–1063 ms</strong> every time, which is the signature of a hook firing with the first prompt rather than at REPL open. For contrast, two Claude sessions on the same day reached the office with a <code>session.start</code> and <em>no</em> turn at all, having been opened and never given work.</li>
+</ul>
+<p>Upstream this looks deliberate rather than broken: Rovo ties <code>on_session_start</code> to session-with-history creation, and its release notes show those semantics being tuned — <code>fix(core): ensure on_session_start hook fires for new sessions with empty history</code>, and <code>docs(event-hooks): clarify on_session_start behavior</code>. There is no REPL-open hook to subscribe to. <code>on_ready</code> and <code>on_exit</code> do exist in the installed bundle, but they belong to the Agent Client Protocol, not to event hooks.</p>
+<p><strong>Why the adapter does not paper over it.</strong> With no launch event there is no <code>session_id</code>, so a character invented at launch could never be reconciled with the real session once it arrives: you would get a phantom at launch and a second character at the first job, and AOP has no identity-merging semantics to join them. A late arrival beats a ghost. The fix belongs upstream — fire at REPL open, or add a launch hook.</p>
+<p><strong>And Claude's eagerness turned out to be the worse of the two problems</strong> [measured 2026-08-27, 2.1.246]. In one afternoon of ordinary local use, <strong>15 of 20 sessions</strong> in <code>~/.roving-office/state-claude-code.json</code> reached the office with <code>seq = 2</code> — a <code>session.start</code> and a <code>session.end</code>, nothing between, often less than a second apart. Each one spawned a character who rode the lift up, walked in, and left again, spending a lift cycle and one of the room's first names to say nothing.</p>
+<p>They are not conversations. <strong>14 of the 15 never wrote a transcript file at all</strong>, which is the clearest signal available that no model turn ever ran: title generation, background tasks and the desktop bridge each open a session the same way a terminal does. Nothing on the payload distinguishes them — <code>source</code> is <code>startup</code>, <code>cwd</code> is the repo, and <code>transcript_path</code> is set on every one of them, pointing at a file that is never created.</p>
+<p>So the adapter <strong>holds</strong> <code>session.start</code> in its state file until an event arrives that proves the session is real, and holds a subagent's the same way. The held introduction keeps the <code>source</code> and timestamp it had, so a session that eventually types something is still announced as the <code>startup</code> it was, at the moment it began — nothing is renamed <code>attach</code> for having been patient. <code>TeammateIdle</code> and <code>SessionEnd</code> are suppressed while an introduction is held, since a heartbeat and a farewell are both meaningless for a session the office never heard of.</p>
+<p>The upshot is that <strong>both harnesses now become visible at their first sign of life</strong>, by opposite routes: Rovo because it has no launch event to offer, Claude because its launch event does not mean what it appears to. The cost is that a terminal opened and left at an empty prompt has no character until it is used, which is the same trade this section already documents for Rovo — and unlike a phantom at launch, it needs no identity merging to resolve.</p>
+<h3 id="45-payload-shapes-as-recorded-closes-open-item-3" tabindex="-1">4.5 Payload shapes, as recorded [closes open item 3]</h3>
+<p>The shape recorder was built on the assumption that this undocumented contract would drift. It did — though not in the direction expected. Rovo emits <strong>more than one shape per hook</strong>, and §4.2 documented only one of each:</p>
+<table>
+<thead>
+<tr>
+<th>Hook</th>
+<th>Documented in §4.2</th>
+<th>Also observed in live traffic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>on_user_prompt</code></td>
+<td><code>{ user_prompt }</code></td>
+<td><code>{ prompt }</code></td>
+</tr>
+<tr>
+<td><code>on_tool_start</code></td>
+<td><code>{ tool_calls: [ { tool_name, tool_args, tool_call_id } ] }</code></td>
+<td>flat <code>{ tool_name, tool_call_id, args: { … } }</code></td>
+</tr>
+<tr>
+<td><code>on_tool_end</code></td>
+<td><code>{ tool_results: [ { tool_name, tool_call_id } ] }</code></td>
+<td>flat <code>{ tool_call_id, status }</code>, and bare <code>{ tool_call_id }</code></td>
+</tr>
+</tbody>
+</table>
+<p>Note <code>args</code> rather than <code>tool_args</code>, and <code>prompt</code> rather than <code>user_prompt</code>: the same field under two names, in the same CLI version.</p>
+<p><strong>Nothing needed fixing</strong>, which is the interesting part. <code>argsOf</code> already reads <code>args</code> alongside <code>tool_args</code>, <code>pick</code> already reads <code>prompt</code> alongside <code>user_prompt</code>, <code>toolEntries</code> already falls back to treating <code>attributes</code> as a single flat entry, and <code>entryId</code>/<code>status</code> already cover the shortened <code>on_tool_end</code> forms. The fallback chains absorbed a real contract change without a line of code — which is the argument for writing them even when a single shape has been &quot;verified&quot;, and the argument for recording shapes as data rather than trusting a comment.</p>
+<p>The lesson for the other harnesses: treat every §*.2 payload block as <em>one observed shape</em>, not <em>the</em> shape.</p>
+<h3 id="46-update_todo-steps-and-why-it-fires-at-the-start" tabindex="-1">4.6 <code>update_todo</code> → steps, and why it fires at the <em>start</em></h3>
+<p>Rovo's <code>update_todo</code> is nearly Claude's <code>TodoWrite</code> under another name — a list with one
+item <code>in_progress</code> — and it maps through the same shared module
+(<code>bin/mappers/lib/todo-steps.cjs</code>). Two differences, both of which had to be built:</p>
+<p><strong><code>merge: true</code> means the update is not the list.</strong> The tool takes a merge flag, and with
+it an update carries only the items that changed and only the fields that changed —
+<code>{id: 1, status: &quot;completed&quot;}, {id: 2, status: &quot;in_progress&quot;}</code>, not a word of text.
+Claude's <code>TodoWrite</code> has no such flag and Codex's <code>update_plan</code> sends the whole plan, so
+the shared module had been written to assume a rewrite. Replayed against a three-part
+checklist walked by merges, that assumption was wrong three ways at once:</p>
+<table>
+<thead>
+<tr>
+<th>What the agent did</th>
+<th>What the office was told</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ticked off part 1, took up part 2, ids only</td>
+<td><strong>nothing at all</strong> — no <code>step.end</code>, no <code>step.start</code>, part 1 still on the desk label</td>
+</tr>
+<tr>
+<td>the same, with the text carried</td>
+<td><code>2 of 2</code> and a two-item checklist, for a list of three</td>
+</tr>
+<tr>
+<td>the same again</td>
+<td>part 1 <code>cancelled</code> — struck through and <em>remembered</em> that way</td>
+</tr>
+</tbody>
+</table>
+<p>None of the three is a rendering fault, and none of them would show up as an error: the
+office drew exactly what it was told, confidently. The fix is to hold the list per turn
+on the emitter and apply the update to it, so absence means &quot;unchanged&quot; under a merge and
+only a replacement can drop a part. The held list is cleared at <code>turn.start</code> with the
+rest of the todo state, which matters more than it looks — Rovo's ids restart at 1 each
+turn, so a list carried across the boundary would take the next turn's first merge onto
+the last turn's parts.</p>
+<p><strong>Its todo items carry their own <code>id</code>, and integers.</strong> The text-hashing Claude needs is
+unnecessary here — but a <code>typeof id === 'string'</code> test had been quietly sending every Rovo
+item to the hash anyway. Two costs, one of them the reason merges can work at all: an
+id-and-status update has nothing <em>but</em> the id to be matched on, and a hash is a hash of
+the wording, so an agent rewording an item mid-turn read as a part abandoned and another
+started. Rovo answers the question; take its answer.</p>
+<p>One difference, and it is forced rather than chosen: the steps are emitted from
+<strong><code>on_tool_start</code></strong>, where Claude uses <code>PostToolUse</code>. Rovo's <code>on_tool_end</code> carries
+<code>tool_results</code> and no arguments, so the list only exists at the start of the call. The
+cost is announcing a part from a call that could still fail, which for a local list
+rewrite is close to never — and a part announced a moment early beats the whole checklist
+being invisible, which is what it was before.</p>
+<p>A batch containing <code>update_todo</code> alongside other calls still reports every one of them:
+the steps ride along with the <code>tool.start</code> they came from, and do not displace it.</p>
+<h2 id="5-openclaw" tabindex="-1">5. OpenClaw</h2>
+<p><strong>Built.</strong> <code>openclaw-plugin/</code> — an in-process plugin, not a hook adapter — installed by <code>bin/aop-openclaw-install.cjs</code> (<code>npm run connect:openclaw</code>), or packed for a Gateway on a server by <code>bin/aop-openclaw-pack.cjs</code> (<code>npm run pack:openclaw</code>) and installed there against a freshly minted office by <code>bin/aop-openclaw-server.sh</code>, which ships beside the tarball. Ten hooks, L2 minus permissions, real ghosts, and the first thing here that can heartbeat.</p>
+<pre><code>openclaw-plugin/openclaw.plugin.json   manifest: id, activation.onStartup, configSchema
+openclaw-plugin/package.json           openclaw.extensions -&gt; ./index.mjs
+openclaw-plugin/index.mjs              entry: registers the hooks, wires the two below
+openclaw-plugin/lib/map.mjs            OpenClaw hooks -&gt; AOP (the mapper)
+openclaw-plugin/lib/publisher.mjs      queue, batch, retry, heartbeat, spool (the bridge)
+openclaw-plugin/lib/shared.mjs         the one file that reaches into bin/ (§5.7)
+bin/lib/aop-core.cjs                   shared with the hook adapters (§7.2)
+bin/aop-openclaw-pack.cjs              vendors + tarballs it for a server (§5.7)
+</code></pre>
+<p>Repo <code>github.com/openclaw/openclaw</code>, docs <code>docs.openclaw.ai</code>, config <code>~/.openclaw/openclaw.json</code> (JSON5, hot-reloaded).</p>
+<h3 id="51-verified-from-the-package-not-the-prose-verified-2026-08-29-on-202671-2" tabindex="-1">5.1 Verified from the package, not the prose [verified 2026-08-29 on 2026.7.1-2]</h3>
+<p>The previous version of this section was written from <code>docs.openclaw.ai</code> and carried a list of hook names with <strong>unverified</strong> field types. That list was close but not right, and the way to settle it turned out to be cheap: <code>npm pack openclaw</code> ships <code>dist/*.d.ts</code> <strong>and</strong> the whole <code>docs/</code> tree. So the contract below is read from the type declarations, not from a web page.</p>
+<p><code>dist/hook-types-*.d.ts</code> defines a <code>PluginHookHandlerMap</code> of <strong>40</strong> hooks. The ten worth installing, with their real payload fields:</p>
+<table>
+<thead>
+<tr>
+<th>Hook</th>
+<th>Payload</th>
+<th>Context</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>session_start</code></td>
+<td><code>{ sessionId, sessionKey?, resumedFrom? }</code></td>
+<td><code>{ agentId?, sessionId, sessionKey? }</code></td>
+</tr>
+<tr>
+<td><code>session_end</code></td>
+<td><code>{ sessionId, sessionKey?, messageCount, durationMs?, reason?, sessionFile?, nextSessionId? }</code></td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>before_agent_run</code></td>
+<td><code>{ prompt, messages, systemPrompt?, accountId?, channelId?, senderId?, senderIsOwner? }</code></td>
+<td><code>{ runId?, agentId?, sessionId?, sessionKey?, workspaceDir?, modelProviderId?, modelId?, trigger?, … }</code></td>
+</tr>
+<tr>
+<td><code>agent_end</code></td>
+<td><code>{ runId?, messages, success, error?, durationMs? }</code></td>
+<td>agent context</td>
+</tr>
+<tr>
+<td><code>before_tool_call</code></td>
+<td><code>{ toolName, params, runId?, toolCallId?, toolKind?, derivedPaths? }</code></td>
+<td><code>{ …, toolName, toolCallId?, runId? }</code></td>
+</tr>
+<tr>
+<td><code>after_tool_call</code></td>
+<td><code>{ toolName, params, runId?, toolCallId?, result?, error?, durationMs? }</code></td>
+<td>tool context</td>
+</tr>
+<tr>
+<td><code>subagent_spawned</code></td>
+<td><code>{ childSessionKey, agentId, label?, mode, requester?, threadRequested, runId, resolvedModel?, resolvedProvider? }</code></td>
+<td>agent context</td>
+</tr>
+<tr>
+<td><code>subagent_ended</code></td>
+<td><code>{ targetSessionKey, targetKind, reason, runId?, outcome?, error? }</code></td>
+<td>agent context</td>
+</tr>
+<tr>
+<td><code>before_compaction</code></td>
+<td><code>{ messageCount, compactingCount?, tokenCount?, sessionFile? }</code></td>
+<td>agent context</td>
+</tr>
+<tr>
+<td><code>after_compaction</code></td>
+<td><code>{ messageCount, tokenCount?, compactedCount, previousSessionId? }</code></td>
+<td>agent context</td>
+</tr>
+</tbody>
+</table>
+<p>Three corrections to what the earlier draft claimed, each of which would have cost a debugging session:</p>
+<ul>
+<li>The subagent hooks are <strong><code>subagent_spawned</code> / <code>subagent_ended</code></strong>, not <code>subagent_start</code> / <code>subagent_stop</code>.</li>
+<li>Registration is <strong><code>api.on(name, handler, { priority?, timeoutMs? })</code></strong>, and an operator can override the budget per hook with <code>plugins.entries.&lt;id&gt;.hooks.timeouts.&lt;hookName&gt;</code>.</li>
+<li><code>session_end</code>'s <code>reason</code> is a <strong>nine-member enum</strong> — <code>new | reset | idle | daily | compaction | deleted | shutdown | restart | unknown</code> — which collapses onto AOP's seven. <code>shutdown</code> and <code>restart</code> fire from the Gateway's shutdown finalizer for sessions still live when the process stops, which is exactly the case that would otherwise leave characters in the room forever.</li>
+</ul>
+<h3 id="52-there-is-no-permission-hook-and-that-is-the-one-real-loss" tabindex="-1">5.2 There is no permission hook, and that is the one real loss</h3>
+<p>The plugin route <strong>cannot see approvals</strong>. OpenClaw's flow runs the other way: a plugin <em>asks</em> for approval by returning <code>requireApproval</code> from <code>before_tool_call</code> (<code>docs/plugins/plugin-permission-requests.md</code>), and there is no hook for observing the approvals core raises for its own <code>exec</code> tool.</p>
+<p>That is worse than it sounds by count, because spec §4.4 calls <code>permission.request</code> the single most valuable non-L0 event — the only reliable signal that an agent is <em>waiting on you</em>. So <code>CAPABILITIES</code> in <code>lib/map.mjs</code> deliberately omits it, which is what stops the office waiting for an event that will never come, and an OpenClaw agent blocked on an approval looks like an agent thinking hard.</p>
+<p><strong>The Gateway WebSocket is the fix, and it is an increment rather than a redesign.</strong> <code>127.0.0.1:18789</code>, protocol v4, connected with <code>role: &quot;operator&quot;</code>, streams <code>agent</code> (<code>runId</code>, <code>status</code>, <code>stream: lifecycle|assistant|tool</code>, <code>phase: start|end|error</code>), <code>session.message</code>, <code>session.operation</code>, <code>session.tool</code>, <code>session.observer</code>, <code>sessions.changed</code> (with <code>activeRunIds</code>), <code>exec.approval.requested</code> / <code>.resolved</code> (<code>approvalId</code>, <code>toolName</code>, <code>params</code>), plus <code>presence</code>, <code>health</code>, <code>tick</code>. Mapping: <code>sessions.changed</code>/<code>activeRunIds</code> → <code>session.start</code>/<code>session.end</code>, <code>agent</code> with <code>stream: lifecycle</code> → <code>turn.start</code>/<code>turn.end</code>, <code>session.tool</code> → <code>tool.start</code>/<code>tool.end</code>, <code>exec.approval.requested</code>/<code>.resolved</code> → <code>permission.request</code>/<code>permission.resolve</code>, <code>health</code>/<code>tick</code> → <code>session.heartbeat</code>. <code>lib/publisher.mjs</code> is transport-only and would be reused unchanged; only a new mapper is needed. [from docs, unverified]</p>
+<p><strong>And the plugin never returns a decision.</strong> Several of these hooks are decision hooks — a return value can block a call, rewrite its params or demand approval. Every handler returns <code>undefined</code>, always, and the test harness asserts it on every fire. A diorama does not get a vote on whether a tool call happens. This is the one rule in the plugin that is not a trade-off.</p>
+<h3 id="53-the-permission-that-is-not-optional-verified-2026-08-29-on-a-real-gateway" tabindex="-1">5.3 The permission that is not optional [verified 2026-08-29, on a real Gateway]</h3>
+<p><strong><code>before_agent_run</code> and <code>agent_end</code> do not fire</strong> for a non-bundled plugin unless an operator sets <code>plugins.entries.&lt;id&gt;.hooks.allowConversationAccess = true</code>. They are <em>conversation hooks</em>, gated along with <code>llm_input</code>, <code>llm_output</code>, <code>before_model_resolve</code>, <code>before_agent_reply</code> and <code>before_agent_finalize</code> (<code>docs/gateway/configuration-reference.md</code>).</p>
+<p>This is the one thing the type declarations could not have told us, and it took a real install to find. It is worth writing down carefully, because every part of it is a trap.</p>
+<p><strong>The block is invisible from inside the plugin.</strong> <code>api.on('before_agent_run', …)</code> succeeds. No throw, no return value, no diagnostic the plugin can observe. The handler is simply never called. The only evidence is host-side, in <code>openclaw plugins inspect &lt;id&gt; --runtime --json</code>:</p>
+<pre><code>&quot;level&quot;: &quot;warn&quot;,
+&quot;message&quot;: &quot;typed hook \&quot;before_agent_run\&quot; blocked because non-bundled plugins must set
+            plugins.entries.roving-office.hooks.allowConversationAccess=true&quot;
+</code></pre>
+<p><strong>And it took the whole adapter down, not two events.</strong> A plain chat turn — the first thing anyone tests — fires <code>session_start</code>, <code>before_agent_run</code>, <code>agent_end</code> and nothing else. No tools, no subagents, no compaction. Those two hooks were also the only carriers of <code>workspaceDir</code> (§5.5), so §5.5's deferred <code>session.start</code> was waiting for a directory that could never arrive. Net effect: an install that reported <code>status: &quot;loaded&quot;</code>, <code>activated: true</code>, eleven hooks registered, and published <strong>nothing at all</strong>.</p>
+<p>Three changes came out of it, and the ordering matters — the first is the fix, the other two are why the failure was silent:</p>
+<ol>
+<li><strong>Grant it at install.</strong> <code>bin/aop-openclaw-install.cjs</code> sets the key, with <code>--no-conversation-access</code> to decline. A permission that a document tells you to set by hand is a permission half the installs will not have.</li>
+<li><strong>Say so when it is missing.</strong> The plugin cannot see the block, but it can read the same config the host reads, so <code>register</code> checks <code>api.config.plugins.entries[id].hooks.allowConversationAccess</code> and warns at startup naming the key. Detecting an invisible failure indirectly is worth more than the code it costs.</li>
+<li><strong>Degrade instead of dying.</strong> Sessions, tools, subagents, compaction and heartbeats do not need conversation access. Only the desk <em>label</em> and turn timing do. So <code>session.start</code> no longer waits on a directory that may never come — see §5.5 — and a blocked install now loses labels rather than everything.</li>
+</ol>
+<p><strong>What it grants is narrower than its name.</strong> Those hooks carry <code>prompt</code> and <code>messages</code>. The mapper reads the prompt, clamps it to <code>CAPS.title</code> (80 characters) for a desk label, and drops it entirely under <code>metadata</code> redaction. <code>messages</code> is never read. That asymmetry is worth stating in the docs, because &quot;allow conversation access&quot; sounds like far more than one truncated line.</p>
+<p>There is a <strong>non-gated alternative that was deliberately not used</strong>: <code>before_agent_start</code> carries the same <code>prompt</code> and the same agent context, and is absent from the gated list. It is documented as &quot;compatibility-only — prefer the two hooks above&quot;, so building on it would mean depending on a deprecated path to route around a permission the operator is entitled to withhold. Declining it, warning clearly and degrading well is the more honest arrangement. Worth revisiting only if the gate turns out to be commonly refused. [unverified: whether <code>before_agent_start</code> really escapes the gate in practice]</p>
+<h3 id="54-a-silent-emitter-is-the-hardest-kind-so-this-one-talks" tabindex="-1">5.4 A silent emitter is the hardest kind, so this one talks</h3>
+<p>Three failures on the first real install, and <strong>none of them produced an error anywhere</strong>. A blocked hook that registers cleanly and never fires. An artifact that installs and is not the one that runs. An endpoint that is simply absent, which is indistinguishable from an idle agent because both look like an empty queue.</p>
+<p>The pattern is worth naming, because it is a property of emitters generally rather than of OpenClaw: <strong>a fire-and-forget adapter has no natural failure channel.</strong> Design rule 1 says never make the agent wait, and the price of obeying it is that nothing downstream can report back. Two mitigations, both cheap:</p>
+<ul>
+<li><strong>Say what you are doing, when you load.</strong> One line naming the resolved endpoint, whether it is remote, and which of the three sources it came from. Logged from <code>register</code>, deliberately not from <code>gateway_start</code> — a plugin installed or reconfigured on a running Gateway never sees another <code>gateway_start</code>, which makes that hook precisely the wrong home for the one line that says whether the thing can work.</li>
+<li><strong>Infer what you cannot observe.</strong> The plugin cannot see that a hook was blocked, but it can read the same config the host read to block it. It cannot see that its artifact is stale, but the version is stamped into it. Neither is a real error channel; both turn a silence into a sentence.</li>
+</ul>
+<p><strong>A status code does not say who answered, and that is usually the question.</strong> The first real
+refusal came back <code>403</code>, which reads as an auth failure and is not one: the receiver's ingest
+returns <code>401</code> for a bad token and never returns <code>403</code> at all, so a <code>403</code> is proof that
+something <em>between</em> the agent and the office answered — a WAF, or an egress proxy — and no
+amount of correcting the token or the keycard would have helped. The office replies JSON and a
+WAF replies HTML, so <code>core.post</code> now reads the first 300 characters of a failing response and
+the warning quotes it back. Per-status guidance follows the measurements rather than the HTTP
+spec: <code>401</code> and <code>502</code> mean the token (<code>502</code> because the hosting edge replaces the receiver's
+<code>401</code>), <code>404</code> means the keycard, and <code>403</code> means <em>ask the network</em>, with the decisive next
+step — the same POST by <code>curl</code> from the same host — named in the log line itself.</p>
+<p>That is also why the emitter now sends a <code>User-Agent</code>. Node sends none by default, and an
+anonymous POST with no UA is a normal thing for a WAF to refuse.</p>
+<p>And <strong>an absent office is a warning, not a note.</strong> It had been logged at <code>info</code>, which on a busy Gateway is the same as not logging it. A plugin that cannot publish is not configured differently, it is broken.</p>
+<p>That also changed <code>core.post</code>'s contract: it now resolves <code>{ ok, status, reason }</code> rather than a bare boolean, so a refusal can be reported as <code>HTTP 403</code> — check the token — rather than as an event that quietly never arrived. <code>401</code>/<code>403</code> point at the token and <code>404</code> at the keycard, which between them cover most of what goes wrong once the endpoint is set at all. It complains <strong>once per outage</strong> and reports recovery, because a wrong token would otherwise write a line every few seconds forever, and an operator being shouted at continuously is one who stops reading.</p>
+<h3 id="55-two-payload-facts-that-shaped-the-mapper" tabindex="-1">5.5 Two payload facts that shaped the mapper</h3>
+<p><strong><code>session_start</code> does not know where it is.</strong> Its context is <code>{ agentId, sessionId, sessionKey }</code> — no <code>cwd</code>, no <code>workspaceDir</code>. Only the <em>agent</em> context carries <code>workspaceDir</code>, and that does not arrive until the first turn. Publishing <code>session.start</code> immediately would file the session under no project at all, so the office would seat a character in the <code>default</code> room and then meet the same session again, with a real project, in another.</p>
+<p>So <code>session.start</code> is <strong>deferred</strong> — but only while a better answer is actually coming, which is a distinction §5.3 forced. It is held until an event knows a directory, then emitted ahead of it with its original timestamp intact. If no run hook will ever fire (conversation access refused), there is nothing to wait for, and the mapper publishes immediately against a fallback workspace resolved the way OpenClaw resolves <code>agents.defaults.workspace</code>. Both halves are load-bearing, and each was briefly wrong on its own: deferring unconditionally published nothing at all for a chat session, and publishing unconditionally sent <code>session.start</code> stamped with the fallback moments before the real directory arrived — seating one session in two rooms, which is the exact phantom the deferral exists to prevent. Rovo CLI lands in the same behaviour from the opposite cause — it has no launch event at all (§4.4) — and spec §7 blesses it either way: a late arrival beats a phantom. A session that ends without ever running a turn is still announced, at the end, with no project.</p>
+<p><strong><code>parent_tool_call_id</code> has to be inferred.</strong> Spec §4.1 wants a ghost bound to the exact <code>agent</code>-class tool call that spawned it, so the office can dissolve every straggler when that call ends. Claude Code hands it over as <code>parent_tool_use_id</code>; OpenClaw does not. The mapper tracks the last <code>agent</code>-class tool call per session — which is what <code>subagents</code> is — and uses that. Correct for the ordinary case and wrong if two <code>subagents</code> calls overlap, which is a knowingly accepted approximation rather than an oversight.</p>
+<h3 id="55a-a-routing-key-is-not-a-name-verified-2026-08-29-from-live-traffic" tabindex="-1">5.5a A routing key is not a name [verified 2026-08-29, from live traffic]</h3>
+<p>The first thing anybody said about the working bridge was that the names were wrong. They were: every character in the room wore</p>
+<pre><code>agent:albus:telegram:direct:12345
+</code></pre>
+<p>because <code>session_start</code> carries a <code>sessionKey</code> and the mapper sent it as <code>session.label</code>. Two mistakes in one line, and the second is the interesting one. A <code>sessionKey</code> is an <strong>address</strong> — agent, channel, chat type, chat id — so it is a plausible-looking identifier and no kind of name. And <code>label</code> is the office's <em>override</em>: the field an adapter uses to say &quot;this session is called X&quot;, which suppresses the whole naming pipeline. So the room did not merely read badly; nobody ever picked up a job surname either, because a harness-set name is never second-guessed. One wrong field cost both halves of the mechanic.</p>
+<p><strong>What OpenClaw actually has is better than any other harness.</strong> Its agents are configured by hand, and the config names them:</p>
+<pre><code class="language-jsonc">&quot;agents&quot;: { &quot;list&quot;: [{ &quot;id&quot;: &quot;albus&quot;, &quot;identity&quot;: { &quot;name&quot;: &quot;Albus Dumbledclaw&quot; } }] }
+</code></pre>
+<p><code>api.config</code> is already on the plugin API — the same object §5.3 and §5.4 read for the conversation gate and the workspace fallback — so the lookup is local, synchronous and needs no new permission. <code>agentId</code> → <code>agents.list[].identity.name</code>, falling back to <code>agents.list[].name</code>, resolved with OpenClaw's own id normalisation (trim, lower-case, per <code>dist/config-utils-*.js</code>). The result goes in the new <a href="./aop-spec.html#32-session"><code>session.actor</code></a>, which means <em>who is running this</em> rather than <em>what this is called</em>.</p>
+<p><strong>And then the real config settled the design question.</strong> The first cut took a first name from the identity and went on generating the job surname, on the theory that the office's best idea should keep working. Six real agents said otherwise:</p>
+<pre><code>Guy Fawkes · Albus Dumbledclaw · Paige Turner · Sideline Cruston · Florence Nightingclaw
+</code></pre>
+<p>Every surname is the punchline. <code>Paige Docs-Verifier</code> throws away <em>Turner</em> and puts our own gag in its place, which is the office talking over the person who set the room up. So the rule went by word count instead: <strong>two or more words are kept whole and permanently</strong>, <code>namedFrom: 'actor'</code> freezing them against the job-driven rename; <strong>one word is a first name</strong> and still earns a job, so <code>Bobster</code> becomes <em>Bobster Flaky-Mender</em>. Worth the note because the mechanic looked like the thing to protect right up until the data arrived — the office's naming is only good while it is not overwriting somebody.</p>
+<p>Three details that are easy to get wrong:</p>
+<ul>
+<li><strong>The id is never used as a name.</strong> <code>albus</code> happens to read like one; <code>code-reviewer</code> and <code>main</code> do not, and defaulting to the id would fill a room with characters called Main. No identity configured means a generated name, which is what every other harness gets.</li>
+<li><strong>The identity arrives late, and that is normal.</strong> <code>agentId</code> is on the <em>agent</em> context, so a session's first event can be anonymous and its second one Albus — the same asymmetry that defers <code>session.start</code> in §5.5. The office adopts a late actor by renaming the character: a whole name replaces theirs outright, a single word changes only the person and the job carries on.</li>
+<li><strong>The resolver is injected, not imported.</strong> The mapper takes a function; <code>index.mjs</code> closes over <code>api.config</code>. So the mapper is testable without an OpenClaw, and a config reloaded under a long-lived gateway is picked up without re-registering hooks.</li>
+</ul>
+<h3 id="55b-the-config-was-the-wrong-file-verified-2026-08-29" tabindex="-1">5.5b The config was the wrong file [verified 2026-08-29]</h3>
+<p>§5.5a read <code>agents.list[].identity.name</code> and called that &quot;the only place a display name exists&quot;. It is not, and it is not even the good one. Every OpenClaw workspace holds an <strong><code>IDENTITY.md</code></strong>, written by the agent itself during the bootstrap conversation:</p>
+<pre><code class="language-markdown">- Name: Bobster
+- Creature: Lobster
+- Emoji: 🦞
+- Colour: #c1440e
+</code></pre>
+<p>The config block is a label somebody typed once; this is the file the agent maintains about itself. And crucially, it is where the <strong>default agent's</strong> name lives — <code>main</code> usually has no <code>identity</code> block in config at all, and is usually the busiest desk in the building, so a config-only bridge leaves the most important character in the room anonymous. Name resolution is now <code>IDENTITY.md</code> → <code>identity.name</code> → <code>name</code> → the id if it reads as a word, which is where <strong>Main</strong> comes from.</p>
+<p>Four things this cost, all of them the kind that only show up against real files:</p>
+<ul>
+<li><strong>The bold runs through the colon.</strong> The shipped template writes <code>- **Name:** Claw</code>, so a regex that treats <code>**</code> as a wrapper around the <em>key</em> leaves the closing pair at the head of the value, and every agent in the office is called <code>** Something</code>. Found by a test against three real files, not by reading the template.</li>
+<li><strong>An unfilled field is a trap.</strong> <code>- **Name:**</code> is followed by <code>_(pick something you like)_</code> on its own line. Read values on the same line only, and reject <code>_(…)_</code>, or a fresh workspace produces a colleague called <em>(pick something you like)</em>.</li>
+<li><strong>The rest of the file is prose, and prose contains colons.</strong> These files run to essays — priorities, communication style, a line reading <code>**Never guesses people's names:** ask instead</code>. Only the first match for a key counts, and only bullet-shaped lines qualify.</li>
+<li><strong><code>OPENCLAW_STATE_DIR</code> does not move the default agent's workspace.</strong> Every other agent's hangs off the state dir; the default agent's comes from <code>resolveDefaultAgentWorkspaceDir</code>, which goes straight to <code>~/.openclaw</code> and honours <code>OPENCLAW_WORKSPACE_DIR</code> instead. Copy the asymmetry rather than tidying it, or you read the wrong file on exactly the machines that configured anything. With <code>agents.defaults.workspace</code> set, non-default agents are in a <strong>subdirectory named after the id</strong>, not <code>workspace-&lt;id&gt;</code>.</li>
+</ul>
+<p>The reader caches on mtime, since it is called on the way to publishing an event and a gateway runs for weeks: one <code>statSync</code> per event is affordable, re-reading an essay is not, and an edited <code>IDENTITY.md</code> is still picked up without a restart.</p>
+<h3 id="55c-clothes-as-identity-verified-2026-08-29" tabindex="-1">5.5c Clothes as identity [verified 2026-08-29]</h3>
+<p><code>IDENTITY.md</code> sometimes carries a <code>Colour</code>, and it turns out to be worth more than decoration. Office shirt colours are drawn from a palette on arrival, which means they are pleasant and mean nothing — the same agent is a different colour every restart. A colour from an identity is stable, so it becomes the thing you actually recognise: the agent in rust is always that agent.</p>
+<p>Two decisions are load-bearing:</p>
+<ul>
+<li><strong>Send it as written; resolve it in the office.</strong> <code>#c1440e</code>, <code>teal</code>, <code>rgb(193 68 14)</code>, <code>hsl(20 87% 41%)</code> — the office has a browser and an adapter does not, so the functional forms are parsed by assigning them to a canvas <code>fillStyle</code> and seeing whether it took, which is parsing and validation in one step. Doing it with <strong>two</strong> sentinels is what makes that honest, since one cannot distinguish &quot;rejected, so unchanged&quot; from &quot;accepted, and equal to the sentinel&quot;. Hex is done arithmetically instead: it is the commonest case by far, and routing it through a canvas would have made the whole module untestable outside a browser for no gain.</li>
+<li><strong>An unreadable colour is not an error.</strong> <code>Colour: lobster red</code> is a mood; the palette answers and nothing anywhere special-cases a failure. The detail panel then shows a <strong>Colour</strong> row <em>only</em> when a colour was chosen and parsed, which makes the panel a debugging tool: no row means the field did not take.</li>
+</ul>
+<h3 id="55d-real-colours-are-not-colours-verified-2026-08-29-against-a-live-gateways-config" tabindex="-1">5.5d Real colours are not colours [verified 2026-08-29, against a live Gateway's config]</h3>
+<p>The <code>Colour</code> field above was built against a hex, and then six real agents were asked what they had written in theirs:</p>
+<pre><code>Rich red / crimson · Bright tangerine / golden-orange · Blue
+Warm library yellow / marigold · Lavender / healthcare purple · Field green / pitch green
+</code></pre>
+<p><strong>Five of the six resolved to nothing</strong>, and the sixth was worse: <code>Blue</code> is a CSS keyword, so it resolved to <code>#0000ff</code> — a saturated primary in a room whose sixteen shirts are all muted mid-tones, which reads as a rendering fault rather than a choice. A canvas is a <em>colour</em> parser, and nobody writes colours.</p>
+<p>Three findings came out of fixing it, in ascending order of usefulness.</p>
+<ul>
+<li><strong>Vocabulary is a solved problem, and not by an LLM.</strong> <code>color-name-list</code> (MIT, 31,915 names) contains <code>rich red</code>, <code>field green</code>, <code>pitch green</code>, <code>tangerine</code>, <code>marigold</code>, <code>golden orange</code>, <code>stormy sea</code>, <code>oxblood</code> and <code>burnt sienna</code> as literal entries. Filtered to names of ≤ 2 words containing a colour term it is 12,005 entries and 237 KB, vendored as <code>src/agents/colour-names.js</code> by <code>bin/gen-colour-names.mjs</code> — pinned, so no dependency and no fetch at runtime — and <strong>imported dynamically</strong>, so an office with no described colours in it never loads the table at all.</li>
+<li><strong>Finding a colour is the easy half; making it wearable is the point.</strong> Every naming source, LLMs included, answers with the <em>ideal</em>: <code>crimson</code> is <code>#8c000f</code> (nearly black), <code>marigold</code> <code>#fcc006</code> (a highlighter), <code>blue</code> <code>#0000ff</code>. So the match is projected into the lightness and chroma range the palette actually occupies — measured off those sixteen shirts, not chosen — keeping the hue, which is the part a description is about.</li>
+<li><strong>The colour space decides whether that works.</strong> The first attempt clamped S and L in HSL and was comedy: <code>charcoal grey</code> came out <strong>green</strong> and <code>oxblood</code> came out <strong>hot pink</strong>, because HSL's axes are not independent. In OkLab it behaves, and a near-neutral keeps its chroma rather than acquiring a hue out of rounding noise — so charcoal stays grey.</li>
+</ul>
+<p>Two smaller rules earned their place on real data. Matching prefers the phrase that explains a <strong>whole segment</strong>, or <code>Warm library yellow / marigold</code> matches <code>yellow</code> (one word of three) and Paige gets olive. And modifier words are applied as adjustments — <code>deep</code>, <code>muted</code>, <code>pale</code> — but skipped when the matched name already contains them, or <code>deep teal</code> is deepened twice.</p>
+<p><strong>On using OpenClaw's own model to guess a hex</strong>, which is the obvious idea: no. A hook may never await, so it could only run once at register time; it would be non-deterministic across restarts; it would help one harness out of four; and per the second finding it would return the same fire-engine <code>#DC143C</code> a table does, so it does not even solve the problem. The <em>useful</em> version of the idea costs nothing: the agent already wrote the file, so a hex <strong>anywhere</strong> in the line is honoured exactly — <code>Colour: Rich red / crimson (#b03a3a)</code> — words for the reader, hex for the office. Document that and the model does the work at authoring time.</p>
+<h3 id="55e-avatars-the-bytes-have-to-travel-verified-2026-08-29" tabindex="-1">5.5e Avatars: the bytes have to travel [verified 2026-08-29]</h3>
+<p><code>IDENTITY.md</code> often carries an <code>Avatar</code>, and three of the six real agents had one. It is the only identity field that cannot simply be <em>read</em>: the file is on the gateway's disk and the office is a browser elsewhere, so there is nothing to point at until the picture has been moved.</p>
+<ul>
+<li><strong>Content-addressed, both ends.</strong> The plugin hashes the bytes and <code>PUT</code>s them to <code>/aop/v0/avatars/&lt;sha256&gt;</code> (<a href="./aop-spec.html#57-avatars-put-aopv0avatarssha256">spec §5.7</a>); the receiver verifies the hash before storing, which is what turns an address into a claim it can check. Idempotence falls out of it, so a restarted gateway offers its avatars again — <code>HEAD</code> first — and nothing moves.</li>
+<li><strong>Never in a hook.</strong> <code>urlFor(file)</code> is synchronous and answers only from what has already been uploaded, starting the upload in the background when it cannot. Which makes <code>actor_avatar</code> the latest-arriving identity field: named late, adopted late, exactly like <code>actor</code> and <code>actor_color</code> before it.</li>
+<li><strong>The type is sniffed, never asserted, and SVG is refused.</strong> The office serves these from its own origin, so a document that can carry script is not a portrait. PNG, JPEG, GIF, WebP; 2 MB cap.</li>
+<li><strong>The path is relative to more than one thing.</strong> <code>avatars/x.jpg</code> is relative to the workspace when it came from <code>IDENTITY.md</code> and arguably to <code>agentDir</code> when it came from the config block. Both are tried, first hit wins — no rule for an operator to have followed.</li>
+</ul>
+<p>The picture goes in the detail panel rather than on the character: at the scale a name tag is legible, a face is four pixels.</p>
+<h3 id="55f-a-cache-of-who-somebody-is-is-a-latch-verified-2026-08-29-from-a-live-gateway" tabindex="-1">5.5f A cache of who somebody is, is a latch [verified 2026-08-29, from a live gateway]</h3>
+<p>All of §5.5b–e shipped and the room filled with copies of one agent: four identical Sidelines, Bobster's work under Sideline's name, and <code>main</code> anonymous. Four symptoms, and the interesting part is that they came from two mistakes, both of them the same shape — <strong>an answer about one agent, kept somewhere that outlives the question</strong>.</p>
+<p><strong>An identity resolved once is not a cache, it is a latch.</strong> Looking up a name means config and a <code>statSync</code>, and this runs on every event, so of course it is remembered. But it was remembered <em>per session record</em> and guarded with <code>if (!s.actor)</code>, which quietly means &quot;the first agent this record ever saw gets to name it, permanently&quot;. Session records outlive occupants: <code>childSessionKey</code> is a routing address that OpenClaw hands out again, and <code>subagent_ended</code> is the hook least likely to fire. So the second ghost at an address wore the first one's name, colour and face, and no event could correct it. The fix is not more invalidation but a different question — not &quot;do we know who this is&quot; but &quot;do we know who this is <em>now</em>&quot; — so the answer is stored beside the agent id it was asked about, and a mismatch drops all three fields at once. Dropping two of three would be the same bug with a longer tail.</p>
+<p><strong>A subagent's <code>agentId</code> is not evidence that it is a different agent.</strong> OpenClaw runs helper threads <em>as</em> the spawning agent and reports that agent's id, so <code>identityFor(event.agentId)</code> faithfully named every helper after its parent. That is where the four Sidelines came from — and the guard has to survive the child's own hooks, which will <code>learn</code> the same id a moment later and re-adopt what was just declined. Hence a flag on the session rather than a decision at spawn time: some sessions have no identity of their own, and that is a fact about them, not a step in a sequence.</p>
+<p><strong>And a default that is inferred is a default that is wrong.</strong> <code>agents.list</code> has no entry for <code>main</code> on a normal install — that is the entire reason §5.5b reads <code>IDENTITY.md</code> first — so &quot;the default agent is whichever entry says <code>default: true</code>, else the first one listed&quot; mis-crowned the first-listed agent. That single fallback produced two wrong answers: <code>main</code> was looked for in a <code>workspace-main</code> that does not exist, and the first-listed agent was handed <code>~/.openclaw/workspace</code> and read Main's <code>IDENTITY.md</code>. OpenClaw's default agent id is a constant, so it is a constant here.</p>
+<p>The lesson that generalises past this plugin is the fourth one: <strong>none of this was diagnosable.</strong> Nothing said which file an identity had been read from, so telling a latched identity from a mis-resolved workspace from a missing file was pure inference. Both fixes for that are one line each — a gateway log line per agent, re-printed if the answer ever changes, and a <code>Cast:</code> table in <code>--status</code> that resolves through <code>lib/identity.mjs</code> so it cannot disagree with the room. An adapter that maps <em>identity</em> should be able to say who it thinks everybody is, out loud, without a browser.</p>
+<h3 id="56-what-being-long-lived-actually-buys" tabindex="-1">5.6 What being long-lived actually buys</h3>
+<p>All four of these are unavailable to a hook adapter, and all four fall out of the same fact: the bridge is still running when the next event arrives.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Hook adapter</th>
+<th>This bridge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Eight parallel tool calls</td>
+<td>eight processes, eight POSTs</td>
+<td>one batch, one POST</td>
+</tr>
+<tr>
+<td>Retry</td>
+<td>spool + a detached sender, at-least-once</td>
+<td>in-process, in order, at-most-once</td>
+</tr>
+<tr>
+<td>Per-session state</td>
+<td><code>~/.roving-office/state-&lt;harness&gt;.json</code></td>
+<td>memory</td>
+</tr>
+<tr>
+<td>Idle session</td>
+<td>office reaps it on a TTL</td>
+<td><code>session.heartbeat</code> every 15s</td>
+</tr>
+</tbody>
+</table>
+<p>The heartbeat is the one that changes what the room can show. §7 notes that hooks &quot;cannot heartbeat on their own (they are dead between events)&quot; and concludes that v0 should just rely on the receiver's TTL. A Gateway that is already running does not have that problem, so an OpenClaw session sitting quietly for an hour between prompts keeps its desk.</p>
+<p>The rule it must still obey is <strong>design rule 1</strong>, and being in-process makes it easier to break, not harder: OpenClaw <em>awaits</em> hook handlers. A handler that awaited a 900ms remote POST would make every tool call 900ms slower. So <code>publish()</code> is synchronous — envelope, push, arm a timer, return — and the network only ever happens on the timer. Measured in the harness: ten events queued in 2–3ms against an office deliberately answering in 900ms, delivered as one request.</p>
+<h3 id="57-installed-as-a-link-deliberately" tabindex="-1">5.7 Installed as a link, deliberately</h3>
+<p><code>openclaw plugins install</code> accepts <code>clawhub:</code>, <code>npm:</code>, <code>npm-pack:</code>, <code>git:</code>, a local path, and <code>--link &lt;path&gt;</code>. We link, for two reasons.</p>
+<p>The plugin <strong>shares <code>bin/lib/aop-core.cjs</code></strong> with the hook adapters, so a copy of <code>openclaw-plugin/</code> alone would not carry it. And a copy is a snapshot — precisely the trap §2.5 documents for the Claude plugin, where install copies the repo to a version-keyed cache and <code>plugin update</code> compares versions to decide whether to re-copy, so a change that does not bump the version is a change no session ever runs. <strong>A link has no snapshot, so it cannot go stale, and there is no version ritual to forget.</strong> Given how much of §2.5 is spent on that ritual, this is the more interesting half of the comparison.</p>
+<p>The price is that the checkout has to stay put — the same deal §4.1 already strikes by baking an adapter path into a config file. <code>--status</code> prints the linked path and says so if it no longer points at this checkout.</p>
+<p><strong>And a Gateway on a server has no checkout to link to</strong>, which the first draft of this section quietly ignored. <code>bin/aop-openclaw-pack.cjs</code> (<code>npm run pack:openclaw</code>) closes it: a tarball installable with <code>openclaw plugins install npm-pack:&lt;file&gt;</code>. The interesting part is the seam. Rather than regex-rewriting import paths at pack time — which works until someone adds a third import and does not notice — the plugin reaches outside itself in exactly <strong>one</strong> file, <code>lib/shared.mjs</code>, whose whole job is to be that seam. The packer vendors <code>aop-core.cjs</code> and <code>tool-classes.cjs</code> into <code>vendor/</code> and replaces that single file; every other file in the artifact is byte-identical to the checkout, so an artifact can be reviewed by diffing it against <code>openclaw-plugin/</code>.</p>
+<p>Two guards, because the failure mode is remote and misattributed — a Gateway logging a module-not-found at startup looks like OpenClaw's fault:</p>
+<ul>
+<li>
+<p><strong>The audit.</strong> Every relative specifier in the staged tree is resolved, and two things fail the build (exit 1, not a warning): one that escapes the package, and one that resolves to a file the artifact does not contain. Both confirmed by deliberately breaking them and watching it refuse.</p>
+<p>The second half was added after it was needed. <code>FILES</code> is a hand-written list, a new <code>lib/avatar.mjs</code> was not added to it, and the audit passed — because its one regex looked for <code>import</code> or <code>require</code> followed by a quote, which is <em>not</em> what <code>import { x } from './y.mjs'</code> looks like. The form the plugin is almost entirely written in was the form it never checked, so the only thing that caught the missing module was <code>--verify</code> actually running the artifact, and the message was a Node stack trace. Three patterns now, and a missing file is reported as a missing file.</p>
+</li>
+<li>
+<p><strong><code>--verify</code>.</strong> It extracts the tarball to a temp directory with no checkout above it, registers the plugin against a stub <code>api</code>, drives a session and asserts the envelopes — because a vendored file can be <em>present</em> and still be the wrong one. It is what the default <code>npm run pack:openclaw</code> runs.</p>
+</li>
+</ul>
+<p>The honest cost is that a packed install is a <strong>copy</strong>, so §2.5's staleness trap returns by the other door: the version is stamped from <code>package.json</code> for traceability, but a server runs the copy it has until someone replaces it. Link where you can, pack where you must.</p>
+<p>The manifest is required even with no config (<code>docs/plugins/building-plugins.md</code>), and <code>activation.onStartup: true</code> is what makes a hook-only observer load at all. One deliberate deviation: the entry is a <strong>plain default export</strong> rather than a call to <code>definePluginEntry</code>. Read at 2026.7.1-2 that helper is a pure normaliser returning <code>{ id, name, description, configSchema, register }</code>, and it defaults <code>configSchema</code> to a <em>strict empty object schema</em> — which would reject the very config this plugin needs. Importing it would buy nothing but a bare <code>openclaw</code> specifier that a linked directory outside the OpenClaw install cannot reliably resolve. The plugin therefore has <strong>zero dependencies and no build step</strong>.</p>
+<h3 id="58-double-counting-half-built-and-honest-about-which-half" tabindex="-1">5.8 Double counting: half-built, and honest about which half</h3>
+<p>OpenClaw wraps Claude Code and Codex, so a machine with this plugin <em>and</em> our Claude plugin can show the same work as two characters.</p>
+<p>The emitter half is done: <code>harness.name = &quot;openclaw&quot;</code> always, and <code>ext.wrapped_harness</code> when configured with <code>plugins.entries.roving-office.config.wrappedHarness</code>. It has to be <strong>told</strong> rather than sniffing, and that is the honest position — nothing in the hook payloads names the wrapped harness. <code>modelProviderId</code> is the provider (<code>anthropic</code>), not the harness, and inferring <code>claude-code</code> from it would be wrong for every session where OpenClaw drives Anthropic directly.</p>
+<p>The receiver half — de-duplicating on <code>session.cwd</code> + overlapping time when two harnesses report the same <code>project.repo.commit</code> — is <strong>not built</strong>. Until it is, <code>wrappedHarness</code> is a declaration waiting for a reducer, and the practical mitigation is to run one adapter or the other. This is the one open item that was supposed to be settled <em>before</em> the plugin shipped (§7 item 6); it shipped first because the emitter side is what the office needs in order to have anything to de-duplicate.</p>
+<h2 id="6-a-cloud-agent-is-not-a-harness" tabindex="-1">6. A cloud agent is not a harness</h2>
+<p>Every adapter above rests on the same premise: a process on the user's own machine that
+will run a shell command, or an in-process bus an adapter can register on. A <strong>cloud</strong>
+coding agent — one that takes a work item and returns a pull request, without ever
+touching your laptop — has neither. There is no config file to edit and no process that
+will execute anything on an adapter's behalf, so every mechanism in this document is
+unavailable, and the only route left is something server-side posting to a published
+office directly.</p>
+<p>That is worth writing down rather than leaving as an omission, because three of the
+adapter contract's assumptions turn out to be load-bearing only for local harnesses, and
+anything running in the cloud breaks each one:</p>
+<ul>
+<li><strong>No <code>.git</code>, so no project.</strong> §7 step 4 derives the office from the nearest ancestor
+<code>.git</code> and <code>git remote get-url origin</code>. Something with no working directory has to be
+handed a repository URL instead, canonicalised to <code>host/owner/repo</code> by exactly the same
+rules — or one repository lands in two different rooms depending on where the work
+started.</li>
+<li><strong>No redaction of ours.</strong> Spec §10 is enforced in the adapter. A source that posts to
+the office itself sends whatever its author configured, so the redaction contract moves
+into whatever template does the posting, and that template should therefore be
+metadata-only.</li>
+<li><strong>No loopback.</strong> A cloud service cannot reach <code>127.0.0.1</code>, so this is the first source
+that <em>requires</em> a published office (§7.1) rather than merely tolerating one.</li>
+</ul>
+<p>Beyond that, nothing general can be said: whether a given product exposes a subscribable
+event stream at all, what an integration may post, and when it knows enough to post it,
+are questions about that product rather than about AOP. Settle them against the product —
+and with whoever owns it — before writing an adapter, or before writing anything more
+specific here.</p>
+<h2 id="7-the-shared-adapter" tabindex="-1">7. The shared adapter</h2>
+<p><code>bin/aop-send &lt;harness&gt; [event-name]</code> — one script (Node, no deps, or plain <code>bash</code> + <code>curl</code>), used by all three hook-based harnesses:</p>
+<ol>
+<li>Read stdin (raw JSON payload), never block on an empty stdin.</li>
+<li>Resolve the endpoint — <code>AOP_URL</code>/<code>AOP_TOKEN</code> if set, else <code>~/.roving-office/endpoint.json</code>; <strong>if neither, exit 0 immediately.</strong></li>
+<li>Normalise: pick the mapper by <code>argv[1]</code>, derive <code>type</code> and <code>payload</code>, apply the redaction rules and truncation caps from spec §10.</li>
+<li>Derive <code>project</code> per spec §3.4.1: nearest ancestor <code>.git</code>, <code>git remote get-url origin</code> canonicalised to <code>host/owner/repo</code>, current branch into <code>repo.branch</code>. The canonical form is what goes in <code>repo.remote</code> as well as what picks the office — the raw <code>get-url</code> output may carry a <code>userinfo</code> credential and MUST NOT be sent (spec §3.3, §10). Worktrees deliberately collapse onto the repo's office. Honour <code>ROVING_OFFICE_SCENE</code> by stamping <code>project.scene</code>. Cache the whole lot in <code>~/.roving-office/project-cache.json</code> keyed by <code>cwd</code> — do <strong>not</strong> shell out to git on every hook, and version the entries, or a cache written before a field was narrowed keeps serving the old one.</li>
+<li><code>POST</code> NDJSON, gzip if &gt; 4 KiB — inline against a loopback office (connect 0.5 s, total 1 s), or spooled and handed to a detached sender against a remote one (§7.1).</li>
+<li>On any failure, append to a capped spool file and exit 0. The bridge (or the next successful call) drains it.</li>
+<li><code>exit 0</code>. Always. Under every circumstance.</li>
+</ol>
+<p>Plus one long-lived <strong>heartbeat/reaper</strong> helper: hooks cannot heartbeat on their own (they are dead between events), so the receiver's TTL logic (spec §7.4) is what retires characters — or a tiny daemon <code>aop-heartbeat</code> pings for sessions it has seen recently. Given the office reaps on its own, v0 should just rely on TTL.</p>
+<p><strong>As built</strong> (<code>bin/aop-send.cjs</code>, zero dependencies, Node — same runtime the office already needs). All seven steps above hold, with four additions the plan did not anticipate:</p>
+<ul>
+<li><strong><code>--chain '&lt;command&gt;'</code>.</strong> Re-runs a displaced hook with the same stdin, detached, before we do anything else. Forced by Rovo's first-command-only behaviour (§4.1) and useful anywhere a harness gives one slot per event.</li>
+<li><strong>A hard watchdog.</strong> <code>exit 0</code> after 2.5 s no matter what state the process is in, on top of the per-request timeouts. Belt and braces, because the failure mode is someone's agent appearing to hang.</li>
+<li><strong>Per-session state</strong> in <code>~/.roving-office/state-&lt;harness&gt;.json</code>: <code>seq</code> counters, whether a turn is open, and in-flight tool calls, so <code>tool.end</code> can still report a name, class and duration when the harness only sends an id. Written atomically; last writer wins, and a duplicated <code>session.start</code> is absorbed by the receiver's id de-duplication.</li>
+<li><strong><code>~/.roving-office/settings.json</code>.</strong> Spec §10 specifies redaction via env vars, which hooks make awkward: a hook inherits the spawning harness's environment, so changing mode means restarting every session. The file is read per event, so <code>{ &quot;redaction&quot;: &quot;summary&quot; }</code> applies to the next tool call. Env still wins over file, and <code>full</code> still needs its own second opt-in.</li>
+<li><strong>Shape sampling.</strong> Payload <em>keys and value types</em> — never string contents — are appended to <code>~/.roving-office/shapes-&lt;harness&gt;.ndjson</code>, capped, so unverified field names get closed out by real traffic instead of guesswork. <code>ROVING_OFFICE_CAPTURE=full</code> records values too, <code>=0</code> turns it off.</li>
+</ul>
+<p>Adding the second harness then pulled two small shared modules out of the first, and the third harness pulled a larger one. Each was extracted when a second (or third) consumer actually arrived, which is the right moment — earlier would have been speculative, later would have been two copies drifting:</p>
+<ul>
+<li><strong><code>bin/mappers/lib/tool-classes.cjs</code></strong> — the fallback patterns, the shell-command reclassification and the <code>target</code> extraction. Per-harness tool <em>tables</em> stay in their mappers; the reasoning about unknown tools is shared (§2.4).</li>
+<li><strong><code>bin/mappers/lib/event-shape.cjs</code></strong> — the three mechanics under a mapper that turned out not to be per-harness at all, once there were four mappers to compare: the per-session bookkeeping record (<code>{seq, started, turnOpen, tools, todo}</code> — every mapper wants the same fields for the same reasons), the rule that an <code>undefined</code> field must not overwrite a known one, and the result byte count. Which <em>field</em> holds the result is per-harness and stays in the mapper; how big it is, is arithmetic. Three copies of the state record and two each of the other two went in.</li>
+<li><strong><code>bin/lib/local-config.cjs</code></strong> — <code>~/.roving-office/settings.json</code> and <code>projects.json</code> scaffolding, the adapter sanity check, and the <code>--status</code> lines about both. These files describe the <em>office</em>, not a harness: a machine with two harnesses wired up has one redaction setting and one alias table, and whichever installer runs first should be the one that creates them.</li>
+<li><strong><code>bin/lib/cli-flags.cjs</code></strong> — how the five installers read their own arguments: <code>flag('--dry-run')</code>, <code>value('--config')</code> (the argument <em>after</em> the name, because a path is what every harness's own CLI takes there and what tab-completes), and <code>help</code>, since all five accept both <code>--help</code> and <code>-h</code>. Four of the five had written the pair out themselves, in three spellings: <code>flag</code> three times, <code>value</code> three times with two different answers for an absent flag, and Codex with a <code>Set</code> of the whole argument list to ask the same questions with <code>.has</code> — while Cursor asked <code>args.includes('--uninstall')</code> three separate times in one function. Deliberately <em>not</em> merged with <code>bin/lib/cli-args.js</code>, which is the same job for the twelve office-generating tools: those take <code>--seed=7</code>, typed by hand dozens of times a session, and these take <code>--config &lt;path&gt;</code>. Two conventions rather than one reader with a mode, and in any case these five are CommonJS, because a hook adapter starts under whatever Node the harness launches it with.</li>
+<li><strong><code>bin/lib/aop-core.cjs</code></strong> — <em>the emitter core</em>, pulled out for OpenClaw (§5). Where the office is (<code>resolveEndpoint</code>, <code>isLoopback</code>), which office a directory belongs to (<code>deriveProject</code>, <code>canonicalRemote</code>), how much may be said and how short (<code>resolveRedaction</code>, <code>clamp</code>, <code>tidyPath</code>, <code>CAPS</code>), and the POST itself. Everything a <em>hook</em> needs that a <em>bridge</em> needs identically. Its smallest export earns its place by reach rather than by size: <code>readJson(file, fallback)</code> — parse or fall back, because every one of these files reads JSON somebody may have hand-edited — had a private copy in the Claude, Codex and Cursor installers (Cursor's named <code>read</code>, and hard-wired to a <code>{}</code> fallback), in <code>local-config.cjs</code> and in <code>aop-connect.cjs</code> — six restatements of one line, in files that were already requiring <code>aop-core</code> transitively through <code>local-config.cjs</code>. It also owns <code>MAPPER_HELPERS</code>, the frozen bag of <code>{ clamp, tidyPath, firstString, toIso, CAPS }</code> a mapper is handed: a mapper requires nothing, so what it may assume about its host is a contract, and a contract assembled at each call site can differ per driver — <code>bin/aop-send.cjs</code> built one, and the seven test files that drive the mappers built their own, one of them already missing <code>toIso</code>. Stated once, a helper a mapper starts using is either there for every driver or for none. Transport deliberately stays out: a short-lived hook spools and hands off, a bridge batches on a timer, and forcing those into one shape would help nobody. What they must not be allowed to disagree about is which room a repo walks into and what a desk label may contain — one is visible to whoever is watching, the other to whoever wrote the prompt.</li>
+</ul>
+<p>The extraction paid for itself immediately, which is §7.2.</p>
+<p>One deviation worth naming: the files are <code>.cjs</code>, not extensionless <code>aop-send</code>. The office's <code>package.json</code> is <code>&quot;type&quot;: &quot;module&quot;</code>, and an extensionless Node script's module type is ambiguous enough to break on a version bump; <code>.cjs</code> is unambiguous and matches <code>server.cjs</code>.</p>
+<ul>
+<li><strong><code>bin/aop-node.sh</code></strong> — the one file in <code>bin/</code> that is not Node, because it is what finds Node. A hook command names the launcher and the launcher <code>exec</code>s the adapter, so no hook depends on <code>node</code> being on the PATH it happens to inherit. This is not defensive programming for its own sake: a GUI-launched harness gets launchd's five-directory PATH and no version manager is on it, which cost every Cowork session (§2.7). It resolves once, caches to <code>~/.roving-office/node-path</code>, and — like the adapter — exits 0 and stays off stderr whatever happens.</li>
+</ul>
+<h3 id="71-remote-offices-without-making-the-agent-wait" tabindex="-1">7.1 Remote offices, without making the agent wait</h3>
+<p>The adapter needed <strong>no changes at all</strong> to <em>address</em> a remote office — it posts to
+whatever URL it resolves and has always picked <code>https</code> from the URL's own protocol. What
+it needed was a different way to <em>spend time</em>, because the budgets were written for
+loopback: 500 ms to connect, 1 s in total, against a measured 0.7–0.9 s round trip to a
+hosted receiver. Left alone, every event would have timed out into the spool and the
+office would have gone quiet without a single error anywhere.</p>
+<p>Raising the budgets alone is not available: design rule 2 says a slow office must never
+become a slow agent, and a Rovo hook blocks its agent while it runs. So delivery splits
+by locality:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Local (loopback)</th>
+<th>Remote</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST happens</td>
+<td>inline, in the hook</td>
+<td>in a detached child (<code>aop-send --flush</code>)</td>
+</tr>
+<tr>
+<td>Hook wall time</td>
+<td>~40 ms, including the POST</td>
+<td>~40 ms, excluding it</td>
+</tr>
+<tr>
+<td>Budgets</td>
+<td>connect 0.5 s, total 1 s</td>
+<td>connect 2 s, total 4 s, process ceiling 10 s</td>
+</tr>
+<tr>
+<td>If it fails</td>
+<td>spool, retry on the next hook</td>
+<td>spool, retry on the next hook</td>
+</tr>
+</tbody>
+</table>
+<p>The hook appends to the spool <em>first</em> and then spawns, so the events are on disk before
+anything can go wrong with the child; if the spawn fails they are simply carried by the
+next hook. The child is <code>detached</code> with <code>stdio: 'ignore'</code> so it survives the harness
+reaping the hook's process group and holds no pipe that could block.</p>
+<p>That turns the spool from an error path into the normal path, which exposed a race worth
+naming: two senders can now be in flight at once. Reading the spool and deleting it
+afterwards loses whatever arrived in between, so a sender <strong>renames</strong> the spool to a
+private claim file, and appends the batch back on failure. The rename is atomic, so
+exactly one sender owns a given batch. Delivery becomes at-least-once, which the
+receiver's existing id de-duplication already covers.</p>
+<p>Two behaviours found by testing, both worth keeping in mind:</p>
+<ul>
+<li><strong>A local office start takes the machine's adapters back</strong>, because there is one
+endpoint file and it holds one URL. It now says so on stderr rather than silently
+redirecting every hook.</li>
+<li><strong><code>unpublishEndpoint</code> had to get stricter.</strong> It deleted any endpoint whose <code>pid</code> was
+not <em>contradicting</em> it — and a remote endpoint has no pid by design, so a local office
+exiting wiped it and disarmed every hook on the machine. It now requires a pid that
+positively matches its own. Absence of a claim is not a claim.</li>
+</ul>
+<p>A project <strong>alias file</strong> turned out to be necessary too. A repo is rarely named exactly like the office it should walk into, so <code>~/.roving-office/projects.json</code> maps either a canonical remote slug or a derived id onto a project id:</p>
+<pre><code class="language-json">{ &quot;aliases&quot;: { &quot;bitbucket.org/you/your-repo&quot;: &quot;the-roving-office&quot; } }
+</code></pre>
+<p>Read on every hook rather than cached with the git lookup, so an edit takes effect on the next event instead of when the cache expires.</p>
+<p><strong>This repo needs no alias of its own.</strong> The room in <code>src/projects.js</code> is <code>the-roving-office</code>, which is exactly what its remote slug derives to. That is deliberate, and it is the lesson of the rename: the office id is what a repo rename silently changes, so a room named after the remote means a fresh clone lands in the right office with no machine-local setup at all. The mechanism stays for any repo whose name genuinely differs from its room.</p>
+<h3 id="72-the-bug-that-justified-the-shared-core-verified-2026-08-29" tabindex="-1">7.2 The bug that justified the shared core [verified 2026-08-29]</h3>
+<p><code>post()</code> was duplicated — once in <code>aop-send.cjs</code>, once in the OpenClaw publisher — for about an hour, on the reasonable grounds that the two want different timing budgets. Then a test pointed an emitter at an IPv6 loopback URL and a <em>reachable</em> receiver logged zero requests.</p>
+<p>The cause is a mismatch between two Node APIs. <code>new URL('http://[::1]:8080/x').hostname</code> returns <code>&quot;[::1]&quot;</code> — <strong>with</strong> the brackets — while <code>http.request({ hostname })</code> wants it bare and adds its own. Handed the bracketed form it tries to resolve the punctuation as a hostname, fails, and the emitter behaves exactly as though the office were down: every event spools, every retry fails identically, and nothing anywhere says why. Silent, total, and indistinguishable from a network problem.</p>
+<p>Two things worth taking from it:</p>
+<ul>
+<li><strong>The fix belongs in one file.</strong> Both copies had it, because the second was copied from the first. <code>post()</code> now lives in <code>aop-core.cjs</code> and takes its budgets as an argument, which was the only thing the two genuinely disagreed about.</li>
+<li><strong><code>isLoopback</code> does not recognise <code>::ffff:127.0.0.1</code>.</strong> That is correct as written — its own comment says anything not plainly loopback is treated as remote, because being wrong that way only costs patience. It also makes a useful test lever: an IPv4-mapped loopback address is classified <code>remote: true</code> while still being reachable, which is how the remote delivery path gets exercised on one machine. The obvious alternative, binding to the machine's own LAN address, does not work — its firewall resets connections to itself.</li>
+</ul>
+<p>There was a fourth copy of <code>isLoopback</code>, in <code>local-config.cjs</code>, with a comment reading &quot;the same loopback test as aop-send.cjs, which is the file that acts on it&quot;. It now imports the real one.</p>
+<p>There was a fifth, in <code>aop-connect.cjs</code>, and its comment is the more instructive one: it justified the duplication on the grounds that &quot;that file is on the hook's critical path and stays free of local requires, so the cost of a hook is a Node start and nothing else&quot;. True when written, and false by the time <code>aop-send.cjs</code> acquired <code>require('./lib/aop-core.cjs')</code> — which is exactly what §7.2 is about, since the shared <code>post()</code> is what it went there for. A comment asserting why two copies are cheaper than one require does not notice when the require arrives. <code>aop-connect</code> now imports it too; the half of that comment worth keeping is the half about <em>agreement</em>, because <code>--status</code> reports <code>remote</code> and the adapter acts on it, and it survives on the import line.</p>
+<h2 id="8-suggested-build-order" tabindex="-1">8. Suggested build order</h2>
+<ol>
+<li><s><strong>Receiver first.</strong></s> <strong>Built.</strong> <code>server.cjs</code> serves, per office, <code>POST /office/&lt;keycard&gt;/aop/v0/events</code> (token-gated, NDJSON batches, id de-duplication), <code>GET /aop/v0/stream</code> (SSE, <code>?harness=</code> filtered), <code>GET /aop/v0/state</code> (replay of live sessions) and <code>GET /aop/v0/health</code>. <code>src/data/AopSource.js</code> is the single reducer for spec §6; <code>src/data/sources.js</code> registers the six sources and the picker drives them. Poke it with the <code>curl</code> in <a href="../architecture.html#receiving-events">Architecture</a> before suspecting an adapter.</li>
+<li><s><strong>Claude Code plugin.</strong></s> <strong>Built.</strong> <code>bin/mappers/claude-code.cjs</code> + <code>.claude-plugin/</code> + <code>hooks/hooks.json</code> + <code>bin/aop-claude-install.cjs</code>. Fifteen hooks, L2, at zero token cost. Claude, Codex and OpenClaw can drive real <strong>ghosts</strong> (spec §6.1), so the scene-side ghost work is the next thing that pays off: cloned chairs and a translucent body clone in <code>props.js</code> / <code>Agent.js</code>, plus per-desk fan slots in <code>AgentManager</code>. Read §2.5's three measured behaviours first, particularly that a plugin install is a <em>copy</em>.</li>
+<li><s><strong>Rovo hooks</strong> (L1) — five hook entries and a mapper.</s> <strong>Built, and a fuller L1 than predicted.</strong> <code>bin/aop-send.cjs</code> (shared core) + <code>bin/mappers/rovo-cli.cjs</code> (mapper)
+<ul>
+<li><code>bin/aop-rovo-install.cjs</code> (installer). Eight hook entries, not five, so a Rovo session gets an explicit lifecycle rather than implicit spawn. Read §4.1's five constraints before touching it — particularly first-command-only, which is why the installer has to chain.</li>
+</ul>
+</li>
+<li><s><strong>Codex <code>notify</code></strong> (degraded L0) while capturing real <code>hooks</code> payloads, then the full mapper.</s> <strong>Built as the full hooks plugin.</strong> <code>bin/mappers/codex-cli.cjs</code> + <code>.codex-plugin/</code> + the shared <code>hooks/hooks.json</code> + <code>bin/aop-codex-install.cjs</code>.</li>
+<li><s><strong>Cursor hooks.</strong></s> <strong>Built.</strong> <code>bin/mappers/cursor.cjs</code> + <code>bin/aop-cursor-install.cjs</code>, translating Cursor-native events and TodoWrite multi-step plans into AOP.</li>
+<li><strong>Rovo <code>serve</code> bridge</strong> (L2) — also the reference implementation for a long-lived bridge.</li>
+<li><s><strong>OpenClaw plugin</strong>, once the double-count question in §5 is settled.</s> <strong>Built</strong> — and the double-count question is <em>half</em> settled, which is a deviation worth naming: the emitter stamps <code>harness.name</code> and <code>ext.wrapped_harness</code>, but the receiver-side de-duplication does not exist (§5.8). It shipped in that order because the office needs the declarations before it can have anything to de-duplicate. <code>openclaw-plugin/</code> + <code>bin/aop-openclaw-install.cjs</code>, ten hooks, L2 minus permissions. Read §5.2 first: the plugin route cannot see approvals at all, which is the one thing the Gateway WebSocket would add.</li>
+<li><strong>A cloud source</strong> (§6) — something server-side posting to a <em>published</em> office, not a mapper. Whatever it is, do it after the hosted office is something the project relies on, since it cannot be tested against loopback at all.</li>
+<li>Keep <code>MockSource</code> as the offline demo, and add an AOP recorder/replay so the the screenshots are reproducible.</li>
+</ol>
+<h2 id="appendix-how-this-was-verified" tabindex="-1">Appendix: how this was verified</h2>
+<p><strong>Claude Code</strong> — installed locally, v2.1.246. Flags read from <code>claude --help</code> and <code>claude plugin --help</code>. Hook payloads captured for real by running a probe session with a temporary settings file whose hooks were <code>cat &gt;&gt; tmp_rovo_hooks.jsonl</code>, with <code>--output-format stream-json --include-hook-events --verbose</code>; the session itself failed with &quot;Not logged in&quot;, which is <em>why</em> only <code>SessionStart</code>, <code>UserPromptSubmit</code> and <code>SessionEnd</code> fired. Hook and SDK-message name inventories came from <code>strings</code> over the installed binary — which also confirms the wider set really is present in 2.1.246, not just in the docs: <code>PostToolUseFailure</code>, <code>PostToolBatch</code>, <code>PermissionDenied</code>, <code>FileChanged</code>, <code>CwdChanged</code> and <code>StopFailure</code> all appear. Docs claims (payload fields for tool hooks, OTel event names) came from <code>docs.claude.com</code>.</p>
+<p>The plugin work was then verified by building and running it, not by reading:</p>
+<ul>
+<li><strong>Manifest shape</strong> taken from <code>claude plugin init --with hooks</code> rather than from memory (a throwaway plugin, scaffolded, read, deleted), then checked with <code>claude plugin validate .</code> — which is also where the marketplace <code>description</code> warning came from.</li>
+<li><strong>Install</strong> through <code>claude plugin marketplace add ./</code> + <code>claude plugin install roving-office@roving-office</code>; <code>claude plugin details</code> reported all 15 hooks and <code>~0 tok</code>. Re-running both commands proved them idempotent (exit 0, &quot;already installed&quot;), which is what lets the installer just run them.</li>
+<li><strong>The copy-on-install behaviour</strong> was found by looking: the tree under <code>~/.claude/plugins/cache/…/0.1.0/</code> contains <code>bin/</code>, <code>bin/mappers/</code> and the exec bit intact, and <code>installed_plugins.json</code> records <code>installPath</code> and <code>gitCommitSha</code>.</li>
+<li><strong>Live delivery, both routes.</strong> An unauthenticated <code>claude -p …</code> still fires <code>SessionStart</code> and <code>UserPromptSubmit</code> (the auth failure is <em>why</em> nothing further runs), and both arrived at the receiver as real <code>session.start</code> / <code>turn.start</code> envelopes with the project resolved through the alias file — first via the plugin, then again with the plugin disabled and hooks installed at project scope.</li>
+<li><strong>Everything the unauthenticated session cannot reach</strong> — tool calls, subagents, permissions, compaction, failures — was exercised by replaying a scripted 25-event session through the mapper in all three redaction modes and asserting the output: types against the spec's enum, ghost parentage, turn ids, classes, <code>artifact.change</code> on success only, and that nothing is emitted that <code>CAPABILITIES</code> does not declare.</li>
+<li><strong>Settings-route safety</strong> was tested against a copy of this machine's real <code>~/.claude/settings.json</code>, which already has two hooks: install added 15 entries and left both untouched with their matchers, a second run was a no-op, and <code>--uninstall</code> returned the file byte-identical to the original.</li>
+</ul>
+<p><strong>Rovo CLI</strong> — v202608.25.1. <code>eventHooks</code> schema read from the live <code>~/.rovo/config.yml</code>; the stdin/exit-0/latency constraints from an existing production hook script on this machine. Real payloads read from a co-resident hook's own debug log (25 samples across <code>on_complete</code> and <code>on_tool_permission</code>), then confirmed by installing this adapter and watching real <code>session.start</code>/<code>session.end</code> envelopes arrive at the receiver. The extra three event names came from <code>strings</code> over the installed binary, which registers <code>[&quot;on_session_start&quot;,&quot;on_user_prompt&quot;,&quot;on_complete&quot;,&quot;on_session_end&quot;]</code>, and were then accepted by Rovo in a real config. First-command-only was proved by adding a second command to an event and observing that it neither ran nor appeared in Rovo's own <code>event_hooks.log</code>, while a single command on a fresh event did both. Hook firing per mode (TUI vs <code>run</code> vs <code>serve</code>) was established by driving one turn each way with a capture-only config and diffing what arrived. The <code>serve</code> API was probed for real: <code>rovo serve 8791 --disable-session-token</code>, then <code>GET /openapi.json</code> for the endpoint and schema inventory, a live SSE subscription to <code>/v3/agent_lifecycle_events</code>, and one tiny chat turn through <code>POST /v3/set_chat_message</code> + <code>GET /v3/stream_chat</code> to capture frame names. Server shut down afterwards via <code>POST /shutdown</code>.</p>
+<p>Session-visibility timing (§4.4) was established by launching a Rovo CLI in a repo under a pty, sending it no input, and watching the receiver's cursor for 14 seconds while the TUI sat fully rendered at its prompt: nothing arrived. The complementary figure — <code>on_session_start</code> to <code>on_user_prompt</code> within 54–1063 ms across four sessions — came from the recorded shape timestamps, and the Claude contrast from two same-day sessions that reached the office with a <code>session.start</code> and no turn at all.</p>
+<p><strong>Codex CLI</strong> — installed locally, v0.151.0. The hook names and stdin fields were
+checked against the current official hook contract and the public Rust types;
+the installed CLI supplied plugin/marketplace JSON, feature status and doctor
+output for the installer. A scripted eight-case fixture session covers lifecycle,
+turn ids, the absence of a Bash failure signal, patch artifacts without patch-content retention,
+plans, permission requests, waiting, subagent parentage and summaries. The plugin
+manifest is checked with the Codex plugin validator, and the installer's dry-run
+and status paths are exercised without modifying the active installation.</p>
+<p><strong>OpenClaw</strong> — the runtime is not installed on the development machine, though §5.3 is the exception and the most valuable evidence here: a <strong>real Gateway on a Linux server</strong> installed the packed tarball, and its <code>openclaw plugins inspect roving-office --runtime --json</code> is what revealed the conversation-hook gate — then, once that was fixed, that the same command shows no plugin <em>config</em> at all, which is what forced the self-narration in §5.4. Three releases in an afternoon (<code>0.3.0</code> → <code>0.5.0</code>), each fixing something no local test could have found, all of it in the install-and-configure seam. Nothing else in this section needed one, because the <em>contract</em> does not depend on it, because <code>npm pack openclaw</code> (2026.7.1-2) ships both <code>dist/*.d.ts</code> and the entire <code>docs/</code> tree. So §5.1's hook table is read from <code>dist/hook-types-*.d.ts</code> — the <code>PluginHookHandlerMap</code> and every <code>PluginHook*Event</code> / <code>PluginHook*Context</code> type — rather than from a web page, and it corrected three things the docs-only draft had wrong (the subagent hook names, the registration signature, and the nine-member <code>session_end</code> reason enum). <code>definePluginEntry</code>'s behaviour came from its <em>implementation</em> in <code>dist/plugin-entry-*.js</code>, which is what revealed that its default <code>configSchema</code> is a strict empty object and would reject this plugin's own config. Packaging and install semantics from the shipped <code>docs/plugins/{building-plugins,manage-plugins,sdk-entrypoints}.md</code> and <code>docs/cli/plugins.md</code>. The Gateway WebSocket route (§5.2) is still <strong>docs-only and unverified</strong> — nothing here has connected as an operator.</p>
+<p>The plugin itself was then verified by running it, since a plugin whose harness is absent can still be driven directly:</p>
+<ul>
+<li><strong>A stub <code>api</code></strong> implementing <code>on(name, handler, opts)</code> drives a scripted 21-event session — start, a turn, five tool calls including two overlapping, a spawned subagent, a compaction pair, heartbeats, and an end — with payloads shaped to the <code>.d.ts</code>. Asserted: types against the spec's enum, the deferred <code>session.start</code> arriving first and carrying the project, <code>tool_class</code> for each tool, ghost parentage on the right tool call, <code>artifact.change</code> on success only, that no handler ever returns a value, and that every fire returns in under 50ms.</li>
+<li><strong>Delivery, end to end, into the real receiver.</strong> <code>server.cjs</code> on this machine accepted the plugin's envelopes and replayed them from <code>GET /aop/v0/state</code> as <code>openclaw/sdk</code> sessions with the project resolved — the same route and the same office the hook adapters use.</li>
+<li><strong>The remote path, for real</strong>, using <code>::ffff:127.0.0.1</code> so <code>isLoopback</code> classifies it remote while it stays reachable (§6.2). Asserted: ten events queued in 2–3ms against an office answering in 900ms; a downed office costing <strong>one</strong> failed request rather than twenty, because the backoff floor is not defeated by fresh events arriving; unassisted recovery, in order, once it came back; <code>stop()</code> spooling the remainder; and the spool draining on the next start.</li>
+<li><strong>Batching and gzip</strong> were confirmed accidentally and then deliberately: the first harness receiver silently dropped the opening batch because it did not decompress, which is how the &gt;4 KiB gzip threshold got exercised without being aimed at.</li>
+<li><strong>The refactor was re-tested from the other side.</strong> Moving <code>post</code>, <code>deriveProject</code> and the redaction helpers into <code>aop-core.cjs</code> touched the two working adapters, so both installers' <code>--status</code> and a real Rovo-mapper <code>session.start</code> were run again against the live office afterwards.</li>
+<li><strong>Against the <em>hosted</em> office, twice.</strong> An office was minted on the deployed receiver with <code>POST /api/offices</code> and the plugin published into it over the public internet — once from the checkout, once from a <strong>packed tarball extracted outside it</strong>, which is the server scenario end to end. The hosted office replayed the sessions back with tool classes, an <code>artifact.change</code>, <code>project.scene</code> from config, and <code>openclaw/sdk</code> as the harness. This is the evidence behind &quot;no server change is needed&quot;: the deployment predated the adapter by weeks.</li>
+<li><strong>One assertion was wrong before the code was.</strong> The hosted replay appeared to be missing subagent ghosts, which read as a mapper bug for a few minutes. It is not: <code>lib/aop-bus.cjs</code>'s <code>replay</code> drops a session on <code>session.end</code>, and <code>/state</code> is defined as the <em>live</em> set, so a ghost that has finished is correctly absent. The office's <code>buffered</code> count is what proves the events were accepted. Worth recording because the same trap is waiting for the next person who tests a short-lived session against <code>/state</code>.</li>
+</ul>
+<p><strong>§6</strong> is the one section with nothing behind it: no cloud source has been built, run or measured, and it deliberately claims nothing about any particular product. Read it as the three constraints an adapter would have to satisfy, not as a design.</p>
+<p><strong>Known unverified items, in priority order</strong></p>
+<ol>
+<li><s>Codex <code>hooks</code> stdin payload field names</s> → <strong>closed</strong> (§3 and the official hook contract).</li>
+<li>Claude <code>PreToolUse</code>/<code>PostToolUse</code>/<code>PermissionRequest</code>/<code>SubagentStart</code> payloads as <em>actually emitted</em> by 2.1.246 — still docs-only, because this machine's Claude is not logged in, so no model turn has ever run here. The mapper reads every field through a fallback chain and the installed plugin records payload shapes to <code>~/.roving-office/shapes-claude-code.ndjson</code> (keys and types, never contents), so the first authenticated session closes this by itself: check that file against §2.2, then tighten the chains in <code>bin/mappers/claude-code.cjs</code>. <code>SessionStart</code> and <code>UserPromptSubmit</code> are already confirmed from live traffic.</li>
+<li><s>Rovo hook payload field names</s> → <strong>closed</strong> (§4.2, §4.5). The shape recorder did the job it was built for: 50 recorded shapes across 8 hook names now cover <code>on_tool_start</code> and <code>on_tool_end</code>, and they found the contract to be <em>wider</em> than §4.2 claimed rather than different. No chain needed tightening — see §4.5.</li>
+<li>Whether Rovo's lifecycle SSE single-quote payload is a bug or intentional. Still present in 202608.25.1, so any <code>serve</code> bridge needs a lenient parser.</li>
+<li><s>OpenClaw session-state enum values, and how it labels wrapped Claude/Codex sessions</s> → <strong>half closed</strong> (§5.1, §5.8). The enum is settled: <code>session_end.reason</code> is <code>new | reset | idle | daily | compaction | deleted | shutdown | restart | unknown</code>, from the type declarations. The second half is closed in the <em>negative</em>, which is the more useful answer — <strong>nothing in the hook payloads names the wrapped harness.</strong> <code>modelProviderId</code> is the provider, not the harness. So the de-duplication design in §5.6 cannot be built on sniffing, and <code>wrappedHarness</code> is configured instead.</li>
+<li>Whether any cloud source can be made to post to an office at all, and what it knows early enough to be worth posting. A source that can only report <em>after</em> it has delivered gives the room presence without work, which is the opposite of what the office is for. §6 sets out the constraints; nothing beyond them has been settled.</li>
+</ol>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#0-the-headline">0. The headline</a></li>
+<li><a href="#1-capability-matrix">1. Capability matrix</a></li>
+<li><a href="#2-claude-code">2. Claude Code</a><ul><li><a href="#21-hook-events-available">2.1 Hook events available</a></li>
+<li><a href="#22-payloads-captured-verbatim">2.2 Payloads — captured, verbatim</a></li>
+<li><a href="#23-mapping">2.3 Mapping</a></li>
+<li><a href="#24a-todowrite-steps">2.4a TodoWrite → steps</a></li>
+<li><a href="#24b-the-generated-title-and-why-it-needs-its-own-event-verified-2026-09-04-21260">2.4b The generated title, and why it needs its own event [verified 2026-09-04, 2.1.260]</a></li>
+<li><a href="#24-tool-tool_class">2.4 Tool → tool_class</a></li>
+<li><a href="#25-plugin-shape-as-built-verified-on-21246">2.5 Plugin shape [as built, verified on 2.1.246]</a></li>
+<li><a href="#26-alternatives-considered">2.6 Alternatives considered</a></li>
+<li><a href="#27-claude-desktop-the-same-harness-a-different-path-verified-2026-08-27">2.7 Claude Desktop: the same harness, a different PATH [verified 2026-08-27]</a></li>
+<li><a href="#28-cowork-out-of-reach-because-it-is-not-on-this-machine-verified-2026-08-27">2.8 Cowork: out of reach, because it is not on this machine [verified 2026-08-27]</a></li></ul></li>
+<li><a href="#3-codex-cli">3. Codex CLI</a></li>
+<li><a href="#4-rovo-cli">4. Rovo CLI</a><ul><li><a href="#41-push-eventhooks-in-rovoconfigyml-verified-on-202608251">4.1 Push: eventHooks in ~/.rovo/config.yml [verified on 202608.25.1]</a></li>
+<li><a href="#42-closed-hook-payload-field-names-was-blocker-3">4.2 Closed: hook payload field names [was blocker #3]</a></li>
+<li><a href="#43-pull-the-rovo-serve-api-verified-locally">4.3 Pull: the rovo serve API [verified locally]</a></li>
+<li><a href="#44-when-a-session-becomes-visible-verified-2026-08-27">4.4 When a session becomes visible [verified 2026-08-27]</a></li>
+<li><a href="#45-payload-shapes-as-recorded-closes-open-item-3">4.5 Payload shapes, as recorded [closes open item 3]</a></li>
+<li><a href="#46-update_todo-steps-and-why-it-fires-at-the-start">4.6 update_todo → steps, and why it fires at the start</a></li></ul></li>
+<li><a href="#5-openclaw">5. OpenClaw</a><ul><li><a href="#51-verified-from-the-package-not-the-prose-verified-2026-08-29-on-202671-2">5.1 Verified from the package, not the prose [verified 2026-08-29 on 2026.7.1-2]</a></li>
+<li><a href="#52-there-is-no-permission-hook-and-that-is-the-one-real-loss">5.2 There is no permission hook, and that is the one real loss</a></li>
+<li><a href="#53-the-permission-that-is-not-optional-verified-2026-08-29-on-a-real-gateway">5.3 The permission that is not optional [verified 2026-08-29, on a real Gateway]</a></li>
+<li><a href="#54-a-silent-emitter-is-the-hardest-kind-so-this-one-talks">5.4 A silent emitter is the hardest kind, so this one talks</a></li>
+<li><a href="#55-two-payload-facts-that-shaped-the-mapper">5.5 Two payload facts that shaped the mapper</a></li>
+<li><a href="#55a-a-routing-key-is-not-a-name-verified-2026-08-29-from-live-traffic">5.5a A routing key is not a name [verified 2026-08-29, from live traffic]</a></li>
+<li><a href="#55b-the-config-was-the-wrong-file-verified-2026-08-29">5.5b The config was the wrong file [verified 2026-08-29]</a></li>
+<li><a href="#55c-clothes-as-identity-verified-2026-08-29">5.5c Clothes as identity [verified 2026-08-29]</a></li>
+<li><a href="#55d-real-colours-are-not-colours-verified-2026-08-29-against-a-live-gateways-config">5.5d Real colours are not colours [verified 2026-08-29, against a live Gateway's config]</a></li>
+<li><a href="#55e-avatars-the-bytes-have-to-travel-verified-2026-08-29">5.5e Avatars: the bytes have to travel [verified 2026-08-29]</a></li>
+<li><a href="#55f-a-cache-of-who-somebody-is-is-a-latch-verified-2026-08-29-from-a-live-gateway">5.5f A cache of who somebody is, is a latch [verified 2026-08-29, from a live gateway]</a></li>
+<li><a href="#56-what-being-long-lived-actually-buys">5.6 What being long-lived actually buys</a></li>
+<li><a href="#57-installed-as-a-link-deliberately">5.7 Installed as a link, deliberately</a></li>
+<li><a href="#58-double-counting-half-built-and-honest-about-which-half">5.8 Double counting: half-built, and honest about which half</a></li></ul></li>
+<li><a href="#6-a-cloud-agent-is-not-a-harness">6. A cloud agent is not a harness</a></li>
+<li><a href="#7-the-shared-adapter">7. The shared adapter</a><ul><li><a href="#71-remote-offices-without-making-the-agent-wait">7.1 Remote offices, without making the agent wait</a></li>
+<li><a href="#72-the-bug-that-justified-the-shared-core-verified-2026-08-29">7.2 The bug that justified the shared core [verified 2026-08-29]</a></li></ul></li>
+<li><a href="#8-suggested-build-order">8. Suggested build order</a></li>
+<li><a href="#appendix-how-this-was-verified">Appendix: how this was verified</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

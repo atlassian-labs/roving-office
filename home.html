@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your offices — The Roving Office</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <!-- The icon set, absolute for the same reason the stylesheet is. /favicon.ico is
+       the one a browser asks for whether or not a page mentions it, so it lives at
+       the root and carries 16/32/48 in the one file; the PNG is what everything
+       modern prefers, and the touch icon is what iOS puts on a home screen.
+       All sizes are exported from assets/logo.png. -->
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+</head>
+<body class="reception">
+  <header class="reception-nav">
+    <a class="reception-brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="40" height="40" />
+      <span>The Roving Office</span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="/docs">Docs</a>
+      <a href="/office/TEST-0000/" id="demo-link">Back to the demo</a>
+    </nav>
+  </header>
+  <main id="wizard" class="offices-page">
+    <h1>Your offices</h1>
+    <p class="offices-lede">Come back to a familiar room, or make a little space of your own.</p>
+    <div class="wz-door">
+      <form class="wz-card" id="enter-form" autocomplete="off">
+        <label class="wz-label" for="keycard">Have a keycard?</label>
+        <p class="wz-card-lede">Its eight characters are your office’s address.</p>
+        <div class="wz-row">
+          <input id="keycard" name="keycard" class="wz-input" type="text" inputmode="text" spellcheck="false" placeholder="XXXX-XXXX" aria-label="Office keycard" aria-describedby="keycard-hint" maxlength="9" size="9" autocapitalize="characters" />
+          <button type="submit" class="wz-go" id="enter-go">Enter</button>
+        </div>
+        <p class="wz-hint" id="keycard-hint" role="status"></p>
+      </form>
+      <section class="wz-card">
+        <h2 class="wz-label">A room of your own</h2>
+        <p class="wz-card-lede">Connect your agents, arrange the furniture, and keep a keycard to come back.</p>
+        <button type="button" class="wz-new" id="create-office">Open a new office</button>
+        <p class="wz-hint bad wz-create-error" id="create-hint" role="status"></p>
+      </section>
+    </div>
+    <section class="wz-recent hidden" id="recent"><h2>Your recent offices</h2><ul id="recent-list"></ul></section>
+    <p class="offices-note">Offices with no viewers or active agents close after thirty minutes.</p>
+  </main>
+  <script type="module" src="/src/wizard.js"></script>
+</body>
+</html>

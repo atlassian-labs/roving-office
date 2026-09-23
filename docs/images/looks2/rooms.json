@@ -1,0 +1,130 @@
+[
+ {
+  "seed": "look-146",
+  "name": "The Telescope Room",
+  "desks": 12,
+  "fitness": 0.6741,
+  "joined": false,
+  "divider": false
+ },
+ {
+  "seed": "look-128",
+  "name": "The Sorting Office",
+  "desks": 7,
+  "fitness": 0.6836,
+  "joined": false,
+  "divider": true
+ },
+ {
+  "seed": "look-125",
+  "name": "The Warehouse Paperless Floor",
+  "desks": 11,
+  "fitness": 0.7016,
+  "joined": true,
+  "divider": false
+ },
+ {
+  "seed": "look-20",
+  "name": "Press Room and a Warren",
+  "desks": 12,
+  "fitness": 0.7661,
+  "joined": true,
+  "divider": true
+ },
+ {
+  "seed": "look-59",
+  "name": "Bench and a Post Corner",
+  "desks": 3,
+  "fitness": 0.7982,
+  "joined": false,
+  "divider": false
+ },
+ {
+  "seed": "look-83",
+  "name": "The Stacks",
+  "desks": 5,
+  "fitness": 0.8094,
+  "joined": false,
+  "divider": true
+ },
+ {
+  "seed": "look-62",
+  "name": "The Second Lookout",
+  "desks": 7,
+  "fitness": 0.8179,
+  "joined": true,
+  "divider": true
+ },
+ {
+  "seed": "look-27",
+  "name": "Copy Room and a Conservatory",
+  "desks": 11,
+  "fitness": 0.8205,
+  "joined": false,
+  "divider": false
+ },
+ {
+  "seed": "look-38",
+  "name": "Fax Room and a Conservatory",
+  "desks": 9,
+  "fitness": 0.8357,
+  "joined": true,
+  "divider": false
+ },
+ {
+  "seed": "look-112",
+  "name": "The Sunlit Long Room",
+  "desks": 4,
+  "fitness": 0.8626,
+  "joined": false,
+  "divider": true
+ },
+ {
+  "seed": "look-149",
+  "name": "Two Galleries",
+  "desks": 5,
+  "fitness": 0.8691,
+  "joined": true,
+  "divider": true
+ },
+ {
+  "seed": "look-60",
+  "name": "The Little Print Shop",
+  "desks": 4,
+  "fitness": 0.8719,
+  "joined": true,
+  "divider": false
+ },
+ {
+  "seed": "look-144",
+  "name": "The Shuttered Observatory",
+  "desks": 5,
+  "fitness": 0.8785,
+  "joined": false,
+  "divider": false
+ },
+ {
+  "seed": "look-103",
+  "name": "The Warehouse Depot",
+  "desks": 5,
+  "fitness": 0.9115,
+  "joined": true,
+  "divider": true
+ },
+ {
+  "seed": "look-147",
+  "name": "Telescope Room and a Parlour",
+  "desks": 5,
+  "fitness": 0.9128,
+  "joined": true,
+  "divider": false
+ },
+ {
+  "seed": "look-28",
+  "name": "The Shuttered Row Room",
+  "desks": 3,
+  "fitness": 0.9211,
+  "joined": false,
+  "divider": true
+ }
+]

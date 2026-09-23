@@ -1,0 +1,73 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #243b48;
+  background: #c9dce2;
+  --ink: #243b48;
+  --panel: #f5f8f3ed;
+  --accent: #345c74;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+body[data-building="dune"] { --ink: #663723; --panel: #fff3e5ed; --accent: #a25331; }
+body[data-building="lantern"] { --ink: #353a32; --panel: #f6f1e4ed; --accent: #4b5141; }
+main, #view { width: 100%; height: 100dvh; overflow: hidden; }
+#view { display: block; touch-action: none; }
+button, select, a { font: inherit; color: inherit; }
+button, select { border: 1px solid transparent; cursor: pointer; }
+button:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.identity {
+  position: absolute; top: 24px; left: 24px; max-width: 370px;
+  padding: 22px 24px; color: var(--ink); background: var(--panel);
+  border: 1px solid #ffffff70; border-radius: 18px; pointer-events: none;
+}
+.eyebrow { font-size: 9px; letter-spacing: .17em; text-transform: uppercase; margin: 0 0 12px; }
+h1 { font: 500 43px/1 Georgia, serif; letter-spacing: -.025em; margin: 0 0 13px; }
+#office-description { font-size: 13px; line-height: 1.5; max-width: 275px; margin: 0; }
+.materials { display: flex; gap: 5px; margin-top: 16px; }
+.materials i { display: block; width: 30px; height: 5px; border-radius: 2px; }
+.office-picker {
+  position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 5px; padding: 7px; border-radius: 14px;
+  color: var(--ink); background: var(--panel); box-shadow: 0 5px 25px #11252212;
+}
+.office-picker button { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; padding: 11px 18px; border-radius: 9px; background: none; font-size: 12px; white-space: nowrap; }
+.office-picker span { font-size: 9px; opacity: .7; letter-spacing: .12em; }
+button[aria-pressed="true"] { background: var(--accent); color: white; }
+.office-link { position: absolute; top: 31px; right: 24px; display: grid; gap: 6px; text-align: right; color: var(--ink); }
+.office-link a { font-size: 11px; text-decoration: none; background: var(--panel); border-radius: 8px; padding: 10px 13px; }
+.office-link small { font-size: 9px; background: var(--panel); padding: 5px 8px; border-radius: 5px; }
+.controls {
+  position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 7px; align-items: center; justify-content: center; flex-wrap: wrap;
+  width: max-content; max-width: calc(100% - 32px); padding: 9px;
+  border-radius: 14px; background: var(--panel); color: var(--ink);
+}
+.controls [role="group"] { display: flex; gap: 4px; }
+.controls button, select { background: #ffffff65; font-size: 11px; padding: 10px 12px; border-radius: 7px; white-space: nowrap; }
+.controls button[aria-pressed="true"] { background: var(--accent); color: white; }
+.separator { height: 25px; width: 1px; background: #52615425; margin: 0 3px; }
+.hint { position: absolute; bottom: 9px; left: 50%; transform: translateX(-50%); margin: 0; white-space: nowrap; font-size: 10px; padding: 6px 12px; border-radius: 7px; background: var(--panel); color: var(--ink); }
+#loading, #error { position: absolute; top: 48%; left: 50%; transform: translateX(-50%); border-radius: 12px; background: var(--panel); padding: 20px 28px; color: var(--ink); }
+#error { max-width: 80%; white-space: pre-wrap; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 1200px) {
+  .identity { max-width: 310px; }
+  h1 { font-size: 35px; }
+  .office-picker { top: auto; bottom: 120px; }
+}
+@media (max-width: 650px) {
+  .identity { top: 14px; left: 14px; right: 14px; max-width: none; padding: 15px 18px; }
+  h1 { font-size: 31px; margin-bottom: 8px; }
+  .eyebrow { font-size: 8px; margin-bottom: 8px; }
+  #office-description { font-size: 11px; max-width: none; }
+  .materials { margin-top: 10px; }
+  .office-picker { top: 151px; bottom: auto; width: calc(100% - 28px); gap: 3px; padding: 5px; }
+  .office-picker button { flex: 1; padding: 9px 10px; align-items: center; font-size: 11px; }
+  .office-picker span { display: none; }
+  .office-link { top: auto; bottom: 156px; right: 14px; }
+  .office-link small { display: none; }
+  .controls { bottom: 40px; width: calc(100% - 28px); max-width: none; padding: 7px; }
+  .controls button, select { padding: 8px 9px; font-size: 10px; }
+  .separator { display: none; }
+  .hint { bottom: 9px; font-size: 8px; }
+}

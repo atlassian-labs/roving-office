@@ -1,0 +1,128 @@
+The Roving Office
+Copyright (c) 2026 Atlassian US., Inc.
+
+This product includes software developed at Atlassian (https://www.atlassian.com/).
+
+
+BRAND ASSETS ARE NOT COVERED BY THE APACHE-2.0 GRANT
+====================================================
+
+The Apache License 2.0 in LICENSE covers the source code in this repository. It
+does NOT cover the brand assets listed below. Those remain the trademarks and
+artwork of their respective owners, and they are reproduced here solely to
+identify the products and services this office can connect to.
+
+The exclusion is written out rather than left to inference. Apache-2.0 section 2
+grants recipients a copyright licence to reproduce, prepare derivative works of,
+publicly display and distribute the work -- a right this project holds in its
+own code and does not hold in another party's brand artwork. Section 6 disclaims
+trademarks, but it does not disclaim copyright in artwork. So the assets in
+parts A and B below are excluded from the section 2 grant by this notice.
+
+Nothing in this repository grants you any right to these assets, and nothing
+here is a rights clearance. If you fork or redistribute this repository, you
+need your own permission from each owner.
+
+
+A. ATLASSIAN BRAND ASSETS
+-------------------------
+
+Atlassian, the Atlassian logo, Rovo and Jira are trademarks of Atlassian Pty Ltd
+and its affiliates. They appear in this repository with Atlassian's permission,
+as Atlassian is also the entity releasing the code, and their use is governed by
+Atlassian's own brand and trademark terms rather than by LICENSE:
+
+  Atlassian Trademark Guidelines
+  https://www.atlassian.com/legal/trademark
+
+  Atlassian Design System -- logo and brand usage guidelines
+  https://atlassian.design/foundations/logos
+
+That permission is not sublicensable and does not travel with a copy of this
+repository. A downstream recipient who redistributes, modifies or builds on this
+code must remove these assets or obtain permission from Atlassian directly, and
+must in either case comply with the guidelines above. In particular, those
+guidelines do not permit you to modify, recolour, reproportion, deconstruct or
+recompose an Atlassian mark.
+
+The Atlassian assets excluded from the Apache-2.0 grant are:
+
+  A1. The Atlassian logo, extruded as a desk standee
+      src/scene/standees.js (ACE_SHAPES)
+      docs/images/objects/aceLogo.png
+
+  A2. The Rovo logomark, extruded as a desk standee
+      src/rovo-mark.js (ROVO_SHAPES), extruded by src/scene/standees.js
+      docs/images/objects/rovoLogo.png
+
+  A3. The Rovo logomark, drawn flat as a source tile
+      src/ui/marks.js (rovoMark), from src/rovo-mark.js (ROVO_SHAPES)
+      docs/images/panels/source-picker.png
+      The same artwork as A2, drawn flat rather than extruded.
+
+  A4. The Jira logomark, on the kanban board texture
+      src/scene/kanban.js (KB_LOGO_GLYPH_D)
+      docs/images/objects/kanbanBoard.png
+
+A1 through A3 are three-dimensional and flat renderings of Atlassian marks
+prepared for this scene, not the marks as published in an Atlassian kit. A4 is
+the Jira logomark drawn as a 24-pixel decoration on a board texture. All four
+are used here with Atlassian's approval for this repository and for no other
+purpose.
+
+
+B. THIRD-PARTY BRAND ASSETS
+---------------------------
+
+These are other companies' trademarks, reproduced at tile size to identify which
+agent an office is listening to. This project holds no licence to them and
+cannot pass one on. They are excluded from the Apache-2.0 grant, and they are
+subject to removal at their owner's request.
+
+  B1. The Claude Spark
+      src/ui/marks.js (claudeMark)
+      docs/images/panels/source-picker.png
+      Claude and the Claude Spark are trademarks of Anthropic PBC.
+      Guidelines: https://www.anthropic.com/legal/trademark-guidelines
+
+  B2. The OpenAI Blossom
+      src/ui/marks.js (codexMark)
+      docs/images/panels/source-picker.png
+      OpenAI, Codex and the OpenAI Blossom are trademarks of OpenAI OpCo, LLC.
+      Guidelines: https://openai.com/brand
+
+Each is that owner's own published asset, reproduced without recolouring or
+reproportioning. Both owners' guidelines permit the product name in plain text
+without permission, so a fork that cannot or does not want to carry these marks
+can replace each with a text label and lose nothing but the picture.
+
+
+C. THE OPENCLAW MARK, WHICH IS NOT EXCLUDED
+-------------------------------------------
+
+The OpenClaw mark in src/ui/marks.js (openclawMark) is the favicon of the
+openclaw/openclaw repository and ships under that project's MIT licence, which
+does grant the right to redistribute it. Its notice is reproduced in
+THIRD_PARTY_NOTICES.txt as that licence requires. The mark remains the OpenClaw
+Foundation's; MIT grants copyright permission, not trademark permission, and it
+is used here only to identify the corresponding product.
+
+
+PRODUCT NAMES
+-------------
+
+Product names used in this project's interface and documentation -- Rovo CLI,
+Claude Code, Codex, Cursor, OpenClaw, Jira -- identify those products and
+nothing more. This project is not affiliated with, endorsed by, or sponsored by
+Anthropic, OpenAI, Anysphere or the OpenClaw Foundation.
+
+
+EVERYTHING ELSE
+---------------
+
+Third-party software notices, and the licence texts that must travel with a
+copy, are in THIRD_PARTY_NOTICES.txt and vendor/. Machine-readable per-file
+provenance and per-distribution scope are in third-party/inventory.json. All
+other visual work in this repository -- the room and its props, the project
+logo and icon set, the spot illustrations, the scene renders and the in-house
+source tiles -- is original to this project and is covered by LICENSE.

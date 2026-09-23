@@ -1,0 +1,3007 @@
+@import url("/assets/ui-theme.css");
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app { position: relative; width: 100vw; height: 100vh; }
+
+#scene { display: block; width: 100%; height: 100%; }
+
+/* ---- UI overlay ---- */
+#ui { position: absolute; inset: 0; pointer-events: none; }
+#ui > * { pointer-events: auto; }
+
+#title-bar {
+  position: absolute;
+  top: 16px; left: 16px; right: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  pointer-events: none;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+/* The office's own mark, where a green lamp used to stand in for one. It lives
+   inside the anchor, so the mark and the name are a single way back to reception
+   rather than two targets side by side; `inline-flex` on the anchor is what puts
+   them on one baseline without a float or a vertical-align guess.
+
+   A small text shadow keeps the white wordmark legible over the scene. */
+.brand h1 a { display: inline-flex; align-items: center; gap: 8px; }
+.brand-mark {
+  width: 22px; height: 22px; flex: none;
+  filter: none;
+}
+.brand h1 {
+  margin: 0; font-size: 18px; font-weight: 650; letter-spacing: 0.3px;
+  text-shadow: none;
+}
+/* A way out to reception, styled as the title it already was: an underline here
+   would make the office's own name look like a footnote. */
+.brand h1 a { color: inherit; text-decoration: none; pointer-events: auto; }
+.brand h1 a:hover { color: var(--brand); }
+/* The wall-mounted LED panel above the coffee machine is the clock now. */
+
+/* ---- Keycard chip ----
+   The office's address, in the title bar. Monospace and tracked for the same
+   reason the reception field is: this is a code read one character at a time. */
+.keycard-chip { position: relative; display: flex; align-items: center; pointer-events: auto; }
+
+.kc-button {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  font-size: 11.5px; font-weight: 600; letter-spacing: 1.2px;
+  color: var(--muted);
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 999px; padding: 5px 11px;
+  cursor: pointer; backdrop-filter: blur(10px);
+  transition: border-color 0.15s, color 0.15s;
+}
+.kc-button:hover { border-color: rgba(36, 50, 71, 0.28); color: var(--text); }
+.kc-button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* Lit when this office holds the machine's adapter feed. There is one endpoint per
+   machine, so this is exclusive — and worth showing, because the alternative is
+   wondering which room your agents walked into. */
+.kc-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--conn-live); box-shadow: 0 0 6px var(--conn-live);
+}
+/* A padlock when this office asks visitors for a passcode. Muted rather than coloured:
+   it is a statement of fact about the door, not a warning about anything. */
+.kc-lock { display: flex; align-items: center; color: var(--muted); }
+.kc-lock[hidden] { display: none; }
+
+/* "Link copied" belongs under the key, in the same lozenge as the key itself:
+   as bare text in the title bar it sat on whatever the scene happened to be —
+   a pale wall, a bright window — and was unreadable about half the time. */
+.kc-note {
+  position: absolute; top: calc(100% + 6px); left: 0;
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.6px;
+  color: var(--sage); white-space: nowrap;
+  background: var(--panel-solid);
+  border: 1px solid color-mix(in srgb, var(--sage) 40%, var(--border));
+  border-radius: 999px; padding: 4px 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+.kc-note:empty { display: none; }
+
+/* ---- Scene switcher ---- */
+/* #title-bar disables pointer events so drags reach the canvas; the switcher
+   opts back in. */
+.switcher { position: relative; pointer-events: auto; margin-left: 4px; }
+
+.switcher-trigger {
+  display: flex; align-items: center; gap: 8px;
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--text);
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 999px; padding: 6px 12px;
+  cursor: pointer; backdrop-filter: blur(10px);
+  transition: border-color 0.15s, background 0.15s;
+}
+.switcher-trigger:hover { border-color: rgba(36, 50, 71, 0.28); }
+/* Caret is an inline SVG that rotates to indicate open state. Uses currentColor
+   to inherit the muted palette colour, and flex-shrink: 0 to prevent squishing. */
+.switcher-caret { flex-shrink: 0; color: var(--muted); transition: transform 0.18s; }
+.switcher-caret svg { display: block; }
+.switcher.open .switcher-caret { transform: rotate(180deg); }
+
+/* `display: flex` below outranks the user-agent's `[hidden] { display: none }`,
+   so the hidden attribute alone cannot hide this menu. This rule restores it:
+   class+attribute beats the bare class, keeping `hidden` the single source of
+   truth for open state (which also keeps it out of the accessibility tree). */
+.switcher-menu[hidden] { display: none; }
+
+.switcher-menu {
+  position: absolute; top: calc(100% + 8px); left: 0;
+  /* Wide enough that a two-source scene name and the trash can can share a row
+     without the name wrapping to three lines. */
+  min-width: 276px;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 6px;
+  background: var(--panel-solid);
+  border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: var(--shadow-overlay);
+  backdrop-filter: blur(14px);
+  z-index: 20;
+}
+/* A row is the source's mark beside a two-line label, so which offices are live
+   harness feeds and which are simulated is visible without opening anything. */
+.switcher-item {
+  position: relative;
+  display: flex; align-items: center; text-align: left;
+  border-radius: 8px;
+  transition: background 0.12s;
+}
+.switcher-item:hover { background: rgba(36, 50, 71, 0.07); }
+.switcher-item.active { background: rgba(36, 50, 71, 0.11); }
+/* The row is a container now: choosing the scene and deleting it are two separate
+   controls, so the whole row can no longer be one button. `.switcher-choose` takes
+   all the width the trash can leaves, which is what keeps a click anywhere along
+   the name doing the obvious thing. */
+.switcher-choose {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  font: inherit; color: var(--text);
+  background: transparent; border: 0; border-radius: 8px;
+  padding: 8px 10px; cursor: pointer;
+}
+
+/* Hidden until the row is hovered or the button has focus: a menu of scenes should
+   read as a list of rooms, not a list of things to delete. Focus-visible matters as
+   much as hover here — a keyboard user cannot hover, and an invisible control they
+   can still tab to is worse than no control. */
+.switcher-trash {
+  flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; margin-right: 6px;
+  color: var(--muted); background: transparent;
+  border: 1px solid transparent; border-radius: 7px;
+  cursor: pointer; opacity: 0;
+  transition: opacity 0.12s, color 0.12s, border-color 0.12s, background 0.12s;
+}
+.switcher-item:hover .switcher-trash { opacity: 1; }
+.switcher-trash:focus-visible { opacity: 1; outline: none; border-color: var(--muted); }
+.switcher-trash:hover { color: var(--status-error); background: rgba(224, 103, 103, 0.12); }
+
+/* The pencil keeps the trash can's shape and shows itself on the same terms, so the
+   two read as one pair of row controls rather than two ideas. Renaming is not
+   destructive, so its hover is the sage the rest of the chrome uses for "yes". */
+.switcher-rename {
+  flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; margin-right: 2px;
+  color: var(--muted); background: transparent;
+  border: 1px solid transparent; border-radius: 7px;
+  cursor: pointer; opacity: 0;
+  transition: opacity 0.12s, color 0.12s, border-color 0.12s, background 0.12s;
+}
+.switcher-item:hover .switcher-rename { opacity: 1; }
+.switcher-rename:focus-visible { opacity: 1; outline: none; border-color: var(--muted); }
+.switcher-rename:hover { color: var(--brand); background: rgba(36, 50, 71, 0.08); }
+
+/* Being renamed: the row *is* the field. Hiding the controls rather than sitting the
+   field beside them keeps the name in the place it was reading from a moment ago,
+   and leaves nothing to click that would throw the typing away. */
+.switcher-item.renaming .switcher-choose,
+.switcher-item.renaming .switcher-rename,
+.switcher-item.renaming .switcher-trash { display: none; }
+.switcher-rename-field {
+  flex: 1; min-width: 0;
+  margin: 6px; padding: 6px 8px;
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--text);
+  background: var(--surface-soft);
+  border: 1px solid var(--brand); border-radius: var(--radius-control);
+  outline: none;
+}
+.switcher-rename-field::placeholder { font-weight: 400; color: var(--muted); }
+/* Armed: the first click asked, and this is the row saying so while it waits for a
+   second. Loud on purpose — the next click is the destructive one. */
+.switcher-item.arming { background: rgba(224, 103, 103, 0.14); }
+.switcher-item.arming .switcher-trash {
+  opacity: 1; color: var(--status-error);
+  border-color: color-mix(in srgb, var(--status-error) 55%, transparent);
+  background: rgba(224, 103, 103, 0.18);
+}
+.switcher-item.arming .switcher-item-name::after { content: ' · delete?'; color: var(--status-error); }
+.switcher-item-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.switcher-item-mark {
+  flex: 0 0 18px; display: flex; color: var(--accent, var(--muted));
+}
+.switcher-item-mark svg { width: 18px; height: 18px; display: block; }
+.switcher-item-glyph { display: flex; color: var(--accent, var(--muted)); }
+/* Several sources overlap into the width of one, so a mixed office does not push
+   every name in the menu across. The negative margin is undone on the first child
+   so the stack still starts on the same left edge as a single mark. */
+.switcher-item-mark.stacked { flex-basis: 26px; }
+.switcher-item-mark.stacked svg { width: 14px; height: 14px; }
+.switcher-item-mark.stacked .switcher-item-glyph { margin-left: -5px; }
+.switcher-item-mark.stacked .switcher-item-glyph:first-child { margin-left: 0; }
+.switcher-item-name { font-size: 13px; font-weight: 600; }
+.switcher-item-where { font-size: 11px; color: var(--muted); }
+.switcher-item.active .switcher-item-name::after {
+  content: ' ●'; color: var(--sage); font-size: 9px; vertical-align: middle;
+}
+/* An armed row says "delete?" instead of showing the active dot: two markers on one
+   name is a sentence nobody can read. */
+.switcher-item.active.arming .switcher-item-name::after { content: ' · delete?'; }
+
+/* The last row sits below a divider so it reads as an action, not a scene — whether
+   it adds one ("New scene") or leaves for an office of your own. */
+.switcher-add {
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  font: inherit; color: var(--text); cursor: pointer;
+  background: transparent; border: 0;
+  padding: 8px 10px;
+  margin-top: 4px; padding-top: 10px;
+  border-top: 1px solid var(--border); border-radius: 0 0 8px 8px;
+}
+.switcher-add .switcher-item-name { color: var(--brand); }
+.switcher-add .switcher-item-mark { color: var(--brand); }
+
+/* ---- Source badge ---- */
+.source-badge {
+  display: flex; align-items: center; gap: 7px;
+  pointer-events: auto; margin-left: 2px;
+  font-size: 11.5px; color: var(--muted);
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 999px; padding: 5px 11px 5px 9px;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.15s;
+}
+.source-badge:empty { display: none; }
+.source-badge.clickable { cursor: pointer; }
+.source-badge.clickable:hover { border-color: rgba(36, 50, 71, 0.28); }
+.sb-marks { display: flex; align-items: center; }
+.sb-mark { display: flex; color: var(--accent, var(--muted)); }
+.sb-mark svg { width: 15px; height: 15px; display: block; }
+/* Same overlap as the switcher rows: the pill sits in the title bar beside the
+   office name and cannot grow a mark's width per source it listens to. */
+.sb-marks.stacked .sb-mark { margin-left: -4px; }
+.sb-marks.stacked .sb-mark:first-child { margin-left: 0; }
+.sb-marks.stacked svg { width: 13px; height: 13px; }
+.sb-label { font-weight: 600; color: var(--text); }
+/* Tabular figures the long way round, as at the other four sites in this file:
+   `font-variant-numeric: tabular-nums` is overridden by the `font-feature-settings`
+   ui-theme.css sets on `body`, so a rule that wants lining digits has to ask through the
+   same property and restate the variant token with them. See assets/ui-theme.css. */
+.sb-state { font-feature-settings: var(--font-variants-sans), 'tnum' 1; }
+/* The dot is the honest bit: a live feed can show an empty room for minutes, so
+   "listening" and "no adapter" must not look the same. */
+.sb-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--muted); box-shadow: 0 0 6px currentColor;
+}
+.sb-dot[data-state='live'] { background: var(--conn-live); }
+.sb-dot[data-state='waiting'] { background: var(--conn-waiting); }
+.sb-dot[data-state='connecting'] { background: var(--conn-connecting); }
+.sb-dot[data-state='offline'] { background: var(--conn-offline); }
+.sb-dot[data-state='idle'] { background: var(--muted); }
+
+/* Anchored bottom-left. Deliberately no overflow on the panel itself: the job
+   flag pokes out past its right edge, and any overflow value other than visible
+   would clip it. The roster scrolls internally instead. */
+#agent-panel {
+  position: absolute;
+  bottom: 16px; left: 16px;
+  width: 264px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 14px 10px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-panel);
+}
+/* Hidden with A, for a clear look at the room — the roster covers the nearest corner
+   of it, which is the corner you are usually working on. */
+#agent-panel.hidden { display: none; }
+#agent-panel h2 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+#agent-list {
+  list-style: none; margin: 0 0 12px; padding: 0;
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 40vh; overflow-y: auto;
+}
+/* Two lines, on a grid rather than nested flexes: the glyphs occupy column one of
+   the first row, and the status line is pinned to column two of the second, which
+   is what left-aligns it with the name instead of with the source mark. The glyph
+   cell simply shrinks when an office has no source, so nothing needs an override
+   for that case — a hardcoded indent would have. */
+.agent-row {
+  display: grid; grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 9px; row-gap: 1px; align-items: center;
+  padding: 7px 9px; border-radius: 9px; cursor: pointer;
+  background: rgba(36, 50, 71, 0.03);
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+.agent-row:hover { background: rgba(36, 50, 71, 0.07); }
+.agent-row.selected { border-color: var(--brand); background: var(--selected); }
+.agent-row .a-marks { grid-column: 1; grid-row: 1; display: flex; align-items: center; gap: 7px; }
+.agent-row .a-src { display: flex; flex: 0 0 auto; }
+.agent-row .a-src svg { width: 12px; height: 12px; display: block; }
+.agent-row .swatch { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+.agent-row .name { grid-column: 2; grid-row: 1; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.agent-row .status { grid-column: 2; grid-row: 2; font-size: 11px; color: var(--muted); }
+/* Several jobs at once: one line each, stacked inside the one status cell so
+   the grid still has a single thing on row 2 and the steps line below is undisturbed. */
+.agent-row .status.multi { display: flex; flex-direction: column; gap: 1px; }
+.agent-row .status .job-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* A third line, and only for the minority of rounds that have parts (spec §4.2).
+   Implicit row, so nothing above needs an override for the usual two-line case.
+   Dimmer than the status line it sits under: the headline is still the answer to
+   "what are they doing", and the part only qualifies it. */
+.agent-row .steps {
+  grid-column: 2; grid-row: 3;
+  display: flex; flex-direction: column; gap: 2px; min-width: 0;
+}
+.agent-row .step {
+  font-size: 10px; color: var(--job-active);
+  line-height: 1.3; white-space: normal; overflow-wrap: anywhere;
+}
+
+.legend { border-top: 1px solid var(--border); padding-top: 10px; }
+.legend h3 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+/* Two columns of families, each a heading and its members. The count sits hard
+   against the right of its own row, so the numbers line up as a census. */
+#legend-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 9px 14px; }
+#legend-list .legend-group { display: flex; flex-direction: column; gap: 3px; }
+#legend-list .legend-head {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; color: var(--text); font-weight: 600;
+}
+#legend-list .legend-title { text-transform: capitalize; }
+#legend-list .legend-members { list-style: none; margin: 0; padding: 0 0 0 7px; display: flex; flex-direction: column; gap: 3px; }
+#legend-list .legend-members li { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--muted); }
+#legend-list .legend-label { text-transform: capitalize; }
+#legend-list .swatch { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+#legend-list .legend-count { margin-left: auto; font-feature-settings: var(--font-variants-sans), 'tnum' 1; color: var(--muted); font-weight: 500; }
+/* Nobody in this state right now: still listed, because the legend is also the
+   key to the rings on the floor — just stepped back out of the way. */
+#legend-list .empty { opacity: 0.42; }
+
+/* ---- Job Delivery / Job Removal ---- */
+.delivery {
+  position: relative;
+  margin-top: 12px; padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.delivery h3 {
+  margin: 0 0 8px; font-size: 11px; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--muted);
+  transition: color 0.2s;
+}
+.delivery.removal h3 { color: var(--job-error); }
+
+#delivery-body { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+.mail-item { display: flex; flex-direction: column; gap: 2px; }
+.mail-item .when {
+  display: flex; align-items: center; gap: 6px;
+  font-feature-settings: var(--font-variants-sans), 'tnum' 1; font-size: 10.5px;
+  letter-spacing: 0.4px; color: var(--muted);
+}
+/* Who an addressed envelope is for, pushed to the far end of the time line so the
+   clock and the name each keep their own edge. */
+.mail-item .to {
+  display: flex; align-items: center; gap: 4px;
+  margin-left: auto;
+  letter-spacing: 0.2px; color: var(--text);
+}
+/* A folded dart, matching the planes: nose to the right, tail notched. Painted in
+   the recipient's own colour, set inline, so it echoes the tint of the flight. */
+.mail-item .to .dart {
+  width: 9px; height: 8px; flex: 0 0 9px;
+  background: var(--muted);
+  clip-path: polygon(0 0, 100% 50%, 0 100%, 24% 50%);
+}
+.mail-item .what { color: var(--text); font-weight: 600; font-size: 12px; }
+.delivery.removal .mail-item .what { color: var(--job-error); }
+.mail-item .extra { font-size: 10.5px; color: var(--muted); }
+.mail-empty { color: var(--muted); font-style: italic; }
+
+/* Clipping slot sits flush with the panel's outer edge (panel padding 14px +
+   1px border), so a flag translated fully left is hidden behind the panel. */
+.flag-slot {
+  position: absolute;
+  left: calc(100% + 15px);
+  top: 8px;
+  width: 52px; height: 24px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.mail-flag {
+  display: flex; align-items: stretch; height: 100%;
+  transform: translateX(-100%);
+  transition: transform 0.42s cubic-bezier(0.34, 1.5, 0.64, 1);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+}
+.mail-flag.up { transform: translateX(0); }
+.mail-flag .pole {
+  width: 4px; flex: 0 0 4px;
+  background: linear-gradient(#d8dbe0, #9aa1a9);
+  border-radius: 0 2px 2px 0;
+}
+.mail-flag .pennant {
+  flex: 1 1 auto;
+  background: linear-gradient(#e2493f, #c62c26);
+  clip-path: polygon(0 0, 100% 0, 78% 50%, 100% 100%, 0 100%);
+}
+
+#inspector {
+  position: absolute;
+  bottom: 16px; right: 16px;
+  width: 336px; max-height: calc(100vh - 96px);
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-panel);
+}
+#inspector.hidden { display: none; }
+
+/* ---- Transient north compass --------------------------------------------
+   A direction instrument, not a control: it wakes only while the building turns and
+   ignores the pointer. The corner below is where it rests when the corner is free;
+   when a panel is in the way, src/ui/north-compass.js writes `right` and `bottom`
+   over these to step it clear — up off the bottom strips, aside from the inspector.
+   Modals remain above it at z-index 30. */
+.north-compass {
+  position: absolute;
+  right: 20px; bottom: 20px;
+  width: 64px; height: 64px;
+  z-index: 25;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.48s ease, transform 0.48s ease;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.34));
+}
+.north-compass.visible { opacity: 0.78; transform: scale(1); }
+.north-compass svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.north-compass-face {
+  /* The Orientation card's face, scaled down rather than redrawn in another voice. */
+  fill: rgba(36, 50, 71, 0.05);
+  stroke: rgba(36, 50, 71, 0.16);
+  stroke-width: 1;
+}
+.north-compass-ticks {
+  fill: none;
+  stroke: rgba(36, 50, 71, 0.14);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+.north-compass-ticks .quarter {
+  stroke: rgba(36, 50, 71, 0.34);
+  stroke-width: 1.5;
+}
+.north-compass-needle {
+  transform-origin: 32px 32px;
+}
+.north-compass-north { fill: #d2513c; }
+.north-compass-south { fill: rgba(232, 230, 223, 0.56); }
+.north-compass-pin { fill: var(--text); }
+
+@media (prefers-reduced-motion: reduce) {
+  .north-compass { transition: none; }
+}
+
+/* Just the agent's name: status and source are stated in full in the rows below,
+   each next to its own glyph, so the heading carries no lozenge or mark. */
+#inspector h2 {
+  margin: 0 0 12px; font-size: 16px; color: var(--text);
+  display: flex; align-items: center; gap: 9px;
+  padding-right: 24px;
+}
+#inspector h2 .insp-name {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* ---- The way out of a panel, for a mouse --------------------------------------
+   Every panel that can be dismissed carries one of these, and they are one rule
+   rather than one per panel: an × drawn twice is an × that comes to look like two
+   things. Only the position is per panel, below, because a bottom strip, a modal
+   card and the roster each have a different corner to sit in.
+
+   Kept muted until it is wanted: a close button is a thing to find when you look
+   for it, not a thing to be offered while you are reading the panel. */
+.panel-close {
+  background: none; border: 0; color: var(--muted);
+  font-size: 22px; line-height: 1; cursor: pointer; padding: 0 2px;
+  /* Panels that ignore the pointer — the first-person caption — still let their own
+     × be clicked, which is the one part of them that is a control. */
+  pointer-events: auto;
+}
+.panel-close:hover { color: var(--text); }
+.panel-close:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+
+/* The agent detail panel and the roster: their own top-right corner, clear of the
+   heading beside it. */
+#inspector-close, #agent-panel-close {
+  position: absolute; top: 12px; right: 12px;
+}
+
+/* A bottom strip keeps its news in the same corner, so the × sits outside it: the
+   editor's Last Action line is at `right: 14px` and would otherwise be written
+   underneath it. Both are above the sections rather than in them. */
+#dev-panel > .panel-close,
+#scene-panel > .panel-close,
+#editor-panel > .panel-close {
+  position: absolute; top: 12px; right: 12px;
+}
+#inspector-body { font-size: 13px; color: var(--muted); line-height: 1.55; }
+/* The portrait, when an identity brought one. Sized as a passport photo rather than a
+   hero image: it is the answer to "who is this", asked of a panel that is mostly rows.
+   Squared with a soft radius, since avatars arrive in every aspect ratio and `cover`
+   crops to the middle, which is where a face is. */
+#inspector-body .portrait {
+  margin: 0 0 12px;
+  display: flex; justify-content: center;
+}
+#inspector-body .portrait img {
+  width: 96px; height: 96px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(36, 50, 71, 0.04);
+  display: block;
+}
+#inspector-body .kv { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+#inspector-body .kv .k { color: var(--muted); }
+#inspector-body .kv .v { color: var(--text); font-weight: 600; text-align: right; }
+/* Rows whose value is a glyph plus a word. Right-aligned like every other value,
+   so the glyph travels with the text rather than sitting in a column of its own. */
+#inspector-body .kv .v-status,
+#inspector-body .kv .v-source { display: flex; align-items: center; justify-content: flex-end; gap: 7px; }
+
+#inspector-body .kv .v-dot {
+  width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto;
+}
+#inspector-body .kv .v-src { display: flex; flex: 0 0 auto; }
+#inspector-body .kv .v-src svg { width: 13px; height: 13px; display: block; }
+#inspector-body .job { margin-top: 12px; padding: 10px; border-radius: 9px; background: rgba(36, 50, 71, 0.04); color: var(--text); }
+
+/* ---- Work log ---- */
+#inspector-body .log-head {
+  margin: 16px 0 8px; font-size: 11px; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--muted);
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+#inspector-body .log-head .count { text-transform: none; letter-spacing: 0; }
+/* ---- The checklist for the round in hand ----
+   Tucked under the job box and indented to it, because it belongs to that job
+   rather than standing beside it. Tick column is fixed so the labels line up into a
+   list you can read down; a proportional glyph column would ragged them. */
+#inspector-body .plan {
+  list-style: none; margin: 6px 0 0; padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 3px;
+  border-left: 2px solid var(--border);
+  margin-left: 10px;
+}
+#inspector-body .plan li {
+  display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 7px;
+  font-size: 11px; color: var(--muted); align-items: baseline;
+}
+#inspector-body .plan .plan-tick { text-align: center; font-size: 10px; }
+#inspector-body .plan .plan-label { overflow-wrap: anywhere; }
+
+/* The part in hand is the one line worth finding without reading, so it is the only
+   one at full weight. */
+#inspector-body .plan .plan-active { color: var(--text); font-weight: 600; }
+#inspector-body .plan .plan-active .plan-tick { color: var(--job-active); }
+#inspector-body .plan .plan-completed .plan-tick { color: var(--sage); }
+/* Skipped is struck through and pending is not, which is the distinction the whole
+   list is here to draw: a part passed over on purpose against one not yet reached.
+   Colour alone would not do it — they are both quiet, and a reader scanning for
+   "what is left" needs to see at a glance which of these is still owed. */
+#inspector-body .plan .plan-skipped .plan-label { text-decoration: line-through; opacity: 0.75; }
+#inspector-body .plan .plan-failed,
+#inspector-body .plan .plan-cancelled { color: var(--job-error); }
+#inspector-body .plan .plan-failed .plan-tick,
+#inspector-body .plan .plan-cancelled .plan-tick { color: var(--job-error); }
+#inspector-body .plan .plan-more { display: block; font-style: italic; opacity: 0.8; }
+
+#inspector-body .log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+#inspector-body .log > li {
+  border-radius: 8px;
+  background: rgba(36, 50, 71, 0.035);
+}
+#inspector-body .log-entry > summary {
+  display: grid; grid-template-columns: 10px minmax(0, 1fr) 10px; gap: 8px;
+  padding: 6px 8px; cursor: default; list-style: none;
+}
+#inspector-body .log-entry > summary::-webkit-details-marker { display: none; }
+#inspector-body .log-entry.expandable > summary { cursor: pointer; }
+#inspector-body .log-entry.expandable > summary::after {
+  content: '›'; grid-column: 3; grid-row: 1;
+  color: var(--muted); align-self: center;
+  transform: rotate(0deg); transition: transform 0.12s;
+}
+#inspector-body .log-entry[open] > summary::after { transform: rotate(90deg); }
+#inspector-body .log .dot {
+  width: 8px; height: 8px; border-radius: 50%; margin-top: 5px;
+}
+#inspector-body .log .label {
+  color: var(--text); font-size: 12px; font-weight: 600; line-height: 1.35;
+}
+#inspector-body .log .times {
+  font-size: 10.5px; color: var(--muted); font-feature-settings: var(--font-variants-sans), 'tnum' 1;
+  margin-top: 2px;
+}
+#inspector-body .log .outcome { text-transform: capitalize; }
+#inspector-body .log li.active .label { color: var(--job-active); }
+#inspector-body .log li.error .label { color: var(--job-error); }
+#inspector-body .log-plan {
+  list-style: none; margin: 0 8px 8px 26px; padding: 7px 0 0;
+  display: flex; flex-direction: column; gap: 4px;
+  border-top: 1px solid var(--border);
+}
+#inspector-body .log-plan li {
+  display: grid; grid-template-columns: 12px minmax(0, 1fr); gap: 7px;
+  font-size: 11px; color: var(--muted); align-items: baseline;
+}
+#inspector-body .log-plan .plan-tick { text-align: center; font-size: 10px; }
+#inspector-body .log-plan .plan-label { overflow-wrap: anywhere; }
+#inspector-body .log-plan .plan-completed .plan-tick { color: var(--sage); }
+#inspector-body .log-plan .plan-active { color: var(--job-active); }
+#inspector-body .log-plan .plan-skipped .plan-label { text-decoration: line-through; opacity: 0.75; }
+#inspector-body .log-plan .plan-failed,
+#inspector-body .log-plan .plan-cancelled { color: var(--job-error); }
+#inspector-body .log-plan .plan-more { display: block; font-style: italic; }
+#inspector-body .log-empty { font-size: 12px; font-style: italic; }
+
+/* ---- Driving an agent by hand ----
+   A dozen lozenges along the bottom of the panel, wrapped rather than scrolled: they
+   are a set, and a set you have to scroll to see the end of is a set you press the
+   wrong member of. Each hugs its own label so the row reads as words rather than as a
+   grid of equal boxes — "Search web" and "Sofa" are not the same size of idea.
+
+   The lozenge itself is `.dev-btn`, shared with the bottom strips (see below): one
+   look for "a thing you press", wherever in the UI it is pressed. */
+#inspector-body .pilot {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  margin: 2px 0 2px;
+}
+/* Smaller than a strip's, because this panel's type is smaller and a control that
+   shouts over the rows above it would make the panel look like a toolbar. */
+#inspector-body .pilot-btn { font-size: 10.5px; padding: 4px 8px; }
+
+/* ---- The bottom strips (press D, press E) ---- */
+/* One column holding every panel that lives along the bottom, inset clear of the roster
+   on the left so the two never overlap (16 + 232 + 16 = 264).
+
+   The stacking is the column's job rather than each panel's. Both strips wrap to a
+   second or third row depending on how much room the inspector has left them, so any
+   fixed offset between them is a guess that is wrong as soon as one of them grows —
+   which is precisely how they used to end up on top of one another. Laid out bottom-up
+   so the lowest panel stays pinned to the bottom edge and the others rise off it.
+
+   The inspector shares the bottom-right, but it is usually closed, and reserving its
+   332px permanently made the strips narrow enough to scroll. Since the inspector
+   precedes this container in the document, its open state can be read directly: give way
+   only while it is actually on screen.
+
+   The roster on the left is read the same way, and for the same reason: hiding it with A
+   is asking for a clear look at the room, and a strip that went on holding a 232px gutter
+   for a panel that is not there would keep its controls crowded to pay for empty screen.
+   Both neighbours are earlier siblings, so each gives way exactly while it is open. */
+#bottom-stack {
+  position: absolute;
+  bottom: 16px; left: 296px; right: 16px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  gap: 12px;
+  /* The gap between two panels is still the room, so clicks fall through it. Each panel
+     takes the pointer back for itself. */
+  pointer-events: none;
+}
+#inspector:not(.hidden) ~ #bottom-stack { right: 368px; }
+#agent-panel.hidden ~ #bottom-stack { left: 16px; }
+
+#dev-panel, #scene-panel, #editor-panel {
+  pointer-events: auto;
+  display: flex;
+  column-gap: 18px; row-gap: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 14px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-panel);
+}
+#dev-panel.hidden, #scene-panel.hidden, #editor-panel.hidden { display: none; }
+
+/* Every strip is a column: what the panel is, on its own line, then its sections in a
+   row underneath. The title shape is the roster's, so all the permanent panels
+   introduce themselves the same way instead of the editor wearing its name as a pill
+   tucked in beside the first control. */
+#dev-panel, #scene-panel, #editor-panel { flex-direction: column; row-gap: 8px; }
+/* Each strip anchors its own corner furniture — the × and the editor's Last Action
+   line. Without this they anchor to #bottom-stack instead, which puts all three
+   crosses in one corner and only looks right for whichever panel is on top. */
+#dev-panel, #scene-panel, #editor-panel { position: relative; }
+#dev-panel h2, #scene-panel h2, #editor-panel h2 {
+  margin: 0; font-size: 13px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+}
+/* The editor's title used to be terracotta, on the reasoning that edit mode changes what
+   a click does and so its name should double as the warning. With three strips sharing
+   the bottom of the screen that read as one panel being special rather than one panel
+   being a mode, so it now introduces itself like the others. */
+
+/* The sections themselves, in a row that holds its order at any width.
+   It wraps now, which reverses what strip.js says next door and is worth saying why.
+   The rule there was written when every section was a row of lozenges a few dozen
+   pixels tall, and reflowing them shuffled the whole panel about. The scene panel has
+   since grown two sections that are pictures — a compass and a map — and at that size
+   a single line stops fitting on an ordinary window long before it stops fitting on a
+   narrow one. So the wrap is allowed, but only at one seam: the compass and the map
+   are bound into `.dev-pair` and drop to the second line together, which is a layout
+   with two states rather than one that rearranges continuously. */
+.dev-panel-body {
+  display: flex; flex-wrap: wrap; align-items: stretch;
+  column-gap: 18px; row-gap: 12px;
+  /* Keep overflowing controls inside the panel, with room for their focus rings.
+     The Scene panel observes row changes to hide its centred pair's divider. */
+  overflow: clip;
+  overflow-clip-margin: 6px;
+}
+
+/* `stretch` above is what makes the rules between sections run the full height of
+   their line instead of stopping at the bottom of whichever section is shortest. A
+   group is a column, so stretching it lengthens the box without moving anything
+   inside: the controls stay at the top and the border beside them reaches the floor. */
+
+/* The pair that wraps as one: the compass and the map drop to a second line together
+   rather than the map going alone and the compass following at some other width. */
+.dev-pair { display: flex; column-gap: 18px; align-items: stretch; flex: 0 0 auto; }
+/* The seam between Season and the compass when they share a row. */
+.dev-group + .dev-pair { position: relative; }
+.dev-group + .dev-pair::before {
+  content: ''; position: absolute; left: -9px; top: 0; bottom: 0;
+  border-left: 1px solid var(--border);
+}
+
+/* A group takes the width it wants and gives it up under pressure, down to its widest
+   single control. That is what turns a squeeze into wrapped lozenges — a group that
+   refused to shrink would push the row wider instead and the pills would never wrap.
+   `min-width: 0` because a flex item will not shrink past its content otherwise. */
+.dev-group { display: flex; flex-direction: column; gap: 7px; flex: 0 1 auto; min-width: 0; }
+/* A group that holds its width no matter how narrow the window gets. For controls that
+   have no smaller form to shrink into — a scrubber that shrinks is just a less accurate
+   scrubber, where a row of lozenges shrinks by wrapping and loses nothing. Without this
+   the fixed-width contents overflowed the shrinking group and printed over its
+   neighbour. */
+.dev-group-fixed { flex: 0 0 auto; }
+/* Selected is the widest of the fixed groups, because it holds the most: a name with a
+   coordinate pair after it, a heading, a row of seven swatches, two buttons and the key
+   hints. Sized so the longest of those — `Espresso machine (12.00, 8.00)` — stays on one
+   line, since a name that wraps away from its position reads as two facts rather than
+   one. A minimum rather than a width: it may still take more if a longer name needs it. */
+#editor-panel .dev-group-selected { min-width: 264px; }
+.dev-group + .dev-group { border-left: 1px solid var(--border); padding-left: 18px; }
+.dev-group h4 {
+  margin: 0; font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+}
+/* A control is taller than a line of small caps, so a section that grows one in its
+   heading would carry its title — and every row beneath it — a few pixels lower than
+   its neighbours'. The same fix the editor's Layout section uses: every heading in the
+   strip takes the control's height and centres its text in it, so one section gaining
+   a picker moves nothing, and every section's first row still starts level.
+
+   In flow, deliberately. Floating the control above the heading was tried in the
+   editor first and poked it through the body's clip, taking the top off the pill. */
+#scene-panel .dev-group h4 { min-height: 26px; display: flex; align-items: center; }
+#scene-panel .dev-place-group h4 { justify-content: space-between; gap: 10px; width: 264px; }
+.dev-group-body { display: flex; flex-direction: column; gap: 4px; }
+
+/* Readouts are polled 8×/second, so they are monospaced and tabular: variable
+   digit widths would make the numbers jitter as they change.
+
+   The row wraps so that under pressure the value drops below its label instead of being
+   cut off at the panel's edge. Half a coordinate is worse than no coordinate — it reads
+   as a number rather than as a number with its end missing — and the value itself must
+   not wrap internally, hence `nowrap` on it below. Camera is the last section, so it is
+   the first to feel a squeeze; being the only one nobody clicks, that is the right way
+   round. */
+.dev-kv { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; font-size: 11px; }
+/* An explicit `display` beats the browser's own `[hidden] { display: none }`, so a row
+   told to hide itself would otherwise stay on screen. Every element here that anything
+   hides needs this said once, next to the rule that broke it. */
+.dev-kv[hidden], .dev-k[hidden] { display: none; }
+.dev-k { color: var(--muted); min-width: 38px; }
+.dev-v, .dev-time {
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  color: var(--text);
+}
+/* A readout whose value happens to be a link. Underlined only on hover, so a column of
+   these does not read as louder than the camera numbers beside it. */
+.dev-vlink { text-decoration: none; }
+.dev-vlink:hover { text-decoration: underline; color: var(--brand); }
+/* The divider between several links sharing one label — `Docs: A | B | C`. Dimmer than
+   the links it separates, and it takes the row's own gap on both sides rather than
+   padding of its own, so the three names sit at even intervals however the row wraps. */
+.dev-vsep { color: var(--border); }
+
+/* A key cap standing in for a value — the empty selection row, which says how to fill
+   itself. Smaller than the ones in the shortcuts panel, to sit on a readout's line. */
+.dev-v kbd {
+  font-size: 10px; color: var(--text); background: rgba(36, 50, 71, 0.07);
+  border: 1px solid var(--border); border-bottom-width: 2px;
+  border-radius: 4px; padding: 1px 4px; margin-right: 3px;
+}
+/* A readout may wrap at the spaces it already contains, so a narrow panel folds
+   `az 41deg . tilt 42deg . d 32` onto two lines rather than running off the edge. Safe
+   because every value is formatted to a fixed number of decimals and the digits are
+   tabular: the line is always the same width, so the wrap lands in the same place every
+   time instead of hopping about as the camera moves. Never inside a number, though. */
+.dev-v { overflow-wrap: normal; word-break: keep-all; }
+.dev-time { white-space: nowrap; }
+
+/* The clock, its slider and the Live button. Wraps, so Live drops onto a second line
+   rather than the slider being squeezed to a stub — the slider is the control that needs
+   its length to be usable, and a button is perfectly happy one line down. */
+.dev-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 10px; }
+/* Same trap as .switcher-menu above: flex outranks the UA's [hidden]. */
+.dev-row[hidden] { display: none; }
+/* A row whose parts only make sense side by side — a picker and the button that acts on
+   it — so it holds the line instead of wrapping. */
+.dev-row-nowrap { flex-wrap: nowrap; }
+
+/* Time is a two-line control: clock and Live on the first line, the scrubber across the
+   full width of the second. The stack sets the width once and both lines take it, which
+   is what puts Live flush with the right-hand end of the scrubber's track — align them
+   separately and they drift apart the moment either changes size. */
+.dev-time-stack { display: flex; flex-direction: column; gap: 7px; width: 190px; }
+/* The scene panel's clock fills its group. Its compact form below halves this minimum. */
+.dev-time-grow { width: auto; min-width: 190px; }
+/* The compass and the button under it. Sized to the dial rather than to a track: this
+   group used to hold a slider, and a bearing on a line put 359° and 1° at opposite ends
+   of the one control that most needs to keep turning. */
+.dev-sun-stack { display: flex; flex-direction: column; align-items: center; gap: 7px; width: 96px; }
+.dev-compass {
+  display: block; cursor: grab;
+  /* Turning the card must not drag-select the panel behind it, or be taken for a
+     scroll on a touchpad. */
+  touch-action: none; user-select: none;
+}
+.dev-compass:active { cursor: grabbing; }
+.dev-compass:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 50%; }
+
+/* Where on earth the office is. The map sets the height of the whole strip, which is
+   the one place a panel of lozenges is allowed to grow: a latitude is worth pointing
+   at, and the strip has room below it that nothing else was using. Everything else in
+   the panel keeps its size and simply sits at the top of a taller row. */
+.dev-place-stack { display: flex; flex-direction: column; gap: 6px; width: 264px; }
+/* Held to the map's width above, so the picker lines up with the map's right edge and
+   a long place name widens the select rather than the whole section. */
+.dev-place-group .dev-select { max-width: 130px; }
+.dev-map {
+  display: block; border-radius: 6px; cursor: crosshair;
+  background: rgba(0,0,0,0.18);
+  /* Dragging the pin must not also drag-select the panel, and on a touchpad it must
+     not be read as a page scroll. */
+  touch-action: none; user-select: none;
+}
+.dev-map:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+/* The coordinates under the map, and the day length beside them. Monospaced like every
+   other readout, and a size down: it is a confirmation of the pin, not a control. */
+.dev-place-value {
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  font-size: 11px; color: var(--muted); white-space: nowrap;
+}
+/* The named-place picker. Styled as a lozenge like everything else here rather than
+   left as the platform's own control, which at this size is a different design. */
+.dev-select {
+  font: inherit; font-size: 11px; color: var(--muted);
+  background: rgba(36, 50, 71, 0.05);
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 2px 8px; cursor: pointer; flex: 0 0 auto;
+}
+/* Dimmed while the office is not anywhere: the picker is then naming a state rather
+   than a choice, and it should not sit in the panel as loud as the settings that are
+   actually doing something. Hover brings it back, because it is still the way to pick. */
+.dev-select-dim { opacity: 0.5; }
+/* Back to full strength the moment it is reached for. Opacity applies to the focus
+   ring as much as to the text, so a dimmed control that kept its dimming while
+   focused would draw a half-strength ring — which is the one state where the ring has
+   to be unmistakable. */
+.dev-select-dim:hover, .dev-select-dim:focus-visible { opacity: 1; }
+.dev-select:hover { color: var(--text); background: rgba(36, 50, 71, 0.10); }
+/* The app's own ring rather than the browser's blue one, which is what the map and the
+   compass beside it already wear. Two pixels out, which the body's clip margin allows
+   for — see `overflow-clip-margin` up at `.dev-panel-body`. */
+.dev-select:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* The scale above the snap track: a label and a tick per stop, each centred on its own
+   value. Positioned rather than laid out in a row, because the stops are not evenly
+   spaced — that is the whole point of the control — and no flex distribution can put a
+   mark a quarter of the way along. */
+/* The snap scale, stood upright beside its slider. Coarse at the top, fine at the
+   bottom — the way a scale of sizes is drawn — with each mark at its own value's
+   fraction of the track rather than at an even third, so the gap from ½ to 1 looks
+   like twice the gap from ¼ to ½, which is what it is. */
+.dev-snap-stack-upright { display: flex; align-items: stretch; gap: 6px; height: 74px; }
+.dev-snap-scale { position: relative; width: 22px; }
+.dev-snap-tick {
+  position: absolute; left: 0; transform: translateY(50%);
+  display: flex; flex-direction: row; align-items: center; gap: 3px;
+  color: var(--muted); line-height: 1;
+}
+.dev-snap-label { font-size: 11px; }
+.dev-snap-mark { font-size: 9px; opacity: 0.7; }
+/* The stop currently in force. The label carries it rather than the tick, since that is
+   the part being read. */
+.dev-snap-tick.active { color: var(--brand); }
+.dev-snap-tick.active .dev-snap-label { font-weight: 600; }
+.dev-time-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.dev-time { font-size: 15px; font-weight: 600; flex: 0 0 auto; }
+.dev-slider { display: block; width: 100%; margin: 0; accent-color: var(--brand); cursor: pointer; }
+/* Chrome and Safari take `writing-mode` on a range; `direction: rtl` is what puts the
+   minimum at the bottom rather than the top. `appearance` is the older spelling of the
+   same idea, kept as the fallback. */
+.dev-slider-upright {
+  writing-mode: vertical-lr; direction: rtl;
+  appearance: slider-vertical; -webkit-appearance: slider-vertical;
+  width: 14px; height: 100%; flex: 0 0 auto;
+}
+
+.dev-seg { display: flex; flex-wrap: wrap; gap: 6px; }
+/* A column of lozenges instead of a wrapping row. Four options that wrap to two rows
+   at one panel width and three at another is a control that moves about; the panel is
+   tall enough now to spend the height on holding still. */
+.dev-seg-stack { flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
+.dev-seg-stack button { text-align: center; }
+.dev-btn, .dev-seg button {
+  font: inherit; font-size: 11px; color: var(--muted);
+  background: rgba(36, 50, 71, 0.05);
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 4px 10px; cursor: pointer; white-space: nowrap; flex: 0 0 auto;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.dev-btn:hover, .dev-seg button:hover { color: var(--text); background: rgba(36, 50, 71, 0.10); }
+.dev-btn.active, .dev-seg button.active {
+  color: var(--brand); background: var(--selected); border-color: var(--brand); font-weight: 600;
+}
+/* A disabled pill still has to be readable, because the reason it is disabled is in its
+   tooltip and an invisible control is not one anybody hovers. Dimmed and un-hoverable
+   rather than hidden: the furniture picker's Delete says "no" for a reason worth reading. */
+/* A lozenge sitting directly in a group's column rather than in a row of its own. Flex
+   stretches a column's children across, which would make a lone button as wide as the
+   section — so it hugs its text like every other pill instead. */
+.dev-btn-inline { align-self: flex-start; }
+.dev-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.dev-btn:disabled:hover { color: var(--muted); background: rgba(36, 50, 71, 0.05); }
+/* The one pill that is a link rather than a button (the debug log), which needs the
+   two things an anchor brings and a button does not. */
+.dev-link { text-decoration: none; display: inline-block; }
+
+/* The shutter. Wide enough to hold `Copied` without the strip jumping when the glyph is
+   swapped for it — a button that resizes as it reports is a button that moves out from
+   under the pointer just as you might click it again. Twice the height of a lozenge, and
+   the glyph twice the type size, so the one thing in this panel you press rather than
+   read looks like it. */
+.dev-shot {
+  min-width: 62px; min-height: 46px;
+  display: inline-flex; align-items: center; justify-content: center;
+  /* The lozenges are `999px`, which on a 23px-tall button reads as a ~12px corner. At
+     twice the height the same rule would give twice the corner and a very different
+     shape, so this states the radius the others end up with rather than the rule that
+     produced it. */
+  border-radius: 12px;
+}
+.dev-shot-glyph { font-size: 22px; line-height: 1; }
+.dev-shot.bad { color: var(--status-error); border-color: var(--status-error); }
+
+/* A dropdown in the same clothes as the pills, for a list too long to be a row of them.
+   `field-sizing` keeps it as wide as its longest entry where it is supported and is
+   harmlessly ignored where it is not; the explicit max stops "Coffee machine — one only"
+   from setting the width of the whole strip. */
+.dev-select {
+  font: inherit; font-size: 11px; color: var(--text);
+  background: rgba(36, 50, 71, 0.05);
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 4px 10px; cursor: pointer; flex: 0 1 auto;
+  max-width: 168px; field-sizing: content;
+}
+.dev-select:hover { background: rgba(36, 50, 71, 0.10); }
+.dev-select option { color: var(--text); background: var(--panel-solid); }
+/* One width, whatever is in it. `field-sizing: content` is right for a list that holds
+   still, and wrong for one that shortens as the room fills: the picker would step
+   narrower with every item added, walking the Add button out from under the cursor. */
+.dev-select-fixed { width: 168px; flex: 0 0 auto; field-sizing: auto; }
+
+/* ---- Furniture editor panel (press E) ---- */
+/* Wears the developer panel's clothes — same box, groups, readouts and pill buttons, all
+   shared above — and is placed by #bottom-stack rather than by itself. */
+
+/* The way a layout comes in as a file. It stands where the JSON textarea used to,
+   and keeps its footprint — a fixed height, so nothing in the strip moves when a
+   file is dragged over it. Dashed, because a dashed border is what a drop target
+   has looked like since long before this office had a floor. */
+.editor-drop {
+  width: 100%; min-width: 260px; height: 56px;
+  box-sizing: border-box;
+  display: grid; place-items: center; text-align: center;
+  padding: 6px 10px;
+  font-size: 12px; font-weight: 600; color: var(--sage);
+  background: var(--green-soft);
+  border: 1px dashed var(--green-bold); border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.editor-drop:hover { background: var(--green-hovered); border-color: var(--sage); }
+/* Two labels, one shown at a time. The sentence is the default and the short form is
+   what a narrow strip gets — see the container queries at the end of this section. */
+.editor-drop-short { display: none; }
+.editor-drop:focus-visible { outline: 1px solid var(--brand); outline-offset: 1px; }
+/* A stronger green and solid edge confirm the active drop target. */
+.editor-drop.over {
+  color: var(--sage); border-style: solid; border-color: var(--sage);
+  background: var(--green-hovered);
+}
+
+/* The saved-layout name field: one line tall, in the same voice as the drop zone. */
+.editor-name {
+  flex: 1;
+  min-width: 90px;
+  color: var(--text); background: var(--surface-soft);
+  border: 1px solid var(--border); border-radius: 8px;
+  font: inherit;
+  font-size: 11px;
+  padding: 3px 8px;
+}
+.editor-name:focus { outline: 1px solid var(--brand); }
+
+/* ---- The editor's layout picker: the scene switcher's trigger, in miniature,
+   living in the Layout section's own heading. The strip sits at the bottom of
+   the screen, so its menu opens upward. ---- */
+/* The picker and Save are taller than a heading line, and floating them out of
+   flow clipped them against the body's scroll container. In flow instead, with
+   every heading in this strip given the pill's height: nothing clips, the text
+   shares one centred baseline, and every section's first row starts level. */
+#editor-panel .dev-group h4 { min-height: 26px; display: flex; align-items: center; }
+#editor-panel .dev-group-layout h4 { justify-content: space-between; gap: 10px; }
+.layout-head-tools { display: flex; align-items: center; gap: 6px; }
+.dev-btn-small { font-size: 11px; padding: 3px 10px; }
+.layout-picker { position: relative; }
+.layout-picker-trigger {
+  display: flex; align-items: center; gap: 6px;
+  font: inherit; font-size: 11px; font-weight: 600; color: var(--text);
+  text-transform: none; letter-spacing: 0;
+  background: var(--surface-soft); border: 1px solid var(--border);
+  border-radius: 999px; padding: 3px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  max-width: 180px;
+}
+.layout-picker-trigger:hover { border-color: rgba(36, 50, 71, 0.28); }
+.layout-picker-current { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.layout-picker.edited .layout-picker-current { color: var(--brand); }
+.layout-picker.open .switcher-caret { transform: rotate(180deg); }
+.layout-picker-menu[hidden] { display: none; }
+.layout-picker-menu {
+  position: absolute; bottom: calc(100% + 8px); right: 0;
+  min-width: 200px;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 6px;
+  background: var(--panel-solid);
+  border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: var(--shadow-overlay);
+  backdrop-filter: blur(14px);
+  z-index: 20;
+}
+.layout-item {
+  display: flex; align-items: center; gap: 2px;
+  border-radius: 8px; padding: 0 4px 0 0;
+}
+.layout-item:hover { background: rgba(36, 50, 71, 0.07); }
+.layout-item.active { background: rgba(36, 50, 71, 0.11); }
+.layout-item.arming { background: rgba(224, 103, 103, 0.14); }
+.layout-choose {
+  flex: 1; display: block; text-align: left;
+  font: inherit; font-size: 12px; color: var(--text);
+  background: none; border: 0; padding: 7px 10px;
+  cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.layout-tool {
+  flex-shrink: 0; display: grid; place-items: center;
+  width: 24px; height: 24px;
+  color: var(--muted); background: none;
+  border: 1px solid transparent; border-radius: 6px;
+  cursor: pointer; opacity: 0;
+  transition: opacity 0.12s;
+}
+.layout-item:hover .layout-tool { opacity: 1; }
+.layout-tool:focus-visible { opacity: 1; outline: none; border-color: var(--muted); }
+.layout-tool:hover { color: var(--text); background: rgba(36, 50, 71, 0.1); }
+.layout-trash:hover { color: var(--status-error); background: rgba(224, 103, 103, 0.12); }
+
+/* Room to work: the strip that hosts a picker, a drop zone and a name prompt should
+   not be the most cramped thing on screen. */
+#editor-panel { min-height: 170px; position: relative; }
+/* Put dividers in the gaps, so a wrapped row starts at the same content edge. */
+#editor-panel .dev-panel-body { --group-gap: 36px; column-gap: var(--group-gap); }
+#editor-panel .dev-group + .dev-group { position: relative; border-left: 0; padding-left: 0; }
+#editor-panel .dev-group + .dev-group:not(.dev-row-start)::before {
+  content: ''; position: absolute; top: 0; bottom: 0;
+  left: calc(var(--group-gap) / -2); border-left: 1px solid var(--border);
+}
+/* The Layout section takes whatever width the other sections leave. */
+#editor-panel .dev-group-layout { flex: 1 1 104px; position: relative; container: layout / inline-size; }
+#editor-panel .editor-layout-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 6px; width: 100%; max-width: 430px;
+}
+#editor-panel .dev-group-layout .editor-drop { min-width: 0; min-height: 56px; height: auto; }
+@container layout (width < 240px) {
+  #editor-panel .dev-group-layout h4 { flex-wrap: wrap; gap: 8px; }
+  #editor-panel .layout-head-tools { flex-wrap: wrap; width: 100%; }
+  #editor-panel .layout-picker { min-width: 0; max-width: 100%; }
+  #editor-panel .layout-picker-trigger { max-width: 100%; }
+}
+@container layout (width < 340px) {
+  #editor-panel .editor-drop-long { display: none; }
+  #editor-panel .editor-drop-short { display: inline; }
+}
+/* Feedback shares the title row, with its own column clear of the legend and ×. */
+#editor-panel .editor-status {
+  grid-area: 1 / 2; min-width: 0; max-width: 300px; margin: 0 24px 0 0;
+  line-height: 18px; text-align: right; overflow-wrap: anywhere;
+  font-size: 11px; color: var(--muted);
+  opacity: 1; transition: opacity 0.8s;
+  pointer-events: none;
+}
+#editor-panel .editor-status em { font-style: italic; margin-right: 2px; }
+#editor-panel .editor-status span { color: var(--text); }
+#editor-panel .editor-status.bad span { color: var(--status-error); }
+#editor-panel .editor-status.fade { opacity: 0; }
+/* The body scrolls sideways under pressure, and that overflow clips the
+   picker's menu — which pops upward, outside the row. While the menu is open
+   the clip is released; a row that cannot scroll for the moment a menu is up
+   costs nothing, where a menu that cannot show costs the feature. */
+#editor-panel .dev-panel-body:has(.layout-picker.open) { overflow: visible; }
+
+/* Start the clock compact when packing rows, then use that row's spare width. */
+#scene-panel { container: scene / inline-size; }
+#scene-panel .dev-group-time { flex: 1 1 128px; min-width: 0; }
+#scene-panel .dev-time-grow { width: 100%; min-width: 0; }
+#scene-panel .dev-time-head { gap: 6px; }
+#scene-panel .dev-time-head button { text-transform: none; letter-spacing: normal; }
+#scene-panel .dev-group-time > .dev-group-body { gap: 16px; }
+#scene-panel .dev-group-buildings .dev-seg {
+  display: grid; grid-template-columns: repeat(2, max-content); gap: 6px;
+}
+#scene-panel .dev-panel-body { row-gap: 24px; justify-content: center; }
+#scene-panel .dev-pair.dev-row-start::before { display: none; }
+@container scene (width < 480px) {
+  #scene-panel .dev-pair { flex-wrap: wrap; justify-content: center; gap: 24px; min-width: 0; max-width: 100%; }
+  #scene-panel .dev-group + .dev-group { border: 0; padding-left: 0; }
+  #scene-panel .dev-pair::before { display: none; }
+}
+
+/* --- The strip under pressure ---------------------------------------------------
+   The strip is never as wide as the window. It sits between the roster and the
+   inspector (see `#bottom-stack`), so opening the inspector on a 1366px screen
+   leaves it about 770px and the whole panel still has to fit — while the *window*
+   has not changed width at all. That is why these are container queries and not
+   media queries: a media query asks the one question whose answer cannot tell the
+   two cases apart, and would squeeze a panel with acres of room beside a closed
+   inspector while leaving the genuinely cramped one alone.
+
+   What they do is what strip.js asks for: sections keep their places and shrink in
+   their own way rather than reflowing. A group that drops to a second line takes
+   everything after it along, so the same control sits somewhere different depending
+   on whether the inspector happens to be open — and a control you have to find
+   again is worse than a smaller one. The wrap is still there underneath as a last
+   resort; these rules move the width at which it starts from around 1040px down to
+   roughly 700px, which covers the windows people actually use. That floor is real
+   rather than a scrollbar, which is why it is worth moving: `.dev-panel-body`
+   *clips*, so a section pushed out of the box is gone rather than out of sight. */
+#editor-panel { container-type: inline-size; container-name: editor; }
+
+/* Roughly the width at which Layout can no longer have its full-sentence drop zone
+   alongside four unshrunk neighbours. */
+@container editor (max-width: 1040px) {
+  /* Snap grid gives up nothing here: it stands upright, so it costs the row about
+     forty pixels whatever the panel's width, and there is no track length to trim. */
+  /* The drop zone gives up the most and misses it the least. It is a target, and a
+     target needs to be *hittable* rather than large; the sentence goes with the
+     size, leaving the short label, and `title` still carries the long one. */
+  #editor-panel .editor-drop { min-width: 132px; height: 44px; }
+  #editor-panel .editor-drop-long { display: none; }
+  #editor-panel .editor-drop-short { display: inline; }
+  #editor-panel .dev-panel-body { --group-gap: 24px; }
+}
+
+/* Narrower still: the roster and the inspector both open on a small laptop. */
+@container editor (max-width: 820px) {
+  #editor-panel .editor-drop { min-width: 160px; min-height: 48px; height: auto; font-size: 12px; }
+
+  /* The furniture picker, capped. It holds names like "Espresso machine", and the
+     `.dev-place-group` picker in the scene panel is already capped at much the same
+     width for the same reason: a `<select>` shows its choice, not its longest one. */
+  #editor-panel .dev-select { max-width: 132px; }
+}
+
+/* Says what just happened, including why a drop was refused — the one place the editor
+   can explain itself in words rather than in colour. */
+
+/* The standing hint under the item picker: the three gestures, written in keys. Set at
+   the readouts' size so it reads as part of the panel's furniture rather than as a
+   message that just arrived. */
+.editor-hint {
+  display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; gap: 3px;
+  font-size: 11px; color: var(--muted); margin-top: 2px;
+}
+.editor-hint kbd {
+  font-family: var(--font-mono); font-feature-settings: var(--font-variants-mono); font-size: 10px;
+  color: var(--text); background: rgba(36, 50, 71, 0.07);
+  border: 1px solid var(--border); border-bottom-width: 2px;
+  border-radius: 4px; padding: 1px 4px; text-align: center;
+}
+
+/* The colours a selected prop can be painted. A row of the colours themselves rather
+   than a list of their names: "Plum" is a word you have to picture, and a square of it
+   is the thing itself. Square-ish and small, because six of them plus Room have to sit
+   on one line inside a panel that is already narrow. */
+.editor-swatches { display: flex; flex-wrap: wrap; gap: 5px; }
+/* The buttons are a different kind of thing from the readouts above them — those state
+   what the selection is, these change it — so they get a gap rather than the 4px the
+   body puts between every row alike. Wide enough to read as a break between two kinds
+   of thing rather than as a loose row. */
+#editor-panel .dev-group-selected .dev-row { margin-top: 8px; }
+#editor-panel .dev-group-selected .dev-group-body { gap: 8px; }
+#editor-panel .dev-group-layout .dev-group-body { gap: 12px; }
+#editor-panel .dev-panel-body { row-gap: 24px; }
+.editor-swatch {
+  width: 18px; height: 18px; padding: 0; border-radius: 5px; cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.35);
+  box-shadow: inset 0 0 0 1px rgba(36, 50, 71, 0.10);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.editor-swatch:hover { transform: translateY(-1px); }
+/* The chosen one is ringed in the panel's own accent rather than outlined in its own
+   colour, which a dark swatch would swallow. */
+.editor-swatch[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--panel-solid), 0 0 0 3px var(--brand);
+}
+.editor-swatch:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+/* Auto is the absence of a choice rather than a colour, so it says so. Drawn as an
+   empty square it read as a seventh swatch — of black, against this panel — which is
+   exactly the thing it is not. A labelled pill cannot be mistaken for paint. */
+.editor-swatch-auto {
+  width: auto; padding: 0 7px; font-size: 10px; letter-spacing: 0.3px;
+  color: var(--muted); background: transparent; border-color: var(--border);
+  box-shadow: none;
+}
+/* Filled like the other swatches when it is the one in force. It carries no inline
+   background — see `drawPalette` — so this is the rule that decides what is behind the
+   word, and without it the chosen Auto printed `--bg` text over nothing. */
+.editor-swatch-auto[aria-pressed="true"] {
+  color: var(--brand); background: var(--selected); border-color: var(--brand);
+  box-shadow: none; font-weight: 600;
+}
+
+/* The selected item's name, in the heading beside the word Selected. The one piece of
+   text in this panel worth reading at a glance, so it is the one piece set in the
+   foreground colour rather than the muted one the small-caps headings use — and left
+   in its own case, since a name is a name and not a label. */
+.editor-sel-name {
+  margin-left: 7px; color: var(--text); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.6px;
+}
+/* A separator, because both halves are now in small caps and ran together without one.
+   Drawn rather than written into the text so that `:empty` still hides the whole thing
+   when nothing is selected — a `::before` is not content as far as that is concerned. */
+.editor-sel-name::before {
+  content: '–'; margin-right: 7px; color: var(--muted); font-weight: 400;
+}
+.editor-sel-name:empty { display: none; }
+
+/* ---- Shortcuts modal (press ?) ---- */
+/* The host is the backdrop: shortcuts.js dismisses on clicks that land on it
+   directly, so the card must be its only child. */
+#shortcuts-panel {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: var(--blanket);
+  backdrop-filter: blur(3px);
+}
+#shortcuts-panel.hidden { display: none; }
+
+/* Tall enough for the whole list on a normal screen. At 70vh the fourth section sat
+   below the fold, which for a panel whose entire job is telling you what exists is the
+   one failure that matters — a reader who does not know `⌘C` takes a photo will not
+   think to scroll a list to find out. It still scrolls when it must; it just does not
+   have to on a laptop. */
+.sc-card {
+  width: min(560px, 100%); max-height: min(86vh, 860px);
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--panel-solid);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-overlay);
+}
+.sc-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px 12px; border-bottom: 1px solid var(--border);
+}
+/* The same treatment the strips give their own names — small, tracked-out caps in the
+   muted ink — so the modal introduces itself the way every other panel does rather than
+   in a voice of its own. The `?` rides alongside as a real key cap, which is what lets it
+   come out of the list below. */
+.sc-head h2 {
+  margin: 0; display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+}
+
+.sc-body { padding: 4px 18px 14px; overflow-y: auto; }
+.sc-group { margin-top: 14px; }
+.sc-group h3 {
+  margin: 0 0 6px; font-size: 10px;
+  text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+}
+.sc-row { display: flex; align-items: baseline; gap: 12px; padding: 5px 0; }
+/* The keys column is fixed so every label starts at the same x — a ragged left edge down
+   the descriptions makes the list much harder to scan than the few pixels are worth.
+   Sized to `[ / ] / Del`, the longest run in the list. A longer one would push its own
+   label out of line rather than widening the column for everybody, so it should raise
+   this — and the card's width with it, or the descriptions pay for the keys. */
+.sc-keys { flex: 0 0 118px; display: flex; align-items: center; justify-content: flex-end; gap: 3px; }
+.sc-row kbd, .sc-head kbd {
+  font-family: var(--font-mono); font-feature-settings: var(--font-variants-mono); font-size: 11px;
+  color: var(--text); background: rgba(36, 50, 71, 0.07);
+  border: 1px solid var(--border); border-bottom-width: 2px;
+  border-radius: 5px; padding: 2px 6px; min-width: 20px; text-align: center;
+}
+/* The title's key cap sets its own type, so it is not dragged into the heading's caps
+   and tracking along with the word beside it. */
+.sc-head kbd { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.sc-sep { color: var(--muted); font-size: 10px; }
+.sc-label { font-size: 12.5px; color: var(--text); }
+
+/* A panel's name, inside the row that toggles it, set the way that panel's own heading
+   is set — small caps, tracked out, muted. `Show/hide ᴀɢᴇɴᴛs panel` is pointing at the
+   strip headed `Agents`, and matching the type is what says so without a sentence
+   explaining it. The size is the label's rather than the heading's: a word in the middle
+   of a line that dropped to 10px would sit in a hole. */
+.sc-cap {
+  text-transform: uppercase; letter-spacing: 1px;
+  font-size: 11px; font-weight: 600; color: var(--muted);
+}
+
+/* ---- Source picker ----
+   Same arrangement as the shortcuts modal: the host is the dismissing backdrop
+   and the card is its only child. */
+#source-picker {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: var(--blanket);
+  backdrop-filter: blur(3px);
+  z-index: 30;
+}
+#source-picker.hidden { display: none; }
+
+.sp-card {
+  width: min(860px, 100%);
+  background: var(--panel-solid);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-overlay);
+  overflow: hidden;
+}
+.sp-head { padding: 20px 22px 4px; position: relative; }
+.sp-head > .panel-close { position: absolute; top: 14px; right: 16px; }
+.sp-head h2 { margin: 0; font-size: 17px; letter-spacing: 0.3px; }
+.sp-sub { margin: 6px 0 0; font-size: 12.5px; color: var(--muted); }
+
+/* Six sources read as two calm rows of three, rather than six squeezed cards. */
+.sp-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  padding: 18px 22px 6px;
+}
+@media (max-width: 780px) {
+  .sp-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.sp-option {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 20px 12px 14px;
+  font: inherit; color: var(--text); text-align: center;
+  background: rgba(36, 50, 71, 0.03);
+  border: 1px solid var(--border); border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.14s, border-color 0.14s, transform 0.14s;
+}
+.sp-option:hover, .sp-option:focus-visible {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  transform: translateY(-2px);
+  outline: none;
+}
+.sp-option.selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* Square checkboxes make the multiple-selection behaviour visible before a click. */
+.sp-check {
+  position: absolute; top: 9px; right: 9px;
+  display: none; align-items: center; justify-content: center;
+  width: 17px; height: 17px; border-radius: 50%;
+  color: var(--on-bold); background: var(--brand);
+}
+.sp-option.selected .sp-check { display: flex; }
+.sp-logo { color: var(--accent); }
+.sp-logo svg { width: 44px; height: 44px; display: block; }
+.sp-label { font-size: 14px; font-weight: 650; }
+.sp-blurb { font-size: 11.5px; color: var(--muted); line-height: 1.35; }
+.sp-tag {
+  margin-top: 2px; padding: 2px 8px;
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--muted);
+  border: 1px solid var(--border); border-radius: 999px;
+}
+.sp-tag.ready { color: var(--sage); border-color: color-mix(in srgb, var(--sage) 45%, transparent); }
+
+/* A source the demo office cannot be pointed at. Dimmed and inert, but still legible
+   and still wearing its own mark: the card's job here is to show what the room can do
+   elsewhere, so an option scrubbed of its colour would be advertising nothing. The
+   lift and wash on hover go, because both are promises of a click that will not come —
+   `not-allowed` says the same thing with the cursor instead. */
+.sp-option.locked {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: saturate(0.6);
+}
+.sp-option.locked:hover {
+  background: rgba(36, 50, 71, 0.03);
+  border-color: var(--border);
+  transform: none;
+}
+
+/* The note explains, the button commits. Side by side so the action sits at the
+   card's bottom-right where a modal's confirm belongs, with the explanation given
+   the remaining width rather than a column of its own. */
+.sp-foot {
+  display: flex; align-items: flex-end; gap: 18px;
+  padding: 12px 22px 18px;
+  font-size: 11.5px; color: var(--muted); line-height: 1.45;
+}
+.sp-note { margin: 0; flex: 1; min-width: 0; }
+
+/* The way out of a locked office, sitting inside the sentence that explains why one
+   is needed. A button by element and a link by every other measure — inline, in the
+   accent, underlined — because it reads as part of the prose rather than as a second
+   action competing with the confirm button beside it. */
+.sp-link {
+  display: inline; padding: 0;
+  font: inherit; color: var(--sage);
+  background: none; border: none;
+  text-decoration: underline; text-underline-offset: 2px;
+  cursor: pointer;
+}
+.sp-link:hover { filter: brightness(1.15); }
+.sp-link:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 3px; }
+
+.sp-confirm {
+  flex: 0 0 auto;
+  padding: 9px 16px;
+  font: inherit; font-size: 12.5px; font-weight: 650;
+  color: var(--on-bold); background: var(--brand);
+  border: 1px solid transparent; border-radius: 9px;
+  cursor: pointer;
+  transition: filter 0.14s, opacity 0.14s;
+}
+.sp-confirm:hover:not(:disabled) { filter: brightness(1.08); }
+.sp-confirm:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+/* Disabled rather than hidden: the button is where the eye goes for "now what",
+   and its label is what says a choice is still needed. */
+.sp-confirm:disabled {
+  color: var(--muted); background: transparent;
+  border-color: var(--border); cursor: default;
+}
+
+/* ---- The keycard dialog ----
+   Clicking the keycard opens the office rather than copying a link: the link, the
+   headcount, the passcode and closing the room are four answers to one question and
+   they sit together. Same idiom as the source picker above — the host is the
+   dismissing backdrop and the card is its only child — so the two share every
+   layout decision that is not about their contents. */
+#keycard-dialog {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: var(--blanket);
+  backdrop-filter: blur(3px);
+  z-index: 30;
+}
+#keycard-dialog.hidden { display: none; }
+
+/* 744px, and the number is measured rather than chosen: two columns of 337px inside
+   22px of padding either side and a 26px gutter. 337 is what the widest thing in the
+   card needs, which is the link field showing a whole office URL in 11.5px mono without
+   scrolling — 326px of it, plus a little slack. The close confirmation is the longest
+   sentence in here and reads as four lines at that width; going wider only spreads the
+   same sentences thinner, and narrower is where the link field starts giving way. Still
+   `min(…, 100%)` and still capped by `max-height`, so a small laptop gets the whole card
+   and a phone gets one column (see `.kd-grid`). */
+.kd-card {
+  width: min(744px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 20px 22px 18px;
+  background: var(--panel-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-dialog, 16px);
+  box-shadow: var(--shadow-overlay);
+}
+
+.kd-head { position: relative; padding-right: 28px; }
+.kd-head > .panel-close { position: absolute; top: -2px; right: -4px; }
+.kd-head h2 { margin: 0; font-size: 17px; letter-spacing: 0.3px; }
+
+/* The keycard at the size it is read at: one character at a time, out loud, down a
+   corridor. Tracked for the same reason the chip and the reception field are. */
+.kd-keycard {
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  font-size: 22px; font-weight: 650; letter-spacing: 2px;
+  color: var(--text);
+}
+
+/* Wraps, because at one column — or at two on a small laptop — a row of a field and two
+   buttons is wider than the column holding it, and a wrapped row is legible where a
+   squeezed one is not. */
+.kd-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.kd-row > :is(.kd-link, .kd-field) { flex: 1; min-width: 0; }
+
+.kd-link, .kd-field {
+  padding: 8px 10px;
+  font: inherit; font-size: 12.5px;
+  color: var(--text); background: var(--surface-soft);
+  border: 1px solid var(--border); border-radius: var(--radius-control, 8px);
+}
+.kd-link { font-family: var(--font-mono); font-size: 11.5px; }
+/* It *asks* for a whole office link — `https://therovingoffice.com/office/K7F2-9QBX` is
+   44 characters, plus the field's own padding — and that is a basis rather than a floor
+   on purpose. A wrapping flex line is laid out by what its items ask for, so Copy link
+   drops underneath rather than squeezing the field; but `min-width: 0` still lets the
+   field give way on a phone, where there is no width to be had and an overflowing box
+   would be worse than a truncated link. */
+.kd-row > .kd-link { flex: 1 1 calc(44ch + 22px); min-width: 0; }
+.kd-link:focus-visible, .kd-field:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+
+.kd-action {
+  flex: 0 0 auto;
+  padding: 8px 13px;
+  font: inherit; font-size: 12.5px; font-weight: 650;
+  color: var(--on-bold); background: var(--brand);
+  border: 1px solid transparent; border-radius: var(--radius-control, 8px);
+  cursor: pointer;
+  transition: filter 0.14s, opacity 0.14s;
+}
+.kd-action:hover:not(:disabled) { filter: brightness(1.08); }
+.kd-action:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+/* Disabled rather than hidden, throughout: a control that vanishes for a visitor
+   teaches nobody why, and `.kd-owner-note` is what explains the greyed pair. */
+.kd-action:disabled { color: var(--muted); background: transparent; border-color: var(--border); cursor: default; }
+/* The secondary pair — Remove, Keep it — read as the quieter half of a choice. */
+.kd-quiet { color: var(--text); background: transparent; border-color: var(--border); font-weight: 550; }
+.kd-quiet:hover:not(:disabled) { background: var(--surface-hovered); filter: none; }
+
+/* The four subjects, two to a row, with the key ring spanning both under them:
+ *
+ *     This office   |  Who is here
+ *     Passcode      |  Close
+ *     Your offices — both columns
+ *
+ * Left column is the room, right column the people in it; the second row is the two
+ * things you can do to the room, side by side because they are one decision seen twice —
+ * how locked down this office is. It is 175px shorter than the same sections stacked in
+ * one 520px column, measured with the close confirmation armed: 645px against 820px,
+ * against a card capped at `100vh - 48px`. A laptop that had to scroll to reach Close
+ * now does not.
+ *
+ * No cell is placed by CSS — `kd-grid` in src/ui/keycard-dialog.js appends the sections
+ * in this reading order and the grid flows them — which is what makes the demo office
+ * right for free: `Passcode` and `Close` are `hidden` there, and the key ring closes up
+ * behind them instead of leaving two empty cells. */
+.kd-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 26px;
+}
+.kd-grid > .kd-wide { grid-column: 1 / -1; }
+
+/* One column below the width two need, and 775 is measured rather than picked. Two
+   columns of 326px — a whole office link, which is the widest single thing in the card —
+   inside 44px of card padding and a 26px gutter is a 722px card, and the card is that
+   wide at a 770px viewport; the few pixels over that are for the rounding, since a
+   fractional track rounds down and the field would be the one pixel that gave. Narrower
+   still and the link starts truncating, so a portrait tablet and a phone get the same
+   sections in the same reading order, stacked, rather than a grid squeezed until
+   something in it is unreadable. The query is on the viewport because that is what the
+   card's own width follows. */
+@media (max-width: 775px) {
+  .kd-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.kd-section { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+.kd-section h3 {
+  margin: 0; font-size: 11px; font-weight: 650;
+  letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted);
+}
+.kd-section[hidden] { display: none; }
+
+.kd-count { margin: 10px 0 0; font-size: 14px; font-weight: 600; color: var(--text); }
+.kd-state { margin: 10px 0 0; font-size: 13px; color: var(--text); }
+/* A description now sits directly under its heading rather than at the foot of its
+   section, so its top margin is the gap after an 11px uppercase label — tighter than
+   the gap it used to need after a row of controls — and it grew a bottom one, because
+   what follows it is the controls it describes. */
+.kd-note { margin: 6px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--muted); }
+.kd-section > .kd-note { margin-bottom: 2px; }
+.kd-note[hidden] { display: none; }
+/* What closing costs, which only appears once the button is armed and so arrives under a
+   description that was already there. A wider gap than one note gets after a heading,
+   because these are two paragraphs and the second is the one that just turned up. */
+.kd-confirm { margin-top: 11px; }
+.kd-owner-note { margin-top: 16px; }
+/* The keycard field's own hint: what it makes of what you have typed so far. Under the
+   field rather than under the heading, because it changes on every keystroke. */
+.kd-hint { min-height: 1.5em; }
+.kd-hint.bad { color: var(--status-error); }
+
+/* The offices this browser has been in. A key ring rather than a history — there is no
+   list of offices on the server — so the keycards are set in the same monospace they are
+   read aloud in, and a row that has died is struck through rather than removed. */
+.kd-offices { margin: 10px 0 0; padding: 0; list-style: none; }
+.kd-offices li {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
+}
+.kd-offices li:last-child { border-bottom: 0; }
+.kd-office-card {
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  font-size: 12.5px; font-weight: 650; letter-spacing: 1px;
+  color: var(--brand); text-decoration: none;
+}
+.kd-office-card:hover { text-decoration: underline; text-underline-offset: 2px; }
+.kd-office-card:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 3px; }
+/* The room you are standing in: named, so there is no hole where it should be, and not
+   a link, because a link to where you already are does nothing. */
+.kd-office-card.here { color: var(--text); }
+.kd-office-when { font-size: 11px; color: var(--muted); margin-left: auto; }
+.kd-offices li.gone .kd-office-card { color: var(--muted); text-decoration: line-through; }
+
+/* The third door: a keycard somebody sent you. Exactly as wide as a keycard, and set in
+   the mono the card is read aloud in — not stretched to fill the row the way the link
+   field is, because a box that holds nine characters and is three hundred pixels wide
+   invites a sentence. */
+.kd-row > .kd-keycard-field {
+  /* Nine characters — the eight plus the hyphen — at the 1px of tracking below, inside
+     the 10px of padding and 1px of border either side that `border-box` puts in here. */
+  flex: 0 0 auto; width: calc(9ch + 9px + 22px);
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.kd-or { flex: 0 0 auto; font-size: 11.5px; color: var(--muted); }
+
+/* Closing an office cannot be undone, so it is the one control in the office that
+   changes colour when it is armed — the first click is a question and the second is
+   the act, and they must not look the same. */
+.kd-danger-action.armed {
+  color: #fff;
+  background: var(--status-error);
+  border-color: transparent;
+}
+.kd-danger-action.armed:hover:not(:disabled) { filter: brightness(1.08); }
+
+.kd-flash {
+  display: block; margin-top: 8px;
+  font-size: 11.5px; font-weight: 600; color: var(--sage);
+}
+.kd-flash:empty { display: none; }
+
+.kd-problem { margin: 14px 0 0; font-size: 12px; line-height: 1.45; color: var(--status-error); }
+.kd-problem:empty { display: none; }
+
+/* ---- The passcode prompt ----
+   Not a modal: it stands where the loading line was, because nothing behind it has
+   loaded and a backdrop that dismissed would reveal an empty canvas. The way out is
+   the link to reception, which is a real place. */
+/* `fixed`, not `absolute`, and it matters: the office page mounts this inside `#ui`,
+   which is itself positioned, while the debug log has no `#ui` at all and the prompt
+   lands on `<body>` — where an absolute box has no positioned ancestor to anchor to.
+   An overlay over the viewport is what `fixed` means, and it is right on both pages. */
+.pp-host {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: var(--bg);
+  z-index: 40;
+}
+
+.pp-card {
+  width: min(420px, 100%);
+  padding: 26px 24px 22px;
+  background: var(--panel-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-dialog, 16px);
+  box-shadow: var(--shadow-overlay);
+  text-align: left;
+}
+.pp-title { margin: 0; font-size: 18px; font-weight: 650; letter-spacing: 0.2px; }
+.pp-sub { margin: 8px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--muted); }
+.pp-keycard {
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  font-weight: 650; letter-spacing: 1px; color: var(--text);
+}
+.pp-row { display: flex; gap: 8px; margin-top: 18px; }
+.pp-field {
+  flex: 1; min-width: 0; padding: 9px 11px;
+  font: inherit; font-size: 13px;
+  color: var(--text); background: var(--surface-soft);
+  border: 1px solid var(--border); border-radius: var(--radius-control, 8px);
+}
+.pp-field:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+.pp-go {
+  flex: 0 0 auto; padding: 9px 15px;
+  font: inherit; font-size: 12.5px; font-weight: 650;
+  color: var(--on-bold); background: var(--brand);
+  border: 1px solid transparent; border-radius: var(--radius-control, 8px);
+  cursor: pointer;
+}
+.pp-go:hover:not(:disabled) { filter: brightness(1.08); }
+.pp-go:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.pp-go:disabled { color: var(--muted); background: transparent; border-color: var(--border); cursor: default; }
+.pp-problem { margin: 12px 0 0; font-size: 12px; line-height: 1.45; color: var(--status-error); }
+.pp-problem:empty { display: none; }
+.pp-away {
+  display: inline-block; margin-top: 16px;
+  font-size: 11.5px; color: var(--sage);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+
+/* ---- First Person panel (press F with an agent selected) ----
+   Across the top middle, in the slot the title bar has just vacated — see the
+   `.riding` rule below. Centred rather than inset left-and-right because it is a
+   caption for the view behind it, and the view's subject is in the middle.
+
+   Pointer events stay off throughout: it is something to read, not to operate, and
+   the canvas underneath is the whole point. */
+#fpv-hud {
+  position: absolute;
+  top: 16px; left: 50%; transform: translateX(-50%);
+  width: min(680px, calc(100vw - 560px));
+  display: flex; flex-direction: column; gap: 9px;
+  pointer-events: none;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 11px 16px 13px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-panel);
+}
+#fpv-hud.hidden { display: none; }
+
+/* While riding, the office's own furniture goes: the brand, the office switcher and
+   the source badge all answer "which office is this", which is not the question you
+   are asking from inside somebody's head. Faded rather than cut, to match the
+   vignette, and made unclickable on the way out — #title-bar is absolutely
+   positioned, so none of this moves anything else. */
+#ui.riding #title-bar {
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+#title-bar { transition: opacity 0.25s ease; }
+
+.fpv-head { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.fpv-eye { color: var(--sage); display: flex; }
+.fpv-eye svg { width: 15px; height: 15px; display: block; }
+/* Source glyph and status dot, sized as in the roster row so the same agent reads
+   the same in both. */
+.fpv-marks { display: flex; align-items: center; flex: 0 0 auto; }
+.fpv-marks svg, .fpv-src svg { width: 13px; height: 13px; display: block; }
+.fpv-src { display: flex; flex: 0 0 auto; }
+.fpv-swatch { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+/* The agent's name is the title of the panel, so it takes the job's size. */
+.fpv-name { font-weight: 600; font-size: 16px; line-height: 1.2; }
+/* Pushed to the far edge so the name reads as a title and the key as an aside. */
+.fpv-exit { margin-left: auto; color: var(--muted); }
+.fpv-exit kbd {
+  font: inherit; font-size: 10.5px;
+  background: rgba(36, 50, 71, 0.07);
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 1px 5px; margin-right: 4px;
+}
+
+/* Two groups in the dev panel's language, since they are the same kind of readout.
+   "Doing" gets a fixed 30% rather than being sized by its text: it rewrites itself
+   every few seconds as an agent sits down, stands up and picks things up, and a
+   column that resized with it would drag the divider — and the job beside it —
+   back and forth the whole time. The job takes whatever is left. */
+.fpv-body { display: flex; align-items: stretch; gap: 16px; min-width: 0; }
+.fpv-group { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.fpv-group:first-child { flex: 1 1 auto; }
+.fpv-group + .fpv-group {
+  flex: 0 0 30%; border-left: 1px solid var(--border); padding-left: 16px;
+}
+.fpv-group h4 {
+  margin: 0; font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted);
+}
+.fpv-group-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+
+/* The one thing the panel exists to say, so the one thing set at reading size. */
+.fpv-job-label {
+  font-size: 16px; font-weight: 600; line-height: 1.25;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.fpv-job-label.idle { color: var(--muted); font-weight: 500; font-style: italic; }
+/* Between the round and its clock, because that is the order the question is asked
+   in down here: what are they on, which part of it, how long. */
+.fpv-job-step { font-size: 11px; color: var(--job-active); margin-bottom: 2px; }
+.fpv-job-times { font-size: 11px; color: var(--muted); }
+.fpv-job-times strong {
+  color: var(--text); font-weight: 600;
+  /* Tabular figures: the seconds tick every second, and proportional digits make
+     the whole line jitter as they do. */
+  font-feature-settings: var(--font-variants-sans), 'tnum' 1;
+}
+/* Wraps inside its fixed column, and reserves both lines up front: the longest
+   thing it says ("on their feet, carrying a drink") needs two, and letting the panel
+   grow and shrink a line at a time would just trade the sideways jump for a
+   vertical one. Two lines still fit inside the job's height, so this costs nothing. */
+.fpv-doing { font-size: 12px; padding-top: 2px; line-height: 1.35; min-height: 2.7em; }
+
+
+#loading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; color: var(--muted);
+  background: var(--bg);
+  transition: opacity 0.6s ease;
+}
+#loading.done { opacity: 0; pointer-events: none; }
+
+/* How the work arrived: a flat envelope for a letter, a cube for a package. Sat on
+   the job line in the delivery feed, where the shape says it faster than a word
+   would. */
+.mail-item .parcel-mark {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 6px;
+  border-radius: 1px;
+}
+.mail-item .parcel-mark.letter {
+  width: 13px;
+  height: 9px;
+  background: #f4f1e8;
+  /* The red airmail stripe the envelopes in the mailbox carry. */
+  border-top: 2px solid #d23b3b;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+.mail-item .parcel-mark.package {
+  width: 11px;
+  height: 11px;
+  background: #bf9b6a;
+  /* The tape down the middle, as on the boxes beside the mailbox. */
+  border-left: 3px solid #d9c39a;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+/* ---- Reception ---- */
+body.reception { overflow: auto; background: var(--panel-solid); }
+.reception-nav {
+  max-width: 1320px; margin: auto; padding: 24px 36px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.reception-brand { display: inline-flex; align-items: center; gap: 12px; color: var(--text); text-decoration: none; font-size: 19px; font-weight: 700; }
+.reception-brand img { width: 40px; height: 40px; display: block; }
+.reception-nav nav { display: flex; gap: 24px; }
+.reception-nav nav a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 600; }
+.reception-nav nav a:hover { color: var(--brand); }
+#wizard { max-width: 1320px; margin: auto; padding: 44px 36px 40px; }
+.wz-hero { display: grid; grid-template-columns: 1fr 1.1fr; align-items: center; gap: 48px; }
+.wz-tell { padding: 16px 0; }
+.wz-eyebrow { display: flex; align-items: center; gap: var(--space-2); color: var(--text); font-size: var(--text-body); font-weight: 600; margin: 0 0 var(--space-6); }
+.wz-welcome-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--leaf); }
+.wz-tell h1 { font-size: clamp(40px, 4.5vw, 64px); line-height: 1.06; letter-spacing: -2px; margin: 0 0 24px; font-weight: 720; }
+.wz-tell h1 span { color: var(--brand); }
+.wz-lede { font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 440px; margin: 0 0 28px; }
+.wz-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.wz-primary, .wz-new, .wz-go { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 18px; border-radius: var(--radius-control); border: 1px solid transparent; font: 600 var(--text-body) var(--font-sans); font-feature-settings: var(--font-variants-sans); cursor: pointer; text-decoration: none; }
+.wz-primary, .wz-go { background: var(--brand); color: var(--on-bold); }
+.wz-primary:hover, .wz-go:hover:not(:disabled) { background: var(--brand-hovered); }
+.wz-new { background: var(--panel-solid); color: var(--text); border-color: var(--border-strong); }
+.wz-new:hover:not(:disabled) { background: var(--surface-hovered); }
+.wz-go:disabled, .wz-new:disabled { background: var(--surface-soft); color: var(--muted); border-color: var(--border); cursor: default; }
+.wz-demo-note { font-size: 13px; color: var(--muted); margin: 14px 0 0; }
+.wz-stage-wrap { position: relative; isolation: isolate; padding: 12px; }
+.wz-stage-wrap::before { content: ''; position: absolute; inset: 20px 28px 42px 4px; border-radius: 48% 50% 14% 30%; background: var(--sky-soft); z-index: -2; }
+.wz-sun { position: absolute; width: 140px; height: 140px; border-radius: 50%; background: var(--sun); top: 0; right: 12px; z-index: -1; }
+.wz-leaf { position: absolute; background: var(--leaf); border-radius: 0 100% 0 100%; z-index: -1; }
+.wz-leaf-one { width: 112px; height: 164px; bottom: 55px; right: 0; transform: rotate(28deg); }
+.wz-leaf-two { width: 78px; height: 116px; bottom: 48px; right: 86px; background: #b3df72; transform: rotate(-18deg); }
+.wz-stage { position: relative; width: calc(100% - 44px); margin: 24px 0 0 8px; aspect-ratio: 1.2; border-radius: 48% 48% 14% 28%; overflow: hidden; }
+.wz-scene { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.25s; }
+.wz-stage.live .wz-scene { opacity: 1; }
+.wz-stage-caption { position: relative; text-align: center; padding: 12px 8px 0; margin: 0; font-size: var(--text-small); color: var(--muted); }
+.wz-spinner { position: absolute; top: 50%; left: 50%; width: 28px; height: 28px; margin: -14px; border: 3px solid var(--border); border-top-color: var(--brand); border-radius: 50%; animation: wz-spin 0.8s linear infinite; }
+.wz-stage.live .wz-spinner { display: none; }
+@keyframes wz-spin { to { transform: rotate(360deg); } }
+.wz-room-notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; margin: 48px 0; padding: 24px 0 40px; border-bottom: 1px solid var(--border); }
+.wz-note-spot { display: block; width: 112px; height: 80px; object-fit: contain; object-position: left bottom; margin-bottom: var(--space-4); }
+.wz-room-notes h2 { margin: 0 0 var(--space-2); font-size: 18px; line-height: 24px; }
+.wz-room-notes p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--muted); }
+.wz-door { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.wz-card { padding: var(--space-6); background: var(--panel-solid); border: 1px solid var(--border); border-radius: var(--radius-surface); }
+.wz-label { display: block; font-size: 18px; font-weight: 650; margin: 0 0 8px; }
+.wz-card-lede { margin: 0 0 16px; font-size: 14px; color: var(--muted); line-height: 1.6; }
+.wz-row { display: flex; gap: 12px; align-items: stretch; }
+.wz-input { min-width: 0; flex: 1; width: 100%; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: 8px; font: 500 18px var(--font-mono); font-feature-settings: var(--font-variants-mono); letter-spacing: 2px; background: var(--panel-solid); color: var(--text); text-transform: uppercase; }
+.wz-input::placeholder { color: var(--muted); opacity: 0.8; }
+.wz-hint { min-height: 1.4em; margin: 8px 0 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.wz-hint.bad { color: var(--conn-offline); }
+.wz-create-error:empty { display: none; }
+.wz-foot { font-size: 13px; color: var(--muted); line-height: 1.7; }
+.wz-foot strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 8px; }
+.wz-foot p { margin: 0 0 12px; }
+.wz-foot a { color: var(--brand); }
+.wz-recent { margin-top: 20px; }
+.wz-recent.hidden { display: none; }
+.wz-recent h2 { font-size: 14px; margin: 0 0 12px; }
+.wz-recent ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 12px; }
+.wz-recent li { display: flex; align-items: center; gap: 8px; }
+.wz-recent-card { font: 500 13px var(--font-mono); font-feature-settings: var(--font-variants-mono); padding: 8px; color: var(--brand); border: 1px solid var(--border); border-radius: 6px; text-decoration: none; }
+.wz-recent-when { font-size: 12px; color: var(--muted); }
+.wz-recent li.gone .wz-recent-card { color: var(--muted); text-decoration: line-through; }
+@media (max-width: 880px) {
+  .reception-nav { padding: 20px 24px; }
+  #wizard { padding: 24px; }
+  .wz-hero { gap: 24px; }
+  .wz-tell h1 { font-size: 42px; letter-spacing: -1.4px; }
+  .wz-lede { font-size: 16px; }
+  .wz-door { grid-template-columns: 1fr; gap: 20px; }
+}
+@media (max-width: 600px) {
+  .reception-nav { padding: 16px 20px; flex-wrap: wrap; gap: 12px; }
+  .reception-brand { font-size: 16px; gap: 8px; }
+  .reception-brand img { width: 32px; height: 32px; }
+  .reception-nav nav { gap: 16px; margin-left: auto; }
+  #wizard { padding: 20px; }
+  .wz-hero { grid-template-columns: 1fr; }
+  .wz-stage-wrap { max-width: 440px; width: 100%; justify-self: center; }
+  .wz-stage { aspect-ratio: 1.5; }
+  .wz-room-notes { grid-template-columns: 1fr; gap: 28px; margin: 28px 0; padding-bottom: 28px; }
+  .wz-room-notes > div { display: grid; grid-template-columns: 80px 1fr; column-gap: 16px; }
+  .wz-note-spot { grid-row: 1 / 3; width: 80px; height: 64px; margin: 0; }
+  .wz-room-notes h2 { font-size: 16px; }
+  .wz-sun { width: 96px; height: 96px; }
+  .wz-leaf-one { width: 72px; height: 116px; }
+  .wz-leaf-two { width: 56px; height: 88px; right: 56px; }
+  .wz-row { flex-direction: column; }
+  .wz-card { padding: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .wz-spinner { animation: none; } .wz-scene { transition: none; } }
+
+/* The loading overlay doubles as the place a lost office is reported, so it needs
+   one button — see officeLost() in src/main.js. */
+#loading { flex-direction: column; gap: 14px; text-align: center; padding: 24px; }
+.loading-action {
+  font: inherit; font-size: 12.5px; font-weight: 650;
+  color: var(--on-bold); background: var(--brand);
+  border: 1px solid transparent; border-radius: 9px;
+  padding: 8px 16px; cursor: pointer;
+}
+.loading-action:hover { filter: brightness(1.08); }
+
+/* ---- Debug log (debuglog.html) ----
+
+   A document rather than an overlay, so the page scrolls and the header rides along
+   at the top of it. `body` is the scrolling box because `html` is pinned to the
+   viewport for the sake of the room — the same arrangement reception uses.
+
+   The look is deliberately the office's own: same tokens, same header, same pills.
+   A debug view that looked like a debug view would be one more thing to learn, and
+   this one already assumes you are having a bad day. */
+body.debuglog { overflow: auto; }
+
+body.debuglog #title-bar {
+  position: sticky;
+  top: 0; left: 0; right: 0;
+  z-index: 5;
+  padding: 12px 16px;
+  /* Rows scroll under it, so it has to be opaque enough to read over — a blur alone
+     leaves monospace text legible-ish, which is not the same as legible. */
+  background: linear-gradient(to bottom, var(--bg) 65%, rgba(248, 250, 247, 0.96));
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+/* The overlay's title bar ignores the pointer and lets its children take it back;
+   here the bar is a real strip in the document and nothing sits behind it. */
+body.debuglog #title-bar { pointer-events: auto; }
+body.debuglog .brand { flex-wrap: wrap; row-gap: 8px; }
+
+.linkout {
+  font-size: 11.5px; font-weight: 600; color: var(--muted);
+  text-decoration: none; padding: 4px 10px;
+  border: 1px solid var(--border); border-radius: 999px;
+  white-space: nowrap;
+}
+.linkout:hover { color: var(--text); border-color: rgba(36, 50, 71, 0.18); }
+
+#debuglog {
+  padding: 14px 16px 40px;
+  /* The column grid, written once and used by both the header strip and every row.
+     They are separate grid containers — see `.log-row` — so the only thing keeping
+     their columns above one another is that they resolve the same template.
+
+     The first column is a fixed width rather than `auto` for the same reason: `auto`
+     is measured per row, so a row from a replayed ring, which carries a date as well
+     as a clock, sized its own first column wider and shunted every column after it
+     out of line with the rest of the page. Fixed to fit the widest form, which costs
+     the common one some slack and buys columns that are actually columns. */
+  --log-grid: 186px 16px 122px 144px 100px 70px minmax(0, 1fr);
+}
+
+/* ---- the column headers ---- */
+
+.log-head-row {
+  display: grid;
+  grid-template-columns: var(--log-grid);
+  gap: 10px;
+  padding: 4px 8px 6px;
+  /* The 2px the rows spend on their family stripe, so the two grids start level. */
+  border-left: 2px solid transparent;
+  border-bottom: 1px solid var(--border);
+  /* Under the title bar, whose height src/debug/debuglog.js measures for us: a
+     header that scrolls away is a header you have to scroll back up to consult,
+     which is most of the way back to having none. */
+  position: sticky;
+  top: var(--titlebar-h, 56px);
+  z-index: 4;
+  background: var(--bg);
+}
+.lrh {
+  font-size: 9.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); opacity: 0.75;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: help;
+}
+
+/* ---- the controls strip ---- */
+
+.log-controls {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 0 10px;
+  font-size: 11.5px;
+}
+.lc-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-weight: 650; letter-spacing: 0.02em;
+  color: var(--conn-connecting);
+}
+.lc-status::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: currentColor; box-shadow: 0 0 8px currentColor;
+}
+.lc-status[data-state="live"] { color: var(--conn-live); }
+.lc-status[data-state="connecting"] { color: var(--conn-connecting); }
+.lc-status[data-state="offline"] { color: var(--conn-offline); }
+
+.lc-count {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+}
+/* How many tabs are on this office — the running total the join and leave rows are
+   the history of, and the only place in the app that shows it. */
+.lc-watchers { color: var(--muted); opacity: 0.8; }
+.lc-watchers::before { content: '·'; margin-right: 8px; opacity: 0.5; }
+
+/* Readouts left, buttons right — hung off the first button rather than the last
+   readout, because the watcher count is absent until the first heartbeat answers and
+   an alignment that depends on it would lurch when it arrives. */
+.lc-button:first-of-type { margin-left: auto; }
+
+.lc-button {
+  font: inherit; font-size: 11.5px; font-weight: 600;
+  color: var(--muted); background: transparent;
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 4px 12px; cursor: pointer;
+}
+.lc-button:hover:not(:disabled) { color: var(--text); border-color: rgba(36, 50, 71, 0.18); }
+.lc-button.on { color: var(--on-bold); background: var(--brand); border-color: transparent; }
+.lc-button:disabled { opacity: 0.4; cursor: default; }
+
+/* ---- the filter strip ----
+
+   Its own row under the controls, and quieter than them: these are a question being
+   put to the log rather than a change to what it collects, and a control that dims
+   the page's contents should not be the loudest thing on it. Everything goes back to
+   `All …` in one click, which is the promise that makes the rest safe to touch. */
+
+.log-filters {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 0 12px;
+  font-size: 11.5px;
+}
+/* Something is hidden: a hairline down the left edge of the strip, in the same sage
+   the office uses for its own affordances, so a page with fewer rows than you expect
+   always has a visible reason a glance away. */
+.log-filters.on {
+  border-left: 2px solid var(--sage);
+  padding-left: 10px; margin-left: -12px;
+}
+
+.lf-search {
+  font: inherit; font-size: 11.5px;
+  flex: 1 1 240px; min-width: 140px; max-width: 420px;
+  color: var(--text); background: rgba(36, 50, 71, 0.05);
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 5px 12px;
+}
+.lf-search::placeholder { color: var(--muted); opacity: 0.75; }
+.lf-search:focus-visible {
+  outline: none;
+  border-color: var(--sage); background: rgba(36, 50, 71, 0.08);
+}
+
+.lf-select {
+  font: inherit; font-size: 11.5px;
+  color: var(--muted); background: rgba(36, 50, 71, 0.05);
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 5px 8px; cursor: pointer;
+  max-width: 190px; field-sizing: content;
+}
+.lf-select:hover { color: var(--text); }
+/* A dropdown that is doing something says so in ink, since its own text is the only
+   place the current filter is written down. (A class rather than `[value]`, which for
+   a select is the markup's idea of its value and not the one the reader chose.) */
+.lf-select.set { color: var(--text); border-color: rgba(139, 168, 136, 0.55); }
+.lf-select option { color: var(--text); background: var(--panel-solid); }
+
+/* Hung off the last dropdown, so the row does not shuffle when a name gets longer. */
+.lf-reset { margin-left: auto; }
+
+/* ---- the rows ---- */
+
+.log-rows { list-style: none; margin: 0; padding: 0; }
+
+/* One grid per row rather than one for the list, because a row can expand and its
+   JSON must be free to be as wide as it likes without dragging the columns with it.
+   The columns are fixed so the eye can run down `type` without re-finding it on
+   every line — the single most useful property of a log laid out in text. */
+.log-row {
+  border-bottom: 1px solid rgba(36, 50, 71, 0.045);
+  font-size: 12px;
+}
+.log-row:hover { background: rgba(36, 50, 71, 0.028); }
+
+.lr-line {
+  display: grid;
+  grid-template-columns: var(--log-grid);
+  align-items: baseline;
+  gap: 10px;
+  padding: 5px 8px;
+  cursor: pointer;
+  /* The family's colour arrives as a stripe down the left edge: the type column
+     already says which family it is, and this makes it findable without reading. */
+  border-left: 2px solid var(--family, transparent);
+}
+.lr-line:focus-visible { outline: 2px solid var(--brand); outline-offset: -1px; }
+
+.lr-time {
+  display: flex; align-items: baseline; gap: 8px;
+  min-width: 0; overflow: hidden;
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  white-space: nowrap;
+}
+.lr-abs { color: var(--muted); font-size: 11px; }
+/* The relative time is the one that answers "is this still happening?", so it is
+   the brighter of the two, and right-aligned in a fixed box so a hundred rows of
+   it do not shuffle sideways every second as `9s` becomes `10s`. */
+.lr-ago {
+  color: var(--text); opacity: 0.75; font-size: 11px;
+  min-width: 58px; text-align: right;
+}
+
+.lr-mark { display: flex; align-items: center; color: var(--accent, var(--muted)); }
+.lr-mark svg { width: 13px; height: 13px; display: block; }
+.lr-mark.unknown { color: var(--muted); font-size: 14px; line-height: 1; }
+
+.lr-type {
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  font-size: 11px; font-weight: 600;
+  color: var(--family, var(--text));
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* The name of the colleague this row is about — the column that ties a line of text
+   to a body walking across the office, so it carries more ink than the sender beside
+   it, which is bookkeeping by comparison. */
+.lr-character {
+  color: var(--text); font-size: 11px; opacity: 0.92;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* An errand nobody in the room ran: a subagent has no body to look at (spec §6.1),
+   so it is set as a note about its parent rather than as a person of its own. */
+.lr-character.sub { color: var(--muted); font-style: italic; opacity: 0.8; }
+/* A row about nobody — a queued job, a tab opening. Present but faint, because the
+   dash is an answer and an empty cell would read as a missing one. */
+.lr-character.none { color: var(--muted); opacity: 0.45; }
+
+.lr-who, .lr-session {
+  color: var(--muted); font-size: 11px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lr-session {
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  opacity: 0.75;
+}
+/* The summary is the sentence, so it gets the width and the ink — but only one line
+   of it: a wrapped row breaks the columns of every row below it. */
+.lr-summary {
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* One hue per family (docs/aop-spec.md §4), borrowed from the vocabularies the room
+   already uses so that `error` is the same red in both places. */
+.log-row[data-family="session"] { --family: var(--status-walking); }
+.log-row[data-family="turn"] { --family: var(--status-working); }
+.log-row[data-family="tool"] { --family: var(--status-researching); }
+.log-row[data-family="attention"] { --family: var(--status-error); }
+.log-row[data-family="job"] { --family: var(--job-active); }
+.log-row[data-family="other"] { --family: var(--muted); }
+/* Somebody opening or closing a tab on this office. Deliberately the quietest hue in
+   the list: it is context for the events around it rather than an event itself. */
+.log-row[data-family="presence"] { --family: var(--sage); }
+.log-row[data-kind="viewer"] .lr-who,
+.log-row[data-kind="viewer"] .lr-summary { font-style: italic; }
+.log-row[data-kind="viewer"] .lr-summary { color: var(--muted); }
+.log-row[data-kind="viewer"] .lr-mark { color: var(--sage); font-size: 11px; }
+
+/* An event from a harness this scene does not listen to. Kept rather than filtered,
+   because it is the answer to "why is my agent not in the room?" — but dimmed, so
+   it never reads as something the office is showing. */
+.log-row.unwatched { opacity: 0.5; }
+.log-row.unwatched:hover { opacity: 0.85; }
+
+/* Simulated stage directions are not protocol events, and must not be mistaken for
+   them: a dashed left edge says "this one never crossed the network". */
+.log-row[data-kind="office"] .lr-line { border-left-style: dashed; }
+
+.lr-json {
+  margin: 0; padding: 10px 14px 14px 40px;
+  font-family: var(--font-mono);
+  font-feature-settings: var(--font-variants-mono);
+  font-size: 11px; line-height: 1.55;
+  color: var(--muted);
+  white-space: pre-wrap; word-break: break-word;
+  background: var(--surface-hovered);
+}
+.log-row:not(.open) .lr-json { display: none; }
+
+/* A thing that happened to the office rather than in it — the receiver restarting,
+   the office being deleted — set in the stream where it happened. */
+.log-note {
+  padding: 8px 10px; margin: 4px 0;
+  font-size: 11.5px; color: var(--job-active);
+  border-left: 2px solid var(--job-active);
+  background: rgba(232, 171, 82, 0.07);
+}
+
+.log-empty {
+  max-width: 62ch; padding: 28px 10px;
+  font-size: 12.5px; line-height: 1.7; color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.debuglog #title-bar { backdrop-filter: none; }
+}
+
+/* --- The embedder's chrome levels (src/host.js) --------------------------- */
+
+/* What `?chrome=` and `postMessage({ chrome })` actually do.
+ *
+ * The rules live here rather than in host.js so that what each level hides is a
+ * styling decision, changeable without touching the seam. host.js only sets the
+ * attribute.
+ *
+ * The problem being solved is a fixed-width panel in a small frame. `#agent-panel`
+ * is 232px wide whatever the viewport, so in a 425px-wide embed it takes 55% of
+ * the width and 35% of the area, and the room it exists to annotate becomes the
+ * smaller half of the picture. There is currently no way for the embedder to say
+ * so; the closest available workaround is to over-size the frame and scale it
+ * down, which shrinks the panel's share but never removes it.
+ *
+ * `full` is the default and is not listed: no attribute, no rules, today's
+ * behaviour exactly. */
+
+/* Keep the room's own labels and the title bar; drop the side panels. For a
+ * frame that is a glance rather than a workspace. */
+body[data-chrome='minimal'] #agent-panel,
+body[data-chrome='minimal'] #bottom-stack,
+body[data-chrome='minimal'] #inspector {
+  display: none;
+}
+
+/* The room and nothing else, for a full-screen or ambient embed where any panel
+ * is an interruption. The loading overlay is deliberately still shown: hiding it
+ * would turn a slow boot into a black rectangle with no explanation. */
+body[data-chrome='none'] #title-bar,
+body[data-chrome='none'] #agent-panel,
+body[data-chrome='none'] #bottom-stack,
+body[data-chrome='none'] #inspector,
+body[data-chrome='none'] #shortcuts-panel,
+body[data-chrome='none'] #source-picker,
+body[data-chrome='none'] #fpv-hud {
+  display: none;
+}
+
+/* --- A title bar that fits a narrow embed ---------------------------------- */
+
+/* `chrome=minimal` means "drop the panels, keep the title bar", and at a normal
+ * width that is exactly right. In a 425px embed it was not: the bar is a flex row
+ * of chips sized in fixed pixels, so the brand wrapped onto three lines and the
+ * source badge ran off the right edge. The panels were gone and the header had
+ * taken their place.
+ *
+ * So the bar gets a narrow form. Same information, one line: a smaller brand that
+ * will not wrap, tighter chips, and the whole row allowed to shrink rather than
+ * overflow. Scoped to `minimal` and to narrow viewports, so the standalone office
+ * and every wider embed are untouched.
+ *
+ * The threshold is the width below which the default bar stops fitting, measured
+ * rather than picked: at 560px the row still has room, and by 480px the brand has
+ * begun to wrap. */
+@media (max-width: 520px) {
+  body[data-chrome='minimal'] #title-bar {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    gap: 6px;
+  }
+
+  /* The brand is the one thing here that can afford to be smaller: the keycard and
+     the source badge are the parts you read. `white-space: nowrap` is the fix for
+     the wrap, and the shrink lets it give way to the chips rather than push them
+     off the edge. */
+  body[data-chrome='minimal'] .brand {
+    flex-shrink: 1;
+    min-width: 0;
+    gap: 6px;
+  }
+  body[data-chrome='minimal'] .brand h1 {
+    font-size: 12px;
+    letter-spacing: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  body[data-chrome='minimal'] .brand-mark {
+    width: 16px;
+    height: 16px;
+  }
+
+  body[data-chrome='minimal'] .switcher-trigger,
+  body[data-chrome='minimal'] .keycard-chip {
+    font-size: 11px;
+    padding: 4px 8px;
+    gap: 5px;
+  }
+
+  /* `nowrap` on every chip, and it is the point rather than a detail. Letting a
+     chip shrink without it does not make it narrower, it makes it *taller*: the
+     text wraps inside and a one-line bar becomes a three-line one, which is worse
+     than the overflow it was meant to fix. */
+  body[data-chrome='minimal'] .keycard-chip,
+  body[data-chrome='minimal'] .switcher-trigger,
+  body[data-chrome='minimal'] .source-badge,
+  body[data-chrome='minimal'] .sb-label,
+  body[data-chrome='minimal'] .sb-state {
+    white-space: nowrap;
+  }
+
+  body[data-chrome='minimal'] .source-badge {
+    font-size: 10.5px;
+    gap: 5px;
+    padding: 4px 8px;
+  }
+
+  /* The connection state goes. "live · 1 of 4 live" is the longest string in the
+     bar and the only one whose absence costs nothing here: the dot beside it says
+     the same thing in one glyph, and it stays. */
+  body[data-chrome='minimal'] .sb-state {
+    display: none;
+  }
+}
+
+/* --- The source picker in a narrow embed ----------------------------------- */
+
+/* The picker is deliberately generous: five large options side by side, because
+ * choosing your sources is a one-time decision for a new office and not a list to
+ * be scanned. At 780px it drops to two columns, which is still generous.
+ *
+ * In a 425px embed that is three rows of 44px-logo cards inside a 468px frame, so
+ * the options overflow and the confirm button at the foot goes off the bottom:
+ * the one control you opened the picker to reach is the one you cannot get to.
+ *
+ * The card is also `width: min(860px, 100%)` with a 24px backdrop padding and 22px
+ * of its own, so at 425px more than a fifth of the width is margin.
+ *
+ * So a compact form below the same 520px this file uses for the title bar. Two
+ * columns still, because five rows would be taller than three; smaller marks and
+ * labels; and the per-option blurb hidden, since "Atlassian's terminal agent" is
+ * the least load-bearing text on screen when the frame is this small and the logo
+ * and name are both right there. */
+@media (max-width: 520px) {
+  #source-picker {
+    padding: 8px;
+  }
+
+  .sp-card {
+    border-radius: 12px;
+  }
+
+  /* The picker can be taller than the frame even compacted, on a very short one.
+     Scrolling the card beats clipping the confirm button off the bottom. */
+  .sp-card {
+    max-height: 100%;
+    overflow-y: auto;
+  }
+
+  .sp-head {
+    padding: 12px 12px 2px;
+  }
+  .sp-head h2 {
+    font-size: 14px;
+  }
+  .sp-sub {
+    margin: 3px 0 0;
+    font-size: 11px;
+  }
+
+  .sp-grid {
+    gap: 6px;
+    padding: 10px 12px 4px;
+  }
+
+  .sp-option {
+    padding: 10px 8px 8px;
+    gap: 4px;
+    border-radius: 10px;
+  }
+  /* No lift on hover: on a frame this size the 2px nudge reads as a wobble, and
+     touch has no hover to begin with. */
+  .sp-option:hover,
+  .sp-option:focus-visible {
+    transform: none;
+  }
+
+  .sp-logo svg {
+    width: 24px;
+    height: 24px;
+  }
+  .sp-label {
+    font-size: 11.5px;
+  }
+  .sp-blurb {
+    display: none;
+  }
+  .sp-tag {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+  .sp-check {
+    top: 5px;
+    right: 5px;
+    width: 14px;
+    height: 14px;
+  }
+
+  /* The footer is what actually broke this, and only in a real office: the demo
+     one has a short note and a Close button, while an office you own carries six
+     lines explaining how sources share a room, then the confirm button. Measured
+     at 425x468 the note alone was 137px of a 157px footer, and the button landed
+     at bottom 478 in a 468px frame. The card scrolls, but a primary action below
+     the fold on first paint is one most people will never find.
+
+     So the note is clamped to its first two lines, which is the sentence that
+     earns its place ("pick as many as you like, they share the room"), and the
+     rest gives way to the button. Column rather than row, with the button full
+     width: at this size the two cannot sit side by side, and a wrapped flex row
+     is how the button ended up underneath an unbounded paragraph. */
+  .sp-foot {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 12px 12px;
+    gap: 8px;
+  }
+  .sp-note {
+    font-size: 10.5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .sp-confirm {
+    width: 100%;
+    font-size: 12px;
+    padding: 8px 14px;
+  }
+}
+
+/* ---- Add-item menu ---- */
+/* A menu of our own rather than a <select>, because a row carries the jobs a kind
+   does, whether the room has that job covered, and a line of prose about it — see
+   editor/kit-menu.js. Modelled on `.switcher-menu` above, which is the same
+   decision taken about scenes, so the two read as one family of control. */
+.kit-menu { position: relative; }
+.kit-trigger { white-space: nowrap; }
+
+/* Same trick as `.switcher-menu[hidden]`: the display below would outrank the
+   user-agent's `[hidden] { display: none }`, so `hidden` stays the single source
+   of truth for open state — and stays out of the accessibility tree. */
+.kit-sheet[hidden] { display: none; }
+.kit-sheet {
+  /* Fixed, and on `document.body` rather than inside the menu: see kit-menu.js for
+     why it has to escape `.dev-panel-body`'s clip. `left` and `bottom` are written
+     by script from the trigger's rect. */
+  position: fixed;
+  /* Wide enough for a note to run two lines rather than five, and for the bird post's
+     five species to sit on one line rather than wrapping mid-strip (it was
+     340). Still narrow enough to leave the room visible beside it: this opens over the
+     floor you are arranging, so a sheet that covered it would hide the work.
+
+     A *fixed* height rather than a cap, because the tabs hold very different numbers
+     of rows and a sheet that resized itself as you moved between them would jump the
+     content under the cursor. It scrolls instead, and the scrolling happens inside
+     `.kit-body` so the heading and tabs can stay put. */
+  width: 510px; height: 420px; max-height: 70vh;
+  /* Both dimensions give way to a small window before they overflow it — the width
+     matters now that there is half again as much of it to fit. */
+  max-width: calc(100vw - 16px);
+  display: flex; flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  background: var(--panel-solid);
+  border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: var(--shadow-overlay);
+  backdrop-filter: blur(14px);
+  z-index: 20;
+  text-align: left;
+}
+
+/* A section heading, with the state of its required job on the right. */
+.kit-head {
+  /* Wraps rather than overflowing: a two-line section name and its chip both fit,
+     which a nowrap row in a 340px sheet does not. */
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: 4px 8px;
+  padding: 10px 8px 2px;
+}
+.kit-head:first-child { padding-top: 2px; }
+.kit-head-name {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text);
+}
+.kit-blurb {
+  font-size: 10.5px; line-height: 1.35; color: var(--muted);
+  padding: 0 8px 4px;
+}
+
+/* The words inside a row. The row itself is a grid, further down. */
+.kit-row-name { font-size: 12px; }
+.kit-row-does {
+  font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--muted);
+}
+.kit-row-note { font-size: 10.5px; line-height: 1.35; color: var(--muted); }
+.kit-none { padding: 2px 8px 6px; font-style: italic; }
+
+/* The heading and the tabs, as one block that does not move. Everything below it
+   scrolls, so which panel this is and which tab you are on are never scrolled away.
+   Padding lives here and on `.kit-body` rather than on the sheet, because the sheet
+   has to be the thing that clips. */
+.kit-top {
+  flex: 0 0 auto;
+  padding: 16px 16px 0;
+  background: var(--panel-solid);
+  border-bottom: 1px solid var(--border);
+  border-radius: 12px 12px 0 0;
+}
+/* The Add item title uses the same scale as the Agents panel title. */
+.kit-title {
+  font-size: 16px; line-height: 20px; font-weight: 600; letter-spacing: -0.2px;
+  color: var(--text);
+  margin: 0; padding: 0 0 12px;
+}
+.kit-tabs { display: flex; gap: 2px; padding-bottom: 6px; }
+.kit-tab {
+  position: relative;
+  flex: 1 1 0; min-width: 0;
+  padding: 5px 6px;
+  font: inherit; font-size: 10.5px; color: var(--muted);
+  background: none; border: 0; border-radius: 7px;
+  cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: background 0.12s, color 0.12s;
+}
+.kit-tab:hover { background: rgba(36, 50, 71, 0.06); color: var(--text); }
+.kit-tab.active { background: rgba(36, 50, 71, 0.11); color: var(--text); }
+.kit-tab:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+/* A tab holding a required job nobody is doing. The dot is the whole message: it says
+   "look in here" without spending a word, and without the tab bar growing a second
+   line to hold a sentence. */
+.kit-tab.wanting::after {
+  content: ''; position: absolute; top: 4px; right: 4px;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #e8ab52;
+}
+
+/* The scrolling half. Padding top and bottom match, so the first section heading sits
+   as far from the tabs as the last row sits from the bottom edge. */
+.kit-body {
+  flex: 1 1 auto; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 1px;
+  padding: 10px 8px;
+}
+
+/* A row: thumbnail, words, and something on the right saying what a press does.
+   Indented, and that is the point of the three columns — a row used to be a stack of
+   text under a heading that was also a stack of text, so an item and a section title
+   read as the same kind of thing. The picture gives the list a spine and the indent
+   makes an item plainly subordinate to the heading above it. */
+.kit-row {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 0 9px;
+  width: 100%; text-align: left;
+  margin-left: 10px; width: calc(100% - 10px);
+  padding: 6px 7px;
+  font: inherit; color: var(--text);
+  background: none; border: 0; border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.kit-row:hover { background: rgba(36, 50, 71, 0.07); }
+.kit-row:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+
+/* The prop's own portrait, on a soft neutral tile for pale furniture. */
+.kit-shot {
+  width: 34px; height: 34px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: var(--surface-hovered);
+}
+/* Nothing to show, but still the column: the words of every row line up whether or not
+   there is a picture beside them. */
+.kit-shot-none { background: rgba(36, 50, 71, 0.04); }
+
+.kit-words { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+
+/* The plus. Says a press will add one rather than merely select it — the row was a
+   button before this and did not look like one. Dim until the row is hovered, so a
+   list of them does not read as a column of live controls. */
+.kit-plus {
+  display: flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px;
+  font-size: 14px; line-height: 1; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 50%;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.kit-row:hover .kit-plus {
+  color: var(--text);
+  border-color: rgba(36, 50, 71, 0.4);
+  background: rgba(36, 50, 71, 0.08);
+}
+
+/* A row that explains rather than adds — the mailbox the room already has, or the
+   delivery person, who is one of the two ways work arrives and is not furniture.
+   Dashed and unclickable, and deliberately still listed. */
+.kit-row-static {
+  cursor: default;
+  border: 1px dashed var(--border);
+  opacity: 0.72;
+}
+.kit-row-static:hover { background: none; }
+.kit-row-static .kit-row-name { color: var(--muted); }
+
+/* A channel switch and its options as one block: the dashed outline goes round both,
+   so the species strip reads as part of the bird post rather than as a separate
+   control that happens to sit under it. The dash is the border the row used
+   to wear itself — same line, one level out. */
+/* The block takes the indent and width a row used to have, so a switch still lines up
+   down the left with the addable rows above it. */
+.kit-toggle-block {
+  border: 1px dashed var(--border); border-radius: 8px;
+  margin: 2px 0 2px 10px; width: calc(100% - 10px);
+}
+/* Which leaves the row inside it borderless, and filling the block rather than carrying
+   the indent a second time — `.kit-row`'s own `margin-left` plus a full width would push
+   the switch 10px out through the dashed border on the right, which is exactly what it
+   did before this line. */
+.kit-toggle-block > .kit-row-toggle {
+  border: 0; border-radius: 6px;
+  margin-left: 0; width: 100%;
+}
+
+/* A switch's options: the strip of choices under its row, drawn only while the switch
+   is on. The panel's own lozenges (`.dev-btn`, as Copy and Paste are) one size down,
+   rather than a fourth kind of small control invented for this one strip — so `active`
+   lights them the same way the segmented controls light theirs. */
+/* Indented to the row's text column — its 7px padding, the 34px portrait and the 9px
+   gap — so the chips hang under the words they are about rather than under the picture. */
+.kit-options {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  padding: 0 8px 8px 50px;
+}
+/* Two classes deep on purpose. There is a second, unconditional `.dev-btn` sizing block
+   much further down the file (12px, 30px tall) which would otherwise win on order and
+   blow this strip up into five full-size pills; a two-class selector outranks it
+   wherever it sits, so this rule does not depend on staying below it. */
+.kit-options .kit-option { font-size: 10px; padding: 3px 9px; min-height: 0; }
+
+/* The two jobs that need telling apart at a glance, in the section's own description
+   and again on every row that does one. Blue in, green out — peers rather than a scale,
+   so two hues of equal weight rather than anything that reads as better and worse. */
+.kit-tag {
+  display: inline-block;
+  padding: 1px 6px; margin: 0 1px;
+  font-size: 9.5px; letter-spacing: 0.03em;
+  border-radius: 999px;
+  vertical-align: baseline;
+}
+.kit-tag-intake { color: var(--brand); background: rgba(127, 178, 217, 0.16); }
+.kit-tag-dispatch { color: var(--sage); background: rgba(139, 168, 136, 0.16); }
+/* Name and lozenges on one line, wrapping only if they truly cannot fit. They were
+   stacked, which made a two-job row three lines tall before its description began. */
+.kit-row-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 5px;
+  margin-bottom: 1px;
+}
+/* Not a job — what you can *do* to it rather than what it is *for* — so a third hue
+   rather than a shade of the other two. */
+.kit-tag-colour { color: var(--brand); background: var(--selected); }
+
+/* ---- Sunny office interface ---- */
+/* The header floats directly over the office; only its controls have surfaces. */
+#title-bar { right: auto; max-width: calc(100% - 32px); gap: 8px; padding: 6px 8px; border: 0; background: transparent; box-shadow: none; backdrop-filter: none; z-index: 26; }
+body.debuglog #title-bar { max-width: none; border-radius: 0; }
+#title-bar .brand { flex-wrap: wrap; gap: 8px; min-width: 0; }
+.brand-mark { width: 32px; height: 32px; display: block; filter: none; }
+.brand h1 { display: flex; align-items: center; gap: 8px; min-height: 34px; font-size: 16px; line-height: 20px; letter-spacing: -0.3px; text-shadow: none; padding: 0 4px; }
+#ui .brand h1 { color: #fff; text-shadow: 0 1px 3px rgba(9, 30, 66, 0.55); }
+.brand h1 a { display: flex; align-items: center; min-height: 34px; }
+.kc-button, .switcher-trigger, .source-badge { border-radius: 6px; min-height: 34px; background: var(--surface-soft); backdrop-filter: none; }
+.kc-button { color: var(--muted); letter-spacing: 0.6px; font-size: 12px; }
+.source-badge { font-size: 12px; }
+.sb-dot, .kc-dot { width: 7px; height: 7px; box-shadow: none; }
+.kc-note { color: var(--sage); box-shadow: var(--shadow-panel); font-size: 12px; }
+#agent-panel h2, #dev-panel h2, #scene-panel h2, #editor-panel h2 { font-size: 16px; color: var(--text); text-transform: none; letter-spacing: -0.2px; padding-right: 26px; }
+#agent-panel { padding: 16px; }
+.agent-row { padding: var(--space-3) var(--space-2); row-gap: 4px; border-radius: var(--radius-control); background: transparent; }
+#agent-list { gap: 2px; }
+.roster-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; padding: 12px 4px 20px; font-size: var(--text-small); line-height: 18px; color: var(--muted); }
+.roster-empty strong { color: var(--text); font-size: var(--text-body); }
+#agent-panel, #inspector { border-radius: var(--radius-surface); }
+.agent-row .name { font-size: 14px; }
+.agent-row .status { font-size: 12px; }
+.agent-row .step { font-size: 12px; }
+.agent-row:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+#legend-list .empty { opacity: 0.72; }
+#inspector { padding: 24px; max-height: calc(100dvh - 116px); }
+#inspector h2 { font-size: var(--text-heading-large); line-height: 28px; letter-spacing: -0.4px; }
+#inspector h2 .insp-name { white-space: normal; overflow-wrap: anywhere; }
+#inspector-body { font-size: var(--text-body); line-height: 20px; }
+#inspector-body .portrait { float: right; margin: 0 0 12px 12px; }
+#inspector-body .portrait img { width: 56px; height: 56px; border-radius: 12px; }
+.insp-follow { margin-top: 16px; min-height: 36px; width: 100%; background: var(--selected); color: var(--brand); border: 1px solid #b8d2f6; border-radius: 6px; font: 600 14px var(--font-sans); font-feature-settings: var(--font-variants-sans); cursor: pointer; }
+.insp-follow:hover { background: #d8e9ff; }
+.insp-job-title { clear: both; font-size: 14px; margin: 24px 0 8px; color: var(--text); }
+#inspector-body .job { font-size: var(--text-body); font-weight: 500; line-height: 20px; margin: 0; padding: var(--space-4); background: var(--sky-soft); border: 0; border-radius: var(--radius-surface); overflow-wrap: anywhere; }
+#inspector-body .job-idle { display: flex; align-items: center; gap: var(--space-3); padding: 12px 0; background: transparent; color: var(--muted); font-weight: 400; }
+.job-idle img { flex: 0 0 84px; }
+#inspector-body .log-head { font-size: 14px; text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--text); margin-top: 24px; }
+#inspector-body .log-head .count { font-size: 12px; font-weight: 400; color: var(--muted); }
+#inspector-body .log .label { font-size: 13px; }
+#inspector-body .log .times { font-size: 12px; }
+#inspector-body .log .outcome { color: var(--job-active); }
+#inspector-body .log .done .outcome { color: var(--job-done); }
+#inspector-body .log .error .outcome { color: var(--job-error); }
+#inspector-body .plan li, #inspector-body .log-plan li { font-size: 12px; }
+#inspector-body .pilot-btn { font-size: 12px; min-height: 32px; }
+#inspector-body .kv { font-size: 13px; padding: 8px 0; align-items: baseline; }
+#inspector-body .kv .k { flex: 0 0 104px; }
+#inspector-body .kv .v { min-width: 0; overflow-wrap: anywhere; }
+.panel-close { width: 30px; height: 30px; border-radius: 6px; display: inline-grid; place-items: center; }
+.panel-close:hover { background: var(--surface-hovered); }
+.dev-btn, .dev-seg button, .dev-select, .layout-picker-trigger { font-size: 12px; min-height: 30px; border-radius: 6px; padding: 5px 10px; }
+.dev-group h4 { font-size: 11px; letter-spacing: 0.3px; }
+.dev-kv, .dev-readout, .editor-hint { font-size: 12px; }
+#dev-panel, #scene-panel, #editor-panel { padding: 20px; row-gap: 20px; border-radius: var(--radius-dialog); }
+#bottom-stack { max-height: calc(100dvh - 110px); }
+#shortcuts-panel { z-index: 31; }
+.sc-head { padding: 24px 24px 16px; }
+.sc-head h2 { font-size: var(--text-heading-medium); line-height: 24px; text-transform: none; letter-spacing: -0.3px; color: var(--text); }
+.sc-card, .sp-card { border-radius: var(--radius-dialog); }
+.sc-body { padding: 4px 24px 24px; }
+.sc-label { font-size: 14px; }
+.sc-group h3 { font-size: 12px; }
+.sc-row { padding: 7px 0; }
+.sc-cap { font: inherit; text-transform: none; letter-spacing: 0; }
+.sp-card { max-height: calc(100dvh - 48px); overflow-y: auto; }
+.sp-head { display: grid; grid-template-columns: minmax(0, 1fr) 144px; column-gap: 24px; align-items: center; padding: 24px; min-height: 112px; }
+.sp-grid { padding: 0 24px; }
+.sp-illustration { grid-column: 2; align-self: center; width: 120px; height: 84px; }
+.sp-head-copy { min-width: 0; }
+.sp-head h2 { font-size: var(--text-heading-large); line-height: 28px; letter-spacing: -0.4px; }
+.sp-sub { font-size: 14px; line-height: 1.5; }
+.sp-sub a { color: var(--brand); text-underline-offset: 2px; }
+.sp-option { border-radius: var(--radius-surface); background: #fff; }
+.sp-option:hover:not(:disabled) { background: var(--surface-hovered); border-color: var(--border-strong); }
+.sp-option.selected { background: var(--selected); border-color: var(--brand); box-shadow: inset 0 0 0 1px var(--brand); }
+.sp-option:hover { transform: none; }
+.sp-option:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.sp-check { display: flex; width: 16px; height: 16px; border-radius: 3px; border: 1.5px solid var(--border-strong); background: var(--panel-solid); }
+.sp-check svg { visibility: hidden; }
+.sp-option.selected .sp-check { background: var(--brand); border-color: var(--brand); }
+.sp-option.selected .sp-check svg { visibility: visible; }
+.sp-blurb { font-size: 13px; line-height: 1.5; }
+.sp-tag { font-size: var(--text-small); line-height: 16px; text-transform: none; letter-spacing: 0; border-radius: 4px; border: 0; background: var(--surface-soft); }
+.sp-tag.ready { background: var(--leaf-soft); color: var(--sage); }
+.sp-option.locked { opacity: 0.7; }
+.sp-foot { background: var(--panel-solid); border-top: 1px solid var(--border); margin-top: var(--space-6); padding: var(--space-6); }
+.sp-note { font-size: 13px; line-height: 1.5; }
+.sp-confirm { font-size: var(--text-body); min-height: 40px; border-radius: var(--radius-control); }
+.sp-link { color: var(--brand); }
+.sp-link[hidden] { display: none; }
+.sp-link:focus-visible, .sp-confirm:focus-visible { outline-color: var(--brand); }
+.north-compass-face { fill: var(--panel-solid); stroke: var(--border-strong); }
+.north-compass-south { fill: var(--muted); }
+@media (max-width: 1100px) {
+  #title-bar { flex-wrap: wrap; gap: 8px; }
+  #inspector { max-height: calc(100dvh - 116px); }
+  #bottom-stack { max-height: calc(100dvh - 110px); }
+}
+@media (max-width: 700px) {
+  #title-bar { top: 8px; left: 8px; right: auto; max-width: calc(100% - 16px); padding: 6px; }
+  #title-bar .brand { gap: 6px; width: 100%; }
+  .brand h1 { font-size: 14px; }
+  .brand-mark { width: 24px; height: 24px; }
+  .kc-button { font-size: 11px; padding: 5px 7px; }
+  .source-badge { font-size: 11px; }
+  #agent-panel { bottom: 8px; left: 8px; width: 220px; max-height: 42dvh; overflow-y: auto; }
+  #agent-list { max-height: 22dvh; }
+  #inspector { bottom: 8px; right: 8px; left: 8px; width: auto; max-height: 55dvh; padding: 20px; z-index: 27; }
+  #ui:has(#inspector:not(.hidden)) #agent-panel { display: none; }
+  #bottom-stack, #inspector:not(.hidden) ~ #bottom-stack, #agent-panel.hidden ~ #bottom-stack { left: 8px; right: 8px; bottom: 8px; max-height: 55dvh; z-index: 28; }
+  #bottom-stack > div { max-height: 55dvh; overflow-y: auto; }
+  #shortcuts-panel, #source-picker { padding: 12px; }
+  .sc-card, .sp-card { max-height: calc(100dvh - 24px); }
+  .sc-head, .sp-head { padding: 20px; }
+  .sp-head { grid-template-columns: minmax(0, 1fr) 80px; column-gap: 16px; min-height: 100px; }
+  .sp-illustration { width: 80px; height: 56px; margin-top: 16px; align-self: end; }
+  .sc-head h2, .sp-head h2 { font-size: var(--text-heading-medium); line-height: 24px; }
+  .sc-body { padding: 4px 20px 20px; }
+  .sc-keys { flex-basis: 82px; flex-wrap: wrap; }
+  .sc-row { gap: 10px; }
+  .sp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 8px 20px; }
+  .sp-label { font-size: 14px; }
+  .sp-tag { font-size: 11px; }
+  .sp-sub, .sp-note { font-size: 13px; }
+  .sp-note { display: block; overflow: visible; }
+  .sp-foot { padding: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; }
+}
+
+/* --- The edit-mode legend -------------------------------------------------- */
+/* What the coloured squares on the floor mean, beside the heading that says which
+   mode you are in. Four entries, and one of them only ever appears in place of
+   another — see `LEGEND` in src/editor/panel.js.
+
+   In the heading rather than in a section of its own, because it explains the whole
+   mode rather than any one control, and because a section would take a column of a
+   panel that is already a row of them. It is allowed to wrap: on a narrow window two
+   lines of legible legend beat one line of clipped one. */
+/* The heading becomes a row so its title and its legend share one centre line.
+   Vertical-align on the legend got close and could not be right: a 13px swatch in an
+   11px line inside a 13px heading has three baselines to choose between and picks a
+   different one as any of the three changes. Flex has one answer.
+
+   Scoped to the editor, because the other two strips have a title and nothing else
+   and should not inherit a layout for a thing they do not have. */
+#editor-panel h2 { display: flex; align-items: center; flex-wrap: wrap; gap: 0 14px; }
+.editor-legend {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: 3px 12px;
+  font-size: 11px; font-weight: 400; letter-spacing: 0.2px;
+  text-transform: none; color: var(--muted);
+}
+.editor-legend-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+/* Square, not round: they stand for squares on the floor. No border — they are
+   samples of a colour, and a dark rule round a muted colour is a third of the chip
+   spent saying nothing. Sized to the heading's own 13px and centred on its line, so
+   the row reads as one thing rather than as a title with badges after it. */
+.editor-legend-dot {
+  width: 13px; height: 13px; border-radius: 3px; flex: none;
+}
+
+/* Native on/off behaviour, with a visible state label as well as colour. */
+.ui-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 30px; position: relative; cursor: pointer; font-size: 12px; color: var(--text); }
+.ui-toggle input { position: absolute; opacity: 0; width: 36px; height: 24px; margin: 0; }
+.ui-toggle-track { position: relative; width: 36px; height: 20px; border-radius: 12px; background: var(--muted); flex: none; }
+.ui-toggle-track::after { content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform 0.15s; }
+.ui-toggle input:checked + .ui-toggle-track { background: var(--green-bold); }
+.ui-toggle input:checked + .ui-toggle-track::after { transform: translateX(16px); }
+.ui-toggle input:focus-visible + .ui-toggle-track { outline: 2px solid var(--brand); outline-offset: 3px; }
+.ui-toggle:has(input:disabled) { color: var(--muted); cursor: not-allowed; }
+.ui-toggle input:disabled + .ui-toggle-track { background: var(--border); }
+.ui-toggle input:disabled:checked + .ui-toggle-track { background: var(--border-strong); }
+.dev-lights-row { display: flex; align-items: center; gap: 12px; }
+/* Fold Lights before the row needs to give up the compass and map. */
+@container scene (width < 1200px) {
+  .dev-lights-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+#editor-panel { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; padding-bottom: 16px; }
+#editor-panel h2 { grid-area: 1 / 1; padding-right: 0; }
+#editor-panel .dev-panel-body { grid-column: 1 / -1; }
+@container editor (width < 700px) {
+  #editor-panel .editor-status { max-width: 140px; }
+}
+
+/* The office is the front door; this invitation stays out of the room's way. */
+.welcome-hint { position: absolute; bottom: calc(24px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 25; pointer-events: auto; width: max-content; max-width: calc(100% - 48px); padding: 12px 40px 12px 16px; border-radius: var(--radius-surface); background: var(--panel-solid); box-shadow: var(--shadow-panel); color: var(--text); font-size: 13px; line-height: 20px; text-align: center; transition: opacity 600ms ease; }
+.welcome-hint.is-leaving { opacity: 0; pointer-events: none; }
+.welcome-shortcuts { display: inline-block; margin-left: 8px; white-space: nowrap; }
+.welcome-shortcuts kbd { padding: 0 5px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface-soft); font-family: var(--font-mono); font-feature-settings: var(--font-variants-mono); }
+.welcome-close { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--muted); font: 20px var(--font-sans); font-feature-settings: var(--font-variants-sans); cursor: pointer; }
+.welcome-close:hover { background: var(--surface-hovered); }
+#wizard.offices-page { max-width: 960px; padding-top: 64px; }
+.offices-page h1 { font-size: 36px; line-height: 44px; letter-spacing: -1px; margin: 0 0 12px; }
+.offices-lede { font-size: 16px; line-height: 24px; color: var(--muted); margin: 0 0 32px; }
+.offices-page .wz-door { align-items: stretch; gap: 24px; }
+.offices-page .wz-row { flex-wrap: wrap; }
+.offices-page .wz-input { flex-basis: 160px; }
+.offices-page .wz-recent { margin-top: 32px; }
+.offices-note { margin: 32px 0 0; font-size: 13px; line-height: 20px; color: var(--muted); }
+@media (max-width: 600px) {
+  .welcome-hint { bottom: calc(16px + env(safe-area-inset-bottom)); max-width: calc(100% - 32px); }
+  #wizard.offices-page { padding-top: 24px; }
+  .offices-page h1 { font-size: 28px; line-height: 36px; }
+  .offices-page .wz-input { flex-basis: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-hint { transition: none; }
+}

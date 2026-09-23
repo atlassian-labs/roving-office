@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The layout algorithm — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html" aria-current="page">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="the-layout-algorithm" tabindex="-1">The layout algorithm</h1>
+<p><em>A seed in, a whole layout out. Where it runs, how a candidate room is judged, and why the
+streams are hashed.</em></p>
+<p>Every room in the office is a <strong>layout</strong> — a list of pieces, their kinds and their
+positions — whether somebody dragged it into place or a seed produced it. This page is
+about the half that produces them.</p>
+<p>What a seed <em>decides</em>, and the adjacency rules it decides it with, is
+<a href="../user/generated-offices.html">generated offices</a>; what a layout <em>is</em>, as a file you can
+save and send, is <a href="../user/layouts.html">layouts</a>. Read whichever of those you need first —
+this page assumes both.</p>
+<h2 id="the-plan-drawings-and-drawing-anything-else" tabindex="-1">The plan drawings, and drawing anything else</h2>
+<p>The gallery images and the terminal plan come from one place. The generator's own working notes are <em>not</em> what
+gets drawn: a layout is applied to the room, and then the room is <strong>surveyed</strong> —
+its blocked floor read straight off <code>obstacleFootprints()</code> (the same list the nav
+grid blocks) and its standing room derived by the same function the generator
+places against (<code>src/plan/survey.js</code>). So the picture is of the layout, not of the
+generator, and the pale bands, the rings and the rectangles are all things the
+room itself would tell you.</p>
+<p>Which means anything that is a layout can be drawn:</p>
+<pre><code class="language-bash">npm run plan -- --from=mcb/layouts/11-desks-outside.json   # a layout somebody made
+npm run plan -- --from=authored                            # the room as authored
+npm run plan -- --from=a.json --from=b.json --gallery --out=plans.html
+</code></pre>
+<p>A file drawn this way gets its name from the blob's own <code>name</code> if it has one, and
+no <strong>Open this office</strong> link if it has no seed — there is nothing to reproduce,
+because the file <em>is</em> the room.</p>
+<h2 id="where-it-runs" tabindex="-1">Where it runs</h2>
+<p>Every new room is generated before it is furnished. Three places:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Seed</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A new office.</strong> A keycard nobody has used becomes an office with one scene, and the scene is generated the first time anyone opens it.</td>
+<td>The scene's own id</td>
+<td><code>adopt()</code> in <code>src/office/office.js</code></td>
+</tr>
+<tr>
+<td><strong>A new scene</strong> in an office you already have (<code>+</code> in the switcher).</td>
+<td>Minted, and stored in the layout</td>
+<td><code>addScene()</code>, same file</td>
+</tr>
+<tr>
+<td><strong>Random</strong>, in the furniture editor's Layout row (press <code>E</code>).</td>
+<td>Minted per press</td>
+<td><code>onRoll</code> in <code>src/editor/editor.js</code></td>
+</tr>
+<tr>
+<td><strong>A seed link</strong> — <code>/?seed=slate-orchard-2210</code>, which is what the gallery's Open-this-office links are. Reception mints a keycard and hands the seed straight on.</td>
+<td>The seed in the link, used once</td>
+<td><code>openOffice()</code> in <code>src/wizard.js</code></td>
+</tr>
+</tbody>
+</table>
+<p>A room is generated <strong>once</strong>, when it is first opened, and never again. The test
+for &quot;never been opened&quot; is the scene's <em>look</em>, not its layout, and that is
+deliberate: clearing a scene's layout is how the editor's <strong>Reset</strong> says &quot;back to
+the floor plan authored in <code>src/layout.js</code>&quot;, so a generator that ran whenever a
+layout was missing would overrule Reset on every reload.</p>
+<p>The seed for a scene is derived from the scene's id rather than minted, which
+makes it safe to run in two tabs at once: both generate the same office and race
+to store an identical blob. That is strictly better than the look-rolling it
+replaced, where two tabs rolled differently and the last write won.</p>
+<p><strong>Random</strong> is an ordinary edit. One press of <code>⌘Z</code> puts the previous room back, and
+the panel prints the name and the seed — the seed because it is the only way back
+to a room you liked. Press it six times and the five you passed over are gone
+unless their seeds were on screen.</p>
+<p>The layout picker shows the office's <strong>name</strong> while it is in the room:
+<code>The January Parlour *</code>, with the star that means unsaved. By the letter of the
+editor's three modes a generated room is an edit of the authored plan and should
+read <code>Default *</code> — but Default is exactly what it is not, and the whole point of
+generating a room is that it is a particular room with a particular name. The
+picker's tooltip carries the seed, and Save offers the name.</p>
+<h2 id="the-arrangements" tabindex="-1">The arrangements</h2>
+<p>Two forms, because there are exactly two ways a desk can have a neighbour:</p>
+<ul>
+<li><strong>single</strong> — one row, all facing the same way, occupants all on one side. The
+row needs its own aisle behind it, which is what makes a floor of these read as
+rows.</li>
+<li><strong>paired</strong> — two rows with their monitors meeting in the middle and their
+occupants on the outside. This is what &quot;back to back&quot; means in a bench system,
+and it gives a team one aisle each rather than two.</li>
+</ul>
+<p><code>rows</code> and <code>perimeter</code> are single; <code>pods</code>, <code>spine</code> and <code>island</code> are paired. What
+differs between the three paired ones is where they want to be — pods a clear gap
+apart, a spine down the middle of the working half, an island in the middle of the
+floor with room all round it — and each says so as a score, in a couple of lines,
+beside the arrangement it belongs to.</p>
+<p>A bank holds at most four desks along the room's 26 and three across its 20,
+worked out from the pitch rather than picked. <strong>A bank that does not entirely fit
+seats what it can and hands the rest back</strong>, so a team of six in a room with space
+for four in a run becomes four here and two at the end of the next bank along —
+which is what every open-plan floor actually looks like. Before that rule the
+banks were all-or-nothing, and a room asked for eight desks came back with two.</p>
+<h2 id="what-it-scans-against" tabindex="-1">What it scans against</h2>
+<p>What it scans against is a list of rectangles, each named after what it came from,
+and the judge is <strong><code>floorFault()</code> — the furniture editor's own arithmetic</strong>, not a
+second copy of it. So &quot;on the floor and out of the way&quot; has one definition in this
+codebase, and a generated room is a room somebody could have dragged into place.</p>
+<p>Three kinds of rectangle go into the list, and the reason there are three rather
+than one flat list of obstacles is a mistake worth not making:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>footprint</strong></td>
+<td>A prop's own blocked floor, on the world's axes — <code>worldExtent()</code> in <code>src/layout.js</code>, shared so this cannot disagree with the nav grid about how much floor a turned couch takes.</td>
+</tr>
+<tr>
+<td><strong>standing room</strong></td>
+<td>The strip between a prop and the spot its user stands on. Reserved, so that nothing later ends up in front of the coffee machine.</td>
+</tr>
+<tr>
+<td><strong>circulation</strong></td>
+<td>The avenue in from the door and the one street it runs into, reserved <em>before</em> anything is placed. Aisles drawn last are aisles made of whatever floor happens to be left.</td>
+</tr>
+</tbody>
+</table>
+<p>A <strong>prop</strong> may not overlap a prop, a way, or somebody's standing room. <strong>Standing
+room</strong> may not overlap a prop, and may overlap anything else. Which reads as:
+build nothing in the aisles, and stand wherever there is floor. The obvious
+design — reserve the street, refuse anything that overlaps it — forbids the single
+most useful arrangement in the room, a bench of desks with the street doing duty
+as the aisle behind the chairs. That is not a conflict; it is what a street is
+<em>for</em>.</p>
+<p>Then the constraints that come from the room itself rather than from the plan:</p>
+<ul>
+<li><strong>A desk's standing room is 3.5 units out along its own axis</strong>, because that is
+where <code>buildDesk</code> puts its approach point and where the agent layer walks to. A
+bench whose standing room lands inside the next bench is a bench nobody can sit
+at. <code>test/plan-reach.test.js</code> compares the generator's constant against the
+prop's own geometry, so a change there has to reach the generator.</li>
+<li><strong>Nobody may build in the doorway.</strong> The room had already written this down:
+<code>randomInteriorPoint</code> refuses to let a wanderer stop within <code>DOORWAY_DEPTH</code> of
+the opening, because anybody idling on the way in is somebody every later
+arrival has to get past. Those are the numbers the plan reserves, and the authored
+bin was later moved out of exactly that rectangle for the same reason.</li>
+<li><strong>A standing spot must be somewhere a person can stand.</strong> The nav grid keeps
+walkers 0.6 off the walls and the cutaway edges, so a spot inside that strip is
+a spot nobody can reach however clear the floor looks.</li>
+<li><strong>Nothing may stand where <code>applyLayout</code> would not keep it.</strong> Import clamps a
+prop's centre into the room by <code>LAYOUT_MARGIN</code>, so a plan that puts one outside
+that is a plan the room quietly rearranges on the way in.</li>
+<li><strong>Every number is snapped to authoring precision as it is placed</strong>, not on the
+way out. A plant placed at a scale of 1.6284 and stored as 1.63 grew its spread
+by three millimetres — enough that the desk beside it, whose position had
+rounded the other way, overlapped it by a hair. The plan that was checked and
+the plan that was stored were not the same plan.</li>
+<li><strong>Nothing may be put down that fences anybody in.</strong> The one rule no rectangle
+can express: a bookcase that overlaps nothing at all can still seal the only way
+into the corridor behind a bank of desks. So each piece, as it goes down, is put
+through one flood fill against every standing spot already in the room — the
+editor's own <code>reachFault</code>, asked of a candidate — and a position that strands
+somebody is passed over for the next best. A bank of desks is tested as one
+piece, because that is how it goes down: two desks that each leave a way through
+can between them close the only one.</li>
+</ul>
+<h2 id="what-makes-a-seed-good" tabindex="-1">What makes a seed <em>good</em></h2>
+<p>Two different questions, and keeping them apart is the whole of the answer.</p>
+<h3 id="the-gate-does-the-room-work" tabindex="-1">The gate: does the room work?</h3>
+<p><code>validate()</code> in <code>src/plan/index.js</code> is a hard pass/fail, and it is the room's own
+rules rather than the generator's opinion of itself:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Somewhere to do every job</strong></td>
+<td>One station able to do each of <code>JOB_ROLES</code> — census, intake, research, dispatch — read from the same table the furniture editor refuses deletions with. A room that cannot say who is in, cannot take work in, cannot look anything up or cannot get work out is not an office.</td>
+</tr>
+<tr>
+<td><strong>Nothing on top of anything else</strong></td>
+<td>Every rectangle judged by <code>floorFault()</code>, the editor's own arithmetic, against every other. Includes hanging off the floor.</td>
+</tr>
+<tr>
+<td><strong>Everybody can reach their own standing spot</strong></td>
+<td>One flood fill from just inside the door, against every place a person has to stand.</td>
+</tr>
+</tbody>
+</table>
+<p>There is no partial credit in there: a mailbox nobody can reach is not 90% of a
+mailbox. A plan that fails is never shipped — instead the brief is <strong>trimmed</strong>
+(desks first, then the planting, then the second couch) and fitted again, three
+times, and then a small plain floor that is impossible not to fit. So
+<code>generateOffice</code> cannot fail and cannot return a broken room, which is what makes
+it safe to run on every new scene with nobody watching.</p>
+<p>Two of those three now hold <strong>by construction</strong> rather than by inspection, and
+that is the more interesting half of this section. Every placement — every
+station, every piece of furniture, every plant, every bank of desks — is refused
+if it would fence anybody in, which is the same refusal the editor makes on a drop
+(<code>reachFault</code>), asked of a candidate before it is committed. It costs one flood
+fill per piece placed rather than one per position scored, and it turned an
+occasional failure into an impossible one: across three thousand seeds, &quot;cannot be
+reached&quot; has not been reported since. The check at the end stays anyway, because
+<em>cannot happen</em> is a claim, and a claim about a room is worth one flood fill.</p>
+<p>What still fires is the first row: a wall can genuinely fill up. In two thousand
+seeds, 1,902 offices fit at the first attempt, 73 needed a second, 18 a third and
+7 the fallback — nearly always because a room with desks all round its walls had
+no frontage left for a bookcase.</p>
+<h3 id="the-scorecard-is-it-a-room-worth-working-in" tabindex="-1">The scorecard: is it a room worth working in?</h3>
+<p>That is a different question and it deserves different machinery, so
+<code>src/plan/score.js</code> is six measures, each 0 to 1, each read off the finished plan:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>seated</strong></td>
+<td>×3</td>
+<td>Desks the floor could seat, against the brief.</td>
+</tr>
+<tr>
+<td><strong>daylight</strong></td>
+<td>×2</td>
+<td>How near the desks are to the window openings themselves — measured as a distance, because a room with glass on two of its four sides could never have <em>all</em> its desks by a window, and a measure whose best case is 0.4 is one nobody can read.</td>
+</tr>
+<tr>
+<td><strong>teams</strong></td>
+<td>×2</td>
+<td>Desks whose nearest neighbour is a teammate. The plainest possible test of &quot;teams sit together&quot;, and it needs no parameter.</td>
+</tr>
+<tr>
+<td><strong>quiet</strong></td>
+<td>×2</td>
+<td>The printer and the drinks, scored on how far the nearest desk is from them.</td>
+</tr>
+<tr>
+<td><strong>errands</strong></td>
+<td>×2</td>
+<td>How far a desk is from the work coming in and going out. The other side of <code>quiet</code>: a room can win that one by putting everything in a far corner, and then every job is a hike.</td>
+</tr>
+<tr>
+<td><strong>floor</strong></td>
+<td>×1</td>
+<td>How much of the floor is still walkable floor. A band rather than a ramp, because both ends are wrong — 90% clear is a barn and 40% is a warren.</td>
+</tr>
+</tbody>
+</table>
+<p><code>npm run plan -- --sweep=2000</code> prints the distribution, the gallery draws it under
+each plan, and <code>npm run plan -- &lt;seed&gt;</code> prints it as bars:</p>
+<pre><code>  office     ████████████████████·····  0.84
+  seated     █████████████████████████  1.00   desks the floor could seat, against the brief
+  daylight   ████████████·············  0.49   how near the desks are to a window
+  teams      ██████████████████·······  0.75   desks whose nearest neighbour is a teammate
+  quiet      █████████████████████████  1.00   the noisy machines kept off the working floor
+  errands    ████████████████████·····  0.81   how far a desk is from the work coming in and going out
+  floor      █████████████████████████  1.00   how much of the floor is still floor
+</code></pre>
+<p>Across two thousand seeds: <strong>median 0.84</strong>, tenth percentile 0.77, worst 0.61.</p>
+<p><strong>It is deliberately not a gate</strong>, and that is a judgement rather than a gap. A
+generator that threw away rooms below a quality bar would quietly narrow what a
+seed can be — a spare two-desk back room with nothing green in it scores badly on
+half of these and is a perfectly good office — and a score used as a gate becomes
+a target, which is how every office ends up the same shape. What it is for is
+<em>measurement</em>: <code>test/plan-score.test.js</code> holds the floor and the median down, so
+&quot;the layouts feel worse since that change&quot; becomes a number somebody can point
+at.</p>
+<p>It has already earned that keep twice:</p>
+<ul>
+<li><strong><code>teams</code> found the bench pitch.</strong> Nineteen rooms in four hundred scored near
+zero on it, and every one of them had banks that were each perfectly one team's.
+The desks within a bank were 5.4 to 6.4 apart while two <em>rows</em> are 5.4 apart at
+the closest — so the desk in the next row was nearer to you than the one on your
+own bench. The pitch is 5.1 to 5.35 now, comfortably inside the gap between
+runs, and the count went from nineteen to six.</li>
+<li><strong><code>seated</code> found the bookcase.</strong> Forty-five rooms in a thousand were losing a
+third of their desks to a trimmed brief, because a floor with desks all round
+its walls had no frontage left for a shelf and the whole brief was refitted
+rather than the shelf being stood free. A bookcase with its back to a bank of
+desks is a thing offices have; twenty rooms in a thousand now need a second
+attempt instead.</li>
+</ul>
+<h3 id="the-sweep" tabindex="-1">The sweep</h3>
+<pre><code>  2000/2000 offices valid   31ms each
+  attempts   first:1902 second:73 third:18 fallback:7
+  shape      rows:608  pods:553  spine:338  perimeter:321  island:180
+  desks      2:54  3:159  4:244  5:281  6:341  7:331  8:256  9:170  10:81  11:60  12:19 …
+  office     min 0.61  p10 0.77  median 0.84  p90 0.89  max 0.95
+</code></pre>
+<p>Two thousand seeds, two thousand distinct floor plans. Four test files carry it in
+CI: <code>test/plan-generator.test.js</code> is the sweep as assertions,
+<code>test/plan-score.test.js</code> is the scorecard's floor, <code>test/plan-survey.test.js</code>
+checks that a surveyed room is the room the generator planned, and
+<code>test/plan-reach.test.js</code> is the one that keeps the generator honest about the
+thing it cannot see — it applies generated offices for real, builds the <strong>real
+<code>NavGrid</code></strong>, and puts each room through the editor's own <code>strandedApproaches</code>,
+with the desks' approach points read off <code>buildDesk</code> rather than recomputed.</p>
+<p>That last test exists because <code>src/plan/reach.js</code> is a deliberate <em>second</em>
+implementation of a question <code>NavGrid</code> already answers. It has to be: the nav grid
+can only be built from a layout that has already been applied to the room, and
+applying a layout in order to find out whether it is any good would mean
+rearranging the office somebody is standing in. A second implementation of one
+question is normally the wrong answer, and the test is what makes it safe — it
+caught the two apart already. The grid blocks every cell a footprint <em>touches</em>
+while the first draft of the check tested cell centres, which made the check
+<strong>more permissive than the room</strong> and passed offices whose corners the agents
+could not reach.</p>
+<h2 id="determinism-and-why-the-streams-are-hashed" tabindex="-1">Determinism, and why the streams are hashed</h2>
+<p>A seed's office has to be that seed's office, and the trap is worth naming because
+Minecraft fell into it: derive per-feature seeds arithmetically from one root and
+some seeds produce degenerate streams, so features start repeating along a
+diagonal. Every stage here gets its own stream, hashed from the seed <em>and the
+stage's name</em> — <code>hash(&quot;…/misty-quay-3100::desks&quot;)</code> — which cannot correlate two
+stages that way.</p>
+<p>It buys a second thing that matters more day to day: the stages are
+<strong>independent</strong>, so changing how the planting works cannot reshuffle the desks. A
+seed's room stays the room it was, feature by feature, as this code grows.</p>
+<p>The one place that could have broken it is the scoring. A scan scores a few hundred
+candidate positions and keeps the best; a draw per candidate would make the
+stream's position depend on how many candidates there happened to be, so adding
+one lattice step somewhere would move every later decision in the room. So the
+tie-break is not a draw at all but a <strong>field over the floor</strong> — <code>fieldAt(seed, what, x, z)</code>, a hash of the position — which has no order to depend on. Score it
+forwards, backwards, or half of it, and the same position wins.</p>
+<h2 id="what-it-deliberately-does-not-do" tabindex="-1">What it deliberately does not do</h2>
+<ul>
+<li><strong>It does not touch the room's shape.</strong> 26 by 20, two walls and two open edges,
+one door, three windows: the nav grid, the obstacle map and every approach point
+are derived from those, and they are <a href="../user/buildings.html#what-is-deliberately-not-themeable">deliberately not
+themeable</a>. A
+generated office is a <em>layout</em>, which is the editor's domain — not a new
+building.</li>
+<li><strong>It does not write teams into the blob.</strong> A team is expressed the way an office
+expresses one, by who sits together, and the layout format has no field for it.
+The grouping is in the geometry and in the reason sentence; nothing downstream
+needs to be told.</li>
+<li><strong>It does not put up walls or meeting rooms.</strong> There is no kit for either. What
+the room has instead is the <a href="../user/generated-offices.html#the-adjacencies-which-are-the-argument">zoning</a> —
+a quiet end, a break end and a goods end — done with furniture, which is what
+Bürolandschaft did with filing cabinets and potted plants for the same reason.</li>
+<li><strong>It does not pick your feeds.</strong> A generated scene is filled with Test Data,
+because a new room with no feed is a black screen with no explanation. Point it
+at a real harness and the room stays as it is.</li>
+</ul>
+<h2 id="where-the-code-lives" tabindex="-1">Where the code lives</h2>
+<pre><code>src/plan/
+  rng.js        # seeds, and the streams a seed hands out: one per stage, hashed
+  brief.js      # what this office wants: headcount, teams, kit, lounge, scheme
+  floor.js      # the floor plate: rectangles, wall bands, the street, the blocks
+  furnish.js    # the test fit: circulation, then desks, then stations, then dressing
+  naming.js     # what came out, as a name and as a sentence of reasons
+  reach.js      # can everybody get everywhere — asked of a plan that is not a room yet
+  score.js      # the scorecard: six measures of a room that already works
+  survey.js     # the plan of a room as it stands, whoever laid it out
+  index.js      # seed in, office out: the blob, the look, the check and the retry
+bin/
+  office-plan.js          # the CLI: one plan, a sweep, or a gallery
+  lib/office-plan-svg.js  # a plan as a drawing, shared by the gallery and the terminal
+</code></pre>
+<p>Nothing in <code>src/plan/</code> imports three.js, and that is not an accident: it reaches
+<code>config.js</code>, <code>layout.js</code> and the editor's placement arithmetic and nothing else. A
+generator you cannot run in a shell is a generator nobody sweeps.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="tuning-the-layouts.html">Tuning the layout generator</a> — how the rules on this page
+were arrived at. Almost every weight and threshold here was set, moved or thrown
+away because a number said so: a headless simulation of the office running, a
+taste model fitted to 146 pairwise human judgements over 74 frozen rooms, and an
+autonomous loop ratcheting on the composite of the two. It also carries the
+measured reasons a single number is <em>not</em> enough</li>
+<li><a href="../office-variety.html">Thirty offices, thirty seeds</a> — thirty consecutive seeds,
+scrollable, each with the name and the reasons it gave itself</li>
+<li><a href="../user/generated-offices.html">Generated offices</a> — the brief, the adjacencies, the naming</li>
+<li><a href="editor.html">The furniture editor</a> — whose <code>floorFault</code> and <code>reachFault</code> are the judge here</li>
+<li><a href="extending.html">Extending the office</a> — adding a prop the generator can then place</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#the-plan-drawings-and-drawing-anything-else">The plan drawings, and drawing anything else</a></li>
+<li><a href="#where-it-runs">Where it runs</a></li>
+<li><a href="#the-arrangements">The arrangements</a></li>
+<li><a href="#what-it-scans-against">What it scans against</a></li>
+<li><a href="#what-makes-a-seed-good">What makes a seed good</a><ul><li><a href="#the-gate-does-the-room-work">The gate: does the room work?</a></li>
+<li><a href="#the-scorecard-is-it-a-room-worth-working-in">The scorecard: is it a room worth working in?</a></li>
+<li><a href="#the-sweep">The sweep</a></li></ul></li>
+<li><a href="#determinism-and-why-the-streams-are-hashed">Determinism, and why the streams are hashed</a></li>
+<li><a href="#what-it-deliberately-does-not-do">What it deliberately does not do</a></li>
+<li><a href="#where-the-code-lives">Where the code lives</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

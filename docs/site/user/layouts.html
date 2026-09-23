@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Layouts — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html" aria-current="page">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="layouts" tabindex="-1">Layouts</h1>
+<p><em>An arrangement of furniture is a thing in its own right: it is kept, it can be named, and
+it can be handed to somebody else as a file.</em></p>
+<img src="../images/panels/editor-strip.png" width="736" alt="The editor strip along the bottom of the screen: Add item, the Selected panel, a snap-grid scrubber, a Paths switch, and the Layout row of Copy, Paste, Download, Reset and Random with the layout picker beside them.">
+<p><em>The <strong>Layout</strong> row at the right-hand end is this page: Copy, Paste, Download, Reset, and the picker that names which layout the room is showing.</em></p>
+<p>Moving the furniture is <a href="rearranging-furniture.html">rearranging the furniture</a>. This is what
+happens to the arrangement afterwards.</p>
+<h2 id="where-your-arrangement-lives" tabindex="-1">Where your arrangement lives</h2>
+<p><strong>A layout belongs to a scene</strong>, and is stored with that scene on the server next to its
+season and building — so everyone holding the keycard gets the room as you left it. Saving
+happens on its own, half a second after you stop.</p>
+<p>A scene nobody has rearranged has no layout stored and gets the authored one back. Laying
+one room out and looking at it in another building is <strong>Copy</strong> in the first and <strong>Paste</strong> in
+the second.</p>
+<h3 id="it-moves-under-everyone-at-once" tabindex="-1">It moves under everyone at once</h3>
+<p>A change is pushed to every other tab watching that office. Open the same keycard twice and
+drag a desk in one — it moves in the other.</p>
+<ul>
+<li><strong>It works with edit mode closed</strong>, which is the ordinary case. Somebody watching their
+agents has no idea the editor exists and should still see the desk move.</li>
+<li><strong>A colleague's change is not on your undo stack.</strong> <strong>⌘Z</strong> is a record of what <em>you</em> did,
+and somebody else's change turning up in it would make undo do something nobody could
+predict.</li>
+<li><strong>Only the layout moves live.</strong> A new season or building is stored and takes effect next
+time the scene is opened — rebuilding the world under somebody standing in it would empty
+the office they were watching in order to redecorate it.</li>
+<li><strong>The demo office never saves.</strong> Its scenes are shared, so a stranger tidying one would be
+tidying it for everybody. The editor still works there; it just forgets.</li>
+</ul>
+<h2 id="saved-layouts" tabindex="-1">Saved layouts</h2>
+<p>Copy, Paste, Download, Reset and Random wrap as the <strong>Layout</strong> section narrows,
+down to a column of five buttons. Their order stays the same.</p>
+<p>The <strong>Layout</strong> section's heading carries a picker, which always names which of three states
+the room is in:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Meaning</th>
+<th>Save</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Default</strong></td>
+<td>The authored room, exactly — where Reset lands</td>
+<td>Disabled: nothing of yours to save</td>
+</tr>
+<tr>
+<td>a name</td>
+<td>The room is that layout, off this browser's shelf, exactly</td>
+<td>Disabled: it is already saved</td>
+</tr>
+<tr>
+<td><em>name</em> · edited</td>
+<td>A change on top of one of those</td>
+<td>Enabled</td>
+</tr>
+</tbody>
+</table>
+<p>Which state you are in is <strong>matched from the room itself, never remembered</strong> — five drags
+that happen to land back on &quot;Cosy Corner&quot; <em>are</em> &quot;Cosy Corner&quot;, and one drag away from it
+lights Save up.</p>
+<p>Hovering a saved layout reveals rename and a trash can that arms on the first press and
+fires on the second. Deleting never touches the room, only the shelf.</p>
+<p><strong>That shelf is per-browser and yours alone.</strong> What travels between people is the file: the
+name rides inside it, so a <strong>Copy</strong> or a <strong>Download</strong> carries it and a colleague's <strong>Paste</strong>
+arrives already called something.</p>
+<h2 id="four-ways-in-and-out" tabindex="-1">Four ways in and out</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>To the clipboard</th>
+<th>To a file</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Out</td>
+<td><strong>Copy</strong></td>
+<td><strong>Download</strong> — <code>cosy-corner.json</code></td>
+</tr>
+<tr>
+<td>In</td>
+<td><strong>Paste</strong></td>
+<td>Drop it on the zone, or click to pick one</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Neither clipboard direction is guaranteed</strong>, and the panel is honest about it. Both need a
+secure context and reading needs permission on top, so when one is shut each refusal names
+the other route: a failed Copy says <em>use Download instead</em>, a failed Paste says <em>drop a
+<code>.json</code> file instead</em>. A refusal is never silent and never a dead end.</p>
+<p>A dropped file that is not a layout is refused in the same words as a clipboard that is not.
+The extension is checked only to say something kinder about an obvious mistake — a <code>.png</code>
+dragged in by accident — never as a gate.</p>
+<h2 id="the-file-is-plain-text-and-meant-to-be-edited" tabindex="-1">The file is plain text, and meant to be edited</h2>
+<p>It says which pieces there are, of what kind, where, and facing which way. No sizes, no
+palette. <strong>Paste</strong> is deliberately forgiving, because the whole point of a portable format
+is that it gets hand-edited:</p>
+<ul>
+<li>Unknown keys are ignored and missing ones left alone.</li>
+<li><strong>Every coordinate is clamped into the room.</strong> A desk at <code>x: 500</code> is a typo rather than an
+error worth refusing, and the useful response is to put it back inside the walls.</li>
+<li>A facing within half a degree of a right angle is treated as that right angle — both what
+somebody typing <code>1.57</code> meant, and what makes a copy/paste round trip exactly lossless.</li>
+</ul>
+<p>So a hand-edited file cannot wedge the office, and the worst a bad one can do is put the
+furniture somewhere silly — which you can see, and undo.</p>
+<h2 id="an-example-to-take-apart" tabindex="-1">An example to take apart</h2>
+<p><strong><a href="../examples/example-layout.json">example-layout.json</a></strong> — a real layout, exported from a
+real room. Download it, drop it on the editor's drop zone (<code>E</code>), and the office rearranges
+itself into it.</p>
+<p>It is worth opening in a text editor too, because the format is short enough to read in one
+go and that is the fastest way to understand what a layout <em>is</em>: a list of pieces, their
+kind, where they stand, and which way they face. Nothing else. No sizes, no palette, no
+room.</p>
+<p>Try editing it before you drop it in — move a desk by changing one number, then watch the
+routes re-route around where you put it. A coordinate outside the room is
+<a href="#the-file-is-plain-text-and-meant-to-be-edited">clamped rather than refused</a>, so you
+cannot break anything by guessing.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="rearranging-furniture.html">Rearranging the furniture</a> — the editor that makes these</li>
+<li><a href="generated-offices.html">Generated offices</a> — where <strong>Random</strong> gets a whole layout from</li>
+<li><a href="offices-and-keycards.html">Offices, keycards and scenes</a> — a layout belongs to a scene</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#where-your-arrangement-lives">Where your arrangement lives</a><ul><li><a href="#it-moves-under-everyone-at-once">It moves under everyone at once</a></li></ul></li>
+<li><a href="#saved-layouts">Saved layouts</a></li>
+<li><a href="#four-ways-in-and-out">Four ways in and out</a></li>
+<li><a href="#the-file-is-plain-text-and-meant-to-be-edited">The file is plain text, and meant to be edited</a></li>
+<li><a href="#an-example-to-take-apart">An example to take apart</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

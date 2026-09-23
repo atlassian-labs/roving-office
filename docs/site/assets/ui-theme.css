@@ -1,0 +1,101 @@
+/* Shared by reception, the office and the generated documentation.
+ * Colours: @atlaskit/tokens 16.11.3, palette-brand-refresh.
+ * Fonts: Inter 4.1 and JetBrains Mono 2.304, both SIL Open Font License 1.1, subset to
+ * latin and bundled locally. Licences in vendor/inter/ and vendor/jetbrains-mono/, which
+ * also record the versions and the subsetting command; see docs/developer/developing.md. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./Inter-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('./JetBrainsMono-latin.woff2') format('woff2');
+}
+:root {
+  color-scheme: light;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* The letterforms this interface is drawn around, which Inter ships as character
+   * variants rather than defaults: cv08 the seriffed capital I, cv09 the flat-top 3,
+   * cv10 the spurred G, cv07 the alternate ß, ss07 square dots and punctuation, ss08
+   * straight quotes. Also tnum and zero, which back `tabular-nums` below.
+   *
+   * A token rather than a single rule because `font-feature-settings` is a low-level
+   * property that *replaces* the inherited feature list instead of adding to it. So any
+   * rule that sets it at all has to restate everything it still wants — including the
+   * ones below that ask for tabular figures, and the handful that use the `font`
+   * shorthand, which resets this property to its initial value. */
+  --font-variants-sans: 'cv07' 1, 'cv08' 1, 'cv09' 1, 'cv10' 1, 'ss07' 1, 'ss08' 1;
+  /* The same for the mono: ss01 the K k l r u alternates, ss02 the straight y, and zero
+   * the dotted zero, so a 0 cannot be read as an O in a keycard or a camera readout. */
+  --font-variants-mono: 'ss01' 1, 'ss02' 1, 'zero' 1;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --radius-control: 6px;
+  --radius-surface: 8px;
+  --radius-dialog: 12px;
+  --text-body: 0.875rem;
+  --text-small: 0.75rem;
+  --text-heading-small: 1rem;
+  --text-heading-medium: 1.25rem;
+  --text-heading-large: 1.5rem;
+  --bg: #f8f8f8;
+  --panel: rgba(255, 255, 255, 0.97);
+  --panel-solid: #fff;
+  --surface-soft: #f0f1f2;
+  --surface-hovered: #dddee1;
+  --border: #dddee1;
+  --border-strong: #8c8f97;
+  --text: #292a2e;
+  --muted: #505258;
+  --brand: #1868db;
+  --brand-hovered: #1558bc;
+  --selected: #e9f2fe;
+  --on-bold: #fff;
+  --green-soft: #baf3db;
+  --green-hovered: #7ee2b8;
+  --green-bold: #1f845a;
+  --sage: #216e4e;
+  --sky-soft: #e9f2fe;
+  --leaf-soft: #dcfff1;
+  --sun-soft: #fef7c8;
+  --sun: #eed12b;
+  --leaf: #94c748;
+  --shadow-panel: 0 4px 20px rgba(35, 60, 78, 0.12), 0 1px 3px rgba(35, 60, 78, 0.06);
+  --shadow-overlay: 0 16px 48px rgba(35, 60, 78, 0.18), 0 2px 6px rgba(35, 60, 78, 0.08);
+  --blanket: rgba(80, 105, 122, 0.22);
+  --status-idle: #6b6e76;
+  --status-resting: #6b6e76;
+  --status-drinking: #6b6e76;
+  --status-working: #1f845a;
+  --status-researching: #227d9b;
+  --status-waiting: #803fa5;
+  --status-delivering: #964ac0;
+  --status-error: #c9372c;
+  --status-walking: #1868db;
+  --job-active: var(--text);
+  --job-done: #216e4e;
+  --job-error: var(--status-error);
+  --conn-live: #1f845a;
+  --conn-waiting: #803fa5;
+  --conn-connecting: #1868db;
+  --conn-offline: #c9372c;
+}
+/* Once for the page and again for the mono, since the mono needs its own list and would
+ * otherwise inherit the sans one. `font-variant-numeric` also loses to this property, so
+ * `tabular-nums` on its own is silently dropped under either of these rules — which is
+ * why the rules in styles.css that want tabular figures set them here instead. */
+body { font-feature-settings: var(--font-variants-sans); }
+code, pre, kbd, samp { font-feature-settings: var(--font-variants-mono); }
+::selection { background: #cfe1fd; color: #123263; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "roving-office",
+  "description": "The Roving Office: a soft-3D isometric office that shows what your coding agents are doing, live.",
+  "owner": {
+    "name": "Mike Cannon-Brookes"
+  },
+  "plugins": [
+    {
+      "name": "roving-office",
+      "description": "Watch your coding-agent sessions as characters in a soft-3D isometric office.",
+      "version": "0.15.5",
+      "source": {
+        "source": "archive",
+        "url": "https://therovingoffice.com/plugins/claude/roving-office-0.15.5.zip",
+        "sha256": "682ced2461dc62e8ffef1e730618f7219b656041a000f2cc822da57391f2a5dc"
+      }
+    }
+  ]
+}

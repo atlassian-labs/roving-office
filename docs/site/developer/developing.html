@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Developing on it — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html" aria-current="page">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="developing-on-it" tabindex="-1">Developing on it</h1>
+<p>There is no app build step or npm runtime install. <code>index.html</code> carries an import map, <a href="https://threejs.org/">Three.js</a> is vendored under <code>vendor/three</code>, and every module loads as an ES module straight from disk — so the whole loop is <em>edit a file, reload the tab</em>. Use Node.js 24 and npm for the development tools; <a href="getting-the-code.html">getting the code</a> covers installation from public npm. The one thing you need running is <code>server.cjs</code>, which is the static server, the office API and the AOP receiver in a single process:</p>
+<pre><code class="language-bash">node server.cjs          # takes the first free port from 8080 to 8095
+</code></pre>
+<p>Run it as often as you like — one per worktree is the normal state of things. A server
+started this way is <strong>private</strong>: it does not write <code>~/.roving-office/endpoint.json</code>, so it
+cannot redirect the hooks feeding an office somebody is watching, and it prints the
+<code>AOP_URL</code> / <code>AOP_TOKEN</code> pair that points a single shell at it if you want to send a session
+there. Name a port (<code>node server.cjs 8081</code>) and you get that port or an error, never a
+quiet substitution. <code>npm run serve</code> is the other one — it publishes, and it is how the
+office you actually work in gets fed.</p>
+<p>It listens on <strong>loopback only</strong>, so <code>http://localhost:&lt;port&gt;</code> works and nothing else on
+your network can reach it. That is not caution for its own sake: this server hands out
+any file under the checkout, with no allowlist, because that is what makes <em>edit a file,
+reload the tab</em> work — and the checkout also holds your uncommitted work, your <code>.git</code>
+and whatever local tool configuration you keep in the tree. A wider bind offers all of
+it to whoever shares the wifi. If you genuinely need another device to reach it — a
+phone, a tablet, a VM — say so once: <code>HOST=0.0.0.0 node server.cjs</code>. The banner then
+names the interface it bound, so you can tell at a glance which kind of server you are
+looking at. The container recipe sets the same variable, because inside a container
+loopback reaches nothing at all.</p>
+<p>For a local simulation, open <code>/office/TEST-0000/</code> on the server's printed URL. Test Data
+runs without any connected harness, company account or external service.</p>
+<p>Almost every graphical glitch in this scene has turned out to be the same bug: two faces landing on exactly the same coordinate, which gives the depth buffer no way to order them, so the surfaces flicker against each other as the camera moves.</p>
+<pre><code class="language-bash">npm run probe -- --sweep --assert=test/coplanar-baseline.json
+</code></pre>
+<p>That builds every building and season headlessly and asserts nothing contests a plane worse than the recorded baseline — CI runs the same command, so a new pair fails the build. Run it after adding geometry — it is far better at finding this than looking is; a deliberate change re-records with <code>--record=</code>. See <a href="coplanar-probe.html">docs/coplanar-probe.md</a> for how to read the output and how to identify what a pair actually is.</p>
+<h2 id="what-ci-runs" tabindex="-1">What CI runs</h2>
+<p><code>.github/workflows/ci.yml</code>, and it is verification and nothing else — six commands, all
+of them ones you can run from a checkout:</p>
+<pre><code>npm ci
+npm run lint
+npm test
+npm run probe -- --sweep --assert=test/coplanar-baseline.json
+npm run pack:openclaw
+npm run pack:plugins
+</code></pre>
+<p>That is the same list by the same script names, on Node 24 and Node 26. <code>npm test</code> covers
+the unit, reducer, scene, server and documentation suites, and it also asserts the
+committed docs site and the third-party inventory are current — so run <code>npm run docs</code>
+after documentation edits and <code>node bin/gen-third-party.mjs</code> after touching a dependency
+or a deployment recipe, or CI fails where you would rather it did not. The headless tools
+import vendored Three.js, so nothing needs network beyond the npm install.</p>
+<p><strong>It holds no credential and deploys nothing, and that is a security boundary rather than
+a simplification.</strong> A public repository takes pull requests from forks, and a job that
+touches a deploy token while running a fork's code hands that token to whoever wrote the
+diff. So the workflow uses <code>pull_request</code> rather than <code>pull_request_target</code>, declares
+read-only permissions, and references no secret. One guard lives in the repository
+settings instead, because a workflow cannot require its own approval: <strong>Settings →
+Actions → General → Fork pull request workflows → require approval for all external
+contributors.</strong></p>
+<p>Deployment is therefore a maintainer action from a checkout rather than a CI step. The
+maintainers' internal mirror of this repository runs its own pipeline that also promotes
+the hosted demo on merge; it reaches infrastructure a contributor has no access to,
+nothing in verification depends on it, and it is not part of this workflow.</p>
+<h2 id="look-at-the-scene" tabindex="-1">Look at the scene</h2>
+<p>The scene is the product, so for anything visual, <strong>look at it</strong>. A headless screenshot catches what no unit test can, and takes seconds:</p>
+<pre><code class="language-bash">node server.cjs 8081 &amp;
+&quot;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&quot; --headless=new \
+  --disable-gpu --enable-unsafe-swiftshader --user-data-dir=/tmp/shot-profile \
+  --window-size=1600,1000 --screenshot=/tmp/shot.png http://localhost:8081/
+</code></pre>
+<p>Give each shot its own <code>--user-data-dir</code>, and do <strong>not</strong> reach for <code>--virtual-time-budget</code>: virtual time never expires against a render loop, so the flag hangs and writes nothing — and under it <code>requestAnimationFrame</code> never fires at all, so no loop-driven animation advances however long the budget. Chrome fires the shutter at load instead, which is the thing to design around, because that is <em>earlier than you think</em>: a dynamically imported module never makes it, and neither does anything that fades or walks in. For those, screenshot a throwaway harness page that imports the module statically, mounts it and disables transitions — the same trick as mounting the real panels against a stub manager for UI detail. <code>--force-prefers-reduced-motion</code> is the other half of it. On macOS, <code>sips -c H W --cropOffset Y X</code> magnifies a region for a closer look.</p>
+<h2 id="photograph-one-object" tabindex="-1">Photograph one object</h2>
+<p>For a single prop, there is a tool, and it is the same idea with the room taken away:</p>
+<pre><code class="language-bash">npm run portrait -- --id=chair       # one object, transparent background, into docs/images/objects
+npm run portrait -- --list           # everything there is to photograph
+npm run portrait                     # the lot, which regenerates the gallery
+</code></pre>
+<p>Each object is a named entry in <code>src/scene/catalogue.js</code>, so a new prop earns its picture by exporting its builder and adding four lines. The pictures fill the <a href="../item-movements.html">Item Library</a>; <a href="prop-portraits.html">photographing a prop</a> documents the tool and the five things worth knowing about how it takes them.</p>
+<p>It is also a quick way to <em>see</em> a prop you are working on without walking an agent across the room to it — open <code>bin/prop-portrait.html?id=chair</code> by hand and it is right there, lit and centred.</p>
+<p>One caveat when two servers are up: only one process can hold <code>~/.roving-office/endpoint.json</code>, so the second serves the UI but receives no adapter events. Give that one a <a href="test-data.html">Test Data</a> office and it behaves.</p>
+<h2 id="photograph-a-whole-theme-from-above" tabindex="-1">Photograph a whole theme from above</h2>
+<p>For the city round the room rather than the room or one object in it, there is a third tool: a straight-down orthographic shot of a theme's whole exterior — street, park, skyline, service yard, whatever that theme actually builds — not only the office at the centre of it. Built the same way <code>buildWorld()</code> builds a live world (environment, lighting, props) but with no agents and no feed, so it is a static, deterministic picture rather than a frame of a running office.</p>
+<pre><code class="language-bash">npm run map                     # every theme, into docs/images/maps
+npm run map -- --list           # which theme keys there are
+npm run map -- --theme=tower    # just one, while you're working on it
+</code></pre>
+<p>The frame is fitted to whatever the theme actually built (the same reasoning as <code>prop-portrait.html</code>'s subject-fitted framing, applied to a whole exterior), rather than to the room: a skyscraper's neighbouring towers run to roughly 150 units across, a street to roughly 80, and hand-carrying both numbers — and a third the day a fifth theme wants something else — is exactly the kind of thing worth deriving instead. The one thing excluded by hand is the 220x220 backdrop ground plane <code>buildExterior()</code> always lays down so there's never a visible void under the scene: real content tops out at a few dozen units in any one mesh, so anything wider <em>and</em> deeper than 100 units is that plane, not something to frame. The settings are captioned in <a href="../user/buildings.html#the-cities-from-above">buildings and themes → user docs</a>.</p>
+<h2 id="where-to-make-a-change" tabindex="-1">Where to make a change</h2>
+<p>Reception, the app and the documentation share <code>assets/ui-theme.css</code>: warm white
+surfaces, dark ink, blue actions and semantic status colours. Eleventy copies that
+stylesheet and the bundled fonts into the documentation site. Prefer its tokens to
+hard-coded panel colours so dialogs and documentation stay consistent. Interactive
+accents use blue; body text and metadata use ink and muted tokens. Paper and furniture
+colours belong to the scene rather than to text or control styling.</p>
+<p>The fonts are Inter 4.1 and JetBrains Mono 2.304, both under the SIL Open Font License
+1.1, committed as <code>assets/Inter-latin.woff2</code> and <code>assets/JetBrainsMono-latin.woff2</code> and
+loaded from there — nothing fetches a font at run time. <code>vendor/inter/</code> and
+<code>vendor/jetbrains-mono/</code> hold each licence and a README recording the upstream release
+and the <code>pyftsubset</code> command that produced the latin subset, following the same pattern
+as <code>vendor/three/</code>; <code>third-party/inventory.json</code> and <code>THIRD_PARTY_NOTICES.txt</code> carry the
+same provenance alongside every other third-party file, and
+<a href="visual-assets.html">Visual assets and their rights</a> records the source and release basis
+of every visual asset in prose. The UI uses these
+shared foundations with native HTML controls; it does not require a React or Atlaskit
+runtime.</p>
+<p>Both faces are used with a few of their character variants switched on, through
+<code>--font-variants-sans</code> and <code>--font-variants-mono</code> in <code>assets/ui-theme.css</code>: the seriffed
+capital <code>I</code>, the flat-top <code>3</code>, the spurred <code>G</code>, square dots and straight quotes, and a
+dotted mono zero. <strong>That is more fiddly than it looks, and the reason is one CSS rule.</strong>
+<code>font-feature-settings</code> is a low-level property that <em>replaces</em> the inherited feature
+list rather than adding to it, and it also beats <code>font-variant-numeric</code>. So a rule that
+sets it drops everything it does not restate — which is why the token exists, why the
+nine rules in <code>styles.css</code> that want tabular figures write
+<code>font-feature-settings: var(--font-variants-sans), 'tnum' 1</code> instead of
+<code>font-variant-numeric: tabular-nums</code>, and why the four rules that use the <code>font</code>
+shorthand restate the token straight after it. Change a font rule without the token and
+the symptom is subtle: digits stop lining up in a column, or one letterform quietly
+reverts.</p>
+<p>The visual identity follows the same distinction as Atlassian Design's
+<a href="https://atlassian.design/foundations/logos">app logos</a> and
+<a href="https://atlassian.design/foundations/illustrations">illustrations</a>: a simple mark
+for recognition, with more expressive artwork where there is room for a story.
+The logo is the multicolour isometric office in <code>assets/logo.png</code>: blue and purple
+walls, an orange doorway and a green garden edge. Its PNG variants and favicon are
+committed alongside it. Keep the wordmark as native text, and leave the transparent
+mark free of an extra background tile or shadow.</p>
+<p>Interface colours use the brand-refresh palette published in <code>@atlaskit/tokens</code>
+16.11.3: neutral white/grey surfaces, Blue700 actions, and Green200/Green800 for
+layout import feedback. The office's material palettes remain expressive and separate
+from the UI. Inter is the main face; JetBrains Mono is for numeric readouts and code.
+Shared definitions live in <code>assets/ui-theme.css</code>.
+Reception uses the real animated vignette with flat sunshine and leaf shapes.
+The small SVG illustrations explain arrivals, research and deliveries; the arrivals
+and mug illustrations also give empty states a welcome. Keep these out of dense
+settings and active work views. Characters, movement and materials carry the
+personality of the room. Blue remains the action colour; yellow and lime are accents
+for artwork, not text colours. Shared spacing, type and radius tokens keep the
+controls consistent: 6px for controls, 8px for surfaces and 12px for dialogs, following
+the <a href="https://atlassian.design/foundations/radius">radius foundations</a>.</p>
+<p>The viewing clock starts at 11:00 for a sunny arrival. <strong>Scene → Now</strong> returns it to
+local time; the time scrubber selects any other hour. Event timestamps use real time.
+The renderer uses exposure 1.0 and a gentler midday sun to preserve material
+colour. Editor cells and routes are unlit and bypass tone mapping; the legend
+uses the same cell colours. Routes sit above rugs and selection overlays.
+Lighting keeps ambient fill at night so the office remains legible while the sun,
+sky and lamps continue to follow the selected time.</p>
+<table>
+<thead>
+<tr>
+<th>You want to</th>
+<th>Start in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Move a desk, add a station</td>
+<td><code>src/layout.js</code> — the floor plan, stations and nav-grid footprints all derive from it. To find the position first, drag it: <a href="editor.html">the furniture editor</a></td>
+</tr>
+<tr>
+<td>Change the furniture editor</td>
+<td><code>src/editor/</code> — the mode (<code>editor.js</code>), its overlays (<code>gizmos.js</code>), its panel (<code>panel.js</code>)</td>
+</tr>
+<tr>
+<td>Change what an agent <em>does</em></td>
+<td><code>src/agents/AgentManager.js</code>, and <code>states.js</code> for the action queue</td>
+</tr>
+<tr>
+<td>Change how they move</td>
+<td><code>src/agents/pathfinding.js</code> and <a href="physics.html">physics.md</a></td>
+</tr>
+<tr>
+<td>Add a prop (<a href="extending.html#add-a-prop">full recipe</a>)</td>
+<td>one file in <code>src/scene/props/</code> (builder + any custom mounting), one line in <code>props/index.js</code>, one entry in the layout's kind table — the registry fails loudly if any of the three is missing. Then a <code>scene/catalogue.js</code> entry so it appears in the <a href="../item-movements.html">Item Library</a></td>
+</tr>
+<tr>
+<td>Add an outlook (<a href="extending.html#add-a-building-or-an-outlook">full recipe</a>)</td>
+<td>one module in <code>src/scene/outlooks/</code> exporting its definition, one line in <code>outlooks/index.js</code>, one mode string in <code>projects.js</code> — the registry fails loudly if any is missing</td>
+</tr>
+<tr>
+<td>Add a theme or a building</td>
+<td><code>src/projects.js</code>, then <a href="../user/buildings.html">buildings and themes</a></td>
+</tr>
+<tr>
+<td>Add a source</td>
+<td><code>src/data/AgentSource.js</code> for the interface, <code>sources.js</code> to declare it</td>
+</tr>
+<tr>
+<td>Change how several sources share a room</td>
+<td><code>src/data/feeds.js</code> — fan-in, id namespacing, and the state the pill summarises</td>
+</tr>
+<tr>
+<td>Change what a harness reports</td>
+<td><code>bin/mappers/</code> for a hook harness, <code>openclaw-plugin/lib/map.mjs</code> for OpenClaw — and bump the version, see below</td>
+</tr>
+<tr>
+<td>Change something every harness shares</td>
+<td><code>bin/lib/aop-core.cjs</code> — the endpoint, the project, the redaction caps and the POST. Both the hook adapter and the OpenClaw bridge read it, which is the point</td>
+</tr>
+<tr>
+<td>Change a panel</td>
+<td><code>src/ui/</code>, and register any new key in <code>ui/shortcuts.js</code></td>
+</tr>
+<tr>
+<td>Change what a job or a duration reads like</td>
+<td><code>src/ui/format.js</code>, shared by every panel that says it</td>
+</tr>
+</tbody>
+</table>
+<p>Two conventions are worth knowing before you start. <strong>A binding cannot exist without a description</strong>: the <code>?</code> panel is rendered from the shortcut registry itself, so a key registered without help text is a bug that shows up on screen. And <strong>capabilities are feature-detected, never named</strong> — the <strong>T</strong> binding tests for <code>source.sendJob</code> rather than asking whether the source is the mock, which is what lets it disappear from an office where nothing can invent a job.</p>
+<p><strong>F</strong> needs a selected agent, but stays registered so the shortcuts panel can explain
+the mode before anyone is selected. The inspector also offers <strong>Follow Along</strong>, wired
+through the same shortcut action; its label carries the precondition in the help panel.</p>
+<h2 id="the-traps" tabindex="-1">The traps</h2>
+<p>All of these have cost someone an afternoon:</p>
+<ul>
+<li><strong>Two surfaces on one plane.</strong> The single most common visual bug in this project. Run the probe.</li>
+<li><strong>Nothing may destructure <code>COLORS</code> at import time.</strong> It is a mutable singleton that <code>applyPalette()</code> rewrites in place — see <a href="../user/buildings.html">buildings and themes</a>.</li>
+<li><strong>Tear down before you build.</strong> The material cache in <code>scene/build.js</code> is keyed on colour and shares materials by reference, so building the new world first leaves it holding materials that teardown then disposes.</li>
+<li><strong>Walls must be rotated into their face, and everything sits at or in front of it.</strong> These walls are solid boxes with nothing punched through them, so a &quot;recessed&quot; element is an invisible one.</li>
+<li><strong>A changed mapper needs a version bump</strong> to reach Claude or Codex, which run copied plugin snapshots of this repo. See <a href="adapters/claude-code.html#changing-the-plugin-means-bumping-the-version">Claude Code</a> and <a href="adapters/codex.html">Codex</a>.</li>
+</ul>
+<h2 id="driving-one-agent-by-hand" tabindex="-1">Driving one agent by hand</h2>
+<p>A test agent runs a loop of its own, so the movement you want to look at arrives when the dice say so. Under <strong>Test Action</strong> at the bottom of the <strong>agent detail panel</strong> — click any <strong>Test Data</strong> agent, in the room or in the roster — is a row of lozenges, one per behaviour the office has, in the order of a working day: <strong>Job by air</strong>, <strong>Job by courier</strong>, <strong>Work</strong>, <strong>Checklist</strong>, <strong>Wait</strong>, <strong>Look up</strong>, <strong>Search web</strong>, <strong>Post run</strong>, <strong>Deliver</strong>, <strong>Bin it</strong>, <strong>Drink</strong>, <strong>Sofa</strong>, <strong>Dance</strong>, <strong>Wander</strong>, <strong>Go home</strong>, <strong>Beam up</strong>.</p>
+<p>Pressing one:</p>
+<ol>
+<li><strong>Closes whatever was in hand, quietly.</strong> No walk to the bin, nothing posted, and nothing in the Job Delivery panel — a hand on the button is neither a delivery nor an error. The log entry closes where it stood, and the press opens one of its own, so &quot;Recent jobs&quot; becomes a record of which buttons you pressed and in what order.</li>
+<li><strong>Runs the behaviour</strong>, as the event a feed would have sent. That is the point of it: the room is driven down exactly the path a real harness drives it down, so what you check by hand is what a session gets.</li>
+<li><strong>Holds the agent for ten seconds</strong> once the errand comes to rest — long enough to look at where they ended up, take a screenshot, and read the panel describing it.</li>
+<li><strong>Hands them back to the random loop</strong>, unless another button was pressed in the meantime.</li>
+</ol>
+<p>While the hold lasts, the pressed lozenge stays lit and the room stops deciding for that one agent: the idle roll, the mid-job coffee run, post waiting in the box and <strong>the feed itself</strong> are all held off. Anything the feed says about what they are <em>doing</em> is dropped rather than queued, so nothing lurches when the hold expires; who somebody <em>is</em> — a rename, a colour, a face — still lands, and an <code>exit</code> outranks any button. Nobody else in the room is affected.</p>
+<p><strong>New job</strong> is the only press that starts outside the agent, and it is the one worth knowing about. A request arriving is a <em>room</em> event: the envelope is posted first, addressed to them and sized before it sets off — because the size is what picks the channel, a letter by air through the window and a package to the door with the courier — the flag goes up and the Job Delivery panel names it. Only then does the agent get up, walk to the box, wait there if their plane is still in the air, open it, and carry the letter or package to a desk. The title <em>inside</em> the envelope becomes their job, which is why the log entry is named after the request rather than after the button.</p>
+<p><strong>Work</strong> is not a substitute for it: with an empty mailbox that button goes to the inbox stack instead, and an agent who already has material fetches nothing at all. Everything about collection lives in <code>_work</code> and <code>_collectMail</code>, with <code>_checkPost</code> as the frame-loop half that catches a prompt landing while somebody is already seated.</p>
+<p><strong>Checklist</strong> is the other button that is more than a single event: it hands over a five-part plan and works through it at the desk, a part every two seconds, so the four surfaces that phrase a step — roster row, panel checklist, first-person HUD, name tag — can be read against each other. Each part ticking over restarts the ten seconds, so the list always finishes before the room takes them back.</p>
+<p>The buttons are drawn for <strong>simulated agents only</strong> — a Test Data office, or the Test Data half of a mixed one. Driving one of those by hand costs nothing, because the loop deciding for them is the one being overridden. A live session's character has no row: a press would put a movement on screen that its harness never reported, and the room being an honest picture of what the sessions are doing is the whole point of it. Two presses have no way back. <strong>Go home</strong> walks them out and removes them, and they do not arrive again until the feed sends a fresh spawn. <strong>Beam up</strong> is the other, and it is the only lozenge that stands in for no feed event at all: nothing a harness can send asks to be beamed up, because the cone of light is the <em>room</em> giving up on a departure that has not finished thirty seconds after it was asked for (<a href="../user/connect-your-agents.html#and-the-blue-cone-of-light">when agents leave</a>). What the button stands in for is the thirty seconds — the one part of that feature nobody would sit through to look at — so it is also the only press allowed on somebody already walking out, which is exactly the state it is about.</p>
+<p>The catalogue is <code>src/agents/pilot.js</code> and it is one list: the panel draws it and <code>AgentManager.pilot</code> runs it, so a new button is an entry there and nothing else. Behaviours deliberately live nowhere but the manager — a movement that existed only for the buttons would be a second office, and it would be the one getting checked.</p>
+<h2 id="driving-the-receiver-by-hand" tabindex="-1">Driving the receiver by hand</h2>
+<p>You do not need a harness to test ingest — <a href="architecture.html#receiving-events">Architecture § Receiving events</a> has a <code>curl</code> that posts a <code>session.start</code> straight at the server, and <code>GET /aop/v0/health</code> answers the question of whether anything is connected at all.</p>
+<h3 id="reading-the-events-as-text" tabindex="-1">Reading the events as text</h3>
+<p>The room is a poor way to answer &quot;did that event arrive, and what was in it?&quot;, so every office has a second page that answers only that:</p>
+<pre><code>/office/&lt;keycard&gt;/debuglog
+</code></pre>
+<p>Same header — keycard, scene switcher, source picker — and in place of the building, the events themselves: newest at the top, each one a line with the wall clock to the millisecond, how long ago it was, <strong>which character in the room it is about</strong>, the harness it came from, the session, and a summary of its payload. Click a line for the whole envelope. There is a link to it under <strong>Events</strong> in the office's own developer panel (press <strong>V</strong>), and <code>G</code> goes straight there; a link back to the office sits in its header.</p>
+<p>A hundred rows are drawn, but two thousand events are remembered — the same ring the receiver holds — so the filters below the strip can reach the whole of it:</p>
+<table>
+<thead>
+<tr>
+<th>Filter</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Search</td>
+<td>Matches the <strong>whole envelope</strong>, not the line, so a tool call id or a file path that never made it into a summary is still findable. Several words all have to match. <code>/</code> puts the cursor in the box from anywhere on the page; <code>Esc</code> empties it.</td>
+</tr>
+<tr>
+<td>Character</td>
+<td>One colleague, followed through everything they did — including the errands of any subagent they spawned.</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>One AOP type, grouped by family in the list, with a count beside each: a list that says <code>tool.start (0)</code> has already told you the adapter is not sending them.</td>
+</tr>
+<tr>
+<td>Sender</td>
+<td>One harness, for when two adapters are running and only one is misbehaving.</td>
+</tr>
+</tbody>
+</table>
+<p>They compose, and they are all <em>views</em>: filtering hides rows and never drops events, so <strong>Clear filters</strong> always gives them back. When they hide everything the empty state says so, and says how many events are sitting behind them — because &quot;nothing matches&quot; and &quot;nothing arrived&quot; look identical and mean opposite things.</p>
+<p><strong>The names are the room's names.</strong> The column says <code>Ines Name-Sleuth</code>, not <code>…a3f21b8c</code>, and it is the same name on that agent's desk in the office, because both come from the same place — <code>src/agents/cast.js</code>, which turns a session into a character and is read by <code>AopSource</code> and this page alike. Two implementations of &quot;who is this?&quot; would be two offices. Three consequences worth knowing:</p>
+<ul>
+<li><strong>A rename rewrites history.</strong> Surnames follow the work, so the prompt that turns Ada Prompt into Ada Filter-Builder repaints every row she already owns. The alternative is a page holding two names for one person, which breaks the promise the column makes: the name you are watching in the room is the name you can search for here, all the way back.</li>
+<li><strong>A subagent is filed under its parent</strong>, indented with a <code>↳</code>. The room does not draw subagents yet (spec §6.1), so naming one in its own right would promise a colleague you can never go and look at — and it also answers the question the row otherwise provokes: why did nobody move when this arrived?</li>
+<li><strong>A row about nobody says so</strong>, with an em dash: a queued job belongs to no one yet, and a tab opening is about the office rather than anyone in it.</li>
+</ul>
+<p>It loads no three.js and opens no WebGL context, which is the point rather than a nicety: the times you most need to know what is arriving are the times the scene is the suspect.</p>
+<p>A few things about it are worth knowing before you trust what it shows you:</p>
+<ul>
+<li><strong>It tails the whole office, not the scene.</strong> Events from a harness the active scene does not listen to still appear, dimmed, with the reason in their tooltip. That row is the answer to the commonest confusion there is — <em>my agent is running, why is the room empty?</em> — and filtering it away to match the scene would hide the one thing worth seeing.</li>
+<li><strong>It reads frames rather than subscribing to types.</strong> <code>AopSource</code> listens for each AOP type by name because <code>EventSource</code> delivers named frames only to matching listeners, so a type missing from its list is a type the office never sees. The log parses the stream itself (<code>src/debug/aop-tail.js</code>), so an event type nobody has added anywhere still shows up, payload and all. If you are adding a type to the spec, this page will show it before any code knows what it is.</li>
+<li><strong>Test Data has nothing to tail.</strong> Simulated agents are invented in the browser and never cross the network, so a Test Data scene produces no AOP traffic whatsoever. The <strong>Test Data</strong> toggle logs the simulation's stage directions instead — a different vocabulary, marked with a dashed edge so the two are never confused — and the empty state says so rather than looking broken.</li>
+<li><strong>The log names characters from the whole ring, and the room only from what it replayed.</strong> Both use the same rules, so the same session is the same person in both — the one seam is that first names avoid collisions among the sessions each knows about, and the log knows about more. If two agents would both have been Ada, the log may pick a different alternate for the second than the room did. The session id is the exact identity when it matters.</li>
+<li><strong>Viewers arriving and leaving are logged too</strong>, and the strip carries the running count — the only place in the app that shows it. These two rows are the exception to the page's rule about time: presence is a thirty second heartbeat that expires after ninety, so a <code>viewer.join</code> is up to 30s late and a <code>viewer.leave</code> up to two minutes, where every other row carries the emitter's own clock and is exact. The tooltip on each says so. The first reading is a baseline rather than an arrival, since on load it is counting the tab you are reading it in.</li>
+</ul>
+<p>The stream it reads is the ordinary one, so <code>curl</code> sees exactly the same thing:</p>
+<pre><code class="language-bash">curl -N &quot;http://localhost:8080/office/&lt;keycard&gt;/aop/v0/stream?after=0&quot;   # the whole ring, then live
+</code></pre>
+<p>If you are an agent working in this repo, the working agreements — Jira status, worktrees, merging, and clearing up afterwards — are in <a href="https://github.com/atlassian-labs/roving-office/blob/main/AGENTS.md"><code>AGENTS.md</code></a>.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#what-ci-runs">What CI runs</a></li>
+<li><a href="#look-at-the-scene">Look at the scene</a></li>
+<li><a href="#photograph-one-object">Photograph one object</a></li>
+<li><a href="#photograph-a-whole-theme-from-above">Photograph a whole theme from above</a></li>
+<li><a href="#where-to-make-a-change">Where to make a change</a></li>
+<li><a href="#the-traps">The traps</a></li>
+<li><a href="#driving-one-agent-by-hand">Driving one agent by hand</a></li>
+<li><a href="#driving-the-receiver-by-hand">Driving the receiver by hand</a><ul><li><a href="#reading-the-events-as-text">Reading the events as text</a></li></ul></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

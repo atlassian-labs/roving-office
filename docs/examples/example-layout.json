@@ -1,0 +1,168 @@
+{
+  "layout": 4,
+  "complete": true,
+  "name": "Three Blocks",
+  "seed": "misty-quay-3100",
+  "reason": "8 desks in two teams of 6 and 2, one block of desks in the middle of the floor, off a street across the room. Work comes and goes by a post box and a printer, and the courier calls. Lookups go to a bookshelf. The break end has two things to sit on, kept away from the quiet desks. Cold Store: one warm couch in a big cold room.",
+  "desks": {
+    "desk-1": {
+      "x": 19.82,
+      "z": 5.1,
+      "facing": 3.14,
+      "standing": false
+    },
+    "desk-2": {
+      "x": 14.5,
+      "z": 5.1,
+      "facing": 3.14,
+      "standing": false
+    },
+    "desk-3": {
+      "x": 9.18,
+      "z": 5.1,
+      "facing": 3.14,
+      "standing": false
+    },
+    "desk-4": {
+      "x": 19.82,
+      "z": 7.9,
+      "facing": 6.28,
+      "standing": true
+    },
+    "desk-5": {
+      "x": 14.5,
+      "z": 7.9,
+      "facing": 6.28,
+      "standing": false
+    },
+    "desk-6": {
+      "x": 9.18,
+      "z": 7.9,
+      "facing": 6.28,
+      "standing": false
+    },
+    "desk-7": {
+      "x": 3.5,
+      "z": 16.1,
+      "facing": 3.14,
+      "standing": false
+    },
+    "desk-8": {
+      "x": 8.5,
+      "z": 16.1,
+      "facing": 3.14,
+      "standing": false
+    }
+  },
+  "stations": {
+    "coatStand": {
+      "kind": "coatStand",
+      "x": 0.8,
+      "z": 3,
+      "facing": 1.57
+    },
+    "mailbox": {
+      "kind": "mailbox",
+      "x": 24.92,
+      "z": 2.5,
+      "facing": -1.57
+    },
+    "printer": {
+      "kind": "printer",
+      "x": 25,
+      "z": 17.5,
+      "facing": -1.57
+    },
+    "bookshelf": {
+      "kind": "bookshelf",
+      "x": 1.63,
+      "z": 18.5,
+      "facing": 1.57
+    },
+    "bin": {
+      "kind": "bin",
+      "x": 25.2,
+      "z": 19,
+      "facing": -1.57
+    }
+  },
+  "furniture": {
+    "armchair": {
+      "kind": "armchair",
+      "x": 24.5,
+      "z": 15.5,
+      "facing": 3.14,
+      "color": "terracotta"
+    },
+    "armchair-2": {
+      "kind": "armchair",
+      "x": 20,
+      "z": 15,
+      "facing": 1.57,
+      "color": "terracotta"
+    },
+    "sideTable": {
+      "kind": "sideTable",
+      "x": 22,
+      "z": 17,
+      "facing": 1.57
+    },
+    "floorLamp": {
+      "kind": "floorLamp",
+      "x": 17,
+      "z": 14.5
+    },
+    "rug": {
+      "kind": "rug",
+      "x": 22,
+      "z": 15,
+      "facing": 1.57,
+      "color": "ink"
+    },
+    "rug-2": {
+      "kind": "rug",
+      "x": 13,
+      "z": 6.5,
+      "facing": 0,
+      "color": "ink"
+    }
+  },
+  "decor": {},
+  "plants": {
+    "plant-1": {
+      "kind": "snake",
+      "x": 1,
+      "z": 1,
+      "facing": 0,
+      "scale": 1.33,
+      "seasonal": false
+    },
+    "plant-2": {
+      "kind": "snake",
+      "x": 17,
+      "z": 1,
+      "facing": 0,
+      "scale": 1.14,
+      "seasonal": true
+    },
+    "plant-3": {
+      "kind": "fig",
+      "x": 17.5,
+      "z": 16,
+      "facing": 0,
+      "scale": 1.64,
+      "seasonal": false
+    },
+    "plant-4": {
+      "kind": "snake",
+      "x": 1,
+      "z": 9,
+      "facing": 0,
+      "scale": 1.13,
+      "seasonal": true
+    }
+  },
+  "channels": {
+    "courier": true
+  }
+}

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Extending the office — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html" aria-current="page">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="extending-the-office" tabindex="-1">Extending the office</h1>
+<p>Four recipes, each ending in a working thing. They share one shape, because the
+codebase does: <strong>a data file owns what exists, a registry owns how it is built,
+and import-time checks weld the two together</strong> — forget one half and the first
+run tells you, loudly, instead of a click failing quietly. <code>src/data/sources.js</code>
+is the original of the pattern; the props and the outlooks follow it.</p>
+<p>Every recipe ends the same way: <code>npm test</code>, the probe, and a look at the scene
+(<a href="developing.html">developing.md</a> has the loop). Docs update in the same PR as the
+change — this repo's documentation is accurate because that is a rule, not a
+hope.</p>
+<h2 id="add-a-prop" tabindex="-1">Add a prop</h2>
+<p>A prop is one file carrying its geometry and, where the common mounting pattern
+is not enough, its own way of being put into the room.</p>
+<ol>
+<li><strong>Build it</strong> — <code>src/scene/props/&lt;kind&gt;.js</code>, exporting <code>build&lt;Kind&gt;()</code>. Raise
+it at its own origin, facing +z, feet on the floor, using the helpers in
+<code>scene/build.js</code> (<code>box</code>, <code>cyl</code>, <code>group</code>, <code>put</code>, <code>mat</code>, <code>footY</code>). Look at
+<code>bin.js</code> for the minimal shape and <code>mailbox.js</code> for a prop with behaviour.
+If agents interact with it, return <code>{ obj, handle }</code> and give the handle the
+methods the agent layer will drive.</li>
+<li><strong>Register it</strong> — one line in <code>src/scene/props/index.js</code>. Add a <code>mount</code> only
+if the common pattern (build, face the approach point, register the handle
+under the kind's name) is not enough.</li>
+<li><strong>Declare it to the layout</strong> — one entry in the kind table in
+<code>src/layout.js</code> (<code>STATION_KINDS</code> or <code>FURNITURE_KINDS</code>): its label, how many
+the room may hold, and the floor it blocks as half-extents in its own axes.
+That entry is what the editor's Add menu, the nav grid and the sync
+machinery read.</li>
+<li><strong>Photograph it</strong> — an entry in <code>scene/catalogue.js</code>, so it appears in
+the <a href="../item-movements.html">Item Library</a> (<code>npm run portrait</code> rewrites the stills).</li>
+</ol>
+<p>Forget 1, 2 or 3 and the registry throws at first import; forget 4 and
+<code>test/scene-catalogue.test.js</code> fails. That is the whole safety story: you
+cannot add half a prop.</p>
+<h2 id="add-a-building-or-an-outlook" tabindex="-1">Add a building or an outlook</h2>
+<p>A <strong>building</strong> is a <code>BUILDINGS</code> entry in <code>src/projects.js</code> — storeys below,
+walls, roof, which outlook is outside — and most new buildings are only that:
+data, no code. The pieces it composes live in <code>scene/building.js</code>.</p>
+<p>An <strong>outlook</strong> — a new world outside the windows — is the registry one level up:</p>
+<ol>
+<li><strong>Build it</strong> — a module in <code>src/scene/outlooks/</code>, exporting its definition:
+<code>{ id, label, aerial, ground(season), build(g, ctx) }</code>. The shared kit
+(trees, lamps, cars, the seeded RNG that keeps rebuilds still) is
+<code>outlooks/streetscape.js</code>; <code>street.js</code> is the worked example.</li>
+<li><strong>Register it</strong> — one line in <code>outlooks/index.js</code>.</li>
+<li><strong>Name its mode</strong> — one string in <code>OUTSIDE_MODES</code> in <code>projects.js</code>, which is
+what a theme or a <code>BUILDINGS</code> entry points at.</li>
+</ol>
+<p>The registry validates both ways at import, and <code>npm run map</code> renders every
+theme's whole city so you can see what you built from above.</p>
+<h2 id="add-a-source" tabindex="-1">Add a source</h2>
+<p>A source fills an office with agents. The five that exist are declared in
+<code>src/data/sources.js</code>, and the picker, the badge and the switcher all read that
+list — none of them know the roster.</p>
+<ol>
+<li><strong>Declare it</strong> — a record in <code>SOURCES</code>: <code>id</code>, <code>label</code>, <code>blurb</code>, <code>accent</code>,
+a <code>mark</code> (inline SVG in <code>ui/marks.js</code>), <code>kind</code>, and a <code>create(ctx)</code> factory.</li>
+<li><strong>Implement it</strong> — a class with the <code>AgentSource</code> shape (<code>start(onEvent)</code>,
+<code>stop()</code>, optional capabilities like <code>sendJob</code>). For a live harness that
+speaks AOP, <code>AopSource</code> already is the implementation — a new AOP harness is
+a <code>SOURCES</code> record with <code>kind: 'aop'</code> and the harness slug, nothing more on
+the browser side.</li>
+<li><strong>Document it</strong> — a page in <code>docs/sources/</code>, saying what it can see and how
+to install its adapter.</li>
+</ol>
+<p>The events a source emits are the office's own vocabulary — <code>spawn</code>, <code>status</code>,
+<code>job</code>, <code>research</code>, <code>dispatch</code>, <code>exit</code> — documented at the top of
+<code>agents/AgentManager.js</code>. Capabilities are feature-detected, never named: a
+source that implements <code>sendJob</code> gets the <strong>T</strong> key, and nothing downstream
+ever asks what kind of source it is talking to.</p>
+<h2 id="add-a-harness-adapter" tabindex="-1">Add a harness adapter</h2>
+<p>An adapter turns a harness's own events into AOP on the wire — it runs on the
+agent's machine, not in the browser. <a href="protocol/aop-harness-adapters.html">aop-harness-adapters.md</a>
+describes the four that exist; <a href="protocol/aop-spec.html">aop-spec.md</a> is the wire format.</p>
+<ol>
+<li><strong>Write the mapper</strong> — <code>bin/mappers/&lt;harness&gt;.cjs</code>, exporting
+<code>map({ event, payload, state, redaction, helpers, endpointId })</code> → an array
+of AOP events, plus a <code>CAPABILITIES</code> list and a <code>TOOL_CLASSES</code> table.
+<code>aop-send.cjs</code> resolves the mapper from the harness slug, so the filename is
+the registration. <code>rovo-cli.cjs</code> is the smaller worked example;
+<code>claude-code.cjs</code> shows held introductions and real subagents.</li>
+<li><strong>Honour the contract.</strong> The parts every mapper must get right:
+<ul>
+<li>
+<p><strong>Redaction is the adapter's job</strong> (spec §10) — the decision about what
+leaves the machine is made where the secret already lives. In <code>metadata</code>
+mode no free text reaches a desk label (titles become &quot;Working&quot;, errors are
+dropped); <code>summary</code> clamps everything through <code>helpers.clamp</code>; <code>full</code>
+carries prompts only with the second opt-in. Never emit a whole command
+line — <code>targetOf</code> takes the binary name only — and paths leave through
+<code>helpers.tidyPath</code>, relative or <code>~</code>-prefixed, never absolute.</p>
+<p><strong>Pass the mode to <code>targetOf</code>.</strong> A <code>target</code> is not one kind of thing: a
+file path is what <code>metadata</code> promises, and a search pattern, a web query
+or a URL is the model's own text. <code>TARGET_KEYS</code> in
+<code>mappers/lib/tool-classes.cjs</code> says which key is which category and
+<code>TARGET_KINDS</code> says what each may say at <code>metadata</code> — a search says
+nothing, a URL says its host. A call site that forgets the argument gets
+<code>metadata</code> behaviour, so the worst it can do is say too little.</p>
+</li>
+<li>
+<p><strong>Introduce before use, and never before.</strong> Any event may be the first the
+office hears (hooks get installed mid-session, receivers restart), so a
+mapper carries <code>session.start</code> ahead of whatever needs it — and a session
+that never does anything is never introduced at all (see <code>QUIET_EVENTS</code>
+in the Claude mapper).</p>
+</li>
+<li>
+<p><strong>Declare capabilities honestly</strong> on <code>session.start</code>: a session that
+promises <code>session.end</code> gets the long reaping leash, so only promise what
+the harness reliably delivers.</p>
+</li>
+<li>
+<p><strong>Classify, don't name.</strong> The office renders <code>tool_class</code>, never tool
+names. Exact names go in your <code>TOOL_CLASSES</code> table; everything unknown
+falls through the shared heuristics in <code>mappers/lib/tool-classes.cjs</code>.</p>
+</li>
+</ul>
+</li>
+<li><strong>Write the installer</strong> — <code>bin/aop-&lt;harness&gt;-install.cjs</code> with <code>--status</code>,
+<code>--dry-run</code> and <code>--uninstall</code>, scaffolding the shared config through
+<code>bin/lib/local-config.cjs</code>. The three that exist show the range, and their
+headers say why each is shaped the way it is.</li>
+<li><strong>Fixture-test it</strong> — recorded payloads → expected events, next to
+<code>test/mapper-claude-code.test.cjs</code>. The recorded shapes are the contract;
+the tests are where the next reader learns the dialect.</li>
+<li><strong>Document it</strong> — a page in <code>docs/sources/</code>, and a row in
+<a href="protocol/aop-harness-adapters.html">aop-harness-adapters.md</a>.</li>
+</ol>
+<p>If the change touches <code>hooks/</code>, <code>bin/aop-send.cjs</code>, <code>bin/aop-node.sh</code>, <code>bin/aop-plugin-hook.sh</code>,
+<code>bin/mappers/</code>, <code>.claude-plugin/</code> or <code>.codex-plugin/</code>, bump the plugin version — every time. The
+why is in <a href="https://github.com/atlassian-labs/roving-office/blob/main/AGENTS.md">AGENTS.md</a>.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#add-a-prop">Add a prop</a></li>
+<li><a href="#add-a-building-or-an-outlook">Add a building or an outlook</a></li>
+<li><a href="#add-a-source">Add a source</a></li>
+<li><a href="#add-a-harness-adapter">Add a harness adapter</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

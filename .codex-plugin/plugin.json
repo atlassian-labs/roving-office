@@ -1,0 +1,31 @@
+{
+  "name": "roving-office",
+  "version": "0.15.5",
+  "description": "Watch Codex sessions as characters in a soft-3D isometric office.",
+  "author": {
+    "name": "Mike Cannon-Brookes"
+  },
+  "homepage": "https://github.com/atlassian-labs/roving-office",
+  "repository": "https://github.com/atlassian-labs/roving-office",
+  "keywords": [
+    "observability",
+    "visualisation",
+    "hooks",
+    "agent-office-protocol"
+  ],
+  "interface": {
+    "displayName": "The Roving Office",
+    "shortDescription": "See Codex sessions work in a live office diorama.",
+    "longDescription": "A zero-context hook integration that turns Codex lifecycle, tool, plan, permission, compaction, and subagent events into live characters in The Roving Office.",
+    "developerName": "Mike Cannon-Brookes",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Observability"
+    ],
+    "defaultPrompt": [
+      "Check whether The Roving Office adapter is connected."
+    ],
+    "websiteURL": "https://github.com/atlassian-labs/roving-office",
+    "brandColor": "#D7A76B"
+  }
+}

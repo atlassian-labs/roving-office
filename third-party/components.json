@@ -1,0 +1,398 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-09-10",
+  "description": "Curated provenance and distribution scope. Regenerate inventory.json and THIRD_PARTY_NOTICES.txt with node bin/gen-third-party.mjs after npm ci. NOASSERTION and review notes are unresolved evidence, not permission to redistribute.",
+  "distributionRecipes": [
+    "Dockerfile.fly",
+    ".dockerignore",
+    "bin/aop-codex-install.cjs",
+    "bin/aop-openclaw-pack.cjs",
+    "bin/aop-plugin-pack.cjs",
+    "bin/lib/zip.cjs",
+    "eleventy.config.mjs",
+    ".github/workflows/ci.yml"
+  ],
+  "distributions": {
+    "source": "Git source archive/checkout: vendored code, assets, development source and notices. npm packages are not bundled; package-lock.json identifies the separate development install.",
+    "development-install": "npm ci: all locked npm packages are development tools, including transitive dependencies. Their complete recorded license documents are in inventory.json and their installed package directories.",
+    "claude-marketplace": "bin/aop-claude-install.cjs adds the checkout as a marketplace, so Claude Code copies the source tree and its upstream notices into its plugin cache. This is the development route; the published route is claude-plugin-archive.",
+    "claude-plugin-archive": "bin/aop-plugin-pack.cjs RUNTIME allowlist, published as plugins/claude/roving-office-<version>.zip and pinned by SHA-256 in plugins/claude/marketplace.json: the hook wrapper, the Node launcher, the adapter, aop-core, the Claude mapper and its three shared modules, hooks.json and assets/logo-256.png. The build asserts that every module the payload loads is one of those files or a Node builtin, so no npm package, Three.js, colour table, font or brand mark is present and no third-party notice applies to it. Node is supplied by the user. Carries a generated NOTICE and FILES.json; ships no LICENSE, because the source tree has none.",
+    "codex-plugin-marketplace": "The same allowlist with the Codex manifest and both mappers, emitted as a complete Codex marketplace tree (plugins/codex, gitignored) for publication to a public Git repository that does not yet exist. Same payload properties as claude-plugin-archive.",
+    "codex-local-marketplace": "bin/aop-codex-install.cjs stageMarketplace copies bin, hooks, plugin manifests, package.json, README and an optional project LICENSE. No npm packages, Three.js, colour table, fonts, brand assets or autoresearch are copied. Node is supplied by the user.",
+    "openclaw-tarball": "bin/aop-openclaw-pack.cjs allowlist: first-party plugin modules and two first-party adapter modules only; Node builtins, no bundled npm packages or visual assets. OpenClaw and Node are host prerequisites. No third-party notice applies to the current payload.",
+    "hosted-app": "Dockerfile.fly copies src, lib, assets, vendor, generated docs, images and examples. THIRD_PARTY_NOTICES.txt contains the bundled Three.js, colour-data and font licenses; vendor retains originals. npm development tools and autoresearch are not copied.",
+    "docs-site": "Generated docs/site contains authored HTML/CSS/JS and copies of the two OFL fonts, their licences and the theme CSS. Eleventy and its npm dependencies execute at build time and are not bundled as libraries. Screenshots can reproduce the app's brand assets.",
+    "fly-container": "Application payload plus the dynamically resolved node:24-slim image. A release needs the actual image digest, Node version, OS/package inventory and retained base-image notices. This source inventory does not claim to be an image SBOM.",
+    "ci": ".github/workflows/ci.yml runs verification only, on the GitHub-hosted ubuntu-latest runner with Node 24 and Node 26 supplied by actions/setup-node. It installs no deployment tooling and holds no credential. These build tools are not bundled in application artifacts, and exact runner image versions are not pinned here."
+  },
+  "components": [
+    {
+      "id": "three",
+      "name": "three",
+      "version": "0.185.1",
+      "license": "MIT",
+      "source": "https://unpkg.com/three@0.185.1/",
+      "paths": [
+        "vendor/three/build/three.module.js",
+        "vendor/three/build/three.core.js",
+        "vendor/three/examples/jsm/controls/OrbitControls.js"
+      ],
+      "licenseFiles": [
+        "vendor/three/LICENSE"
+      ],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app"
+      ],
+      "runtimeNotice": true,
+      "review": "All three code files and LICENSE matched the exact upstream npm version byte for byte on the review date. OrbitControls is the sole vendored addon."
+    },
+    {
+      "id": "color-name-list",
+      "name": "color-name-list",
+      "version": "14.48.0",
+      "license": "MIT",
+      "source": "https://unpkg.com/color-name-list@14.48.0/dist/colornames.json",
+      "modification": "filtered, lowercased and encoded into src/agents/colour-names.js.",
+      "licenseSource": "https://unpkg.com/color-name-list@14.48.0/LICENSE",
+      "paths": [
+        "src/agents/colour-names.js"
+      ],
+      "licenseFiles": [
+        "vendor/color-name-list/LICENSE"
+      ],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app"
+      ],
+      "runtimeNotice": true,
+      "review": "Derived table of 12,005 entries from 31,915 upstream names, filtered to at most two words containing a colour term, lowercased and encoded by bin/gen-colour-names.mjs. The full upstream MIT notice is retained, including Copyright (c) 2017 David Aerne."
+    },
+    {
+      "id": "autoresearch",
+      "name": "uditgoenka/autoresearch",
+      "version": "2.2.2",
+      "revision": "050e30dc4ba0974b03f2873111b9901ec3211390",
+      "license": "MIT",
+      "source": "https://github.com/uditgoenka/autoresearch/tree/050e30dc4ba0974b03f2873111b9901ec3211390",
+      "paths": [
+        ".claude/skills/autoresearch",
+        ".claude/hooks/autoresearch",
+        ".claude/commands/autoresearch",
+        ".claude/commands/autoresearch.md"
+      ],
+      "licenseFiles": [
+        ".claude/skills/autoresearch/LICENSE"
+      ],
+      "distributions": [
+        "source",
+        "claude-marketplace"
+      ],
+      "review": "Vendored Claude payload only, with upstream MIT license retained. See VENDORED.md for the selection and local integration. Not part of the deployed app or the local Codex plugin staging."
+    },
+    {
+      "id": "uxwing-brand-marks",
+      "name": "UXWing Rovo, Claude and OpenAI artwork (retired)",
+      "version": null,
+      "license": "NOASSERTION",
+      "status": "retired",
+      "sources": [
+        "https://uxwing.com/atlassian-rovo-icon/",
+        "https://uxwing.com/claude-ai-icon/",
+        "https://uxwing.com/openai-icon/",
+        "https://uxwing.com/license/"
+      ],
+      "paths": [],
+      "licenseFiles": [],
+      "distributions": [],
+      "review": "Retired: this artwork no longer ships in any distribution. It was byte-verified as copied from UXWing, whose published terms prohibit redistribution and sublicensing however the underlying marks are licensed, so vendor permission could not have rescued these files. src/ui/marks.js now carries each vendor's own official asset for Claude, Codex and OpenClaw; see the claude-mark, codex-mark and openclaw-artwork entries. The Rovo mark is the exception, and neither of its two forms is one of these retired files: both the standee extruded by src/scene/standees.js and the picker tile drawn by src/ui/marks.js are the same four polygons in src/rovo-mark.js, traced from UXWing's rendering of the four-facet Rovo mark, whose brand colours UXWing took from Atlassian rather than authored -- see the atlassian-rovo-standee and rovo-mark entries. Kept as a row rather than deleted so the inventory records what was removed and why."
+    },
+    {
+      "id": "rovo-mark",
+      "name": "Rovo logomark (Atlassian)",
+      "version": null,
+      "license": "NOASSERTION",
+      "source": "Atlassian's own Rovo mark -- the four-facet hexagon -- in four flat colours from the Atlassian brand palette: #1868db, #bf63f3, #fca700, #82b536. The polygon geometry is traced from UXWing's rendering of that same mark (https://uxwing.com/atlassian-rovo-icon/) rather than taken from an Atlassian kit SVG; brand guidance is at https://atlassian.design/foundations/logos.",
+      "modification": "the same ROVO_SHAPES polygons the standee is extruded from (src/rovo-mark.js), converted to 2D SVG paths in src/ui/marks.js -- one path per facet, in the facet's own colour, with no second copy of the geometry to drift.",
+      "paths": [
+        "src/ui/marks.js",
+        "src/rovo-mark.js"
+      ],
+      "licenseFiles": [],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app",
+        "docs-site"
+      ],
+      "review": "Atlassian trademark, used to identify a connectable source. The picker tile briefly carried the official app-kit asset instead -- a blue rounded-square tile with a white glyph -- which is the correct current app icon, but the project owner ruled that the four-facet mark is what this project shows, in the picker as well as on the sill, and overruled the app-kit tile. It is now the same artwork as the standee: one set of polygons, so the tile and the statue cannot disagree. Tracing a mark out of a rendering is a modification and a derivative work, as for the standee. Release basis: the project owner has approved it, on the basis that the mark and its four brand colours are Atlassian's own; Brand approval has been given. Excluded from the Apache-2.0 grant -- see NOTICE and docs/developer/visual-assets.md. This inventory grants no trademark or copyright rights."
+    },
+    {
+      "id": "claude-mark",
+      "name": "Claude Spark (Anthropic)",
+      "version": null,
+      "license": "NOASSERTION",
+      "source": "https://www.anthropic.com/press-kit (Anthropic media resources/Anthropic logos/Claude logos/3 Claude Spark/SVG/Claude Spark - Clay.svg)",
+      "paths": [
+        "src/ui/marks.js"
+      ],
+      "licenseFiles": [],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app",
+        "docs-site"
+      ],
+      "review": "Anthropic trademark, copied verbatim from Anthropic's published press kit and used to identify a connectable source. Unaltered: the kit publishes this mark free-standing in this colour, so no recolouring, re-cropping or other adjustment is applied. No licence, notice or terms file accompanies the kit, so no release basis travels with the asset. Release basis: no permission from Anthropic is held. The mark is retained on the project owner's decision, accepting that a take-down request would be complied with. Anthropic's guidelines permit the product name in plain text, so a text label is the standing fallback. Do not record this as cleared anywhere. Excluded from the Apache-2.0 grant -- see NOTICE and docs/developer/visual-assets.md. This inventory grants no trademark or copyright rights."
+    },
+    {
+      "id": "codex-mark",
+      "name": "OpenAI Blossom (OpenAI)",
+      "version": null,
+      "license": "NOASSERTION",
+      "source": "https://cdn.openai.com/brand/openai-logos.zip (OpenAI-logos/SVGs/OAI_OpenAI-Blossom_Black.svg), linked from https://openai.com/brand/",
+      "paths": [
+        "src/ui/marks.js"
+      ],
+      "licenseFiles": [],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app",
+        "docs-site"
+      ],
+      "review": "OpenAI trademark, copied verbatim from OpenAI's published logo kit and used to identify a connectable source. There is no Codex-specific mark, so this is OpenAI's corporate mark. Unaltered: the kit publishes a black and a white variant, and the black one is used as published on the white and near-white surfaces it appears on. Path data untouched, with one thing done to the wrapper: the published file is a 716-unit box holding a Blossom 354.67 across, and the viewBox is trimmed to the artwork's own measured bounds so the mark matches the size of the ones beside it instead of rendering at half their weight. That discards empty canvas and moves no ink relative to any other ink. No licence, notice or terms file accompanies the kit, so no release basis travels with the asset. Release basis: no permission from OpenAI is held. The mark is retained on the project owner's decision, accepting that a take-down request would be complied with. OpenAI's guidelines permit the product name in plain text, so a text label is the standing fallback. Do not record this as cleared anywhere. Excluded from the Apache-2.0 grant -- see NOTICE and docs/developer/visual-assets.md. This inventory grants no trademark or copyright rights."
+    },
+    {
+      "id": "atlassian-ace",
+      "name": "Atlassian ace standee artwork",
+      "version": null,
+      "license": "NOASSERTION",
+      "source": "https://atlassian.design/assets/c117b4e25b80/logos/atlassian_logo.zip (Atlassian/Atlassian Mark/SVG/Atlassian mark brand RGB.svg)",
+      "modification": "the mark's curves flattened once, offline, into the point lists in src/scene/standees.js and extruded into a 3D solid a third of its height deep.",
+      "paths": [
+        "src/scene/standees.js",
+        "docs/images/objects/aceLogo.png"
+      ],
+      "licenseFiles": [],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app",
+        "docs-site"
+      ],
+      "review": "Atlassian trademark. Traced to the official logo archive by coordinate match at two decimal places, in the same viewBox and brand colour. Flattening and extruding it is a modification and a derivative work, which the Atlassian Design System licence and the Trademark Guidelines both address, so a generic logo approval does not answer it. Release basis: the project owner has approved the standee; Brand approval explicitly covering the 3D extrusion has been given. Excluded from the Apache-2.0 grant -- see NOTICE and docs/developer/visual-assets.md."
+    },
+    {
+      "id": "atlassian-rovo-standee",
+      "name": "Rovo logomark standee artwork",
+      "version": null,
+      "license": "NOASSERTION",
+      "source": "Atlassian's own Rovo mark -- the four-facet hexagon -- in four flat colours from the Atlassian brand palette: #1868db, #bf63f3, #fca700, #82b536. The polygon geometry is traced from UXWing's rendering of that same mark (https://uxwing.com/atlassian-rovo-icon/) rather than taken from an Atlassian kit SVG; brand guidance is at https://atlassian.design/foundations/logos.",
+      "modification": "the mark flattened once, offline, into the four flat polygons in src/rovo-mark.js -- one per facet that reaches the surface, traced out of a rasterized rendering of the mark rather than lifted from a kit SVG -- and extruded by src/scene/standees.js into a 3D solid a third of its height deep.",
+      "paths": [
+        "src/rovo-mark.js",
+        "src/scene/standees.js",
+        "docs/images/objects/rovoLogo.png"
+      ],
+      "licenseFiles": [],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app",
+        "docs-site"
+      ],
+      "review": "Atlassian trademark. The standee is the four-facet Rovo mark, traced from UXWing's rendering of it into flat polygons in four Atlassian brand colours. It briefly carried the official app icon instead -- a blue rounded-square tile with a white glyph -- which is the correct current app icon but reads as a flat blue box once extruded, so the project owner restored the four-facet statue. Flattening and extruding a mark is a modification and a derivative work, as for the ace. Release basis: the project owner has approved the standee, on the basis that the mark and its four brand colours are Atlassian's own; Brand approval explicitly covering the 3D extrusion has been given. Excluded from the Apache-2.0 grant -- see NOTICE and docs/developer/visual-assets.md."
+    },
+    {
+      "id": "atlassian-jira-mark",
+      "name": "Jira logomark on the kanban board texture",
+      "version": null,
+      "license": "NOASSERTION",
+      "source": "https://atlassian.design/assets/6fc1266a1e2d/logos/jira_attribution.zip (jira attribution/SVG/Jira_attribution_dark.svg, path index 14)",
+      "modification": "the logomark path taken out of the attribution lockup and drawn, with a #1868db rounded square behind it, onto the kanban board's canvas texture.",
+      "paths": [
+        "src/scene/kanban.js",
+        "docs/images/objects/kanbanBoard.png"
+      ],
+      "licenseFiles": [],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app",
+        "docs-site"
+      ],
+      "review": "Atlassian trademark, and a component this inventory did not previously record. Exact string match to path index 14 of the dark Jira attribution lockup, with KB_LOGO_BOX matching that file's viewBox height, so the mark was taken out of a lockup rather than sourced standalone. It sits on a board drawn to read as a Jira board. The project owner has decided to keep it, having twice been advised that the design guidance points the other way; recorded here so the decision is visible rather than implicit. Release basis: approved by Atlassian Brand. Excluded from the Apache-2.0 grant -- see NOTICE and docs/developer/visual-assets.md."
+    },
+    {
+      "id": "openclaw-artwork",
+      "name": "OpenClaw lobster mascot artwork",
+      "version": "v2026.9.3",
+      "license": "MIT",
+      "source": "https://github.com/openclaw/openclaw/blob/v2026.9.3/ui/public/favicon.svg",
+      "modification": "the static frame of the upstream file: its SMIL animation wrappers are dropped and the gradient id is renamed so concurrent copies resolve their own; every path, gradient stop, circle and stroke is byte-identical. See vendor/openclaw/README.md.",
+      "paths": [
+        "src/ui/marks.js"
+      ],
+      "licenseFiles": [
+        "vendor/openclaw/LICENSE"
+      ],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app",
+        "docs-site"
+      ],
+      "runtimeNotice": true,
+      "review": "Re-sourced from the OpenClaw repository rather than the website favicon, which resolves the NOASSERTION that stood here. The repository is MIT licensed (\"Copyright (c) 2026 OpenClaw Foundation\") and grants distribution and sublicensing, so this is the one picker mark that ships under a licence permitting redistribution; the notice travels with it in THIRD_PARTY_NOTICES.txt as MIT requires. Two evidence notes for any later review: the repository LICENSE is verbatim MIT plus one trailing sentence pointing at the project's own notices file, which adds no carve-out but makes automated scanners report the repository as NOASSERTION; and the upstream project reserves no trademark rights anywhere in its tree. The lobster remains the OpenClaw Foundation's mark and is used only to identify the corresponding product."
+    },
+    {
+      "id": "inter",
+      "name": "Inter Latin variable font",
+      "version": "4.1",
+      "license": "OFL-1.1",
+      "source": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip (InterVariable.ttf)",
+      "modification": "subset to latin and converted to WOFF2 with pyftsubset; glyph outlines unchanged. See vendor/inter/README.md.",
+      "paths": [
+        "assets/Inter-latin.woff2",
+        "docs/site/assets/Inter-latin.woff2"
+      ],
+      "licenseFiles": [
+        "vendor/inter/LICENSE"
+      ],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app",
+        "docs-site"
+      ],
+      "runtimeNotice": true,
+      "review": "Declared by assets/ui-theme.css; Eleventy copies the font and the licence into docs/site/assets. Vendored as the upstream variable font subset to latin and converted to WOFF2, which changes neither the outlines nor the family name; vendor/inter/README.md records the exact command. Replaces the Atlassian Sans entry that stood here as NOASSERTION."
+    },
+    {
+      "id": "jetbrains-mono",
+      "name": "JetBrains Mono Latin variable font",
+      "version": "2.304",
+      "license": "OFL-1.1",
+      "source": "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip (fonts/variable/JetBrainsMono[wght].ttf)",
+      "modification": "subset to latin and converted to WOFF2 with pyftsubset; glyph outlines unchanged. See vendor/jetbrains-mono/README.md.",
+      "paths": [
+        "assets/JetBrainsMono-latin.woff2",
+        "docs/site/assets/JetBrainsMono-latin.woff2"
+      ],
+      "licenseFiles": [
+        "vendor/jetbrains-mono/LICENSE"
+      ],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app",
+        "docs-site"
+      ],
+      "runtimeNotice": true,
+      "review": "Declared by assets/ui-theme.css; Eleventy copies the font and the licence into docs/site/assets. Vendored as the upstream variable font subset to latin and converted to WOFF2, which changes neither the outlines nor the family name; vendor/jetbrains-mono/README.md records the exact command. Replaces the Atlassian Mono entry that stood here as NOASSERTION."
+    },
+    {
+      "id": "atlaskit-tokens",
+      "name": "Atlassian Design System tokens",
+      "version": "16.11.3",
+      "license": "Apache-2.0",
+      "source": "https://registry.npmjs.org/@atlaskit/tokens/-/tokens-16.11.3.tgz (package/LICENSE)",
+      "modification": "nothing from the package is installed or bundled; only the palette-brand-refresh colour values were transcribed into the hand-authored assets/ui-theme.css. See vendor/atlaskit-tokens/README.md.",
+      "paths": [
+        "assets/ui-theme.css",
+        "docs/site/assets/ui-theme.css"
+      ],
+      "licenseFiles": [
+        "vendor/atlaskit-tokens/LICENSE"
+      ],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "hosted-app",
+        "docs-site"
+      ],
+      "runtimeNotice": true,
+      "review": "Recorded when the visual-asset provenance was written up: assets/ui-theme.css has always named this package in a source comment as the origin of its ~50 colour values, but the licence was not carried. The registry declares Apache-2.0 for this version. Covers the tokens package only, and is not a licence to any Atlassian brand asset."
+    },
+    {
+      "id": "project-artwork",
+      "name": "Project logo, illustrations, UI theme and documentation images",
+      "version": null,
+      "license": "NOASSERTION",
+      "paths": [
+        "assets/logo.png",
+        "assets/logo-256.png",
+        "assets/logo-64.png",
+        "assets/icon-512.png",
+        "assets/icon-192.png",
+        "assets/apple-touch-icon.png",
+        "favicon.ico",
+        "assets/airmail.svg",
+        "assets/arrivals.svg",
+        "assets/breather.svg",
+        "assets/curiosity.svg",
+        "assets/ui-theme.css",
+        "docs/images/panels/source-picker.png"
+      ],
+      "licenseFiles": [],
+      "distributions": [
+        "source",
+        "claude-marketplace",
+        "claude-plugin-archive",
+        "codex-plugin-marketplace",
+        "hosted-app",
+        "docs-site"
+      ],
+      "review": "Project assets are tracked here to avoid mistaking all assets for the two vendored MIT libraries. developing.md describes the original project illustration/logo direction and Atlassian-inspired theme. Ownership, project license and Brand verification are separate release gates, and assets/logo-256.png is the only tracked component inside the published plugin artifacts, so that gate applies to them too. Documentation screenshots and portraits under docs/images are rendered from the scene and can incorporate the third-party marks listed above; review and regenerate them with any asset replacement. The four that carry a mark are recorded against the components they belong to rather than here: docs/images/panels/source-picker.png (reproduces all five picker marks at once) is listed under project-artwork below, and docs/images/objects/{aceLogo,rovoLogo,kanbanBoard}.png under atlassian-ace, atlassian-rovo-standee and atlassian-jira-mark. Note these object portraits are also runtime app assets, not documentation only: src/editor/kit-menu.js fetches them live for the add-item menu."
+    },
+    {
+      "id": "node-container-runtime",
+      "name": "Node.js and container/platform components",
+      "version": "24 (major only)",
+      "license": "NOASSERTION",
+      "sources": [
+        "https://github.com/nodejs/node/blob/main/LICENSE",
+        "https://github.com/nodejs/docker-node"
+      ],
+      "paths": [
+        "Dockerfile.fly",
+        ".github/workflows/ci.yml"
+      ],
+      "licenseFiles": [],
+      "distributions": [
+        "fly-container",
+        "ci"
+      ],
+      "review": "Node includes MIT and separately licensed bundled components. The Fly image additionally contains Debian packages with their own licenses. node:24-slim and the GitHub-hosted runner images resolve later; no exact digest or OS package list can be concluded from this checkout. Capture an SBOM and license/source obligations for the actual released container, retaining /usr/share/doc and Node upstream notices. Host-provided browsers, Node and harness applications are not bundled with the source, Codex staging or OpenClaw tarball."
+    }
+  ],
+  "npmEvidence": {
+    "@11ty/lodash-custom@4.17.21": {
+      "additionalPaths": [
+        "lodash.custom.js"
+      ],
+      "note": "Header attributes OpenJS Foundation and Underscore contributors under MIT, but a full license text is absent from this exact package and upstream gitHead bfd294a01b766800785d007434e687cbd03791dd."
+    },
+    "@11ty/recursive-copy@4.0.4": {
+      "additionalPaths": [
+        "lib/maximatch.js"
+      ],
+      "note": "Package declares ISC; lib/maximatch.js also copies MIT code from array-union, array-differ, arrify and maximatch. Complete notices and pinned provenance for those embedded copies are missing. The top-level declaration is not the whole license inventory."
+    },
+    "natural-compare@1.4.0": {
+      "additionalPaths": [
+        "index.js"
+      ],
+      "note": "README and source header declare MIT with Lauri Rooden attribution; README links to an external license, but no full text ships in the package."
+    },
+    "@humanfs/types@0.15.0": {
+      "note": "README declares Apache 2.0; no full license is included for packages/types at upstream gitHead 85069f193cbacc371c3beb649ce746f8c5a493be. Sibling packages' licenses do not establish this package's missing notice."
+    },
+    "argparse@2.0.1": {
+      "note": "Full historical Python license chain retained in LICENSE, including PSF, BeOpen, CNRI and CWI terms; do not reduce it to an MIT-style notice."
+    }
+  }
+}

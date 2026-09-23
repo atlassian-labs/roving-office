@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Claude Code — The Roving Office</title>
+  <meta name="description" content="Watch your agents work in an isometric office." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html" aria-current="page">For everyone</a>
+      <a href="/docs/developer/index.html">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="user documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/index.html">What this is</a>
+        </li>
+        <li>
+          <a href="/docs/user/watching.html">Watching the office</a>
+        </li>
+        <li>
+          <a href="/docs/user/install.html">Install and run it</a>
+        </li>
+      </ul>
+      <h2>Using it</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/keys.html">Keys and panels</a>
+        </li>
+        <li>
+          <a href="/docs/user/offices-and-keycards.html">Offices, keycards and scenes</a>
+        </li>
+        <li>
+          <a href="/docs/user/connect-your-agents.html">Connect your agents</a>
+        </li>
+        <li>
+          <a href="/docs/user/rearranging-furniture.html">Rearranging the furniture</a>
+        </li>
+        <li>
+          <a href="/docs/user/layouts.html">Layouts</a>
+        </li>
+        <li>
+          <a href="/docs/user/sharing-an-office.html">Sharing an office</a>
+        </li>
+      </ul>
+      <h2>What you are looking at</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/concepts.html">Jobs: the one idea</a>
+        </li>
+        <li>
+          <a href="/docs/user/work-and-post.html">Post, parcels and the bin</a>
+        </li>
+        <li>
+          <a href="/docs/user/the-room.html">The room, prop by prop</a>
+        </li>
+        <li>
+          <a href="/docs/user/agent-names.html">Agent names</a>
+        </li>
+        <li>
+          <a href="/docs/user/buildings.html">Buildings and themes</a>
+        </li>
+        <li>
+          <a href="/docs/user/solar-geometry.html">Solar geometry</a>
+        </li>
+        <li>
+          <a href="/docs/user/generated-offices.html">Generated offices</a>
+        </li>
+      </ul>
+      <h2>Connecting a harness</h2>
+      <ul>
+        <li>
+          <a href="/docs/user/sources/test-data.html">Test Data</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/claude-code.html" aria-current="page">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-server.html">OpenClaw on a server</a>
+        </li>
+        <li>
+          <a href="/docs/user/sources/openclaw-identity.html">OpenClaw: names and faces</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="claude-code" tabindex="-1">Claude Code</h1>
+<p><em>The richest feed there is: explicit turn boundaries and real subagents.</em></p>
+<h2 id="install-it" tabindex="-1">Install it</h2>
+<p>From Claude Code itself, with no download and nothing to clone:</p>
+<pre><code>/plugin marketplace add https://therovingoffice.com/plugins/claude/marketplace.json
+/plugin install roving-office@roving-office
+</code></pre>
+<p>The marketplace hands Claude a versioned archive pinned to a checksum, so the install is
+refused rather than silently wrong if the file it fetches is not the file we published. It
+needs no Git and no npm. It does need <strong>Node</strong> on the machine your agent runs on — the
+observer is a handful of JavaScript files, and they have to run somewhere.</p>
+<p>Then <strong>start a new Claude session</strong> — hooks are read at session start — and point an office
+at <strong>Claude Code</strong> (press <code>D</code>).</p>
+<blockquote>
+<p><strong>Fifteen hooks cost no tokens.</strong> Claude reports them as <em>harness-only — no model context
+cost</em>. Nothing here enters the model's context or changes how your agent behaves. It only
+watches.</p>
+</blockquote>
+<blockquote>
+<p><strong>Connecting it to an office is a separate step.</strong> Installing the plugin does not tell
+it <em>which</em> office to feed. Today that still means running an office yourself, or
+pointing this machine at a hosted one from a copy of the project. A one-step way to pair
+a plugin with an office is being built.</p>
+</blockquote>
+<h3 id="updating-it" tabindex="-1">Updating it</h3>
+<p>Marketplaces that are not Anthropic's have <strong>auto-update off by default</strong>, so a new
+version arrives only when you ask for it:</p>
+<pre><code>/plugin marketplace update roving-office
+/plugin update roving-office@roving-office
+</code></pre>
+<p>Restart the session afterwards, for the same reason as above.</p>
+<h3 id="if-you-have-a-copy-of-the-project" tabindex="-1">If you have a copy of the project</h3>
+<p>Two more routes install it out of that copy instead, and they are what you want if you are
+<em>changing</em> the observer rather than watching with it:</p>
+<pre><code class="language-bash">npm run connect:claude           # install as a plugin — a copy of your copy
+npm run connect:claude:settings  # hooks pointing straight at your copy — live
+npm run connect:claude:status    # which route is live, and whether it is stale
+npm run disconnect:claude        # remove whichever route is active
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>What it is</th>
+<th>Use it when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>marketplace</strong></td>
+<td>The published archive, pinned to a checksum</td>
+<td>You want the office. Nothing to clone</td>
+</tr>
+<tr>
+<td><strong>plugin</strong></td>
+<td>Installed as a <strong>copy</strong> of your copy</td>
+<td>You want a version that is not published yet</td>
+</tr>
+<tr>
+<td><strong>settings</strong></td>
+<td>Hooks pointing straight at your copy</td>
+<td>You are editing the observer — changes apply to the very next tool call</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Do not install two of them</strong> — every event would arrive twice, and the room would
+double-count. The installer refuses and says which one to remove.</p>
+<p>Because the first two run from a copy, <code>connect:claude:status</code> compares them and tells you
+when that copy has drifted from your working tree. &quot;I changed it and nothing happened&quot; is
+otherwise a genuinely confusing half-hour.</p>
+<h2 id="what-you-get" tabindex="-1">What you get</h2>
+<p>Everything the other harnesses give, plus things they cannot:</p>
+<ul>
+<li><strong>Explicit turn boundaries</strong>, so a desk label is never guessed from tool activity.</li>
+<li><strong>File and commit events</strong>, when something is written.</li>
+<li><strong>Permission events</strong>, when you say no.</li>
+<li><strong>Context compaction</strong>, when history is squeezed.</li>
+<li><strong>Real subagents.</strong> A fan-out arrives as actual child sessions bound to the exact call
+that spawned them. The room does not draw them yet — a fan-out looks like one busy person
+— but the feed is there and waiting on the scene.</li>
+</ul>
+<p><strong>Terminal, desktop and SDK are three surfaces, not one.</strong> The same binary serves a
+terminal session, the desktop app's local agent mode and a programmatic run, and the office
+tells them apart. &quot;Claude Code in a terminal&quot; and &quot;Claude Code in the desktop app&quot; are two
+different things to whoever is watching the room.</p>
+<p>Claude also generates a concise title for each session, and the office prefers that as the
+job label over quoting your prompt. It is disabled entirely at the default redaction.</p>
+<h2 id="if-nothing-shows-up" tabindex="-1">If nothing shows up</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Every agent appears twice</td>
+<td>Two routes are installed. Remove one</td>
+</tr>
+<tr>
+<td>Nothing from desktop-app sessions, but terminal works</td>
+<td>See below — this was a real bug and the fix is installed, but <code>connect:claude:status</code> checks the two cases separately for a reason</td>
+</tr>
+<tr>
+<td>&quot;I changed the adapter and nothing happened&quot;</td>
+<td>The plugin is a snapshot. <code>connect:claude:status</code> says whether it has drifted</td>
+</tr>
+<tr>
+<td>A new version was released and nothing changed</td>
+<td>Auto-update is off for marketplaces that are not Anthropic's. Run the two update commands above</td>
+</tr>
+</tbody>
+</table>
+<p><strong>A desktop session gets a different PATH, and that used to empty the room.</strong> A hook
+inherits the environment of whatever launched the agent. From a terminal that is a login
+shell, so a version manager's Node resolves — but the desktop app is launched by the
+system, which hands down a much shorter list of places to look. Every version manager
+installs Node under your home directory, none of which is on that list, so every hook
+failed and the office stayed empty for exactly the sessions a GUI runs. Silently, because a
+non-blocking hook's failure is not the agent's problem.</p>
+<p>Every hook now goes through a wrapper that looks where version managers actually put Node
+and caches the answer.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="../connect-your-agents.html">Connect your agents</a> — redaction, office routing, and when agents leave</li>
+<li><a href="../sharing-an-office.html">Sharing an office</a> — pointing this at a hosted office, and the version bump it needs</li>
+<li>The event-by-event mapping is in the <a href="../../developer/adapters/claude-code.html">developer docs</a></li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#install-it">Install it</a><ul><li><a href="#updating-it">Updating it</a></li>
+<li><a href="#if-you-have-a-copy-of-the-project">If you have a copy of the project</a></li></ul></li>
+<li><a href="#what-you-get">What you get</a></li>
+<li><a href="#if-nothing-shows-up">If nothing shows up</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone watching the room. If you want to change how it works,
+      <a href="/docs/developer/index.html">the developer docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

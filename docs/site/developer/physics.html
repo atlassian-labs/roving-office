@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The physics of the office — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html" aria-current="page">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="the-physics-of-the-office" tabindex="-1">The physics of the office</h1>
+<p>How people move, stand, wait and sit, and the rules we keep rediscovering the hard way. This is a start rather than a full account — it records what the last few fixes taught us while it is still fresh. The thinking behind each one deserves more space than it gets here.</p>
+<p>Everything below was measured, not judged by eye. Where a number appears, it came from running the office headlessly and counting (see <a href="#measuring-it">Measuring it</a>).</p>
+<h2 id="the-rules" tabindex="-1">The rules</h2>
+<h3 id="a-destination-is-a-place-not-a-point" tabindex="-1">A destination is a place, not a point</h3>
+<p>The layout gives each thing one coordinate, and for a long time everybody walked to exactly that coordinate. Two people wanting coffee therefore wanted the same square centimetre, and a lift-load of arrivals all wanted the mat just inside the door. This is the single root cause behind most of what looked like broken physics.</p>
+<p>The fix is to treat a destination as somewhere with room for more than one person: <code>crowd.js</code> hands out standing places either side of the nominal point, and hands out the <strong>middle first</strong>, so a lone visitor stands square to the machine rather than off to one side. Desks and couch seats never had the problem, because a seat is <em>booked</em> before it is walked to — which was the clue.</p>
+<p>Applies to: machines (coffee, water, mailbox, bin, bookshelf) and the doorway, in and out. Home time sends everybody to the door at once, so leaving claims a place too.</p>
+<h3 id="waiting-is-what-is-left-when-there-is-no-way-round" tabindex="-1">Waiting is what is left when there is no way round</h3>
+<p>Yielding to somebody in your way is correct. <em>Stopping</em> is not. A blocked walker used to stand still, which is why queues formed in places nobody would queue.</p>
+<p>Now <code>findPath</code> takes an <code>avoid</code> list, and a walker who is getting nowhere for 0.3s asks for a route that treats the people near them as furniture. A third of a second reads as noticing somebody; anything longer reads as being stuck. Waiting survives only where there is genuinely no way past — a lane too narrow for two, or the last step to a machine somebody is standing at. <strong>A queue should be what is left when there is no alternative, not the default.</strong></p>
+<p>Waiting for the lift is a different thing and is untouched: that is a wait for a <em>thing</em> to be ready, not for a person to move.</p>
+<h3 id="do-not-reset-the-wait-when-re-routing" tabindex="-1">Do not reset the wait when re-routing</h3>
+<p>The counter that says how long somebody has been held up is also the tie-break that settles who goes first when two people are in each other's way. An earlier version ended the walk after five seconds of being blocked, which reset the wait — so a group in a doorway could deadlock indefinitely, each politely waiting for the others, and nobody's wait ever growing long enough to win. Re-routing must leave the wait alone.</p>
+<h3 id="a-seat-is-sat-on-from-its-front" tabindex="-1">A seat is sat on from its front</h3>
+<p>Twice now. A couch seat sits <em>inside</em> the couch, so it is not somewhere anyone can be walked to; a desk seat is walkable floor, so a path to it succeeded by running straight through the chair. Both produced the same tell: people arriving through the furniture.</p>
+<p>The pattern that works, for any seat:</p>
+<ol>
+<li>walk to the floor <strong>in front</strong> of the seat,</li>
+<li>turn to face the way the seat faces,</li>
+<li><code>stepTo</code> the seat — a straight line, never a path — lowering themselves backwards into it, still looking out of it,</li>
+<li>and only then turn to whatever they came to look at.</li>
+</ol>
+<p>A desk chair adds a step, because it is furniture that moves: the side to enter from is chosen before setting off, the chair is swung a quarter turn out of the way on arrival, and chair and occupant swivel to the monitors together once they are in it. Getting up reverses it and pushes the chair back in. Being called away mid-sit does the same, or the chair is left askew at an empty desk.</p>
+<p>Keep it brisk. The first version was correct and far too slow: it is a spin of a chair on castors, not choreography, and anything statelier makes sitting down look like an event.</p>
+<h3 id="look-at-the-thing-not-in-a-direction" tabindex="-1">Look at the thing, not in a direction</h3>
+<p>A heading stored in the layout is only right from one spot, and the whole point of standing places is that people end up a step to one side. Turns take a target and work the angle out from where the agent actually ended up (<code>lookAt</code>, in <code>states.js</code>).</p>
+<h3 id="the-nav-grid-steers-centres-not-shoulders" tabindex="-1">The nav grid steers centres, not shoulders</h3>
+<p>Cells keep an agent's <em>centre</em> out of furniture, but a body is about 0.46 across, so a route that clears a prop on paper still clips it on screen. Widening every prop closes the walking lanes, so this is still open — see the holes below.</p>
+<h3 id="a-footprint-belongs-to-the-prop-not-to-the-world" tabindex="-1">A footprint belongs to the prop, not to the world</h3>
+<p>Every blocked rectangle is measured in the prop's <em>own</em> axes — across its front, and front to back — and laid onto x and z according to which way it is pointing. So a couch stood end-on blocks a tall thin rectangle, and the same couch square to the room blocks a wide flat one, from one pair of numbers.</p>
+<p>It was not always so, and the way it failed is instructive. The half-extents used to be measured in world axes at each prop's authored facing, with rotation taken as the difference from a <code>baseFacing</code> recorded when the instance came into being. For the authored room that is a true description; for anything the <em>editor</em> created, the two angles were the same by construction, so the difference was always nought and a rotation never registered. A couch added end-on blocked the floor of a couch stood square — agents walked through its arms, and stopped dead in front of it — and the editor's search for somewhere to put a new piece could not tell one rotation from another however many it tried. A measurement that depends on the state a thing was born in is a measurement waiting to be wrong.</p>
+<h3 id="a-moving-part-of-the-room-needs-floor-of-its-own" tabindex="-1">A moving part of the room needs floor of its own</h3>
+<p>A footprint is the floor a prop stands on. The door leaf does not stand anywhere — it <em>sweeps</em>, hinged on the left jamb and swinging inward through better than a right angle, and the quarter-disc it passes through is floor no one can be standing in. Nothing in <code>obstacleFootprints()</code> describes that, because the leaf's rectangle where it hangs shut is against the wall and harmless.</p>
+<p>So it was not caught by anything, and the bin's standing room was put 0.26 from the open leaf's centre plane — less than half a body. The leaf swung through whoever was binning something and stayed in them until they left. The courier stands inside the same doorway and is fine, at 0.89; the difference is only that one number was measured and the other was not.</p>
+<p>The lesson is not about the door. Anything with a moving part — a lift car, a chair swinging out, a desk travelling up — owns the volume it moves through and not just the one it occupies, and standing room has to be measured against the swept volume. <code>test/bin-door-clearance.test.js</code> derives the leaf's arc from <code>DOOR</code> and <code>buildDoor</code>'s own constants and asserts no station stands in it, so the next prop dragged into the entrance corner fails a test rather than a screenshot.</p>
+<h3 id="intent-is-not-a-position" tabindex="-1">Intent is not a position</h3>
+<p>The door used to open for anybody within 2.6 in x of the opening and 3.4 either side of the wall. That is a guess at intent from geometry, and it was wrong in both directions: it opened for someone stood at a prop that happened to be near the entrance, and it would have opened for anybody crossing the lane on their way to the mailbox.</p>
+<p>An errand already knows what it is. <code>rec.arriving</code> and <code>rec.leaving</code> are set for the length of the walk in and the walk out, so the manager asks those instead — the door is open before an arrival reaches it and eases shut behind them, and a settled office never touches it. Where a proxy for intent is unavoidable, prefer the flag the behaviour already sets over the box it happens to be standing in.</p>
+<h3 id="every-wait-needs-an-end-and-a-departures-is-on-the-wall-clock" tabindex="-1">Every wait needs an end, and a departure's is on the wall clock</h3>
+<p>Waiting is the office working. Waiting forever is the office broken, and the room's actions are careful about it: <code>waitUntil</code> gives up after fourteen seconds, a blocked <code>walk</code> abandons after forty, a booked standing place expires after twenty-five. <code>follow</code> — the fixed route up a flight of stairs — was the exception, because a walker waits their turn at the end of a flight and that wait had no end to it. Two people never deadlock there (see <code>_mountBlocked</code>), but a queue can be <em>starved</em>, which is the same fault seen from the bottom step. It now waits twenty seconds and then shares the treads, because being rude on a staircase is a smaller fault than never going home.</p>
+<p>The bigger version of the same rule is about the whole errand rather than one action. <strong>Going home is the one walk with nothing to come back to</strong>, so until it finishes the character is still in the room with a desk booked — and it can be held up by everything above at once: a crowd at the door, a lift that has just closed, a flight somebody else is on. So a departure has a deadline. Thirty seconds after being told to leave, the room stops waiting and <a href="../user/connect-your-agents.html#when-agents-leave">beams them up</a>.</p>
+<p><strong>That deadline is wall time, not frames</strong>, and this is the part worth remembering. A browser stops calling <code>requestAnimationFrame</code> for a tab nobody is looking at, while a feed's <code>setInterval</code> keeps running — so the reduction goes on retiring quiet sessions and telling the room to show them out, and the room never draws a frame in which anybody takes a step. A window left in the background for a few hours came back to a hundred and fifty characters, a hundred and seventeen of them &quot;walking&quot;. Nothing was multiplying: they were the whole night's arrivals, every one of them told to go home and none of them able to move. Measured in frames, thirty seconds might be hours of that; measured on the clock, it is thirty seconds. Anything that bounds the room's population has to be on a clock that a stopped loop cannot slow down.</p>
+<h2 id="where-it-lives" tabindex="-1">Where it lives</h2>
+<table>
+<thead>
+<tr>
+<th>file</th>
+<th>what it owns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/layout.js</code></td>
+<td>the layout: prop positions, footprints, <code>STATIONS</code>, <code>DOORWAY</code></td>
+</tr>
+<tr>
+<td><code>src/agents/pathfinding.js</code></td>
+<td><code>NavGrid</code>, A*, the <code>avoid</code> list, body clearance</td>
+</tr>
+<tr>
+<td><code>src/agents/crowd.js</code></td>
+<td>standing places, overlap resolution, <code>wayBlocked</code></td>
+</tr>
+<tr>
+<td><code>src/agents/states.js</code></td>
+<td>the action list: <code>walk</code>, <code>face</code>/<code>lookAt</code>, <code>stepTo</code>, <code>sit</code>, <code>turnChair</code>, and the detour</td>
+</tr>
+<tr>
+<td><code>src/agents/AgentManager.js</code></td>
+<td>the choreography that strings actions together</td>
+</tr>
+<tr>
+<td><code>src/scene/beam.js</code></td>
+<td>the cone of light that takes away anybody the walk out could not</td>
+</tr>
+</tbody>
+</table>
+<p>Actions are a sequential list per agent, which is why a movement that ought to happen <em>while</em> another one does — swinging a chair out as the last step is taken — has to be ordered instead. Worth revisiting if more of these appear.</p>
+<h2 id="measuring-it" tabindex="-1">Measuring it</h2>
+<p>The office runs headlessly in node, which is how every number here was produced: import <code>props.js</code> and <code>AgentManager</code>, stub <code>document.createElement</code> to return a canvas whose 2D context answers with numbers where numbers are expected, seed <code>Math.random</code> so runs are comparable, drive <code>manager.handleEvent(...)</code> on a schedule and tick <code>manager.update(1/60)</code> in a loop. <code>bin/coplanar-probe.js</code> does the same for geometry and installs <code>three</code> into <code>node_modules</code> on first run.</p>
+<p>Two harness details that mattered:</p>
+<ul>
+<li><strong>Spawn everybody at once.</strong> Arrivals staggered by even half a second hid the doorway pile-up completely; the bug only appears with a lift-load.</li>
+<li><strong>Do not measure a movement from its last frame.</strong> <code>stepTo</code> eases to a stop, so the frame before sitting barely moves and the direction they came from is noise. Take the position ~0.4s earlier.</li>
+</ul>
+<p>Invariants worth guarding, with where they stood after the last change:</p>
+<table>
+<thead>
+<tr>
+<th>what</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>people interpenetrating</td>
+<td>0% of frames</td>
+</tr>
+<tr>
+<td>desk sits entered from the back</td>
+<td>0 of 96</td>
+</tr>
+<tr>
+<td>longest single wait for a person (quiet office)</td>
+<td>0.33s</td>
+</tr>
+<tr>
+<td>longest single wait for a person (busy office)</td>
+<td>1.57s</td>
+</tr>
+<tr>
+<td>lift-load of five clears the doorway</td>
+<td>5.1s</td>
+</tr>
+<tr>
+<td>standing places at machines actually reached</td>
+<td>99%</td>
+</tr>
+<tr>
+<td>facing error at a machine</td>
+<td>0.0° mean</td>
+</tr>
+<tr>
+<td>whole sit-down interaction</td>
+<td>0.82s</td>
+</tr>
+<tr>
+<td>chair left askew after a sit</td>
+<td>0.97s worst</td>
+</tr>
+<tr>
+<td>stations whose standing room is inside the door's swing</td>
+<td>0 of 7 (guarded)</td>
+</tr>
+<tr>
+<td>stations whose standing room is inside the entrance lane</td>
+<td>0 of 7 (guarded)</td>
+</tr>
+</tbody>
+</table>
+<p>For contrast, before these fixes: sits were 31 of 31 from the back, the longest wait was capped at 5.00s by the give-up rule, and a lift-load took 21.1s to clear.</p>
+<h2 id="known-holes" tabindex="-1">Known holes</h2>
+<ul>
+<li><strong>Passers-by clip other people's chairs</strong> — 1010 frames of it in a ten-minute run, against 50 for the person actually sitting down. This is the centres-not-shoulders problem, and it is still open.</li>
+<li><strong>A one-cell pinch at x≈3, z 12–14</strong>, between desk-3 and the fig, is the last place two people genuinely cannot pass, so one waits. A layout nudge would remove it.</li>
+<li><strong><code>lookAt</code> is a one-shot turn.</strong> If the crowd nudges somebody after they have turned, the angle is not re-derived. One coffee visit in a ten-minute run ended 37° off because of this; the rest were exact.</li>
+<li><strong>Almost none of the invariants above is guarded automatically.</strong> The two marked <em>guarded</em> are, in <code>test/bin-door-clearance.test.js</code>; every other harness so far has been a throwaway, so a regression would only show up by eye. Those two were the cheap ones — they are statements about the layout, which a test can read straight off. The rest need the office actually running for minutes at a time, and promoting one to <code>npm run probe:office</code> is still the obvious next move.</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#the-rules">The rules</a><ul><li><a href="#a-destination-is-a-place-not-a-point">A destination is a place, not a point</a></li>
+<li><a href="#waiting-is-what-is-left-when-there-is-no-way-round">Waiting is what is left when there is no way round</a></li>
+<li><a href="#do-not-reset-the-wait-when-re-routing">Do not reset the wait when re-routing</a></li>
+<li><a href="#a-seat-is-sat-on-from-its-front">A seat is sat on from its front</a></li>
+<li><a href="#look-at-the-thing-not-in-a-direction">Look at the thing, not in a direction</a></li>
+<li><a href="#the-nav-grid-steers-centres-not-shoulders">The nav grid steers centres, not shoulders</a></li>
+<li><a href="#a-footprint-belongs-to-the-prop-not-to-the-world">A footprint belongs to the prop, not to the world</a></li>
+<li><a href="#a-moving-part-of-the-room-needs-floor-of-its-own">A moving part of the room needs floor of its own</a></li>
+<li><a href="#intent-is-not-a-position">Intent is not a position</a></li>
+<li><a href="#every-wait-needs-an-end-and-a-departures-is-on-the-wall-clock">Every wait needs an end, and a departure's is on the wall clock</a></li></ul></li>
+<li><a href="#where-it-lives">Where it lives</a></li>
+<li><a href="#measuring-it">Measuring it</a></li>
+<li><a href="#known-holes">Known holes</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

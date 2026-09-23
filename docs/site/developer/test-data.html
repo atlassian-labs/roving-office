@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Test Data source — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html" aria-current="page">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="the-test-data-source" tabindex="-1">The Test Data source</h1>
+<p><em>The simulation, and the test rig. What it looks like to watch is
+<a href="../user/sources/test-data.html">Test Data</a>.</em></p>
+<p><code>src/data/MockSource.js</code>. It is the default deliberately, and it is also how the scene, the
+themes and the whole UI get exercised — all four authored offices use it, so anything
+visual can be checked without a harness anywhere near the machine.</p>
+<h2 id="the-post-is-what-drives-it-not-a-timer" tabindex="-1">The post is what drives it, not a timer</h2>
+<p><code>MockSource</code> does not hand out work on a timer and hope the scenery keeps up. <strong>A request
+is posted to somebody who is free</strong>, and what they spend the next minute on is whatever was
+inside that envelope.</p>
+<p>That is worth stating plainly because the obvious alternative is wrong in a way that is
+hard to see. A feed that announces one title while the mailbox delivers another leaves the
+room technically busy and completely unreadable: the plane you watched land is not the work
+anybody is doing, and no single piece of work can be followed across the floor.</p>
+<p>Since the simulation is the thing keeping everyone busy, it always knows who is free — so
+posting a request <em>to</em> somebody is both truer and simpler than posting one into the air and
+throttling the queue afterwards.</p>
+<h2 id="the-constants-are-all-in-one-place" tabindex="-1">The constants are all in one place</h2>
+<p>Roughly, per request: half involve a look-up, a fifth a wait, an eighth fail, a fifth
+arrive unaddressed, and three in ten are big enough to come by courier. All of it is in the
+constants at the top of the file, <strong>which is the only place to change any of it.</strong></p>
+<h2 id="two-arrival-gaps-make-the-shape-of-a-day" tabindex="-1">Two arrival gaps make the shape of a day</h2>
+<p>Short-handed, the next arrival is seconds away; at or above the regulars it is half a
+minute off — so the climb to a full room is a slow one and a vacated desk stays vacated for
+a bit.</p>
+<p>Departures are not a coin toss after every delivery either: everyone walks in with a
+<strong>shift</strong> of two to four requests and leaves when it is done, unless they are one of the
+regulars holding the room, in which case the shift quietly extends.</p>
+<p>The floor and the ceiling are the office's own <code>startCount</code> and the desk count (see
+<code>src/projects.js</code>), so a room authored with four regulars simply wanders in a narrower
+band.</p>
+<h2 id="naming-and-why-it-stopped-being-cute" tabindex="-1">Naming, and why it stopped being cute</h2>
+<p>Mock agents used to draw from a short playful pool — <code>Rovo</code>, <code>Pixel</code>, <code>Vex</code> — so test data
+was recognisable at a glance. They now go through <strong>exactly the same naming as a live
+session</strong>.</p>
+<p>Two reasons. The naming is one of the nicer things the office does, and the default view of
+the product was the one view that never showed it. And the <code>rename</code> path — a person keeping
+their identity while their job changes — is <strong>only exercised by a feed that renames
+people</strong>, which no other source does offline.</p>
+<p>Nothing is lost in telling them apart, because the name was never the honest signal: every
+agent wears its source's mark, and the badge says <code>Test Data · simulated</code>.</p>
+<p>This is also why the sample requests are worded as <strong>instructions with a plain noun in
+them</strong> — <code>Sort the support queue</code>, <code>Merge the customer reports</code>. A title of pure jargon is
+deliberately refused a surname (see <code>src/agents/names.js</code>), so a pool of
+<code>Refactoring auth module</code> would leave the whole room surnameless.</p>
+<h2 id="sendjob-and-why-t-is-feature-detected" tabindex="-1"><code>sendJob</code>, and why T is feature-detected</h2>
+<p><strong>T</strong> posts a request by hand, addressed to whoever is free — or unaddressed into the box
+if nobody is.</p>
+<p>The binding is feature-detected on <code>source.sendJob</code> rather than hardcoded to the mock, so
+it disappears from the keyboard <em>and</em> from the <code>?</code> panel unless some source in the office
+can actually invent one. Inventing a job on a purely live office would misrepresent the
+agents. Keep Test Data ticked alongside a live feed and <strong>T</strong> stays available, which is a
+genuinely useful pairing while an adapter is still being set up.</p>
+<p>It also deliberately ignores whether anybody is free. Somebody asking for work by hand has
+already judged that for themselves, and a keypress that quietly declined would just look
+broken.</p>
+<h2 id="only-one-office-can-hold-the-endpoint" tabindex="-1">Only one office can hold the endpoint</h2>
+<p>Nothing about Test Data needs the receiver, which makes it the right choice for a second
+server. Only one process can hold <code>~/.roving-office/endpoint.json</code>, so a second instance
+serves the UI but receives no adapter events at all — point that one at Test Data and it
+behaves perfectly.</p>
+<h2 id="one-pool-not-two" tabindex="-1">One pool, not two</h2>
+<p>Work flies in as a letter or is brought to the door by a courier, and which one is a coin
+toss made when the envelope is posted — so <strong>both channels come up on their own</strong> over any
+run worth watching.</p>
+<p>The simulation used to <em>state</em> it, from two pools of sample titles split by size. There is
+one pool now, because a parcel and a letter are the same job arriving by different doors.
+See <a href="job-delivery.html">job delivery</a>.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="sources.html">The source model</a> — how several feeds share one room</li>
+<li><a href="job-delivery.html">Job delivery</a> — the mailbox this source posts into</li>
+<li><a href="extending.html#add-a-source">Extending the office</a> — adding another one</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#the-post-is-what-drives-it-not-a-timer">The post is what drives it, not a timer</a></li>
+<li><a href="#the-constants-are-all-in-one-place">The constants are all in one place</a></li>
+<li><a href="#two-arrival-gaps-make-the-shape-of-a-day">Two arrival gaps make the shape of a day</a></li>
+<li><a href="#naming-and-why-it-stopped-being-cute">Naming, and why it stopped being cute</a></li>
+<li><a href="#sendjob-and-why-t-is-feature-detected">sendJob, and why T is feature-detected</a></li>
+<li><a href="#only-one-office-can-hold-the-endpoint">Only one office can hold the endpoint</a></li>
+<li><a href="#one-pool-not-two">One pool, not two</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

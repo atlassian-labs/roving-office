@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Photographing a prop — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html" aria-current="page">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="photographing-a-prop" tabindex="-1">Photographing a prop</h1>
+<p><em>How the object portraits are generated, and the measurements
+that came out of it.</em></p>
+<p>There is no offscreen renderer. The scene is WebGL, so the only thing that can draw it
+faithfully is a browser, and <a href="https://github.com/atlassian-labs/roving-office/blob/main/bin/prop-portrait.js"><code>bin/prop-portrait.js</code></a> lets one
+do exactly that: it serves the repo on a spare port, opens
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/bin/prop-portrait.html"><code>bin/prop-portrait.html</code></a> in a headless Chrome once per
+object, and lets Chrome save the PNG. Four at a time, about a minute and a half for the
+lot.</p>
+<pre><code class="language-bash">npm run portrait                     # all of them, into docs/images/objects
+npm run portrait -- --list           # what there is to photograph
+npm run portrait -- --id=chair       # just one, while you are working on it
+npm run portrait -- --group=greenery # one section
+</code></pre>
+<p>It serves the repo itself rather than starting <code>server.cjs</code>, deliberately: the app server
+claims <code>~/.roving-office/endpoint.json</code>, and a docs tool has no business taking the
+endpoint away from an office somebody is watching.</p>
+<p>That part of it — finding a browser, the read-only server, the shutter and the flags it
+needs — is <a href="https://github.com/atlassian-labs/roving-office/blob/main/bin/lib/shutter.js"><code>bin/lib/shutter.js</code></a>, shared with
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/bin/scene-map.js"><code>bin/scene-map.js</code></a>, which photographs a static scene the same
+way. What stays in this tool is what it photographs and what it says about the result.
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/bin/office-shot.js"><code>bin/office-shot.js</code></a> is not a caller and cannot be: a
+<em>running</em> office cannot be shot at the load event, so it drives Chrome over the DevTools
+protocol and wants the opposite flags.</p>
+<h2 id="five-details-before-you-change-any-of-it" tabindex="-1">Five details before you change any of it</h2>
+<p><strong>The catalogue holds the framing, not the tool.</strong> An entry says which way its object
+faces, where the camera stands, how high, and how much air to leave. The tool itself knows
+nothing about chairs — it fits whatever it is handed from that object's own bounding box,
+which is what lets one page photograph a succulent and a couch without being told the
+difference.</p>
+<p><strong>The box is fitted corner by corner, and it ignores light.</strong> A bounding <em>sphere</em> is easy
+and always too loose: a rug is far wider than it is tall, so a sphere around it is mostly
+air. And additively blended meshes are left out of the box altogether, because in this
+scene those are the glow pools that after-dark lighting lays on the ground — the street
+lamp's is ten metres across, and a box that contained it produced a picture of a bounding
+box with a lamp in the middle. Ordinary transparency stays in; the water cooler's bottle is
+see-through and is very much part of the water cooler.</p>
+<p><strong>It is a studio, not the room.</strong> The office's rig is a low sun raking through one wall,
+which is the wrong light entirely for a single object. A portrait gets a soft fill, a warm
+key that casts, and a cool rim — that last one because the chair is nearly black, and
+without an edge on it, it photographs as a silhouette. The tone mapping and exposure <em>are</em>
+the office's, so brushed steel and a lit monitor read here exactly as they do in the room.</p>
+<p><strong><code>Math.random</code> is seeded from the id.</strong> Half the scene is deliberately random — book
+colours, kanban cards, which way a cactus leans. Without a seed, regenerating the gallery
+would rewrite every file and a real change would be invisible in the diff. With one, each
+object keeps its own look and keeps it between runs.</p>
+<p><strong>The shutter fires at load, earlier than feels reasonable.</strong> Nothing that fades, walks or
+is dynamically imported will be in the picture — which is why the harness uses static
+imports and renders a settled frame in a loop. It is the same lesson reception's
+late-loading vignette teaches from the other side, and the same one in
+<a href="developing.html#look-at-the-scene">developing on it</a>.</p>
+<h2 id="adding-an-object" tabindex="-1">Adding an object</h2>
+<p>Adding one is the cheapest documentation in this repo:</p>
+<ol>
+<li>Export its builder from wherever it lives.</li>
+<li>Add an entry to <a href="https://github.com/atlassian-labs/roving-office/blob/main/src/scene/catalogue.js"><code>src/scene/catalogue.js</code></a> — id, group,
+label, a one-line blurb, and the builder. View hints only if the defaults do not suit
+it.</li>
+<li><code>npm run portrait -- --id=&lt;id&gt;</code> and look at what comes out.</li>
+<li>Check it in the <a href="../item-movements.html">Item Library</a>, which is the only gallery of
+the kit there is.</li>
+</ol>
+<p><code>test/scene-catalogue.test.js</code> fails if you skip step 2, so you cannot add half a prop.
+The full recipe for a prop that agents actually <em>use</em> is in
+<a href="extending.html#add-a-prop">extending the office</a>.</p>
+<p>If it comes out blank, or as a wall of red text, that is the harness telling you the build
+threw — it paints the stack trace into the page precisely so a screenshot of a failure is
+still worth having. Open the page by hand for the console:</p>
+<pre><code class="language-bash">node server.cjs 8081 &amp;
+open &quot;http://localhost:8081/bin/prop-portrait.html?id=chair&quot;
+</code></pre>
+<p>The page takes <code>?face=</code> too, for looking round the back of something without editing the
+catalogue.</p>
+<h2 id="two-measurements-the-gallery-argued-into-existence" tabindex="-1">Two measurements the gallery argued into existence</h2>
+<p>Both of these are derived rather than typed, and both are exported from beside the thing
+they are derived from. That is the pattern to copy: a tuned number with a body-scale
+argument behind it belongs next to the geometry it was measured against, not as one more
+literal in <code>Agent.js</code>.</p>
+<h3 id="why-the-standing-desk-rises-034-and-not-054" tabindex="-1">Why the standing desk rises 0.34 and not 0.54</h3>
+<p>The honest height would be the real one. A desk is 73 cm seated and about 110 cm standing,
+and at this scene's body scale — an agent's head tops out at 2.51 for a body reading about
+1.72 m, so roughly 1.46 units to the metre — that 37 cm rise is 0.54 units. It was 0.54
+first, and standing empty it looked right.</p>
+<p>It is 0.34 because of the arm. An agent's arm is one box on a shoulder pivot with <strong>no
+elbow in it</strong>, so where a hand can be is a circle round the shoulder rather than a volume
+it can reach into. The shoulder is at 1.78 standing, the hand hangs 0.86 below it, and the
+keyboard rides up with the top — so the desk's height <em>is</em> the shoulder angle:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">rise</th>
+<th style="text-align:right">shoulder angle</th>
+<th style="text-align:left">hands, relative to the shoulder</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">0.18</td>
+<td style="text-align:right">-98.7°</td>
+<td style="text-align:left">0.13 above</td>
+</tr>
+<tr>
+<td style="text-align:right"><strong>0.34</strong></td>
+<td style="text-align:right"><strong>-109.7°</strong></td>
+<td style="text-align:left"><strong>0.29 above</strong></td>
+</tr>
+<tr>
+<td style="text-align:right">0.54</td>
+<td style="text-align:right">-124.7°</td>
+<td style="text-align:left">0.49 above</td>
+</tr>
+</tbody>
+</table>
+<p>Seated typing is -97.3°. At 0.54 the arms come up half a unit over the shoulders and the
+agent reads as typing above their own head — a desk too high for the person at it, which is
+the exact ergonomic fault the real object exists to fix. At 0.34 the reach is 12° past the
+seated one, which is somebody at a slightly high desk, and the top still stands clearly
+above the row beside it.</p>
+<p>So the trade is real and worth naming: a smaller rise than life, bought to keep the pose
+honest. A body with no elbow cannot be argued with — and this is why
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/src/scene/props/sit-stand.js"><code>STANDING_TYPE_REACH</code></a> is exported from beside the
+rise it is derived from.</p>
+<h3 id="the-telescopes-eyepiece-is-the-measurement-everything-else-comes-from" tabindex="-1">The telescope's eyepiece is the measurement everything else comes from</h3>
+<p>It sits at 2.10, a tenth under a standing agent's eye, which is what makes using it a pose
+rather than a pause: <code>STOOP_BEND</code> in <a href="https://github.com/atlassian-labs/roving-office/blob/main/src/agents/Agent.js"><code>Agent.js</code></a> is derived
+from exactly that gap, so the bend and the tripod cannot drift apart.</p>
+<p>It is a small bend on purpose — 22.6°, because at this leverage the arc is mostly forward,
+so the angle that lowers an eye 0.10 carries it 0.50 <em>in</em> towards the eyepiece, and leaning
+in is the whole gesture. The height of the hub and the length of a leg are then whatever
+they have to be to put the eyepiece there, computed rather than written down.</p>
+<h3 id="the-winter-tree-and-why-the-gallery-is-worth-generating-at-all" tabindex="-1">The winter tree, and why the gallery is worth generating at all</h3>
+<p><strong>The winter tree is why this gallery is worth generating.</strong> Its branches used to be six
+small spheres sitting above the trunk, touching nothing. Across a road that read as a bare
+canopy, which is all it had ever been asked to do — and at this range they read as exactly
+what they were. A leafy tree hides its structure; a bare one <em>is</em> its structure. Nothing
+here is retouched, so the picture said so on the first day it existed, and the tree got
+real limbs: jointed to the trunk, forking near their ends, with the leader carrying the
+trunk's line on up.</p>
+<p>Two things came out of that fix. Every tree carries the same skeleton, so each one is
+<strong>spun on the spot</strong> — with leaves on, a repeated arrangement is invisible, and with the
+structure showing, a row of identical trees is wallpaper. And a bare tree has to be <strong>the
+same height as the leafy one</strong>: the old trunk stopped well short of the summer canopy,
+which made winter a different species rather than the same tree in January.</p>
+<p>Two things came out of that fix that apply to anything else built this way. Every tree
+carries the same skeleton, so each one is <strong>spun on the spot</strong> at build time — with leaves
+on a repeated arrangement is invisible, and with the structure showing a row of identical
+trees is wallpaper. And a bare tree has to be <strong>the same height as the leafy one</strong>: the old
+trunk stopped well short of the summer canopy, which made winter a different species rather
+than the same tree in January.</p>
+<p>The cost is honest and worth knowing: thirteen meshes a tree against the old seven, and a
+park plants thirty-four of them. That is why it is four bold limbs rather than a spray of
+twigs — and bold is what survives the distance anyway.</p>
+<h3 id="and-why-the-printers-scale-is-not-uniform" tabindex="-1">And why the printer's scale is not uniform</h3>
+<p>The geometry is authored at life size — 1.59 to the top of the feeder — because that is the
+only size the proportions of a printer can be reasoned about at. The room then stretches
+it: twice up in height, three quarters in plan. Both numbers were argued for. At life size
+it was shorter than a desk is wide and read, from across the street, as a white box
+somebody had left against the wall; doubled in every direction instead, it was a
+two-and-a-half-metre cube of white that ate the corner it stands in. A printer is a tall
+thing you stand in front of, and that silhouette is narrow. See <code>SCALE</code> and <code>PLAN</code> in
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/src/scene/props/printer.js"><code>printer.js</code></a>.</p>
+<h2 id="photographing-a-whole-office" tabindex="-1">Photographing a whole office</h2>
+<p>The pictures of the <em>room</em> in the user docs come from a different tool, because an office
+cannot be photographed with a shutter that fires at load:</p>
+<pre><code class="language-bash">node server.cjs 8093 &amp;
+npm run shot -- --out=docs/images/screens/office.png --hide-ui \
+  --size=1600,1000 --wait=70000 --clip=395,80,875,700
+</code></pre>
+<p><code>bin/office-shot.js</code> drives Chrome over the DevTools protocol instead of using
+<code>--screenshot</code>, and it exists for one reason: <strong>the office advances per drawn frame.</strong> A
+headless window is never on screen, so Chrome has no reason to composite and
+<code>requestAnimationFrame</code> fires at a crawl. Timers keep running, so the feed spawns people
+and hands them work — and not one of them can take a step. Whatever you set <code>--wait</code> to,
+you get one agent standing by the door being renamed as they finish jobs they never walked
+to a desk to do.</p>
+<p>The fix is to ask for frames: the tool captures a throwaway screenshot every 30ms through
+the settle period, because <code>Page.captureScreenshot</code> forces a composite. The
+<code>--disable-*-throttling</code> flags were the obvious first guess and changed nothing.</p>
+<p><code>--wait=70000</code> is not superstition either. Test Data opens with its regulars and drifts
+more in over a couple of minutes, so a shorter wait photographs an office that is still
+arriving. <code>--clip</code> crops in the browser so one command still reproduces the exact file,
+and <code>--hide-ui</code> drops the panels for shots where the room is the subject.</p>
+<p>Do <strong>not</strong> pass <code>--force-prefers-reduced-motion</code> to this one, unlike every other
+screenshot recipe here: motion is the thing it is waiting for.</p>
+<h2 id="read-next" tabindex="-1">Read next</h2>
+<ul>
+<li><a href="extending.html">Extending the office</a> — the full recipe for a new prop</li>
+<li><a href="developing.html#look-at-the-scene">Developing on it</a> — the headless screenshot loop and its traps</li>
+<li><a href="coplanar-probe.html">The coplanar-face probe</a> — the bug a new prop is most likely to introduce</li>
+</ul>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#five-details-before-you-change-any-of-it">Five details before you change any of it</a></li>
+<li><a href="#adding-an-object">Adding an object</a></li>
+<li><a href="#two-measurements-the-gallery-argued-into-existence">Two measurements the gallery argued into existence</a><ul><li><a href="#why-the-standing-desk-rises-034-and-not-054">Why the standing desk rises 0.34 and not 0.54</a></li>
+<li><a href="#the-telescopes-eyepiece-is-the-measurement-everything-else-comes-from">The telescope's eyepiece is the measurement everything else comes from</a></li>
+<li><a href="#the-winter-tree-and-why-the-gallery-is-worth-generating-at-all">The winter tree, and why the gallery is worth generating at all</a></li>
+<li><a href="#and-why-the-printers-scale-is-not-uniform">And why the printer's scale is not uniform</a></li></ul></li>
+<li><a href="#photographing-a-whole-office">Photographing a whole office</a></li>
+<li><a href="#read-next">Read next</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

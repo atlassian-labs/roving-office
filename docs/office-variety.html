@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Thirty offices, thirty seeds</title>
+<style>
+  :root { color-scheme: light; --ink: #34302a; --dim: #6f6759; --line: #e2dcd0; --paper: #f4f1ea; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  a { color: #6f7f5c; }
+  header { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(8px);
+           background: rgba(244,241,234,.9); border-bottom: 1px solid var(--line);
+           padding: .8rem clamp(1rem, 4vw, 3rem); display: flex; gap: 1.1rem;
+           align-items: baseline; flex-wrap: wrap; }
+  header h1 { font-size: 1.05rem; margin: 0; }
+  header p { margin: 0; color: var(--dim); font-size: .84rem; }
+  .lede { padding: clamp(1.4rem, 4vw, 2.6rem) clamp(1rem, 4vw, 3rem) 0;
+          max-width: 62rem; margin: 0 auto; }
+  .lede p { margin: 0 0 .7rem; font-size: .95rem; color: #4a443c; }
+  main { padding: 0 clamp(1rem, 4vw, 3rem) 4rem; max-width: 92rem; margin: 0 auto; }
+  .room { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(17rem, .75fr);
+          gap: clamp(1rem, 3vw, 2.4rem); align-items: start;
+          padding: clamp(1.6rem, 4vw, 3rem) 0; border-bottom: 1px solid var(--line); }
+  @media (max-width: 62rem) { .room { grid-template-columns: 1fr; } }
+  .shot { background: #fff; border: 1px solid var(--line); border-radius: 14px;
+          overflow: hidden; box-shadow: 0 1px 2px rgba(52,48,42,.06); }
+  .shot img { display: block; width: 100%; height: auto; }
+  .num { margin: 0; font-variant-numeric: tabular-nums; letter-spacing: .12em;
+         font-size: .72rem; color: var(--dim); }
+  .about h2 { font-size: 1.5rem; margin: .15rem 0 .7rem; line-height: 1.2; }
+  .chips { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0 0 .9rem; }
+  .chip { font-size: .76rem; padding: .16rem .55rem; border: 1px solid var(--line);
+          border-radius: 999px; background: #fff; color: var(--dim); white-space: nowrap; }
+  .chips.small .chip { font-size: .72rem; background: transparent; }
+  .reason { margin: 0 0 .9rem; font-size: .93rem; color: #4a443c; }
+  .scores { display: flex; gap: 1.4rem; margin: 0 0 .9rem; padding: .7rem 0;
+            border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .scores div { display: flex; flex-direction: column; }
+  .scores dt { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+  .scores dd { margin: 0; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+  .seed { margin: 0; font-size: .8rem; color: var(--dim); display: flex;
+          gap: .8rem; align-items: baseline; flex-wrap: wrap; }
+  .seed code, code { background: #fff; border: 1px solid var(--line); border-radius: 6px;
+                     padding: .1rem .4rem; font-size: .82em; }
+  footer { padding: 0 clamp(1rem, 4vw, 3rem) 4rem; color: var(--dim);
+           font-size: .86rem; max-width: 62rem; margin: 0 auto; }
+</style></head>
+<body>
+<header>
+  <h1>Thirty offices, thirty seeds</h1>
+  <p>5 arrangements &middot; 11 colour schemes
+     &middot; 2–9 desks &middot; scroll</p>
+</header>
+<div class="lede">
+  <p>Seeds <code>variety-1</code> to <code>variety-30</code>,
+     in order. <b>Nothing here was hand-picked and nothing was rejected</b> — these are
+     the first thirty seeds, so the variety is the algorithm's own. Every room is a
+     pure function of its seed: the same string always gives the same office.</p>
+  <p>Each one carries the name it gave itself and the sentence explaining why it is
+     laid out that way, both generated from what actually went into the room. The
+     three numbers are its scorecard, out of 100: <b>plan</b> is how well it works as
+     an office, <b>daylight</b> is how near the desks are to the glass, and
+     <b>looks</b> is a model of one person's taste fitted to 146 pairwise judgements
+     over 74 rooms. See <a href="tuning-the-layouts.md">Tuning the layout
+     generator</a> for how those were arrived at, and
+     <a href="generated-offices.md">Generated offices</a> for how a seed becomes a
+     room.</p>
+</div>
+<main>
+  <article class="room" id="variety-1">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-1.png" alt="Overhead view of Lookout and a Wire Room"/></div>
+    <div class="about">
+      <p class="num">01 / 30</p>
+      <h2>Lookout and a Wire Room</h2>
+      <p class="chips">
+        <span class="chip">4 desks</span>
+        <span class="chip">1 team of 4</span>
+        <span class="chip">pods</span>
+        <span class="chip">night-shift</span>
+      </p>
+      <p class="reason">4 desks in one team, clusters of desks, screens meeting in the middle, off a street down the length of the room. Work comes and goes by a printer, with no courier. Lookups go to a telescope at the window. The break end has two things to sit on, kept away from the quiet desks. Night Shift: a tower floor lit by its own panels most of the day.</p>
+      <p class="chips small">
+        <span class="chip">1 rug</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">4 plants</span>
+        <span class="chip">4 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>88</dd></div>
+        <div><dt>daylight</dt><dd>72</dd></div>
+        <div><dt>looks</dt><dd>78</dd></div>
+      </dl>
+      <p class="seed"><code>variety-1</code>
+        <a href="/?seed=variety-1">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-2">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-2.png" alt="Overhead view of The Exchange"/></div>
+    <div class="about">
+      <p class="num">02 / 30</p>
+      <h2>The Exchange</h2>
+      <p class="chips">
+        <span class="chip">6 desks</span>
+        <span class="chip">1 team of 6</span>
+        <span class="chip">island</span>
+        <span class="chip">rooftop-spring</span>
+      </p>
+      <p class="reason">6 desks in one team, one block of desks in the middle of the floor, off a street down the length of the room. Work comes and goes by 2 post boxes, a printer and a stack of stock, and the courier calls. Lookups go to 2 bookshelves. The break end has coffee, water and two things to sit on, kept away from the quiet desks. Rooftop Spring: chimney pots and blossom, everything pale.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">1 plant</span>
+        <span class="chip">10 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>88</dd></div>
+        <div><dt>daylight</dt><dd>50</dd></div>
+        <div><dt>looks</dt><dd>82</dd></div>
+      </dl>
+      <p class="seed"><code>variety-2</code>
+        <a href="/?seed=variety-2">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-3">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-3.png" alt="Overhead view of Rings and a Telescope Room"/></div>
+    <div class="about">
+      <p class="num">03 / 30</p>
+      <h2>Rings and a Telescope Room</h2>
+      <p class="chips">
+        <span class="chip">7 desks</span>
+        <span class="chip">2 teams of 4+3</span>
+        <span class="chip">perimeter</span>
+        <span class="chip">atelier-winter</span>
+      </p>
+      <p class="reason">7 desks in two teams of 4 and 3, desks at the walls, the floor left open, off a street across the room. Work comes and goes by 2 printers and a stack of stock, with no courier. Lookups go to a telescope at the window. The break end has coffee, water and two things to sit on, kept away from the quiet desks. Atelier in Winter: grey light off a hundred wet roofs.</p>
+      <p class="chips small">
+        <span class="chip">2 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">5 plants</span>
+        <span class="chip">7 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>82</dd></div>
+        <div><dt>daylight</dt><dd>54</dd></div>
+        <div><dt>looks</dt><dd>76</dd></div>
+      </dl>
+      <p class="seed"><code>variety-3</code>
+        <a href="/?seed=variety-3">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-4">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-4.png" alt="Overhead view of The Depot"/></div>
+    <div class="about">
+      <p class="num">04 / 30</p>
+      <h2>The Depot</h2>
+      <p class="chips">
+        <span class="chip">8 desks</span>
+        <span class="chip">2 teams of 5+3</span>
+        <span class="chip">pods</span>
+        <span class="chip">long-shadows</span>
+      </p>
+      <p class="reason">8 desks in two teams of 5 and 3, clusters of desks, screens meeting in the middle, off a street across the room. Work comes and goes by 2 post boxes and a stack of stock, and the courier calls. Lookups go to a bookshelf. The break end has water and two things to sit on, kept away from the quiet desks. Long Shadows: dark stained boards raked by a golden hour.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">3 plants</span>
+        <span class="chip">7 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>89</dd></div>
+        <div><dt>daylight</dt><dd>64</dd></div>
+        <div><dt>looks</dt><dd>89</dd></div>
+      </dl>
+      <p class="seed"><code>variety-4</code>
+        <a href="/?seed=variety-4">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-5">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-5.png" alt="Overhead view of Depot and a Spartan Room"/></div>
+    <div class="about">
+      <p class="num">05 / 30</p>
+      <h2>Depot and a Spartan Room</h2>
+      <p class="chips">
+        <span class="chip">6 desks</span>
+        <span class="chip">1 team of 6</span>
+        <span class="chip">spine</span>
+        <span class="chip">night-shift</span>
+      </p>
+      <p class="reason">6 desks in one team, one long back-to-back run down the room, off a street across the room. Work comes and goes by 2 post boxes and a stack of stock, and the courier calls. Lookups go to 2 bookshelves. The break end has coffee, water and two things to sit on, kept away from the quiet desks. Nothing green in it at all. Night Shift: a tower floor lit by its own panels most of the day.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">0 plants</span>
+        <span class="chip">9 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>89</dd></div>
+        <div><dt>daylight</dt><dd>49</dd></div>
+        <div><dt>looks</dt><dd>87</dd></div>
+      </dl>
+      <p class="seed"><code>variety-5</code>
+        <a href="/?seed=variety-5">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-6">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-6.png" alt="Overhead view of The Plain Ring"/></div>
+    <div class="about">
+      <p class="num">06 / 30</p>
+      <h2>The Plain Ring</h2>
+      <p class="chips">
+        <span class="chip">5 desks</span>
+        <span class="chip">2 teams of 3+2</span>
+        <span class="chip">perimeter</span>
+        <span class="chip">tower-in-october</span>
+      </p>
+      <p class="reason">5 desks in two teams of 3 and 2, desks at the walls, the floor left open, off a street across the room. Work comes and goes by a post box and a printer, and the courier calls. Lookups go to a bookshelf and a telescope at the window. The break end has coffee, water and two things to sit on, kept away from the quiet desks. Tower in October: warm upholstery against the cool glass.</p>
+      <p class="chips small">
+        <span class="chip">0 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">3 plants</span>
+        <span class="chip">8 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>93</dd></div>
+        <div><dt>daylight</dt><dd>76</dd></div>
+        <div><dt>looks</dt><dd>61</dd></div>
+      </dl>
+      <p class="seed"><code>variety-6</code>
+        <a href="/?seed=variety-6">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-7">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-7.png" alt="Overhead view of The Reading Room"/></div>
+    <div class="about">
+      <p class="num">07 / 30</p>
+      <h2>The Reading Room</h2>
+      <p class="chips">
+        <span class="chip">6 desks</span>
+        <span class="chip">1 team of 6</span>
+        <span class="chip">island</span>
+        <span class="chip">tower-in-october</span>
+      </p>
+      <p class="reason">6 desks in one team, one block of desks in the middle of the floor, off a street down the length of the room. Work comes and goes by 2 printers and a stack of stock, with no courier. Lookups go to 3 bookshelves and a telescope at the window. The break end has coffee, water and two things to sit on, kept away from the quiet desks. Tower in October: warm upholstery against the cool glass.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">3 plants</span>
+        <span class="chip">11 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>87</dd></div>
+        <div><dt>daylight</dt><dd>47</dd></div>
+        <div><dt>looks</dt><dd>89</dd></div>
+      </dl>
+      <p class="seed"><code>variety-7</code>
+        <a href="/?seed=variety-7">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-8">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-8.png" alt="Overhead view of The Warm Long Bench"/></div>
+    <div class="about">
+      <p class="num">08 / 30</p>
+      <h2>The Warm Long Bench</h2>
+      <p class="chips">
+        <span class="chip">6 desks</span>
+        <span class="chip">1 team of 6</span>
+        <span class="chip">spine</span>
+        <span class="chip">high-summer</span>
+      </p>
+      <p class="reason">6 desks in one team, one long back-to-back run down the room, off a street down the length of the room. Work comes and goes by 2 printers and a stack of stock, with no courier. Lookups go to 3 bookshelves and a telescope at the window. The break end has one thing to sit on, kept away from the quiet desks. High Summer: warm brownstone wood under a leafy July street.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">1 soft seat</span>
+        <span class="chip">3 plants</span>
+        <span class="chip">9 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>87</dd></div>
+        <div><dt>daylight</dt><dd>55</dd></div>
+        <div><dt>looks</dt><dd>86</dd></div>
+      </dl>
+      <p class="seed"><code>variety-8</code>
+        <a href="/?seed=variety-8">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-9">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-9.png" alt="Overhead view of The Boarded Wire Room"/></div>
+    <div class="about">
+      <p class="num">09 / 30</p>
+      <h2>The Boarded Wire Room</h2>
+      <p class="chips">
+        <span class="chip">9 desks</span>
+        <span class="chip">2 teams of 5+4</span>
+        <span class="chip">pods</span>
+        <span class="chip">yard-in-april</span>
+      </p>
+      <p class="reason">9 desks in two teams of 5 and 4, clusters of desks, screens meeting in the middle, off a street across the room. Work comes and goes by a printer, with no courier. Lookups go to 2 bookshelves. The break end has coffee, water and one thing to sit on, kept away from the quiet desks. Yard in April: the service yard greening up under the loading doors.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">1 soft seat</span>
+        <span class="chip">4 plants</span>
+        <span class="chip">6 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>74</dd></div>
+        <div><dt>daylight</dt><dd>52</dd></div>
+        <div><dt>looks</dt><dd>82</dd></div>
+      </dl>
+      <p class="seed"><code>variety-9</code>
+        <a href="/?seed=variety-9">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-10">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-10.png" alt="Overhead view of The Chimney Conservatory"/></div>
+    <div class="about">
+      <p class="num">10 / 30</p>
+      <h2>The Chimney Conservatory</h2>
+      <p class="chips">
+        <span class="chip">6 desks</span>
+        <span class="chip">1 team of 6</span>
+        <span class="chip">pods</span>
+        <span class="chip">rooftop-spring</span>
+      </p>
+      <p class="reason">6 desks in one team, clusters of desks, screens meeting in the middle, off a street across the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to 2 bookshelves. The break end has coffee, water and two things to sit on, kept away from the quiet desks. 6 plants, which is as many as the corners will take. Rooftop Spring: chimney pots and blossom, everything pale.</p>
+      <p class="chips small">
+        <span class="chip">2 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">6 plants</span>
+        <span class="chip">7 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>91</dd></div>
+        <div><dt>daylight</dt><dd>57</dd></div>
+        <div><dt>looks</dt><dd>96</dd></div>
+      </dl>
+      <p class="seed"><code>variety-10</code>
+        <a href="/?seed=variety-10">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-11">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-11.png" alt="Overhead view of The Middle Observatory"/></div>
+    <div class="about">
+      <p class="num">11 / 30</p>
+      <h2>The Middle Observatory</h2>
+      <p class="chips">
+        <span class="chip">5 desks</span>
+        <span class="chip">1 team of 5</span>
+        <span class="chip">spine</span>
+        <span class="chip">quatorze-juillet</span>
+      </p>
+      <p class="reason">5 desks in one team, one long back-to-back run down the room, off a street down the length of the room. Work comes and goes by a post box and a printer, and the courier calls. Lookups go to a telescope at the window. The break end has coffee and water, kept away from the quiet desks. Quatorze Juillet: shutters open, limestone bleached, the whole city out.</p>
+      <p class="chips small">
+        <span class="chip">2 rugs</span>
+        <span class="chip">0 soft seats</span>
+        <span class="chip">5 plants</span>
+        <span class="chip">6 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>88</dd></div>
+        <div><dt>daylight</dt><dd>52</dd></div>
+        <div><dt>looks</dt><dd>85</dd></div>
+      </dl>
+      <p class="seed"><code>variety-11</code>
+        <a href="/?seed=variety-11">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-12">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-12.png" alt="Overhead view of Observatory and a Lounge"/></div>
+    <div class="about">
+      <p class="num">12 / 30</p>
+      <h2>Observatory and a Lounge</h2>
+      <p class="chips">
+        <span class="chip">7 desks</span>
+        <span class="chip">1 team of 7</span>
+        <span class="chip">pods</span>
+        <span class="chip">atelier-winter</span>
+      </p>
+      <p class="reason">7 desks in one team, clusters of desks, screens meeting in the middle, off a street down the length of the room. Work comes and goes by a post box and a printer, and the courier calls. Lookups go to a telescope at the window. The break end has four things to sit on, kept away from the quiet desks. Atelier in Winter: grey light off a hundred wet roofs.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">4 soft seats</span>
+        <span class="chip">5 plants</span>
+        <span class="chip">5 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>92</dd></div>
+        <div><dt>daylight</dt><dd>65</dd></div>
+        <div><dt>looks</dt><dd>95</dd></div>
+      </dl>
+      <p class="seed"><code>variety-12</code>
+        <a href="/?seed=variety-12">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-13">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-13.png" alt="Overhead view of The Boarded Gallery"/></div>
+    <div class="about">
+      <p class="num">13 / 30</p>
+      <h2>The Boarded Gallery</h2>
+      <p class="chips">
+        <span class="chip">3 desks</span>
+        <span class="chip">1 team of 3</span>
+        <span class="chip">perimeter</span>
+        <span class="chip">long-shadows</span>
+      </p>
+      <p class="reason">3 desks in one team, desks at the walls, the floor left open, off a street down the length of the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to a bookshelf. The break end has coffee, water and two things to sit on, kept away from the quiet desks. 8 plants, which is as many as the corners will take. Long Shadows: dark stained boards raked by a golden hour.</p>
+      <p class="chips small">
+        <span class="chip">4 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">8 plants</span>
+        <span class="chip">6 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>94</dd></div>
+        <div><dt>daylight</dt><dd>87</dd></div>
+        <div><dt>looks</dt><dd>97</dd></div>
+      </dl>
+      <p class="seed"><code>variety-13</code>
+        <a href="/?seed=variety-13">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-14">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-14.png" alt="Overhead view of The Half Bench Room"/></div>
+    <div class="about">
+      <p class="num">14 / 30</p>
+      <h2>The Half Bench Room</h2>
+      <p class="chips">
+        <span class="chip">3 desks</span>
+        <span class="chip">1 team of 3</span>
+        <span class="chip">rows</span>
+        <span class="chip">night-shift</span>
+      </p>
+      <p class="reason">3 desks in one team, benches all facing one way, off a street across the room. Work comes and goes by a post box and a printer, and the courier calls. Lookups go to a bookshelf. The break end has water and one thing to sit on, kept away from the quiet desks. Night Shift: a tower floor lit by its own panels most of the day.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">1 soft seat</span>
+        <span class="chip">5 plants</span>
+        <span class="chip">6 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>97</dd></div>
+        <div><dt>daylight</dt><dd>100</dd></div>
+        <div><dt>looks</dt><dd>91</dd></div>
+      </dl>
+      <p class="seed"><code>variety-14</code>
+        <a href="/?seed=variety-14">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-15">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-15.png" alt="Overhead view of Two Islands"/></div>
+    <div class="about">
+      <p class="num">15 / 30</p>
+      <h2>Two Islands</h2>
+      <p class="chips">
+        <span class="chip">7 desks</span>
+        <span class="chip">1 team of 7</span>
+        <span class="chip">island</span>
+        <span class="chip">quatorze-juillet</span>
+      </p>
+      <p class="reason">7 desks in one team, one block of desks in the middle of the floor, off a street down the length of the room. Work comes and goes by a post box, with no courier. Lookups go to a bookshelf and a telescope at the window. The break end has coffee, water and one thing to sit on, kept away from the quiet desks. Quatorze Juillet: shutters open, limestone bleached, the whole city out.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">1 soft seat</span>
+        <span class="chip">5 plants</span>
+        <span class="chip">7 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>89</dd></div>
+        <div><dt>daylight</dt><dd>54</dd></div>
+        <div><dt>looks</dt><dd>86</dd></div>
+      </dl>
+      <p class="seed"><code>variety-15</code>
+        <a href="/?seed=variety-15">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-16">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-16.png" alt="Overhead view of The Telescope Room"/></div>
+    <div class="about">
+      <p class="num">16 / 30</p>
+      <h2>The Telescope Room</h2>
+      <p class="chips">
+        <span class="chip">2 desks</span>
+        <span class="chip">1 team of 2</span>
+        <span class="chip">perimeter</span>
+        <span class="chip">night-shift</span>
+      </p>
+      <p class="reason">2 desks in one team, desks at the walls, the floor left open, off a street across the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to a telescope at the window. The break end has water and two things to sit on, kept away from the quiet desks. Night Shift: a tower floor lit by its own panels most of the day.</p>
+      <p class="chips small">
+        <span class="chip">4 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">1 plant</span>
+        <span class="chip">6 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>91</dd></div>
+        <div><dt>daylight</dt><dd>100</dd></div>
+        <div><dt>looks</dt><dd>87</dd></div>
+      </dl>
+      <p class="seed"><code>variety-16</code>
+        <a href="/?seed=variety-16">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-17">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-17.png" alt="Overhead view of Island and a Print Shop"/></div>
+    <div class="about">
+      <p class="num">17 / 30</p>
+      <h2>Island and a Print Shop</h2>
+      <p class="chips">
+        <span class="chip">4 desks</span>
+        <span class="chip">1 team of 4</span>
+        <span class="chip">island</span>
+        <span class="chip">first-frost</span>
+      </p>
+      <p class="reason">4 desks in one team, one block of desks in the middle of the floor, off a street across the room. Work comes and goes by 2 printers and a stack of stock, with no courier. Lookups go to 2 bookshelves. The break end has coffee and two things to sit on, kept away from the quiet desks. First Frost: a warm room with a cold street through the glass.</p>
+      <p class="chips small">
+        <span class="chip">4 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">4 plants</span>
+        <span class="chip">8 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>89</dd></div>
+        <div><dt>daylight</dt><dd>66</dd></div>
+        <div><dt>looks</dt><dd>95</dd></div>
+      </dl>
+      <p class="seed"><code>variety-17</code>
+        <a href="/?seed=variety-17">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-18">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-18.png" alt="Overhead view of The Level Conservatory"/></div>
+    <div class="about">
+      <p class="num">18 / 30</p>
+      <h2>The Level Conservatory</h2>
+      <p class="chips">
+        <span class="chip">7 desks</span>
+        <span class="chip">3 teams of 4+2+1</span>
+        <span class="chip">perimeter</span>
+        <span class="chip">night-shift</span>
+      </p>
+      <p class="reason">7 desks in two teams of 4 and 2, with one desk on their own, desks at the walls, the floor left open, off a street across the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to a bookshelf. The break end has coffee, water and one thing to sit on, kept away from the quiet desks. 7 plants, which is as many as the corners will take. Night Shift: a tower floor lit by its own panels most of the day.</p>
+      <p class="chips small">
+        <span class="chip">1 rug</span>
+        <span class="chip">1 soft seat</span>
+        <span class="chip">7 plants</span>
+        <span class="chip">7 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>74</dd></div>
+        <div><dt>daylight</dt><dd>51</dd></div>
+        <div><dt>looks</dt><dd>66</dd></div>
+      </dl>
+      <p class="seed"><code>variety-18</code>
+        <a href="/?seed=variety-18">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-19">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-19.png" alt="Overhead view of The Brownstone Cluster"/></div>
+    <div class="about">
+      <p class="num">19 / 30</p>
+      <h2>The Brownstone Cluster</h2>
+      <p class="chips">
+        <span class="chip">4 desks</span>
+        <span class="chip">1 team of 4</span>
+        <span class="chip">pods</span>
+        <span class="chip">first-frost</span>
+      </p>
+      <p class="reason">4 desks in one team, clusters of desks, screens meeting in the middle, off a street down the length of the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to 2 bookshelves. The break end has coffee, water and two things to sit on, kept away from the quiet desks. First Frost: a warm room with a cold street through the glass.</p>
+      <p class="chips small">
+        <span class="chip">4 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">5 plants</span>
+        <span class="chip">8 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>88</dd></div>
+        <div><dt>daylight</dt><dd>76</dd></div>
+        <div><dt>looks</dt><dd>99</dd></div>
+      </dl>
+      <p class="seed"><code>variety-19</code>
+        <a href="/?seed=variety-19">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-20">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-20.png" alt="Overhead view of The Chimney Backbone"/></div>
+    <div class="about">
+      <p class="num">20 / 30</p>
+      <h2>The Chimney Backbone</h2>
+      <p class="chips">
+        <span class="chip">6 desks</span>
+        <span class="chip">1 team of 6</span>
+        <span class="chip">spine</span>
+        <span class="chip">atelier-winter</span>
+      </p>
+      <p class="reason">6 desks in one team, one long back-to-back run down the room, off a street down the length of the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to 2 bookshelves. The break end has coffee and two things to sit on, kept away from the quiet desks. Atelier in Winter: grey light off a hundred wet roofs.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">5 plants</span>
+        <span class="chip">7 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>90</dd></div>
+        <div><dt>daylight</dt><dd>64</dd></div>
+        <div><dt>looks</dt><dd>100</dd></div>
+      </dl>
+      <p class="seed"><code>variety-20</code>
+        <a href="/?seed=variety-20">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-21">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-21.png" alt="Overhead view of The Plain Copy Room"/></div>
+    <div class="about">
+      <p class="num">21 / 30</p>
+      <h2>The Plain Copy Room</h2>
+      <p class="chips">
+        <span class="chip">7 desks</span>
+        <span class="chip">2 teams of 5+2</span>
+        <span class="chip">rows</span>
+        <span class="chip">zinc-and-limestone</span>
+      </p>
+      <p class="reason">7 desks in two teams of 5 and 2, benches all facing one way, off a street across the room. Work comes and goes by 2 printers and a stack of stock, with no courier. Lookups go to a bookshelf. The break end has coffee and one thing to sit on, kept away from the quiet desks. Zinc and Limestone: pale plaster under a zinc roof, green velvet, Paris.</p>
+      <p class="chips small">
+        <span class="chip">2 rugs</span>
+        <span class="chip">1 soft seat</span>
+        <span class="chip">3 plants</span>
+        <span class="chip">7 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>86</dd></div>
+        <div><dt>daylight</dt><dd>58</dd></div>
+        <div><dt>looks</dt><dd>74</dd></div>
+      </dl>
+      <p class="seed"><code>variety-21</code>
+        <a href="/?seed=variety-21">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-22">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-22.png" alt="Overhead view of The Fax Room"/></div>
+    <div class="about">
+      <p class="num">22 / 30</p>
+      <h2>The Fax Room</h2>
+      <p class="chips">
+        <span class="chip">6 desks</span>
+        <span class="chip">2 teams of 4+2</span>
+        <span class="chip">rows</span>
+        <span class="chip">first-frost</span>
+      </p>
+      <p class="reason">6 desks in two teams of 4 and 2, benches all facing one way, off a street across the room. Work comes and goes by a printer, with no courier. Lookups go to 2 bookshelves. The break end has coffee and two things to sit on, kept away from the quiet desks. First Frost: a warm room with a cold street through the glass.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">4 plants</span>
+        <span class="chip">6 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>76</dd></div>
+        <div><dt>daylight</dt><dd>66</dd></div>
+        <div><dt>looks</dt><dd>87</dd></div>
+      </dl>
+      <p class="seed"><code>variety-22</code>
+        <a href="/?seed=variety-22">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-23">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-23.png" alt="Overhead view of The October Paperless Floor"/></div>
+    <div class="about">
+      <p class="num">23 / 30</p>
+      <h2>The October Paperless Floor</h2>
+      <p class="chips">
+        <span class="chip">6 desks</span>
+        <span class="chip">2 teams of 4+2</span>
+        <span class="chip">rows</span>
+        <span class="chip">tower-in-october</span>
+      </p>
+      <p class="reason">6 desks in two teams of 4 and 2, benches all facing one way, off a street across the room. Work comes and goes by a printer, with no courier. Lookups go to a bookshelf. The break end has coffee and two things to sit on, kept away from the quiet desks. 8 plants, which is as many as the corners will take. Tower in October: warm upholstery against the cool glass.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">8 plants</span>
+        <span class="chip">5 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>85</dd></div>
+        <div><dt>daylight</dt><dd>69</dd></div>
+        <div><dt>looks</dt><dd>93</dd></div>
+      </dl>
+      <p class="seed"><code>variety-23</code>
+        <a href="/?seed=variety-23">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-24">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-24.png" alt="Overhead view of The Chimney Post Corner"/></div>
+    <div class="about">
+      <p class="num">24 / 30</p>
+      <h2>The Chimney Post Corner</h2>
+      <p class="chips">
+        <span class="chip">3 desks</span>
+        <span class="chip">1 team of 3</span>
+        <span class="chip">rows</span>
+        <span class="chip">atelier-winter</span>
+      </p>
+      <p class="reason">3 desks in one team, benches all facing one way, off a street across the room. Work comes and goes by a post box, and the courier calls. Lookups go to a bookshelf. The break end has coffee, kept away from the quiet desks. Atelier in Winter: grey light off a hundred wet roofs.</p>
+      <p class="chips small">
+        <span class="chip">0 rugs</span>
+        <span class="chip">0 soft seats</span>
+        <span class="chip">1 plant</span>
+        <span class="chip">5 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>94</dd></div>
+        <div><dt>daylight</dt><dd>97</dd></div>
+        <div><dt>looks</dt><dd>35</dd></div>
+      </dl>
+      <p class="seed"><code>variety-24</code>
+        <a href="/?seed=variety-24">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-25">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-25.png" alt="Overhead view of Observatory and an Exchange"/></div>
+    <div class="about">
+      <p class="num">25 / 30</p>
+      <h2>Observatory and an Exchange</h2>
+      <p class="chips">
+        <span class="chip">7 desks</span>
+        <span class="chip">2 teams of 4+3</span>
+        <span class="chip">pods</span>
+        <span class="chip">night-shift</span>
+      </p>
+      <p class="reason">7 desks in two teams of 4 and 3, clusters of desks, screens meeting in the middle, off a street across the room. Work comes and goes by 2 post boxes, a printer and a stack of stock, and the courier calls. Lookups go to a telescope at the window. The break end has water and two things to sit on, kept away from the quiet desks. Night Shift: a tower floor lit by its own panels most of the day.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">5 plants</span>
+        <span class="chip">8 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>88</dd></div>
+        <div><dt>daylight</dt><dd>46</dd></div>
+        <div><dt>looks</dt><dd>93</dd></div>
+      </dl>
+      <p class="seed"><code>variety-25</code>
+        <a href="/?seed=variety-25">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-26">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-26.png" alt="Overhead view of Sorting Office and a Bare Floor"/></div>
+    <div class="about">
+      <p class="num">26 / 30</p>
+      <h2>Sorting Office and a Bare Floor</h2>
+      <p class="chips">
+        <span class="chip">6 desks</span>
+        <span class="chip">1 team of 6</span>
+        <span class="chip">rows</span>
+        <span class="chip">night-shift</span>
+      </p>
+      <p class="reason">6 desks in one team, benches all facing one way, off a street across the room. Work comes and goes by 2 post boxes and a stack of stock, and the courier calls. Lookups go to 2 bookshelves. The break end has coffee and four things to sit on, kept away from the quiet desks. Nothing green in it at all. Night Shift: a tower floor lit by its own panels most of the day.</p>
+      <p class="chips small">
+        <span class="chip">2 rugs</span>
+        <span class="chip">4 soft seats</span>
+        <span class="chip">0 plants</span>
+        <span class="chip">8 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>93</dd></div>
+        <div><dt>daylight</dt><dd>71</dd></div>
+        <div><dt>looks</dt><dd>65</dd></div>
+      </dl>
+      <p class="seed"><code>variety-26</code>
+        <a href="/?seed=variety-26">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-27">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-27.png" alt="Overhead view of The Quiet Row Room"/></div>
+    <div class="about">
+      <p class="num">27 / 30</p>
+      <h2>The Quiet Row Room</h2>
+      <p class="chips">
+        <span class="chip">2 desks</span>
+        <span class="chip">1 team of 2</span>
+        <span class="chip">rows</span>
+        <span class="chip">atelier-winter</span>
+      </p>
+      <p class="reason">2 desks in one team, benches all facing one way, off a street across the room. Work comes and goes by 2 post boxes and a stack of stock, and the courier calls. Lookups go to 2 bookshelves. The break end has coffee and one thing to sit on, kept away from the quiet desks. 6 plants, which is as many as the corners will take. Atelier in Winter: grey light off a hundred wet roofs.</p>
+      <p class="chips small">
+        <span class="chip">3 rugs</span>
+        <span class="chip">1 soft seat</span>
+        <span class="chip">6 plants</span>
+        <span class="chip">7 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>97</dd></div>
+        <div><dt>daylight</dt><dd>100</dd></div>
+        <div><dt>looks</dt><dd>89</dd></div>
+      </dl>
+      <p class="seed"><code>variety-27</code>
+        <a href="/?seed=variety-27">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-28">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-28.png" alt="Overhead view of Long Benches and a Paperless Floor"/></div>
+    <div class="about">
+      <p class="num">28 / 30</p>
+      <h2>Long Benches and a Paperless Floor</h2>
+      <p class="chips">
+        <span class="chip">9 desks</span>
+        <span class="chip">2 teams of 7+2</span>
+        <span class="chip">spine</span>
+        <span class="chip">rooftop-spring</span>
+      </p>
+      <p class="reason">9 desks in two teams of 7 and 2, one long back-to-back run down the room, off a street across the room. Work comes and goes by a printer, with no courier. Lookups go to 2 bookshelves. The break end has water and one thing to sit on, kept away from the quiet desks. Rooftop Spring: chimney pots and blossom, everything pale.</p>
+      <p class="chips small">
+        <span class="chip">2 rugs</span>
+        <span class="chip">1 soft seat</span>
+        <span class="chip">3 plants</span>
+        <span class="chip">5 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>83</dd></div>
+        <div><dt>daylight</dt><dd>67</dd></div>
+        <div><dt>looks</dt><dd>79</dd></div>
+      </dl>
+      <p class="seed"><code>variety-28</code>
+        <a href="/?seed=variety-28">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-29">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-29.png" alt="Overhead view of The Rooftop Long Room"/></div>
+    <div class="about">
+      <p class="num">29 / 30</p>
+      <h2>The Rooftop Long Room</h2>
+      <p class="chips">
+        <span class="chip">4 desks</span>
+        <span class="chip">1 team of 4</span>
+        <span class="chip">rows</span>
+        <span class="chip">rooftop-spring</span>
+      </p>
+      <p class="reason">4 desks in one team, benches all facing one way, off a street down the length of the room. Work comes and goes by a printer, with no courier. Lookups go to a telescope at the window. The break end has water and one thing to sit on, kept away from the quiet desks. Rooftop Spring: chimney pots and blossom, everything pale.</p>
+      <p class="chips small">
+        <span class="chip">2 rugs</span>
+        <span class="chip">1 soft seat</span>
+        <span class="chip">1 plant</span>
+        <span class="chip">4 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>84</dd></div>
+        <div><dt>daylight</dt><dd>61</dd></div>
+        <div><dt>looks</dt><dd>64</dd></div>
+      </dl>
+      <p class="seed"><code>variety-29</code>
+        <a href="/?seed=variety-29">open this office &rarr;</a></p>
+    </div>
+  </article>
+  <article class="room" id="variety-30">
+    <div class="shot"><img loading="lazy" width="560" height="560"
+      src="images/variety/variety-30.png" alt="Overhead view of The Corner Pod Room"/></div>
+    <div class="about">
+      <p class="num">30 / 30</p>
+      <h2>The Corner Pod Room</h2>
+      <p class="chips">
+        <span class="chip">5 desks</span>
+        <span class="chip">1 team of 5</span>
+        <span class="chip">pods</span>
+        <span class="chip">level-thirty-four</span>
+      </p>
+      <p class="reason">5 desks in one team, clusters of desks, screens meeting in the middle, off a street across the room. Work comes and goes by a post box and a stack of stock, and the courier calls. Lookups go to a telescope at the window. The break end has coffee, water and two things to sit on, kept away from the quiet desks. Level Thirty-Four: polished concrete, cool grey, a field of rooftops below.</p>
+      <p class="chips small">
+        <span class="chip">1 rug</span>
+        <span class="chip">2 soft seats</span>
+        <span class="chip">4 plants</span>
+        <span class="chip">7 stations</span>
+      </p>
+      <dl class="scores">
+        <div><dt>plan</dt><dd>89</dd></div>
+        <div><dt>daylight</dt><dd>52</dd></div>
+        <div><dt>looks</dt><dd>81</dd></div>
+      </dl>
+      <p class="seed"><code>variety-30</code>
+        <a href="/?seed=variety-30">open this office &rarr;</a></p>
+    </div>
+  </article></main>
+<footer>
+  <p>Regenerate with <code>node bin/scene-map.js</code> for the pictures and
+     <code>node bin/office-variety.js</code> for this page.</p>
+</footer>
+</body></html>

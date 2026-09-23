@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The AOP spec — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html" aria-current="page">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="agent-office-protocol-aop-v0" tabindex="-1">Agent Office Protocol (AOP) v0</h1>
+<p><strong>Status:</strong> draft · <strong>Version string:</strong> <code>&quot;0.1&quot;</code> · <strong>Audience:</strong> anyone writing an adapter that feeds live agent activity into The Roving Office.</p>
+<p>AOP is the wire format between an <strong>agentic harness</strong> (Claude Code, Rovo CLI, Codex CLI, OpenClaw, anything else) and the <strong>office</strong> — the 3D diorama that turns that activity into characters walking to desks, hitting the bookshelf, and dropping work in the outbox.</p>
+<p>The office already has an internal event vocabulary (<code>spawn</code>, <code>status</code>, <code>job</code>, <code>research</code>, <code>activity</code>, <code>dispatch</code>, <code>exit</code> — see <code>src/agents/AgentManager.js</code>). Those are <em>stage directions</em>, deliberately shaped for the scene. AOP is the layer above: <strong>what actually happened in the harness</strong>, described in harness-neutral terms. The office reduces AOP events into stage directions. Adapters never emit stage directions directly, so an adapter never has to know what a bookshelf is.</p>
+<pre><code>harness ──hook/stream──▶ adapter ──AOP──▶ ingest ──SSE──▶ browser ──▶ AgentManager
+   (Claude Code)          (thin)          (server.cjs)     (AopSource)   (stage directions)
+</code></pre>
+<h2 id="1-design-rules" tabindex="-1">1. Design rules</h2>
+<p>These are the constraints that shaped everything below. They are not negotiable without a version bump.</p>
+<ol>
+<li><strong>The harness must never wait on us.</strong> Most harnesses emit events by running a short-lived shell command and blocking the agent until it exits. Every adapter is therefore fire-and-forget, hard-capped in wall time, and <strong>always exits 0</strong>. Rovo CLI in particular disables an event hook that exits non-zero.</li>
+<li><strong>Lossy by default.</strong> A <code>kill -9</code> on the harness means no <code>session.end</code>. A crashed office means dropped events. The protocol assumes gaps and defines recovery (§7) rather than pretending to be a reliable log.</li>
+<li><strong>Cheap to emit, cheap to ignore.</strong> A conforming emitter can send six event types (§9, level L0) and still produce a believable office. Everything else is enrichment.</li>
+<li><strong>No content exfiltration.</strong> Events carry <em>shapes and summaries</em> — tool names, file paths, truncated titles — never file contents or full transcripts (§10).</li>
+<li><strong>Capability-gated, not network-gated.</strong> Ingest is token-authenticated, and <em>that</em> is the boundary — not where the request came from. Reading an office needs its keycard; writing to one needs a write token as well (§5.5). This started life as &quot;loopback only&quot;, which was the same intention expressed as a network rule, and it stopped being expressible that way the moment an office could be somewhere other than the machine making the events. It is still not a telemetry pipeline: rule 4 is what limits what may be sent, and it did not move.</li>
+<li><strong>Forward compatible.</strong> Receivers ignore unknown event types and unknown fields, so a newer harness adapter can talk to an older office.</li>
+</ol>
+<h2 id="2-terminology" tabindex="-1">2. Terminology</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>harness</strong></td>
+<td>The program running the model loop — <code>claude-code</code>, <code>rovo-cli</code>, <code>cursor</code>, <code>codex-cli</code>, <code>openclaw</code>.</td>
+</tr>
+<tr>
+<td><strong>session</strong></td>
+<td>One conversation/thread inside a harness. Maps 1:1 to <strong>one character</strong> in the office.</td>
+</tr>
+<tr>
+<td><strong>subagent session</strong></td>
+<td>A session spawned by another session. Its own character, with <code>session.parent_id</code> set.</td>
+</tr>
+<tr>
+<td><strong>turn</strong></td>
+<td>One user prompt and everything the agent does in response. Maps to a piece of <strong>work</strong> at a desk.</td>
+</tr>
+<tr>
+<td><strong>tool call</strong></td>
+<td>One tool invocation inside a turn. Drives which <strong>prop</strong> the character walks to.</td>
+</tr>
+<tr>
+<td><strong>office</strong></td>
+<td>The receiving app: <code>server.cjs</code> (ingest + fan-out) plus the browser scene.</td>
+</tr>
+<tr>
+<td><strong>adapter</strong></td>
+<td>The code that translates a harness's native events into AOP.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-envelope" tabindex="-1">3. Envelope</h2>
+<p>Every event is a single JSON object. Batches are newline-delimited JSON (NDJSON).</p>
+<pre><code class="language-json">{
+  &quot;aop&quot;: &quot;0.2&quot;,
+  &quot;id&quot;: &quot;9f1c1c1e-0b7d-4b7a-9a3f-2f36a5c4b111&quot;,
+  &quot;ts&quot;: &quot;2026-08-26T12:19:54.058Z&quot;,
+  &quot;seq&quot;: 12,
+  &quot;type&quot;: &quot;tool.start&quot;,
+  &quot;harness&quot;: { &quot;name&quot;: &quot;claude-code&quot;, &quot;version&quot;: &quot;2.1.246&quot;, &quot;variant&quot;: &quot;cli&quot; },
+  &quot;session&quot;: {
+    &quot;id&quot;: &quot;478c3346-4425-4bd7-9a9f-0163386a04f1&quot;,
+    &quot;parent_id&quot;: null,
+    &quot;kind&quot;: &quot;main&quot;,
+    &quot;label&quot;: &quot;the-roving-office spec&quot;,
+    &quot;cwd&quot;: &quot;~/dev/roving-office&quot;
+  },
+  &quot;project&quot;: {
+    &quot;id&quot;: &quot;the-roving-office&quot;,
+    &quot;name&quot;: &quot;The Roving Office&quot;,
+    &quot;repo&quot;: { &quot;remote&quot;: &quot;bitbucket.org/atlassian/the-roving-office&quot;, &quot;branch&quot;: &quot;aop-spec&quot; }
+  },
+  &quot;payload&quot;: { &quot;tool_call_id&quot;: &quot;toolu_01&quot;, &quot;tool_name&quot;: &quot;Read&quot;, &quot;tool_class&quot;: &quot;read&quot;, &quot;target&quot;: &quot;src/config.js&quot; }
+}
+</code></pre>
+<h3 id="31-envelope-fields" tabindex="-1">3.1 Envelope fields</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Req</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>aop</code></td>
+<td>string</td>
+<td>✅</td>
+<td>Protocol version, <code>&quot;&lt;major&gt;.&lt;minor&gt;&quot;</code>. Receivers reject a different <strong>major</strong>, accept any minor.</td>
+</tr>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td>✅</td>
+<td>Unique per event. UUIDv4 or <code>&lt;session.id&gt;:&lt;seq&gt;</code>. Used for <strong>idempotency</strong> — a receiver that has seen an <code>id</code> MUST drop the duplicate.</td>
+</tr>
+<tr>
+<td><code>ts</code></td>
+<td>string</td>
+<td>✅</td>
+<td>RFC 3339 / ISO 8601 with milliseconds, <strong>UTC</strong>. Emitter's clock, at the moment the underlying thing happened.</td>
+</tr>
+<tr>
+<td><code>seq</code></td>
+<td>integer</td>
+<td>⬜</td>
+<td>Monotonic per session, starting at 1. Lets the office detect gaps and order events that share a <code>ts</code>.</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>string</td>
+<td>✅</td>
+<td>One of §4. Dotted lowercase, <code>&lt;noun&gt;.&lt;verb&gt;</code>.</td>
+</tr>
+<tr>
+<td><code>harness</code></td>
+<td>object</td>
+<td>✅</td>
+<td><code>{ name, version?, variant? }</code>. <code>name</code> is a lowercase stable slug; see the registry in §4.6 and variants in §4.7.</td>
+</tr>
+<tr>
+<td><code>session</code></td>
+<td>object</td>
+<td>✅</td>
+<td>See §3.2.</td>
+</tr>
+<tr>
+<td><code>project</code></td>
+<td>object</td>
+<td>⬜</td>
+<td>See §3.3. Strongly recommended — it is how the office picks which building to show.</td>
+</tr>
+<tr>
+<td><code>payload</code></td>
+<td>object</td>
+<td>⬜</td>
+<td>Type-specific, per §4.</td>
+</tr>
+<tr>
+<td><code>ext</code></td>
+<td>object</td>
+<td>⬜</td>
+<td>Vendor-specific extras. Receivers MUST NOT interpret and MUST NOT choke on it.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-session" tabindex="-1">3.2 <code>session</code></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Req</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td>✅</td>
+<td>Harness-native session id. Stable for the life of the session.</td>
+</tr>
+<tr>
+<td><code>parent_id</code></td>
+<td>string | null</td>
+<td>⬜</td>
+<td>Set on subagent sessions. The office draws the parent–child relation (and can seat children near the parent).</td>
+</tr>
+<tr>
+<td><code>kind</code></td>
+<td>enum</td>
+<td>⬜</td>
+<td><code>main</code> (default) | <code>subagent</code> | <code>background</code> | <code>remote</code>.</td>
+</tr>
+<tr>
+<td><code>label</code></td>
+<td>string</td>
+<td>⬜</td>
+<td>Human name for the session, ≤ 60 chars. Becomes the character's name tag if present, else a name is generated.</td>
+</tr>
+<tr>
+<td><code>actor</code></td>
+<td>string</td>
+<td>⬜</td>
+<td>Name of the <strong>agent identity</strong> behind the session, ≤ 60 chars. A whole name is kept whole; a single word becomes a first name and the office adds the job.</td>
+</tr>
+<tr>
+<td><code>actor_color</code></td>
+<td>string</td>
+<td>⬜</td>
+<td>What the identity wears, ≤ 40 chars. A colour (<code>#c1440e</code>, <code>rgb(193 68 14)</code>) is used exactly; a description (<code>Rich red / crimson</code>) is read and fitted to the office palette. Anything with no colour in it is ignored.</td>
+</tr>
+<tr>
+<td><code>actor_avatar</code></td>
+<td>string</td>
+<td>⬜</td>
+<td>URL of a picture of the identity, ≤ 512 chars. Absolute <code>http(s)</code>, or a path on the office's own origin — see §5.7 for uploading one.</td>
+</tr>
+<tr>
+<td><code>cwd</code></td>
+<td>string</td>
+<td>⬜</td>
+<td>The session's working directory, tidied per §10 — <code>$HOME</code> replaced with <code>~</code>. Used as a fallback <code>project.id</code> (basename) when <code>project</code> is absent, which the tidying leaves intact. Emitters MUST NOT send the absolute form: under <code>$HOME</code> it is the local account name, and it is on every event of the session.</td>
+</tr>
+<tr>
+<td><code>agent_type</code></td>
+<td>string</td>
+<td>⬜</td>
+<td>Harness-declared role of a subagent (<code>Explore</code>, <code>general-purpose</code>, …). Used for the character's colour bias.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Office identity.</strong> A character's key is <code>harness.name + &quot;:&quot; + session.id</code>. Two harnesses may collide on session ids; the tuple never does.</p>
+<p><strong><code>label</code> and <code>actor</code> are different claims, and the difference matters.</strong> <code>label</code> names a <em>session</em> — &quot;this tab is the night shift&quot; — and is a caption the office repeats verbatim. <code>actor</code> names a <em>someone</em>: this session is being run by an identity that exists apart from it, and will be back tomorrow under a different session id. Send <code>actor</code> whenever the harness has a durable identity behind a session — a configured OpenClaw agent, a named persona — and <code>label</code> when the name belongs to the run rather than the runner.</p>
+<p>Neither is a place for an identifier. A session key, a run id or an agent slug in either field puts <code>agent:albus:telegram:direct:1234</code> on somebody's chest, and the office has no way to tell that it was not meant as a name. Adapters MUST send a name a person would recognise, or nothing: <code>actor</code> is optional precisely so that &quot;no idea who this is&quot; has an honest answer. The office draws a name of its own from the session key in that case, and prefers a plausible stranger to a true identifier.</p>
+<p><strong>What the office does with <code>actor</code> depends on how much of a name it is.</strong> The office normally writes the surname itself, as the job in hand — <em>Ada Kettle-Mender</em> — and that is worth keeping only while it is not talking over somebody:</p>
+<ul>
+<li><strong>Two or more words: the name is kept whole, permanently.</strong> <code>&quot;Albus Dumbledclaw&quot;</code> is <strong>Albus Dumbledclaw</strong>, and no job ever renames him. These names tend to be the joke — Paige Turner, Florence Nightingclaw — and a job surname would delete the better line and take the credit.</li>
+<li><strong>One word: it is a first name, and the office adds the job.</strong> <code>&quot;Bobster&quot;</code> becomes <strong>Bobster Kettle-Mender</strong>, then <strong>Bobster Docs-Verifier</strong>, so a half-given identity still gets the mechanic.</li>
+</ul>
+<p>Words carrying digits are dropped as identifiers, and an <code>actor</code> with nothing name-shaped left in it — <code>agent:albus:telegram:direct:1234</code> — is declined in favour of the pool. A lone honorific is nobody (<code>&quot;Dr&quot;</code>), though an honorific <em>with</em> a name is a whole name and stays as <code>&quot;Dr House&quot;</code>.</p>
+<p>An <code>actor</code> may arrive <strong>after</strong> the session's first event, because OpenClaw learns it from the agent context one hook later. Adopting it late renames the character: a whole name replaces theirs outright, a single word changes only the person and leaves the job running. Two sessions of one identity are the same colleague and share a name; the anti-collision rule that keeps two anonymous tabs from both being Ada does not apply to a name somebody chose.</p>
+<p><strong><code>actor_color</code> is what that identity wears.</strong> Everyone in the office has a shirt colour, normally drawn from a palette — pleasant, and meaningless. An identity that names its own colour gets it instead, and gets it every session, which turns the colour into something you can recognise across a restart: the agent in rust is always the same agent.</p>
+<p>Send it <strong>as written</strong> and let the office read it. That is not politeness, it is the division of labour: an adapter reads a file, and the office has a browser, a palette and a colour space. So <code>actor_color</code> is a <em>claim about appearance</em>, not a resolved value, and the office handles three kinds of claim differently.</p>
+<ul>
+<li><strong>A colour stated as a colour is used exactly.</strong> <code>#c1440e</code>, <code>c1440e</code>, <code>rgb(193 68 14)</code>, <code>hsl(20 87% 41%)</code>, and a hex anywhere inside a longer string — <code>Rich red / crimson (#b03a3a)</code>. A hex is a decision, and decisions are honoured without adjustment.</li>
+<li><strong>A colour stated in words is read, then fitted.</strong> Real identities describe themselves rather than specify: <code>Rich red / crimson</code>, <code>Bright tangerine / golden-orange</code>, <code>Warm library yellow / marigold</code>, <code>Field green / pitch green</code>. The office matches the description against a table of colour names and projects the result into the range its own shirts occupy, so it arrives recognisable <em>and</em> wearable. This is the interesting half; <code>src/agents/colour.js</code> documents how and, more usefully, why the obvious approaches fail.</li>
+<li><strong>A claim with no colour in it is ignored</strong>, not an error. <code>Colour: the vibe of a Tuesday</code> is a mood, and the palette answers instead.</li>
+</ul>
+<p>Note what follows from the middle case: <strong>a bare colour word is a description, not a specification.</strong> <code>teal</code> is read and fitted like any other word, because <code>#008080</code> is a CSS keyword rather than anybody's shirt. Adapters wanting an exact colour should send hex.</p>
+<p>Like <code>actor</code>, this may arrive late, in which case the character changes their shirt a few seconds in. Alpha is dropped; a shirt is a shirt.</p>
+<p><strong><code>actor_avatar</code> is a picture of that identity.</strong> Agents that describe themselves tend to have a portrait to go with it, and an office showing one has answered &quot;who is this&quot; in the way a name never quite does. It appears in the agent's detail panel; the character on the floor is still the character.</p>
+<p>The field is a <strong>URL</strong>, which is the whole difficulty: an avatar is usually a <em>file</em>, on the machine the harness runs on, and the office is a browser elsewhere. An adapter with a local file therefore uploads it first (§5.7) and sends the URL it gets back. An adapter whose identities already have pictures on the web sends those instead, and uploads nothing.</p>
+<p>Because the upload has to finish before the URL exists, <code>actor_avatar</code> is the <strong>latest-arriving</strong> identity field: the first few events of a session normally carry no avatar and later ones do. Receivers MUST adopt it mid-session, and MUST ignore any value that is neither an absolute <code>http(s)</code> URL nor a path on their own origin — a <code>src</code> is one of the few places where a string does something.</p>
+<h3 id="33-project" tabindex="-1">3.3 <code>project</code></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Req</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td>✅ (if <code>project</code> present)</td>
+<td>Slug. Matches an entry in <code>src/projects.js</code> when possible, so the office picks the right building/theme; unknown ids fall back to the default office.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td>⬜</td>
+<td>Display name.</td>
+</tr>
+<tr>
+<td><code>repo</code></td>
+<td>object</td>
+<td>⬜</td>
+<td><code>{ remote?, branch?, commit? }</code>. <code>remote</code> is the <strong>canonical</strong> <code>host/owner/repo</code> — see below.</td>
+</tr>
+<tr>
+<td><code>workitem</code></td>
+<td>object</td>
+<td>⬜</td>
+<td><code>{ key, url?, title? }</code> — e.g. a Jira key. Lets the office label the work item on the desk.</td>
+</tr>
+<tr>
+<td><code>scene</code></td>
+<td>string</td>
+<td>⬜</td>
+<td>Explicit scene override. See §3.4.3.</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>repo.remote</code> is <code>host/owner/repo</code>, not the URL somebody cloned with</strong>, and this is a
+<code>MUST</code> rather than a tidiness preference. <code>git remote get-url origin</code> returns whatever a
+contributor typed, and one entirely ordinary form of it is
+<code>https://&lt;user&gt;:&lt;token&gt;@host/owner/repo</code> — so an emitter that forwards the output
+verbatim hands the office a <strong>live credential</strong>, which the office then serves to every
+holder of the keycard. Reducing to the three parts a receiver has any use for makes that
+impossible by construction rather than by a pattern that has to have anticipated the
+shape. Emitters MUST strip any <code>userinfo</code> component and SHOULD send the canonical form.</p>
+<p>It is also the answer to a second, duller problem: an ssh clone and an https clone of one
+repository used to report two different strings for the room they share.</p>
+<p>Receivers still canonicalise what arrives (§3.4.1) — an emitter written against an older
+spec may send a URL, and dropping its events would be worse than reading them.</p>
+<h2 id="34-scenes-and-routing" tabindex="-1">3.4 Scenes and routing</h2>
+<p><strong>One scene is one office is one project.</strong> Not one per harness: three Rovo CLI terminals in the same repo are three characters in <em>one</em> office, and a Claude Code session in that same repo walks into the same room and stands next to them. The harness is a <strong>costume</strong> (coat colour, a glyph on the name tag), never a building.</p>
+<p>The alternative — a scene per client type — puts unrelated repos in one room and splits one body of work across rooms, which is exactly backwards from how the <a href="../../user/install.html">Getting started</a> defines a project: <em>&quot;a body of work you want to watch&quot;</em>.</p>
+<h3 id="341-deriving-the-scene-key" tabindex="-1">3.4.1 Deriving the scene key</h3>
+<p>Adapters SHOULD send <code>project</code>. When they don't, or send it partially, the receiver derives it. First hit wins:</p>
+<table>
+<thead>
+<tr>
+<th>Precedence</th>
+<th>Source</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>project.scene</code> (explicit override)</td>
+<td>used verbatim</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>project.id</code> from the adapter</td>
+<td>used verbatim</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>project.repo.remote</code>, canonicalised to <code>host/owner/repo</code></td>
+<td>e.g. <code>bitbucket.org/atlassian/the-roving-office</code> → <code>the-roving-office</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>basename of the nearest ancestor of <code>session.cwd</code> containing <code>.git</code></td>
+<td>worktree-aware</td>
+</tr>
+<tr>
+<td>5</td>
+<td>basename of <code>session.cwd</code></td>
+<td>last resort</td>
+</tr>
+<tr>
+<td>6</td>
+<td>none of the above</td>
+<td>the <code>default</code> office</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Worktrees and branches collapse into one office.</strong> Because the key comes from the <em>remote</em>, a session in <code>roving-office/.worktrees/agent-spec</code> lands in the same room as one in the main checkout, with <code>repo.branch</code> shown as a per-character detail. Branch-per-office fragments the room precisely when you most want everything in one view. (Deliberately rejected: branch-as-floor. Cute, given <code>storeysBelow</code> already slices the building, but a scene change for little gain.)</p>
+<h3 id="342-many-offices-one-window" tabindex="-1">3.4.2 Many offices, one window</h3>
+<p>The receiver keeps reduced state for <strong>every</strong> project it has seen. The browser renders exactly one at a time.</p>
+<ul>
+<li><code>GET /aop/v0/state</code> returns per-project rosters, so nothing is lost while offscreen.</li>
+<li>The scene switcher badges live headcounts, and the title bar carries an overflow indicator — <em>&quot;4 agents in 2 other scenes&quot;</em>.</li>
+<li>Want two scenes side by side? Open a second browser window on the same keycard and pick a different scene. SSE fan-out already supports N subscribers, and this is far cheaper than a split-screen scene.</li>
+<li>Events for an unknown <code>project.id</code> are <strong>never dropped</strong>; they create a new office lazily, themed by <code>src/projects.js</code> if the id matches an entry there and generically if it doesn't.</li>
+</ul>
+<h3 id="343-the-scene-override" tabindex="-1">3.4.3 The <code>scene</code> override</h3>
+<p><code>project.scene</code> exists for the two cases the derivation gets wrong:</p>
+<ul>
+<li><strong>Monorepos</strong> — one remote, many teams. Set <code>scene</code> per directory.</li>
+<li><strong>&quot;One room for everything&quot;</strong> — set <code>ROVING_OFFICE_SCENE=all</code> in the environment and the adapter stamps <code>scene: &quot;all&quot;</code> on every event, collapsing every repo into a single office.</li>
+</ul>
+<h3 id="344-capacity" tabindex="-1">3.4.4 Capacity</h3>
+<p>The room is authored with <strong>5 desks</strong> (<code>DESKS</code> in <code>src/layout.js</code>), and can be given more in the furniture editor. Real usage overruns whatever it has, so seating degrades in a fixed order:</p>
+<table>
+<thead>
+<tr>
+<th>Population</th>
+<th>Seating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Main sessions, 1–5</td>
+<td>One desk each, in claim order</td>
+</tr>
+<tr>
+<td>Main sessions, 6+</td>
+<td>Couch, then standing at the bookshelf</td>
+</tr>
+<tr>
+<td>Main sessions beyond ~12</td>
+<td>Not rendered; a <em>&quot;+N waiting&quot;</em> badge on the roster</td>
+</tr>
+<tr>
+<td>Subagent sessions</td>
+<td><strong>Never claim a desk</strong> — they ghost onto the parent's, see §6.1</td>
+</tr>
+</tbody>
+</table>
+<p>Subagents are excluded from desk claiming for a practical reason: a single <code>Job</code> fan-out of four would evict every real session in the room within a second.</p>
+<h2 id="4-event-types" tabindex="-1">4. Event types</h2>
+<p>Eighteen types, in five families. <strong>L0</strong> marks the minimum viable set (§9).</p>
+<h3 id="41-session-lifecycle" tabindex="-1">4.1 Session lifecycle</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>L0</th>
+<th>Meaning</th>
+<th>Payload</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>session.start</code></td>
+<td>✅</td>
+<td>A session began (or the adapter noticed one).</td>
+<td><code>{ source, capabilities?, redaction?, model?, permission_mode?, transcript?, resumed?, parent_tool_call_id? }</code></td>
+</tr>
+<tr>
+<td><code>session.heartbeat</code></td>
+<td>✅</td>
+<td>&quot;Still alive.&quot; Emit every 15 s while a session exists.</td>
+<td><code>{ status?, idle_ms? }</code></td>
+</tr>
+<tr>
+<td><code>session.end</code></td>
+<td>✅</td>
+<td>Session finished or was closed.</td>
+<td><code>{ reason, duration_ms?, usage? }</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>source</code>: <code>startup</code> | <code>resume</code> | <code>fork</code> | <code>clear</code> | <code>spawn</code> | <code>attach</code>.</li>
+<li><code>reason</code>: <code>exit</code> | <code>clear</code> | <code>logout</code> | <code>error</code> | <code>killed</code> | <code>timeout</code> | <code>other</code>.</li>
+<li><code>capabilities</code>: array of event types this adapter can emit. Declaring them lets the office avoid waiting for events that will never come (e.g. show no bookshelf trips for an adapter without <code>tool.start</code>).</li>
+<li><code>usage</code>: <code>{ input_tokens?, output_tokens?, cached_tokens?, cost_usd? }</code>.</li>
+<li><code>parent_tool_call_id</code>: set on a subagent session, naming the parent's <code>tool.start</code> of class <code>agent</code> that spawned it. This is what lets the office bind a ghost to the exact tool call it came from, and dissolve every straggler when that call ends. Claude Code supplies it as <code>parent_tool_use_id</code>.</li>
+</ul>
+<h3 id="42-turns" tabindex="-1">4.2 Turns</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>L0</th>
+<th>Meaning</th>
+<th>Payload</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>turn.start</code></td>
+<td>✅</td>
+<td>A turn began — a user prompt, or a clock.</td>
+<td><code>{ turn_id?, title, prompt?, prompt_chars?, trigger?, origin?, plan? }</code></td>
+</tr>
+<tr>
+<td><code>turn.title</code></td>
+<td>⬜</td>
+<td>The turn in flight has a better name than the one it opened with.</td>
+<td><code>{ turn_id?, title }</code></td>
+</tr>
+<tr>
+<td><code>turn.end</code></td>
+<td>✅</td>
+<td>The agent stopped and handed control back.</td>
+<td><code>{ turn_id?, status, title?, summary?, duration_ms?, usage?, tool_calls? }</code></td>
+</tr>
+<tr>
+<td><code>step.start</code></td>
+<td>⬜</td>
+<td>The agent began one part of a turn.</td>
+<td><code>{ step_id, turn_id?, title?, index?, of?, plan? }</code></td>
+</tr>
+<tr>
+<td><code>step.end</code></td>
+<td>⬜</td>
+<td>That part finished.</td>
+<td><code>{ step_id, status?, duration_ms?, summary? }</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>title</code>: <strong>≤ 80 chars, single line</strong> — the desk label. Adapters SHOULD derive it from the first line of the prompt; the office never re-summarises. If the harness writes its own short name for the work, that is the better label — see <code>turn.title</code> below.</li>
+<li><code>prompt</code>: full prompt text. Omitted unless the emitter is explicitly configured to include it (§10).</li>
+<li><code>trigger</code>: <code>user</code> | <code>queue</code> | <code>schedule</code> | <code>parent</code> | <code>retry</code>. <strong>Optional, and omitted rather than guessed</strong> — an emitter that does not know how a turn started MUST leave it out. <code>origin.kind</code> is the fuller answer and does not have to agree with a word this enum lacks.</li>
+<li><code>origin</code>: <em>why this turn exists</em>, <code>{ kind, name?, id?, schedule?, detail? }</code>. See below.</li>
+<li><code>status</code> on <code>turn.end</code>: <code>completed</code> | <code>cancelled</code> | <code>error</code> | <code>blocked</code>.</li>
+<li><code>status</code> on <code>step.end</code>: <code>completed</code> | <code>skipped</code> | <code>failed</code> | <code>cancelled</code>. Defaults to <code>completed</code>.</li>
+<li><code>index</code> / <code>of</code>: 1-based, and only meaningful together. <code>2</code> of <code>5</code> is the second of five.</li>
+<li><code>plan</code>: ordered array of <code>{ id?, title, status? }</code>, ≤ 20 entries — the checklist for this turn.</li>
+</ul>
+<h4 id="the-name-of-the-work-can-arrive-late" tabindex="-1">The name of the work can arrive late</h4>
+<p>A turn has to open with a label, and at the moment it opens the only thing available is
+usually a quote of the request. Harnesses that write their own short name for the work
+— Claude Code generates one per session, the thing its terminal tab shows — produce it a
+second or two <em>after</em> the prompt that earned it, which is after <code>turn.start</code> has gone.</p>
+<p><code>turn.title</code> is how an adapter says so without the round becoming two rounds.</p>
+<ol>
+<li><strong>Same turn, new name.</strong> It renames the work in hand and MUST NOT be read as a new
+job: no second delivery, no status change, no history entry of its own. A new job is
+<code>turn.start</code>'s business.</li>
+<li><strong>Only while the turn is open</strong>, and only for a title that differs from the current
+one. An adapter that has nothing better to say says nothing.</li>
+<li><strong>Once is enough.</strong> This is an upgrade from a placeholder to the real name, not a
+running commentary; an adapter SHOULD NOT emit it per tool call. Where a harness
+restates a title that has not changed, the receiver's no-op (rule 2) is the backstop,
+not the licence.</li>
+<li><strong>Additive.</strong> A receiver that ignores it sees the same title on <code>turn.end</code>, which
+already carries one, and renders exactly as it did before this event existed.</li>
+<li><strong>Subject to §10 like any other title.</strong> It is model-written free text, so <code>metadata</code>
+mode does not send it at all — there is no generic label worth an event.</li>
+</ol>
+<h4 id="origin-why-a-turn-exists" tabindex="-1">Origin: why a turn exists</h4>
+<p><code>trigger</code> says how a turn started in five words. <code>origin</code> says what started it, and the
+difference is the whole of what a viewer wants from a scheduled run: not <em>&quot;this was on a
+schedule&quot;</em> but <em>&quot;this is the hourly Room to Read mail check&quot;</em>.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kind</code></td>
+<td>enum</td>
+<td><code>human</code> | <code>schedule</code> | <code>heartbeat</code> | <code>queue</code> | <code>parent</code> | <code>retry</code> | <code>maintenance</code> | <code>webhook</code>. Required when <code>origin</code> is present.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>string ≤ 80</td>
+<td>What the <strong>operator</strong> called it — <em>&quot;Paige hourly Room to Read Gmail check&quot;</em>.</td>
+</tr>
+<tr>
+<td><code>id</code></td>
+<td>string ≤ 80</td>
+<td>The harness's id for the job, so repeat runs of one job are groupable.</td>
+</tr>
+<tr>
+<td><code>schedule</code></td>
+<td>string ≤ 40</td>
+<td><code>17 * * * *</code>, <code>every 30m</code>. Sent as the harness states it; the office does the phrasing.</td>
+</tr>
+<tr>
+<td><code>detail</code></td>
+<td>string ≤ 200</td>
+<td>Free text about this run, or about the job behind it — a scheduler's <code>description</code> field is the usual source. Subject to redaction either way, so it travels from <code>summary</code> up; see §10.</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>kind</code> splits <code>schedule</code> from <code>heartbeat</code> deliberately: one is a single errand with an
+id and a name, the other is a round that has neither. <code>maintenance</code> is the agent's own
+housekeeping — flushing memory, shedding context — which is nobody asking for anything
+and MUST NOT be reported as <code>human</code>.</li>
+<li><code>origin</code> is <strong>additive</strong>, and a receiver that ignores it renders exactly as before.</li>
+<li>An emitter that knows only how the turn started still SHOULD send <code>origin</code> with just a
+<code>kind</code>. &quot;Nobody asked for this&quot; is worth saying on its own.</li>
+<li><code>name</code>, <code>id</code> and <code>schedule</code> describe a <strong>configured job</strong>, not a conversation, which is
+why §10 lets them through at <code>metadata</code> where <code>title</code> does not. <code>detail</code> is free text
+and does not.</li>
+</ul>
+<h4 id="steps-one-job-several-parts" tabindex="-1">Steps: one job, several parts</h4>
+<p>A job is <em>sometimes</em> one step and <em>sometimes</em> a walk through a series of them. Between
+<code>turn</code> and <code>tool</code> there was nothing that could say &quot;this turn has five parts and I am on
+the second&quot;, so a scheduled job working through a list rendered exactly like one long
+think. These two types are that missing middle, and the rules keep them from becoming a
+second, noisier <code>tool.start</code>.</p>
+<ol>
+<li><strong>No steps means one step.</strong> A turn that never emits <code>step.*</code> is the common case and
+MUST render precisely as it did before this section existed. Adapters MUST NOT wrap a
+single-part turn in a ceremonial lone step, and receivers MUST NOT invent &quot;1 of 1&quot;.</li>
+<li><strong>One open step at a time</strong>, per session. A <code>step.start</code> while another step is open
+closes it as <code>completed</code> — harnesses announce the next item far more reliably than they
+close the last one, so the implicit close is the normal path, not the recovery path.</li>
+<li><strong><code>turn.end</code> closes any open step.</strong> A step never outlives its turn.</li>
+<li><strong>A plan is a hint, not a contract.</strong> Entries may be skipped, reordered or never
+reached, and the count may be wrong. Most harnesses only learn the checklist when the
+agent writes it down, which is <em>after</em> <code>turn.start</code> — so <code>plan</code> may be restated on any
+<code>step.start</code>, and the latest one wins. A receiver treats it as the best description
+available of work it will find out about anyway.</li>
+<li><strong>Steps are parts of a turn, not tool calls.</strong> An adapter MUST NOT emit a step per tool
+call: that is what <code>tool.start</code> is for, the office already debounces it (§6), and a step
+per call would have an agent pace the room for work done at one desk. A step is a unit
+of <em>intent</em> — a todo item, a heartbeat phase, a stage of a migration.</li>
+<li><strong><code>step_id</code> is opaque</strong> and unique within its turn. Receivers match <code>step.end</code> to
+<code>step.start</code> on it and MUST NOT parse it.</li>
+</ol>
+<h3 id="43-tool-activity" tabindex="-1">4.3 Tool activity</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>L0</th>
+<th>Meaning</th>
+<th>Payload</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tool.start</code></td>
+<td>⬜</td>
+<td>A tool call began.</td>
+<td><code>{ tool_call_id, tool_name, tool_class, target?, summary?, concurrent? }</code></td>
+</tr>
+<tr>
+<td><code>tool.end</code></td>
+<td>⬜</td>
+<td>A tool call finished.</td>
+<td><code>{ tool_call_id, tool_name?, tool_class?, status, duration_ms?, error?, result_bytes? }</code></td>
+</tr>
+<tr>
+<td><code>artifact.change</code></td>
+<td>⬜</td>
+<td>The agent changed something durable.</td>
+<td><code>{ kind, path?, added?, removed?, url? }</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>status</code>: <code>ok</code> | <code>error</code> | <code>denied</code> | <code>cancelled</code> | <code>timeout</code>.</li>
+<li><code>kind</code> on <code>artifact.change</code>: <code>file</code> | <code>commit</code> | <code>branch</code> | <code>pr</code> | <code>page</code> | <code>workitem</code>.</li>
+</ul>
+<p><strong><code>tool_class</code></strong> is the whole point of this family: it is the normalised, closed enum the office maps to props. Adapters MUST map their native tool name onto it.</p>
+<table>
+<thead>
+<tr>
+<th><code>tool_class</code></th>
+<th>Native examples</th>
+<th>Office reading</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>read</code></td>
+<td><code>Read</code>, <code>open_files</code>, <code>cat</code></td>
+<td>at the desk, working</td>
+</tr>
+<tr>
+<td><code>search</code></td>
+<td><code>Grep</code>, <code>Glob</code>, <code>grep</code>, <code>ToolSearch</code></td>
+<td>bookshelf trip, researching — a book off the shelf</td>
+</tr>
+<tr>
+<td><code>edit</code></td>
+<td><code>Write</code>, <code>Edit</code>, <code>create_file</code></td>
+<td>at the desk, working</td>
+</tr>
+<tr>
+<td><code>execute</code></td>
+<td><code>Bash</code>, <code>shell</code>, test runners</td>
+<td>at the desk, working</td>
+</tr>
+<tr>
+<td><code>network</code></td>
+<td><code>WebFetch</code>, <code>WebSearch</code>, <code>curl</code></td>
+<td>bookshelf trip, researching — <strong>the globe turns</strong>, no book</td>
+</tr>
+<tr>
+<td><code>knowledge</code></td>
+<td>Confluence/Jira/graph lookups, MCP reads</td>
+<td>bookshelf trip, researching — a book off the shelf</td>
+</tr>
+<tr>
+<td><code>scm</code></td>
+<td>commit, push, PR create</td>
+<td>outbox, delivering</td>
+</tr>
+<tr>
+<td><code>agent</code></td>
+<td><code>Job</code>, <code>invoke_subagents</code></td>
+<td>expect child <code>session.start</code></td>
+</tr>
+<tr>
+<td><code>wait</code></td>
+<td>sleep, poll, watch</td>
+<td>resting</td>
+</tr>
+<tr>
+<td><code>other</code></td>
+<td>anything unmapped</td>
+<td>working</td>
+</tr>
+</tbody>
+</table>
+<h3 id="44-attention-and-interruptions" tabindex="-1">4.4 Attention and interruptions</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>L0</th>
+<th>Meaning</th>
+<th>Payload</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>permission.request</code></td>
+<td>✅</td>
+<td>The agent is blocked on a human decision.</td>
+<td><code>{ request_id, tool_name?, tool_class?, target?, reason? }</code></td>
+</tr>
+<tr>
+<td><code>permission.resolve</code></td>
+<td>⬜</td>
+<td>That decision came in.</td>
+<td><code>{ request_id, decision, by? }</code></td>
+</tr>
+<tr>
+<td><code>notification</code></td>
+<td>⬜</td>
+<td>Harness wants the human's attention (idle nudge, prompt needed).</td>
+<td><code>{ message, level? }</code></td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td>⬜</td>
+<td>Something failed at session scope.</td>
+<td><code>{ message, kind?, recoverable? }</code></td>
+</tr>
+<tr>
+<td><code>context.compact</code></td>
+<td>⬜</td>
+<td>History was compacted.</td>
+<td><code>{ trigger, tokens_before?, tokens_after? }</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>decision</code>: <code>allow</code> | <code>deny</code> | <code>defer</code> | <code>always_allow</code>.</li>
+<li><code>level</code>: <code>info</code> | <code>warn</code> | <code>error</code>.</li>
+<li><code>trigger</code>: <code>auto</code> | <code>manual</code>.</li>
+</ul>
+<p><code>permission.request</code> is the single most valuable non-L0-ish event: it is the only reliable signal that an agent is <strong>waiting on you</strong>, which is exactly what the office is best at showing at a glance.</p>
+<h3 id="45-inbound-work-the-mailbox" tabindex="-1">4.5 Inbound work (the mailbox)</h3>
+<p>These do not describe a session — they describe work <em>arriving</em>, and drive the paper-airplane animation. <code>session</code> MAY be a synthetic <code>{ &quot;id&quot;: &quot;queue&quot; }</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>L0</th>
+<th>Meaning</th>
+<th>Payload</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>job.queued</code></td>
+<td>⬜</td>
+<td>New work landed (Jira assignment, queued prompt, webhook).</td>
+<td><code>{ job_id, title, source?, url?, priority? }</code></td>
+</tr>
+<tr>
+<td><code>job.claimed</code></td>
+<td>⬜</td>
+<td>A session picked it up.</td>
+<td><code>{ job_id, claimed_by }</code></td>
+</tr>
+<tr>
+<td><code>job.dropped</code></td>
+<td>⬜</td>
+<td>It was cancelled or binned.</td>
+<td><code>{ job_id, reason? }</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="46-harness-name-registry" tabindex="-1">4.6 Harness name registry</h3>
+<p><code>harness.name</code> is a slug so the office can colour-code and label consistently. Reserved: <code>claude-code</code>, <code>rovo-cli</code>, <code>cursor</code>, <code>codex-cli</code>, <code>openclaw</code>, <code>mock</code>. Anything else is allowed and rendered generically.</p>
+<h3 id="47-harness-variant" tabindex="-1">4.7 Harness variant</h3>
+<p>One harness binary can have more than one front door. <code>claude-code</code> is reached from a terminal, from Claude Desktop's local agent mode, and from the SDK — the same program, but not the same thing to someone watching the room. Optional <code>harness.variant</code> names which:</p>
+<table>
+<thead>
+<tr>
+<th>variant</th>
+<th>means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cli</code></td>
+<td>started from a terminal</td>
+</tr>
+<tr>
+<td><code>desktop</code></td>
+<td>started by a desktop application</td>
+</tr>
+<tr>
+<td><code>sdk</code></td>
+<td>driven programmatically</td>
+</tr>
+</tbody>
+</table>
+<p>Rules, because a display hint that becomes a routing key stops being optional:</p>
+<ul>
+<li><strong>Advisory and display-only.</strong> A consumer MUST NOT route, filter or subscribe on <code>variant</code>. The office subscribes by <code>harness.name</code>; a CLI session and a desktop session are the same source, shown with a different suffix.</li>
+<li><strong>Never part of identity.</strong> Office identity stays <code>harness.name + &quot;:&quot; + session.id</code> (§3.2). A variant is a property of how the session was started, not of who it is.</li>
+<li><strong>Free-form beyond the table.</strong> An adapter meeting an unfamiliar front door SHOULD pass a sanitised slug rather than nothing; an office renders what it does not recognise verbatim.</li>
+</ul>
+<p>An adapter that cannot tell, omits it.</p>
+<h2 id="5-transport" tabindex="-1">5. Transport</h2>
+<p>Every path below is relative to an <strong>office</strong>: the receiver hosts as many as have
+keycards, and each keeps its own buffer and its own subscribers, so two visitors
+holding different keycards cannot see each other's agents. In full, ingest is</p>
+<pre><code>POST /office/&lt;keycard&gt;/aop/v0/events
+</code></pre>
+<p>and the same prefix applies to <code>/stream</code>, <code>/state</code> and <code>/health</code>. Emitters never
+build that URL: they post to whatever <code>AOP_URL</code> or <code>~/.roving-office/endpoint.json</code>
+names, which is how one machine's hooks are pointed at one office without any adapter
+knowing what a keycard is — and equally how they are pointed at an office on a
+different host, since a URL is a URL. The unprefixed paths remain as an alias for whichever office currently
+holds that endpoint, so a recipe written before offices had addresses still works.</p>
+<h3 id="51-ingest-post-aopv0events" tabindex="-1">5.1 Ingest — <code>POST /aop/v0/events</code></h3>
+<ul>
+<li>Body: one JSON object, <strong>or</strong> NDJSON for batches, <strong>or</strong> a JSON array.</li>
+<li><code>Content-Type: application/json</code> or <code>application/x-ndjson</code>.</li>
+<li><code>Content-Encoding: gzip</code> MUST be accepted.</li>
+<li>Success: <code>202 Accepted</code>, body <code>{&quot;accepted&quot;:N,&quot;dropped&quot;:M}</code>. Receivers MUST respond before doing any scene work.</li>
+<li>Errors: <code>401</code> bad token, <code>413</code> body over 256 KiB, <code>400</code> unparseable. An emitter treats <strong>every</strong> failure identically: log locally, never retry inline, never block the agent.</li>
+</ul>
+<h3 id="52-fan-out-get-aopv0stream-sse" tabindex="-1">5.2 Fan-out — <code>GET /aop/v0/stream</code> (SSE)</h3>
+<p>The browser cannot listen on a socket, so the office server fans out over SSE. Each AOP event becomes one SSE frame with <code>event:</code> set to the AOP <code>type</code> and <code>data:</code> set to the JSON envelope. <code>id:</code> carries a receiver-assigned monotonic cursor so a reconnecting browser can resume with <code>Last-Event-ID</code>. A <code>: ping</code> comment every 15 s keeps intermediaries honest.</p>
+<h3 id="53-snapshot-get-aopv0state" tabindex="-1">5.3 Snapshot — <code>GET /aop/v0/state</code></h3>
+<p>Returns <code>{ cursor, events: [...] }</code> — a <strong>replay</strong> of the events belonging to sessions still in flight, in order, filtered by <code>?harness=</code>. A page reload calls this first, then subscribes to the stream from <code>cursor</code>. Without it, a refresh would empty the office even though five agents are mid-turn.</p>
+<p>Replay rather than a pre-reduced world is deliberate: the receiver would otherwise need its own copy of the reducer in §6, and two reducers drift. Sessions that ended, or that went quiet past the TTL in §7.4, are left out — resurrecting an agent that finished an hour ago just to reap it again is worse than not showing it.</p>
+<h3 id="54-buffering" tabindex="-1">5.4 Buffering</h3>
+<p>The receiver keeps a ring buffer of the last N events (default 2 000) and the reduced state. It is intentionally memory-only: the office is a window onto <em>now</em>, not a historian.</p>
+<h3 id="55-discovery-and-auth" tabindex="-1">5.5 Discovery and auth</h3>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Host</td>
+<td>Any. A receiver may be on loopback or on the other side of the internet, and an emitter treats the two the same way apart from its timing budget (§5.6).</td>
+</tr>
+<tr>
+<td>Port</td>
+<td>The first free port from <code>8080</code> to <code>8095</code>, or exactly the one named as the first argument: <code>node server.cjs 8081</code>. Adapters never need to know it — the port that matters is the one in the endpoint file below.</td>
+</tr>
+<tr>
+<td>Endpoint file</td>
+<td><code>~/.roving-office/endpoint.json</code> = <code>{ &quot;url&quot;, &quot;token&quot;, &quot;keycard&quot;, &quot;aop&quot;: &quot;0.1&quot; }</code>, mode <code>0600</code>. A local receiver writes it on start <strong>when started with <code>--publish</code></strong>, and adds its own <code>pid</code> — one without the flag is private and never touches the file, because several receivers run at once and only one of them can own a machine-wide path; <code>aop-connect</code> writes it for a remote receiver and adds <code>remote: true</code> and <code>host</code>. Adapters read it instead of hardcoding.</td>
+</tr>
+<tr>
+<td>Environment override</td>
+<td><code>AOP_URL</code> and <code>AOP_TOKEN</code> take precedence over the file. There is one endpoint file and it holds one URL, so the environment is how a single shell feeds a different office without redirecting the whole machine.</td>
+</tr>
+<tr>
+<td>Endpoint ownership</td>
+<td>Only the process whose <code>pid</code> is in the file may delete it. A missing <code>pid</code> is <strong>not</strong> consent: a remote endpoint has none, and treating absence as ownership silently disarms every hook on the machine.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="two-capabilities-not-one" tabindex="-1">Two capabilities, not one</h4>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Size</th>
+<th>What it opens</th>
+<th>Where it comes from</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Keycard</strong></td>
+<td>8 characters</td>
+<td><strong>Reads.</strong> <code>GET /stream</code>, <code>/state</code>, <code>/health</code>, and the office page. Short because a person says it out loud.</td>
+<td>The office URL itself.</td>
+</tr>
+<tr>
+<td><strong>Write token</strong></td>
+<td><code>rot_</code> + 32 bytes hex</td>
+<td><strong>Writes.</strong> <code>POST /events</code>, for that office only.</td>
+<td>The first is returned once by <code>POST /api/offices</code>; any later one by <code>POST /tokens</code>, which requires a token you already hold. Stored hashed, never re-readable.</td>
+</tr>
+</tbody>
+</table>
+<p>Compared in constant time, and sent in <strong><code>X-Roving-Office-Token</code></strong>. A local receiver additionally accepts its own per-process token from the endpoint file, which is what every local install already uses.</p>
+<blockquote>
+<p><strong>Emitters must not use <code>Authorization: Bearer</code> for a remote receiver.</strong> Receivers accept
+it, and it is the obvious choice, but <code>Authorization</code> is a header that hosting layers
+legitimately claim as their own. Verified against a hosted office: the identical
+request succeeds with <code>X-Roving-Office-Token</code> and fails with <code>Authorization</code> — <code>401</code>
+where the platform strips the header before the app sees it, <code>502 hosted sandbox bridge token was rejected</code> where its gateway takes offence at a credential it cannot validate.
+The failure is indistinguishable from a wrong token, which is what makes it worth a rule
+rather than a footnote. A custom header is nobody else's business, so it arrives intact.</p>
+</blockquote>
+<p>The split is the whole reason a keycard is safe to paste into chat: it invites someone to <strong>watch</strong> the office without letting them <strong>staff</strong> it.</p>
+<h4 id="551-an-office-holds-several-write-tokens" tabindex="-1">5.5.1 An office holds several write tokens</h4>
+<p>One token per office meant one shared secret: a second machine could only join by being handed the credential the first one held, and taking one machine away meant re-minting and reinstalling on all of them. So an office keeps a small list, each entry a hash, a public <code>id</code> and a human <code>label</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Does</th>
+<th>Needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /office/&lt;keycard&gt;/aop/v0/tokens</code></td>
+<td>Lists what may write here — ids, labels, when each was made and last used. Never a token.</td>
+<td>A token</td>
+</tr>
+<tr>
+<td><code>POST /office/&lt;keycard&gt;/aop/v0/tokens</code></td>
+<td>Mints another, <code>{ label }</code>, and returns the plaintext once.</td>
+<td>A token</td>
+</tr>
+<tr>
+<td><code>DELETE /office/&lt;keycard&gt;/aop/v0/tokens/&lt;id&gt;</code></td>
+<td>Revokes that one, immediately, leaving the rest working.</td>
+<td>A token</td>
+</tr>
+</tbody>
+</table>
+<p><strong>All three need a token, and a keycard is never enough.</strong> This is the rule the whole split rests on: a keycard that could mint would be a keycard that can write. So capability begets capability — the office's first token arrives with the office, and every later one is chained off one already held. Listing is gated too, even though it reveals no secret, because it is a map of who can write into the room.</p>
+<p>Three consequences worth stating rather than discovering:</p>
+<ul>
+<li><strong>Lose every token and the office is read-only for good.</strong> There is no owner to recover through, because nothing here has owners — no login, no listing, no account. Mint another office.</li>
+<li><strong>The last token cannot be revoked.</strong> Zero tokens is the unrecoverable state above, so the API refuses to arrive at it by accident (<code>409</code>). An office you want silenced is one you stop handing the keycard to; it reaps itself soon enough.</li>
+<li><strong>Tokens are flat and equal.</strong> Any token may mint another and revoke any other, including the one that minted it. A parent-and-descendant tree would be the more careful model, and is not worth its weight for a room.</li>
+</ul>
+<p>An office may hold <strong>ten</strong> at once — enough for every machine anyone plausibly points at one room, and few enough that the list stays readable. Verification sweeps the whole list in constant time and never returns early, so how long a refusal takes says nothing about the credentials held.</p>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Office absent</td>
+<td>If the endpoint file is missing or the connect fails, the adapter exits 0 silently. Agents must run fine with no office attached.</td>
+</tr>
+<tr>
+<td>Exposure</td>
+<td>A receiver reachable from outside loopback serves any keycard presented to it. Whatever redaction the emitter applies (§10) is therefore the <em>only</em> thing standing between a session and that host — decide it before pointing adapters at a shared office, not after.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="56-latency-budget" tabindex="-1">5.6 Latency budget</h3>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Budget</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Time the harness waits</strong></td>
+<td><strong>≤ 1 s</strong>, always, whatever else is true</td>
+</tr>
+<tr>
+<td>Local POST, inline</td>
+<td>connect ≤ 0.5 s, total ≤ 1 s</td>
+</tr>
+<tr>
+<td>Remote POST, in a detached sender</td>
+<td>connect ≤ 2 s, total ≤ 4 s, process ≤ 10 s</td>
+</tr>
+<tr>
+<td>Receiver ack</td>
+<td>≤ 50 ms</td>
+</tr>
+<tr>
+<td>Ingest → SSE frame</td>
+<td>≤ 100 ms</td>
+</tr>
+</tbody>
+</table>
+<p>Anything slower than this and the office stops feeling live; anything that blocks longer than this and the harness starts feeling laggy. When in doubt, drop the event.</p>
+<p>Only the first row is a promise to the harness, and it is the one that cannot bend. The rest describe how the request is allowed to spend its own time — which is why a remote emitter <strong>may hand delivery to a detached process</strong>: it appends the batch to its spool, starts a sender nobody is waiting for, and returns. Measured against a hosted receiver, that keeps a hook at ~40 ms while the POST itself takes 700–900 ms, and it is the only arrangement where a slow network cannot become a slow agent. A remote emitter that insists on sending inline has to fit the whole round trip in the first row's budget, and against a real network it will not.</p>
+<p>Delivery is therefore <strong>at-least-once</strong>: a spooled batch may be sent twice if a sender dies between the POST and its acknowledgement. Receivers already de-duplicate on <code>id</code> (§5.1), which is what makes that safe to rely on.</p>
+<h3 id="57-avatars-put-aopv0avatarssha256" tabindex="-1">5.7 Avatars — <code>PUT /aop/v0/avatars/&lt;sha256&gt;</code></h3>
+<p>An identity's picture is a <em>file</em>, on the harness's machine (§3.2). This is how it gets to
+the office so that <code>actor_avatar</code> has something to point at.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PUT /aop/v0/avatars/&lt;sha256&gt;</code></td>
+<td>Body is the raw image bytes. <strong>Write</strong> — needs the token. <code>201</code> stored, <code>200</code> already had it. Responds <code>{ avatar, type, stored }</code>, and <code>avatar</code> is the path to send as <code>actor_avatar</code>.</td>
+</tr>
+<tr>
+<td><code>HEAD /aop/v0/avatars/&lt;sha256&gt;</code></td>
+<td><code>200</code> if the office already holds it, <code>404</code> if not. <strong>Read</strong> — keycard only.</td>
+</tr>
+<tr>
+<td><code>GET /aop/v0/avatars/&lt;sha256&gt;</code></td>
+<td>The bytes, with the type the receiver sniffed. <strong>Read</strong> — keycard only, because an <code>&lt;img&gt;</code> cannot present a token.</td>
+</tr>
+</tbody>
+</table>
+<p>The name of the picture <strong>is the SHA-256 of its bytes</strong>, and everything convenient about
+this route follows from that:</p>
+<ul>
+<li>Receivers MUST verify it. A name that can be checked is a name that cannot be stuffed; an
+unverified content address is just a slot with a long key.</li>
+<li><code>PUT</code> is idempotent, so an emitter that has forgotten what it uploaded — every restart —
+may simply offer the file again. <code>HEAD</code> first makes that free.</li>
+<li>One picture shared by five agents is stored once, and may be cached forever by the
+browser.</li>
+</ul>
+<p>Receivers MUST determine the type from the bytes and MUST refuse anything that is not a
+raster image; PNG, JPEG, GIF and WebP is the set the reference receiver accepts. <strong>SVG is
+excluded deliberately</strong> — it is a document that can carry script, and it would be served
+from the office's own origin. Receivers SHOULD cap the body (2 MB in the reference
+receiver, which is a portrait rather than a file host) and MUST serve what they store with
+the sniffed type and <code>X-Content-Type-Options: nosniff</code>.</p>
+<p>Emitters MUST NOT upload from inside a harness hook, because an upload cannot fit the
+1 s budget of §5.6 and does not need to: send events immediately, upload alongside, and name
+the picture on the next event that goes out.</p>
+<h2 id="6-reduction-aop-stage-directions" tabindex="-1">6. Reduction: AOP → stage directions</h2>
+<p>Normative mapping from AOP to the internal <code>AgentManager</code> events, so every adapter behaves identically on screen.</p>
+<table>
+<thead>
+<tr>
+<th>AOP</th>
+<th>Stage direction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>session.start</code></td>
+<td><code>spawn</code> (walk in, hang coat)</td>
+</tr>
+<tr>
+<td><code>turn.start</code></td>
+<td>addressed <code>mail</code>; the first/new substantive title becomes the stable job, while follow-up turns reuse it; <code>status: working</code></td>
+</tr>
+<tr>
+<td><code>turn.start</code> with <code>payload.plan</code></td>
+<td>the checklist rides <strong>inside the envelope</strong>, so it appears when the agent opens it</td>
+</tr>
+<tr>
+<td><code>turn.title</code></td>
+<td>the job already in hand is <strong>renamed in place</strong> — desk label and surname follow, no second envelope and no status change</td>
+</tr>
+<tr>
+<td><code>step.start</code></td>
+<td><code>step</code> — relabels which part is in hand. <strong>No walk</strong>: see §4.2 rule 5</td>
+</tr>
+<tr>
+<td><code>step.end</code></td>
+<td><code>step</code> — marks that part done; the last one clears the label</td>
+</tr>
+<tr>
+<td><code>tool.start</code> <code>read</code>/<code>edit</code>/<code>execute</code>/<code>other</code></td>
+<td><code>status: working</code></td>
+</tr>
+<tr>
+<td><code>tool.start</code> <code>search</code>/<code>network</code>/<code>knowledge</code></td>
+<td><code>research</code> with <code>payload.target</code> as topic</td>
+</tr>
+<tr>
+<td><code>tool.start</code> <code>scm</code></td>
+<td><code>status: delivering</code></td>
+</tr>
+<tr>
+<td><code>tool.start</code> <code>wait</code></td>
+<td><code>activity: couch</code></td>
+</tr>
+<tr>
+<td><code>tool.start</code> <code>agent</code></td>
+<td>nothing directly — wait for the child <code>session.start</code> (§6.1)</td>
+</tr>
+<tr>
+<td><code>session.start</code> with <code>parent_id</code></td>
+<td><strong>ghost in</strong> at the parent's desk, no walk-in</td>
+</tr>
+<tr>
+<td><code>session.end</code> with <code>parent_id</code></td>
+<td><strong>ghost out</strong> — hand a page to the parent, dissolve</td>
+</tr>
+<tr>
+<td><code>permission.request</code></td>
+<td><code>status: waiting</code></td>
+</tr>
+<tr>
+<td><code>permission.resolve</code></td>
+<td>back to <code>working</code></td>
+</tr>
+<tr>
+<td><code>notification</code> level <code>warn</code>/<code>error</code></td>
+<td><code>status: waiting</code></td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td><code>status: error</code></td>
+</tr>
+<tr>
+<td><code>turn.end</code> status <code>completed</code></td>
+<td><code>dispatch</code> with <code>payload.summary ?? title</code></td>
+</tr>
+<tr>
+<td><code>turn.end</code> status <code>cancelled</code>/<code>blocked</code></td>
+<td><code>status: idle</code></td>
+</tr>
+<tr>
+<td><code>turn.end</code> status <code>error</code></td>
+<td><code>status: error</code>, then <code>idle</code></td>
+</tr>
+<tr>
+<td><code>context.compact</code></td>
+<td><code>activity: water</code> (a breather while it thinks)</td>
+</tr>
+<tr>
+<td><code>session.end</code></td>
+<td><code>exit</code> (walk out)</td>
+</tr>
+<tr>
+<td><code>job.queued</code></td>
+<td><code>mail</code> (paper airplane)</td>
+</tr>
+<tr>
+<td><code>job.claimed</code></td>
+<td>mailbox collection</td>
+</tr>
+<tr>
+<td><code>job.dropped</code></td>
+<td>bin</td>
+</tr>
+<tr>
+<td><code>session.heartbeat</code></td>
+<td>liveness only, no visible effect</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Precedence.</strong> When signals conflict, higher wins: <code>error</code> &gt; <code>waiting</code> &gt; <code>delivering</code> &gt; <code>researching</code> &gt; <code>working</code> &gt; <code>resting</code> &gt; <code>idle</code>. So a <code>permission.request</code> during a <code>tool.start</code> shows as waiting, and the office does not flap back to working until <code>permission.resolve</code>.</p>
+<p><strong>Debounce.</strong> Tool calls are often milliseconds long. The office MUST NOT start a walk animation for a <code>tool.start</code> whose matching <code>tool.end</code> arrives within 400 ms; it renders as continued desk work. Otherwise agents spend all day walking.</p>
+<h3 id="61-subagents-are-ghosts" tabindex="-1">6.1 Subagents are ghosts</h3>
+<p>A subagent never walks through the door and never takes a desk. It <strong>materialises at its parent's workstation as a translucent clone</strong> — four people crowded around one screen, pair programming. The parent keeps the chair; the ghosts pull up phantom copies of it.</p>
+<p>This is the right read for what a subagent <em>is</em>: not a colleague who came to the office, but an extension of one agent's hands, alive only for the length of a tool call.</p>
+<pre><code>            ghost 3   ghost 1
+                  ╲   ╱
+        ghost 4 ── ● PARENT ── ghost 2       ● = desk.seat, the real chair
+                     │
+                 ┌───┴───┐
+                 │ desk  │  monitors
+                 └───────┘
+</code></pre>
+<p><strong>Seat cloning.</strong> Each ghost gets a cloned chair, placed by rotating the parent's <code>desk.seat</code> about the desk origin and pushing it outward, so the fan hugs the monitors:</p>
+<table>
+<thead>
+<tr>
+<th>Ghost</th>
+<th>Angle about the desk</th>
+<th>Radius</th>
+<th>Facing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>+0.42 rad</code></td>
+<td><code>×1.18</code></td>
+<td><code>desk.sitRotation + 0.42</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>−0.42 rad</code></td>
+<td><code>×1.18</code></td>
+<td><code>desk.sitRotation − 0.42</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>+0.80 rad</code></td>
+<td><code>×1.34</code></td>
+<td><code>desk.sitRotation + 0.80</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>−0.80 rad</code></td>
+<td><code>×1.34</code></td>
+<td><code>desk.sitRotation − 0.80</code></td>
+</tr>
+</tbody>
+</table>
+<p>Ghosts alternate sides in arrival order, so two subagents flank the parent symmetrically rather than piling up on one shoulder.</p>
+<p><strong>Appearance.</strong> A ghost is a clone of the <strong>parent's</strong> body — same silhouette, so the family resemblance reads instantly — with:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Opacity</td>
+<td><code>0.40</code> (<code>depthWrite: false</code>, no shadow cast)</td>
+</tr>
+<tr>
+<td>Scale</td>
+<td><code>0.85</code> of the parent</td>
+</tr>
+<tr>
+<td>Tint</td>
+<td>Hue shifted by <code>session.agent_type</code> (<code>Explore</code>, <code>general-purpose</code>, …)</td>
+</tr>
+<tr>
+<td>Name tag</td>
+<td>The <code>agent_type</code>, not a person name, at reduced size</td>
+</tr>
+<tr>
+<td>Status ring</td>
+<td>Kept — a ghost that errors still goes red</td>
+</tr>
+<tr>
+<td>Fade</td>
+<td>In <code>400 ms</code>, out <code>600 ms</code></td>
+</tr>
+<tr>
+<td>Typing phase</td>
+<td>Offset by <code>index × 0.37</code> of the cycle, so they aren't a chorus line</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Ghosts do not travel.</strong> A ghost's <code>tool.start</code> of class <code>search</code> or <code>knowledge</code> does <strong>not</strong> trigger a bookshelf trip; it changes the ghost's status ring and floating micro-label in place. Four ghosts pathfinding around the room at once would be visual noise, and it would destroy the one-screen reading that makes the mechanic work.</p>
+<p><strong>Lifecycle.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>session.start</code> with <code>parent_id</code></td>
+<td>Parent claims a desk if it hasn't; ghost fades in on the next free fan slot</td>
+</tr>
+<tr>
+<td>Ghost <code>tool.*</code></td>
+<td>Status ring + micro-label only, no movement</td>
+</tr>
+<tr>
+<td><code>session.end</code> with <code>parent_id</code></td>
+<td>Ghost slides a page onto the parent's desk, then dissolves</td>
+</tr>
+<tr>
+<td><code>session.end</code> with <code>reason: error</code></td>
+<td>The page is crumpled — it goes to the bin on the parent's next trip</td>
+</tr>
+<tr>
+<td>Parent's <code>tool.end</code> matching <code>parent_tool_call_id</code></td>
+<td>Dissolve any ghosts still standing (belt and braces)</td>
+</tr>
+<tr>
+<td>Parent <code>session.end</code></td>
+<td>Dissolve every ghost first, then the parent walks out</td>
+</tr>
+<tr>
+<td>Ghost TTL, 30 s of silence</td>
+<td>Dissolve — far shorter than either main-session TTL (§7.4), because ghosts are short-lived by nature</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The parent stays <code>working</code>, not <code>waiting</code>.</strong> A parent blocked on subagents is not blocked on <em>you</em>, and <code>waiting</code> is reserved for &quot;needs a human&quot; (§6 precedence). Instead the parent's name tag carries a <code>×N</code> ghost count, and the desk gets a faint glow while the cluster is live.</p>
+<p><strong>Overflow.</strong> A maximum of <strong>4 ghosts</strong> are rendered per desk. Beyond that, the desk shows a <code>+N</code> tally and the extra sessions exist in the roster only, nested under their parent. Nested ghosts of ghosts (a subagent spawning its own subagent) attach to the <strong>nearest ancestor that owns a desk</strong> rather than fanning recursively.</p>
+<p><strong>No desk free for the parent?</strong> The cluster degrades together: parent to the couch, ghosts flanking on the couch and floor with the same fan maths about the couch seat.</p>
+<h2 id="7-loss-gaps-and-recovery" tabindex="-1">7. Loss, gaps and recovery</h2>
+<p>The protocol assumes an unreliable emitter, so receivers implement all four:</p>
+<ol>
+<li>
+<p><strong>Implicit spawn.</strong> Any event naming an unknown session creates that character first, using whatever <code>session</code> metadata the event carries. Adapters therefore never <em>need</em> <code>session.start</code> to have landed.</p>
+</li>
+<li>
+<p><strong>Idempotency.</strong> Duplicate <code>id</code> → drop. Duplicate <code>session.start</code> → no-op. Duplicate <code>session.end</code> → no-op.</p>
+</li>
+<li>
+<p><strong>Gap detection.</strong> A jump in <code>seq</code> marks the session <code>degraded</code>. The office may show it (a tiny frown on the name tag) but must keep animating.</p>
+</li>
+<li>
+<p><strong>TTL reaping.</strong> Silence is the only defence against <code>kill -9</code>, so a character whose session goes quiet is eventually shown the door — but <strong>idleness is not evidence of death</strong>, and the original 90 s fired on ordinary human pauses: read a reply, type a follow-up, and your agent had already left and had to walk back in. Hook-based adapters make this worse, because they are dead between events and cannot heartbeat at all; for them, quiet is the normal state of an alive session.</p>
+<p>So the office runs <strong>two clocks</strong>, chosen per session by what the adapter promised in <code>capabilities</code> (§4.1):</p>
+<table>
+<thead>
+<tr>
+<th>The adapter</th>
+<th>Reaped after</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>declares <code>session.end</code></td>
+<td><strong>30 min</strong></td>
+<td>It has promised to say goodbye, so silence means &quot;thinking&quot;, and the timer is only a backstop for a process that died mid-sentence</td>
+</tr>
+<tr>
+<td>does not</td>
+<td><strong>5 min</strong></td>
+<td>Nothing will ever announce the end, so the office has to guess — but slowly enough to survive a coffee</td>
+</tr>
+</tbody>
+</table>
+<p>An adapter that <em>can</em> heartbeat should, and keeps its character alive indefinitely. One now does: the OpenClaw plugin is in-process and long-lived, so heartbeating is a timer rather than an impossibility (<a href="aop-harness-adapters.html#56-what-being-long-lived-actually-buys">adapter notes §5.4</a>). Ghost sessions (§6.1) reap after <strong>30 s</strong>, and are also dissolved when their parent ends or the spawning tool call closes — so a lost <code>session.end</code> for a subagent costs at most half a minute of a lingering ghost.</p>
+</li>
+</ol>
+<p>Out-of-order events are accepted. A <code>tool.end</code> with no matching <code>tool.start</code> is ignored; a <code>turn.end</code> with no <code>turn.start</code> still counts as a delivery.</p>
+<h2 id="8-worked-example" tabindex="-1">8. Worked example</h2>
+<p>A Claude Code session that greps, edits and finishes, with a permission stop in the middle. Envelope fields trimmed for readability.</p>
+<pre><code class="language-jsonl">{&quot;type&quot;:&quot;session.start&quot;,&quot;seq&quot;:1,&quot;payload&quot;:{&quot;source&quot;:&quot;startup&quot;,&quot;capabilities&quot;:[&quot;session.start&quot;,&quot;session.heartbeat&quot;,&quot;session.end&quot;,&quot;turn.start&quot;,&quot;turn.end&quot;,&quot;tool.start&quot;,&quot;tool.end&quot;,&quot;permission.request&quot;],&quot;model&quot;:&quot;claude-sonnet-5&quot;}}
+{&quot;type&quot;:&quot;turn.start&quot;,&quot;seq&quot;:2,&quot;payload&quot;:{&quot;title&quot;:&quot;Fix the nav grid around the couch&quot;,&quot;trigger&quot;:&quot;user&quot;}}
+{&quot;type&quot;:&quot;tool.start&quot;,&quot;seq&quot;:3,&quot;payload&quot;:{&quot;tool_call_id&quot;:&quot;t1&quot;,&quot;tool_name&quot;:&quot;Grep&quot;,&quot;tool_class&quot;:&quot;search&quot;,&quot;target&quot;:&quot;obstacleFootprints&quot;}}
+{&quot;type&quot;:&quot;tool.end&quot;,&quot;seq&quot;:4,&quot;payload&quot;:{&quot;tool_call_id&quot;:&quot;t1&quot;,&quot;status&quot;:&quot;ok&quot;,&quot;duration_ms&quot;:820}}
+{&quot;type&quot;:&quot;permission.request&quot;,&quot;seq&quot;:5,&quot;payload&quot;:{&quot;request_id&quot;:&quot;p1&quot;,&quot;tool_name&quot;:&quot;Edit&quot;,&quot;tool_class&quot;:&quot;edit&quot;,&quot;target&quot;:&quot;src/config.js&quot;}}
+{&quot;type&quot;:&quot;permission.resolve&quot;,&quot;seq&quot;:6,&quot;payload&quot;:{&quot;request_id&quot;:&quot;p1&quot;,&quot;decision&quot;:&quot;allow&quot;,&quot;by&quot;:&quot;user&quot;}}
+{&quot;type&quot;:&quot;tool.start&quot;,&quot;seq&quot;:7,&quot;payload&quot;:{&quot;tool_call_id&quot;:&quot;t2&quot;,&quot;tool_name&quot;:&quot;Edit&quot;,&quot;tool_class&quot;:&quot;edit&quot;,&quot;target&quot;:&quot;src/config.js&quot;}}
+{&quot;type&quot;:&quot;tool.end&quot;,&quot;seq&quot;:8,&quot;payload&quot;:{&quot;tool_call_id&quot;:&quot;t2&quot;,&quot;status&quot;:&quot;ok&quot;,&quot;duration_ms&quot;:140}}
+{&quot;type&quot;:&quot;artifact.change&quot;,&quot;seq&quot;:9,&quot;payload&quot;:{&quot;kind&quot;:&quot;file&quot;,&quot;path&quot;:&quot;src/config.js&quot;,&quot;added&quot;:6,&quot;removed&quot;:2}}
+{&quot;type&quot;:&quot;turn.end&quot;,&quot;seq&quot;:10,&quot;payload&quot;:{&quot;status&quot;:&quot;completed&quot;,&quot;summary&quot;:&quot;Couch footprint widened; path reroutes cleanly&quot;,&quot;duration_ms&quot;:18400}}
+{&quot;type&quot;:&quot;session.end&quot;,&quot;seq&quot;:11,&quot;payload&quot;:{&quot;reason&quot;:&quot;exit&quot;,&quot;duration_ms&quot;:42000}}
+</code></pre>
+<p>On screen: a character walks in, sits, goes to the bookshelf, comes back, turns amber while waiting on the permission prompt, works, then carries a page to the outbox and leaves.</p>
+<h3 id="81-a-fan-out-as-ghosts" tabindex="-1">8.1 A fan-out, as ghosts</h3>
+<p>Two subagents spawned from one <code>Job</code> call. Note that both children carry <code>session.parent_id</code> and the same <code>parent_tool_call_id</code>, and that neither ever appears at a desk of its own.</p>
+<pre><code class="language-jsonl">{&quot;type&quot;:&quot;tool.start&quot;,&quot;session&quot;:{&quot;id&quot;:&quot;S1&quot;},&quot;payload&quot;:{&quot;tool_call_id&quot;:&quot;t9&quot;,&quot;tool_name&quot;:&quot;Job&quot;,&quot;tool_class&quot;:&quot;agent&quot;}}
+{&quot;type&quot;:&quot;session.start&quot;,&quot;session&quot;:{&quot;id&quot;:&quot;S2&quot;,&quot;parent_id&quot;:&quot;S1&quot;,&quot;kind&quot;:&quot;subagent&quot;,&quot;agent_type&quot;:&quot;Explore&quot;},&quot;payload&quot;:{&quot;source&quot;:&quot;spawn&quot;,&quot;parent_tool_call_id&quot;:&quot;t9&quot;}}
+{&quot;type&quot;:&quot;session.start&quot;,&quot;session&quot;:{&quot;id&quot;:&quot;S3&quot;,&quot;parent_id&quot;:&quot;S1&quot;,&quot;kind&quot;:&quot;subagent&quot;,&quot;agent_type&quot;:&quot;Explore&quot;},&quot;payload&quot;:{&quot;source&quot;:&quot;spawn&quot;,&quot;parent_tool_call_id&quot;:&quot;t9&quot;}}
+{&quot;type&quot;:&quot;tool.start&quot;,&quot;session&quot;:{&quot;id&quot;:&quot;S2&quot;,&quot;parent_id&quot;:&quot;S1&quot;},&quot;payload&quot;:{&quot;tool_call_id&quot;:&quot;t10&quot;,&quot;tool_name&quot;:&quot;Grep&quot;,&quot;tool_class&quot;:&quot;search&quot;,&quot;target&quot;:&quot;nightlights&quot;}}
+{&quot;type&quot;:&quot;session.end&quot;,&quot;session&quot;:{&quot;id&quot;:&quot;S2&quot;,&quot;parent_id&quot;:&quot;S1&quot;},&quot;payload&quot;:{&quot;reason&quot;:&quot;exit&quot;}}
+{&quot;type&quot;:&quot;session.end&quot;,&quot;session&quot;:{&quot;id&quot;:&quot;S3&quot;,&quot;parent_id&quot;:&quot;S1&quot;},&quot;payload&quot;:{&quot;reason&quot;:&quot;exit&quot;}}
+{&quot;type&quot;:&quot;tool.end&quot;,&quot;session&quot;:{&quot;id&quot;:&quot;S1&quot;},&quot;payload&quot;:{&quot;tool_call_id&quot;:&quot;t9&quot;,&quot;status&quot;:&quot;ok&quot;,&quot;duration_ms&quot;:31000}}
+</code></pre>
+<p>On screen: two translucent copies of the agent fade in either side of their chair, one of them turns bookshelf-blue <em>without getting up</em>, then each slides a page onto the desk and dissolves. The parent never left its seat and never showed as blocked.</p>
+<h2 id="9-conformance-levels" tabindex="-1">9. Conformance levels</h2>
+<p>An adapter declares its level in <code>session.start.payload.capabilities</code>; the level is derived from what it lists.</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Requires</th>
+<th>What the office can show</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>L0 — presence</strong></td>
+<td><code>session.start</code>, <code>session.end</code>, <code>session.heartbeat</code>, <code>turn.start</code>, <code>turn.end</code>, <code>permission.request</code></td>
+<td>Who is in the office, what they are working on, who is blocked, when work ships.</td>
+</tr>
+<tr>
+<td><strong>L1 — activity</strong></td>
+<td>L0 + <code>tool.start</code>, <code>tool.end</code> with correct <code>tool_class</code></td>
+<td>Desk vs bookshelf vs outbox movement; researching status; realistic pacing.</td>
+</tr>
+<tr>
+<td><strong>L2 — full</strong></td>
+<td>L1 + <code>artifact.change</code>, <code>context.compact</code>, <code>notification</code>, <code>error</code>, <code>permission.resolve</code>, <code>job.*</code></td>
+<td>Paper airplanes, bins, filing, error states, artefact counts on the desk.</td>
+</tr>
+</tbody>
+</table>
+<p>Every level MUST: send valid envelopes, exit 0 always, respect the latency budget, and honour §10.</p>
+<h2 id="10-privacy-and-redaction" tabindex="-1">10. Privacy and redaction</h2>
+<p>Sessions contain source code, credentials and customer data. AOP is designed so the interesting rendering needs none of it.</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Never send</td>
+<td>File contents, tool results, full transcripts, environment variables, secrets, diffs.</td>
+</tr>
+<tr>
+<td><code>redaction</code> mode</td>
+<td><code>session.start.payload.redaction</code> = <code>metadata</code> (default) | <code>summary</code> | <code>full</code>.</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td>Tool names, <code>tool_class</code>, paths, durations, counts. No free text from the model or user. <code>title</code> is replaced by a generic label — <strong>unless it is an <code>origin.name</code></strong>, see the next row. A <code>turn.title</code> is not sent at all: a generic label is what the turn already carries, and re-sending it is an event that says nothing.</td>
+</tr>
+<tr>
+<td><code>metadata</code> and <code>origin</code></td>
+<td><code>kind</code>, <code>name</code>, <code>id</code> and <code>schedule</code> <strong>survive</strong>; <code>detail</code> does not. A job's name is typed by an operator into a scheduler config, not by a user into a prompt: it is the same category of thing as a tool name or a file path, both of which this mode already sends. So a scheduled turn MAY use <code>origin.name</code> as its <code>title</code> at <code>metadata</code>. This is a deliberate extension rather than an oversight, and the alternative is what motivated it — <code>metadata</code> is the default, and withholding an operator's own label made every scheduled desk in every default install read <code>Working</code>, which looks like a fault and protects nobody. <code>detail</code> is free text about one run and stays behind.</td>
+</tr>
+<tr>
+<td><code>metadata</code> and steps</td>
+<td>A step <code>title</code> is a todo item the <em>model</em> wrote, so it is free text and it goes. <code>step_id</code>, <code>index</code>, <code>of</code> and <code>status</code> are counts and survive, and the office says &quot;Step 2 of 5&quot; — which is the shape of the work without a word of its content. <code>plan</code> degrades to its length for the same reason.</td>
+</tr>
+<tr>
+<td><code>metadata</code> and <code>target</code></td>
+<td>A <code>tool.start.target</code> is a label for one tool call, and what it may say depends on what kind of thing it is. A <strong>path</strong> — the argument keys <code>file_path</code>, <code>path</code>, <code>new_path</code>, <code>notebook_path</code>, <code>file</code>, <code>filename</code>, <code>file_paths[0]</code>, <code>paths[0]</code>, <code>folder_path</code> — is exactly what this mode permits and is sent, tidied per the Paths row. <!-- redaction:target-path --> So is a <strong>declared name</strong>, <code>prompt_name</code>: an identifier somebody saved, the same category as a tool name. <!-- redaction:target-name --> So is a <strong>command</strong>, reduced to the program and its subcommand and never a whole command line. <!-- redaction:target-command --> A <strong>search</strong> — <code>pattern</code>, <code>content_pattern</code>, <code>query</code> — is the model's own words, so <strong>no <code>target</code> is sent at all</strong> and <code>tool_class</code> carries the fact that a search happened. <!-- redaction:target-search --> A <strong>URL</strong>, <code>url</code>, sends its <strong>host only</strong> — no path, no query string, no <code>userinfo</code> — the same reduction the Remotes row requires, and for the same reason. <!-- redaction:target-network --> Truncation is not redaction: capping free text at 200 characters is 200 characters of free text.</td>
+</tr>
+<tr>
+<td><code>summary</code></td>
+<td>Adds <code>title</code>, <code>summary</code>, <code>notification.message</code>, <code>error.message</code>, step and <code>plan</code> titles, each truncated to 200 chars. <strong>And the whole <code>target</code></strong>: a search's pattern, a web query and a full URL are free text like any other, so this is the mode that buys them.</td>
+</tr>
+<tr>
+<td><code>full</code></td>
+<td>Adds <code>payload.prompt</code>. Requires an explicit opt-in env var (<code>ROVING_OFFICE_INCLUDE_PROMPTS=1</code>); adapters MUST NOT default to it.</td>
+</tr>
+<tr>
+<td>Paths</td>
+<td>Absolute paths SHOULD be made relative to <code>session.cwd</code>. <code>$HOME</code> is replaced with <code>~</code>. This includes <code>session.cwd</code> itself (§3.2) and a <code>repo.remote</code> that is a local directory rather than a host.</td>
+</tr>
+<tr>
+<td>Remotes</td>
+<td><code>project.repo.remote</code> MUST NOT carry a <code>userinfo</code> component: <code>https://&lt;user&gt;:&lt;token&gt;@host/owner/repo</code> is a common form of <code>git remote get-url</code>, and forwarding it verbatim publishes a live credential. Send <code>host/owner/repo</code> (§3.3), and send nothing when a remote cannot be reduced to one.</td>
+</tr>
+<tr>
+<td>Truncation</td>
+<td>Every string field is hard-capped: <code>title</code> 80, <code>summary</code> 200, <code>message</code> 200, <code>target</code> 200, <code>prompt</code> 2 000. A step <code>title</code> is a desk label like any other, so it caps at 80.</td>
+</tr>
+<tr>
+<td>Plan length</td>
+<td><code>plan</code> is capped at <strong>20 entries</strong>, and a longer one is truncated rather than dropped — the office shows the remainder as a count. A 200-item list is not a plan, and it would ride on an event that repeats.</td>
+</tr>
+<tr>
+<td>Redaction is emitter-side</td>
+<td>The receiver never sees what was dropped, so a leak cannot be un-leaked downstream.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-versioning" tabindex="-1">11. Versioning</h2>
+<ul>
+<li><code>aop</code> is <code>&quot;&lt;major&gt;.&lt;minor&gt;&quot;</code>. <strong>Minor</strong> = additive only (new event types, new optional fields, new enum members). <strong>Major</strong> = anything that could break a reducer.</li>
+<li>Receivers: reject a different major with <code>400</code>; accept any minor; ignore unknown <code>type</code> values; ignore unknown fields; treat unknown enum members as the family's fallback (<code>tool_class</code> → <code>other</code>, <code>reason</code> → <code>other</code>, <code>level</code> → <code>info</code>).</li>
+<li>Emitters: never repurpose a field's meaning; add a new one instead.</li>
+<li>Vendor extras live in <code>ext</code>, never at the top level.</li>
+</ul>
+<p><strong><code>0.2</code> added <code>turn.title</code> (§4.2), and that is what a minor bump is for.</strong> One new event
+type, no field repurposed and no reduction changed: a receiver written against <code>0.1</code>
+ignores it by the rule above and renders a turn exactly as it did, because the title it
+was already going to read on <code>turn.end</code> still arrives. The bump is not a warning, then —
+it is the emitter saying which vocabulary it has, which is the one thing a receiver
+cannot work out for itself. Contrast the paragraph below, where nothing about the wire
+moved at all.</p>
+<p><strong>Remote hosts did not bump the version, and §1 says they should have.</strong> Its preamble —
+&quot;not negotiable without a version bump&quot; — is about the <em>wire</em>:
+an <code>aop</code> bump exists to tell a reducer that its assumptions may have moved. Nothing moved.
+No event type, field, enum member or reduction changed; a receiver written against <code>0.1</code>
+handles a remotely-emitted event and a loopback one identically, because they are the same
+bytes. What changed is where an emitter may post them, which capability authorises it, and
+how long it may take — all of it §5, none of it observable to a reducer. Rule 5 is
+therefore restated rather than versioned. An emitter or receiver that reads only §§3–4 and
+§6 needs no changes at all, which is the test the version number is meant to answer.</p>
+<h2 id="12-open-questions" tabindex="-1">12. Open questions</h2>
+<ol>
+<li><strong>Cost and usage rendering.</strong> <code>usage</code> is specified but unused. Does the office want a meter on the wall, or is that clutter? Note the loose end either way: <code>usage</code> exists here only as a <em>payload field</em> on <code>session.end</code> and <code>turn.end</code>, but <code>AopSource</code>'s accepted-type list also carries a bare <code>usage</code> <strong>event type</strong> that §4 never defines. Whichever way this question is answered, one of the two should give.</li>
+<li><strong>Multi-window sync.</strong> §3.4.2 settles routing (project = office, second window for a second office), but two windows pinned to the <em>same</em> office both animate independently from the same event stream. Harmless, or should the reduced state be authoritative in the receiver so both windows agree frame-for-frame?</li>
+<li><strong>Bidirectional control.</strong> Should the office be able to <em>answer</em> a <code>permission.request</code> (click the waiting agent → allow)? That needs a reverse channel and turns AOP into a control protocol, with a much bigger security story. Deliberately out of scope for v0.</li>
+<li><strong>Team-scale privacy.</strong> Two people, one office, is a nice demo and a surveillance risk. Any remote fan-out needs an explicit consent model.</li>
+<li><strong>Idle vs resting.</strong> Harnesses report &quot;waiting for user&quot; as idle. Should a long idle session sit on the couch, or leave and come back?</li>
+<li><strong>Ghost fan-out beyond four.</strong> §6.1 caps visible ghosts at four with a <code>+N</code> tally. A 10-way fan-out is increasingly common — is the tally enough, or does a big fan-out deserve its own staging (a huddle around the bookshelf, a meeting room) once the meeting room lands?</li>
+</ol>
+<p>See <a href="../protocol/aop-harness-adapters.html"><code>aop-harness-adapters.md</code></a> for how each harness can emit this, and <a href="./aop-v0.schema.json"><code>aop-v0.schema.json</code></a> for the machine-readable schema.</p>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#1-design-rules">1. Design rules</a></li>
+<li><a href="#2-terminology">2. Terminology</a></li>
+<li><a href="#3-envelope">3. Envelope</a><ul><li><a href="#31-envelope-fields">3.1 Envelope fields</a></li>
+<li><a href="#32-session">3.2 session</a></li>
+<li><a href="#33-project">3.3 project</a></li></ul></li>
+<li><a href="#34-scenes-and-routing">3.4 Scenes and routing</a><ul><li><a href="#341-deriving-the-scene-key">3.4.1 Deriving the scene key</a></li>
+<li><a href="#342-many-offices-one-window">3.4.2 Many offices, one window</a></li>
+<li><a href="#343-the-scene-override">3.4.3 The scene override</a></li>
+<li><a href="#344-capacity">3.4.4 Capacity</a></li></ul></li>
+<li><a href="#4-event-types">4. Event types</a><ul><li><a href="#41-session-lifecycle">4.1 Session lifecycle</a></li>
+<li><a href="#42-turns">4.2 Turns</a></li>
+<li><a href="#43-tool-activity">4.3 Tool activity</a></li>
+<li><a href="#44-attention-and-interruptions">4.4 Attention and interruptions</a></li>
+<li><a href="#45-inbound-work-the-mailbox">4.5 Inbound work (the mailbox)</a></li>
+<li><a href="#46-harness-name-registry">4.6 Harness name registry</a></li>
+<li><a href="#47-harness-variant">4.7 Harness variant</a></li></ul></li>
+<li><a href="#5-transport">5. Transport</a><ul><li><a href="#51-ingest-post-aopv0events">5.1 Ingest — POST /aop/v0/events</a></li>
+<li><a href="#52-fan-out-get-aopv0stream-sse">5.2 Fan-out — GET /aop/v0/stream (SSE)</a></li>
+<li><a href="#53-snapshot-get-aopv0state">5.3 Snapshot — GET /aop/v0/state</a></li>
+<li><a href="#54-buffering">5.4 Buffering</a></li>
+<li><a href="#55-discovery-and-auth">5.5 Discovery and auth</a></li>
+<li><a href="#56-latency-budget">5.6 Latency budget</a></li>
+<li><a href="#57-avatars-put-aopv0avatarssha256">5.7 Avatars — PUT /aop/v0/avatars/<sha256></a></li></ul></li>
+<li><a href="#6-reduction-aop-stage-directions">6. Reduction: AOP → stage directions</a><ul><li><a href="#61-subagents-are-ghosts">6.1 Subagents are ghosts</a></li></ul></li>
+<li><a href="#7-loss-gaps-and-recovery">7. Loss, gaps and recovery</a></li>
+<li><a href="#8-worked-example">8. Worked example</a><ul><li><a href="#81-a-fan-out-as-ghosts">8.1 A fan-out, as ghosts</a></li></ul></li>
+<li><a href="#9-conformance-levels">9. Conformance levels</a></li>
+<li><a href="#10-privacy-and-redaction">10. Privacy and redaction</a></li>
+<li><a href="#11-versioning">11. Versioning</a></li>
+<li><a href="#12-open-questions">12. Open questions</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "recorded": "2026-09-07",
+  "seeds": 96,
+  "minutes": 3,
+  "total": 0.885,
+  "floors": {
+    "seated": 0.9763,
+    "daylight": 0.6722,
+    "teams": 0.9701,
+    "quiet": 0.9769,
+    "floor": 0.9859,
+    "clear": 0.9836,
+    "reliable": 0.9607,
+    "interest": 0.8866
+  }
+}

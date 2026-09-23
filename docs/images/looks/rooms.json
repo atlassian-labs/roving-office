@@ -1,0 +1,110 @@
+[
+ {
+  "seed": "tune-14",
+  "name": "Four Quads",
+  "desks": 10,
+  "fitness": 0.7022
+ },
+ {
+  "seed": "tune-86",
+  "name": "Four Benches",
+  "desks": 9,
+  "fitness": 0.7181
+ },
+ {
+  "seed": "tune-47",
+  "name": "The Loft Row Room",
+  "desks": 8,
+  "fitness": 0.7231
+ },
+ {
+  "seed": "tune-37",
+  "name": "Five Islands",
+  "desks": 11,
+  "fitness": 0.7447
+ },
+ {
+  "seed": "tune-53",
+  "name": "The Paperless Floor",
+  "desks": 9,
+  "fitness": 0.8386
+ },
+ {
+  "seed": "tune-28",
+  "name": "The Amber Bench",
+  "desks": 6,
+  "fitness": 0.8522
+ },
+ {
+  "seed": "tune-74",
+  "name": "The Curtain-Wall Spine",
+  "desks": 8,
+  "fitness": 0.8642
+ },
+ {
+  "seed": "tune-55",
+  "name": "The Frosted Cloister",
+  "desks": 3,
+  "fitness": 0.8744
+ },
+ {
+  "seed": "tune-12",
+  "name": "The Ground-Floor Observatory",
+  "desks": 5,
+  "fitness": 0.8824
+ },
+ {
+  "seed": "tune-2",
+  "name": "The Corner Telescope Room",
+  "desks": 6,
+  "fitness": 0.8934
+ },
+ {
+  "seed": "tune-76",
+  "name": "Two Benches",
+  "desks": 5,
+  "fitness": 0.8998
+ },
+ {
+  "seed": "tune-71",
+  "name": "The Midsummer Quad",
+  "desks": 8,
+  "fitness": 0.9116
+ },
+ {
+  "seed": "tune-11",
+  "name": "The Green Lookout",
+  "desks": 4,
+  "fitness": 0.919
+ },
+ {
+  "seed": "tune-84",
+  "name": "Rings and a Paperless Floor",
+  "desks": 7,
+  "fitness": 0.9368
+ },
+ {
+  "seed": "tune-27",
+  "name": "The Palm Court",
+  "desks": 3,
+  "fitness": 0.9647
+ },
+ {
+  "seed": "tune-80",
+  "name": "The Narrow Bench",
+  "desks": 2,
+  "fitness": 0.953
+ },
+ {
+  "seed": "tune-19",
+  "name": "Reading Room and a Clearing House",
+  "desks": 4,
+  "fitness": 0.9585
+ },
+ {
+  "seed": "tune-17",
+  "name": "Cloister and a Reading Room",
+  "desks": 3,
+  "fitness": 0.9654
+ }
+]

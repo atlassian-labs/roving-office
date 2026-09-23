@@ -1,0 +1,48 @@
+# Dependencies (three.js is vendored under vendor/three, not installed via npm)
+node_modules/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Reference material for the art direction — kept local, too heavy to version
+inspo/
+
+# Scratch files from agent sessions
+tmp_rovo_*/
+tmp_rovo_*
+
+# Worktrees, when they are cut inside the checkout as AGENTS.md recommends. A worktree is
+# a whole second copy of the tree, so an unignored one is `git add .` away from being
+# committed into the first.
+.worktrees/
+
+# Kaizen build output — assembled from the checkout by bin/kaizen-build.sh, and the
+# CLI's own bookkeeping about what it last uploaded
+.output/
+.kaizen/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Claude Code personal settings — office hooks store an absolute path to this
+# machine's checkout, so they must never travel with the repo
+.claude/settings.local.json
+
+# Build artifacts from `npm run pack:openclaw`. Generated, never committed: the packed
+# plugin vendors files that live in bin/, and a committed copy would be a second answer
+# to a question that already has one.
+dist/
+
+# The Codex half of `npm run pack:plugins`, and the exception that proves the rule next
+# door: `plugins/claude/` **is** committed, because the site serves it and neither deploy
+# target may build (see bin/aop-plugin-pack.cjs, "what is committed"). `plugins/codex/` is
+# a whole Git repository's worth of files waiting for a Git repository, and nothing serves
+# a clone — so committing it would put a second copy of every adapter file in this history
+# for no reader. CI rebuilds and verifies it on every push; `pack:plugins:check` guards the
+# committed half.
+plugins/codex/

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<!--
+  The map: one authored theme from src/projects.js, built the way src/main.js
+  builds a live world — environment, lighting, props — and photographed straight
+  down instead of from the isometric camera.
+
+  Driven by bin/scene-map.js, which serves this page and points a headless Chrome
+  at it once per theme, but it is a perfectly good page to open by hand —
+  http://localhost:8098/bin/scene-map.html?theme=tower — when you want to see a
+  layout from above without walking the real camera up there.
+
+  Query string:
+    theme=<key>   which THEMES entry (default: brownstone)
+    seed=<text>   a generated office (src/plan/) instead of the authored layout:
+                  its floor plan is applied and its own season and building are
+                  used, so the picture is of the room that seed makes
+    room=1        frame the room rather than the whole city — implied by seed,
+                  since a generated office is about the furniture and not the view
+    size=<px>     square canvas edge, in pixels (default: 1600)
+
+  No agents, no feeds, no mail: those are what happens in the room, and a map is
+  what the room is. Building only environment + lighting + props keeps this a
+  static, deterministic floor plan rather than a frame of a running simulation.
+
+  The camera looks straight down the room's own +y, so its `up` cannot be world
+  +y (that is the view direction, and lookAt degenerates when up is parallel to
+  it) — it is set to -z instead, which puts the back wall at the top of the frame
+  the way a plan drawn with the front door toward the viewer usually reads.
+
+  This is a picture of the *city*, not the room: buildEnvironment() raises the
+  whole street or skyline round the building, not only the four walls, and a map
+  worth the name shows it. A skyscraper's skyline runs to roughly 150 units
+  across; a street runs to roughly 80. Rather than carry both numbers here (and
+  a third and fourth the day a fifth theme wants something else again), the
+  frame is fitted to whatever the theme actually built — the same reasoning as
+  prop-portrait.html's framingBox(), applied to a whole exterior instead of one
+  object. The one thing worth excluding by hand is the 220x220 ground plane
+  buildExterior always lays down so there's never a visible void under the
+  scene: real content is at most a few dozen units across in any one mesh, so a
+  mesh wider AND deeper than 100 units is that backdrop, not something to frame.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>scene map</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "/vendor/three/build/three.module.js",
+        "three/addons/": "/vendor/three/examples/jsm/"
+      }
+    }
+  </script>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; }
+    canvas { display: block; }
+    #error {
+      position: absolute; inset: 0; display: none; padding: 2rem;
+      font: 16px/1.5 ui-monospace, monospace; color: #b3261e; background: #fff;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+<pre id="error"></pre>
+<!--
+  Module scripts run in document order, and the shutter fires at load — a
+  dynamically imported scene photographs as an empty page (the same lesson as
+  prop-portrait.html and reception's late-loading vignette) — so this is one
+  script, static imports throughout, nothing deferred.
+-->
+<script type="module">
+import * as THREE from 'three';
+import { applyPalette, ROOM } from '/src/config.js';
+import { createScene, resolveTheme } from '/src/projects.js';
+import { applyLayout, resetLayout } from '/src/layout.js';
+import { generateOffice } from '/src/plan/index.js';
+import { addLighting, applyTimeOfDay } from '/src/scene/lighting.js';
+import { buildEnvironment } from '/src/scene/environment.js';
+import { buildProps } from '/src/scene/props.js';
+import { clearMaterialCache } from '/src/scene/build.js';
+import { createRenderer } from '/src/scene/renderer.js';
+
+const params = new URLSearchParams(location.search);
+const themeKey = params.get('theme') || 'brownstone';
+const seed = params.get('seed');
+const size = Number(params.get('size') || 1600);
+// A generated office is a picture of a floor plan, so it frames the floor.
+const roomOnly = seed ? params.get('room') !== '0' : params.get('room') === '1';
+
+window.mapFail = (err) => {
+  const el = document.getElementById('error');
+  el.style.display = 'block';
+  el.textContent = `scene-map: ${themeKey}\n\n${err?.stack || err}`;
+  console.error(err);
+};
+window.addEventListener('error', (e) => window.mapFail(e.error || e.message));
+
+try {
+  // A seed brings its own room *and* its own look: the rug and the upholstery are
+  // chosen to suit the light (see SCHEMES in src/plan/brief.js), so the two halves
+  // travel together. `createScene` resolves the building to the interior it is
+  // native to, exactly as a rolled scene does.
+  let theme;
+  if (seed) {
+    const office = generateOffice(seed);
+    resetLayout();
+    applyLayout(office.layout);
+    const record = createScene({ ...office.look });
+    theme = resolveTheme(record, office.look);
+    document.title = `map: ${office.name} (${office.seed})`;
+  } else {
+    theme = resolveTheme({ theme: themeKey }, {});
+  }
+
+  // Same build order as buildWorld() in src/main.js, minus the agent layer:
+  // palette and material cache before any geometry, then light rig, then the sun
+  // (fixed at noon — a map is a reference picture, not a moment in the day),
+  // then the room and its furniture.
+  applyPalette(theme.palette);
+  clearMaterialCache();
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(theme.sky);
+
+  const root = new THREE.Group();
+  scene.add(root);
+
+  const lights = addLighting(root, theme.light);
+  applyTimeOfDay(lights, 12, theme, scene);
+  buildEnvironment(root, theme);
+  buildProps(root, theme);
+  scene.updateMatrixWorld(true);
+
+  const canvas = document.createElement('canvas');
+  document.body.appendChild(canvas);
+
+  // The office's own look, so a map reads exactly like the room it is a picture of;
+  // `false` leaves the canvas's CSS size to the page, as in prop-portrait.html.
+  const renderer = createRenderer({ canvas, pixelRatio: 1 });
+  renderer.setSize(size, size, false);
+
+  // Frame everything buildEnvironment()/buildProps() actually built, in plan —
+  // the room, the street or the tower cluster round it — except the 220x220
+  // backdrop ground plane, which every theme lays down and none of them wants
+  // framed. Additively-blended meshes are skipped too, same reasoning as
+  // prop-portrait.html's framingBox(): a lamp's glow pool is light, not mass.
+  const box = new THREE.Box3();
+  const v = new THREE.Vector3();
+  root.traverse((node) => {
+    if (!node.isMesh) return;
+    const materials = Array.isArray(node.material) ? node.material : [node.material];
+    if (materials.some((m) => m?.blending === THREE.AdditiveBlending)) return;
+    const meshSize = new THREE.Box3().setFromObject(node).getSize(v);
+    if (meshSize.x > 100 && meshSize.z > 100) return;   // the backdrop plane
+    box.expandByObject(node);
+  });
+
+  // Framed on the room itself for a floor plan, and on everything built for a
+  // city map. Both are "frame what this picture is of"; they differ only in what
+  // the picture is of.
+  if (roomOnly) {
+    box.makeEmpty();
+    box.expandByPoint(new THREE.Vector3(0, 0, 0));
+    box.expandByPoint(new THREE.Vector3(ROOM.W, ROOM.H, ROOM.D));
+  }
+
+  const extent = box.getSize(new THREE.Vector3());
+  const centre = box.getCenter(new THREE.Vector3());
+  // A square frustum — the longer of the two plan axes, plus a margin so
+  // nothing sits flush with the frame edge — rather than one frustum axis per
+  // canvas axis: the canvas is square, and matching an unequal frustum to it
+  // would stretch the shot instead of just leaving more sky on the short side.
+  const margin = roomOnly ? 1.5 : 6;
+  const half = Math.max(extent.x, extent.z) / 2 + margin;
+  // High enough to clear the tallest thing any theme builds (a tower's roof
+  // reaches y=70) with room to spare, whichever theme this is.
+  const camY = box.max.y + 120;
+
+  const camera = new THREE.OrthographicCamera(-half, half, half, -half, 0.1, camY + 50);
+  camera.up.set(0, 0, -1);
+  camera.position.set(centre.x, camY, centre.z);
+  camera.lookAt(centre.x, 0, centre.z);
+
+  // Kept in a loop rather than rendered once: the shutter lands whenever it
+  // lands, and a canvas whose buffer has been composited away photographs as
+  // nothing (same reasoning as prop-portrait.html).
+  const draw = () => { requestAnimationFrame(draw); renderer.render(scene, camera); };
+  draw();
+
+  if (!seed) document.title = `map: ${themeKey}`;
+} catch (err) {
+  window.mapFail(err);
+}
+</script>
+</body>
+</html>
