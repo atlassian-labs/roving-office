@@ -304,7 +304,7 @@ async function connect(target, { keycard, token, sources }) {
  *
  * Matched on the platform's own vocabulary, which is the only signal available: these
  * messages arrive with the same status codes the office itself uses. Observed from a
- * Kaizen deployment while a single pinned sandbox was restarting, when the gateway
+ * hosted deployment while a single pinned sandbox was restarting, when the gateway
  * briefly has no route to the app it is fronting.
  */
 function isPlatformError(message) {

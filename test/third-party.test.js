@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { generate, run } from '../bin/gen-third-party.mjs';
 
@@ -57,39 +56,21 @@ test('license evidence includes Unlicense and README terms while metadata-only e
   assert.match(find('@11ty/recursive-copy').review, /ISC.*MIT/);
 });
 
-// The whole of this test drives `bin/kaizen-build.sh`, the maintainers' internal deploy
-// recipe, which is not published — so in the public export there is no recipe to drive.
-// The Fly recipe's equivalent guarantees are covered by test/docs.test.js and
-// test/plugin-dist.test.cjs, both of which check it unconditionally.
-const NO_KAIZEN = fs.existsSync(path.join(ROOT, 'bin/kaizen-build.sh'))
-  ? false
-  : 'bin/kaizen-build.sh is not in this tree: an exported copy has no internal deploy recipe'
-
-test('the hosted artifact retains the complete runtime notices without shipping development dependencies', { skip: NO_KAIZEN }, (t) => {
-  const { root, put } = fixture(t);
-  for (const name of ['bin/kaizen-build.sh', 'THIRD_PARTY_NOTICES.txt', 'vendor/three/LICENSE', 'vendor/color-name-list/LICENSE']) put(name, read(name));
-  for (const name of ['bin/kaizen-entry.mjs', 'server.cjs', 'home.html', 'styles.css', 'favicon.ico', 'docs/library.html', 'docs/site/index.html', 'docs/images/example.png', 'docs/examples/layout.json', 'assets/icon.svg', 'lib/example.cjs', 'src/example.js', 'admin/console.html', 'agent-setup/prompt.md', 'agent-setup/index.html', 'plugins/claude/marketplace.json', 'plugins/codex/bin/example.cjs']) put(name, 'fixture');
-  put('node_modules/example/LICENSE', 'development-only fixture');
-  execFileSync('bash', ['bin/kaizen-build.sh'], { cwd: root, stdio: 'pipe' });
-  const staged = path.join(root, '.output/server');
-  const notices = fs.readFileSync(path.join(staged, 'THIRD_PARTY_NOTICES.txt'), 'utf8');
-  for (const license of ['vendor/three/LICENSE', 'vendor/color-name-list/LICENSE']) {
-    assert.ok(notices.includes(read(license).trimEnd()), `missing complete ${license}`);
-    assert.equal(fs.readFileSync(path.join(staged, license), 'utf8'), read(license));
-  }
-  assert.ok(!fs.existsSync(path.join(staged, 'node_modules')));
-  assert.ok(!fs.existsSync(path.join(staged, 'third-party/inventory.json')));
-  // The published Claude marketplace ships; the Codex distribution tree does not — it
-  // is a repository to clone rather than a file to download. See test/plugin-dist.test.cjs.
-  assert.ok(fs.existsSync(path.join(staged, 'plugins/claude/marketplace.json')));
-  assert.ok(!fs.existsSync(path.join(staged, 'plugins/codex')));
-  // The admin console's files. `server.cjs` serves them itself because the static file
-  // server refuses that directory, so a host that did not ship them would answer 404 to
-  // a console its own password had just admitted somebody to — which looks like a broken
-  // page rather than an absent feature. Asserted on both recipes, because the console
-  // existing on one deploy target and not the other is the failure worth preventing.
-  assert.ok(fs.existsSync(path.join(staged, 'admin/console.html')));
-  assert.match(read('Dockerfile.fly'), /^COPY admin \.\/admin$/m);
-  assert.match(read('Dockerfile.fly'), /^COPY THIRD_PARTY_NOTICES\.txt \.\/$/m);
-  assert.match(read('Dockerfile.fly'), /^COPY vendor \.\/vendor$/m);
-});
+// The end-to-end staging check that used to live here drove `bin/kaizen-build.sh` — it
+// assembled a fixture tree, ran the recipe, and asserted the staged output carried the
+// complete licence texts while no `node_modules` licence came with it. That deployment has
+// been retired, and the Fly recipe has no staging step to run: it is a Docker build, so
+// the equivalent would mean building an image in the suite.
+//
+// The coverage it carried is still covered, in two cheaper places:
+//
+//   - the notices' *content* — that every declared licence's full text is present and
+//     matches the lockfile — is the first test in this file, which reads the committed
+//     artifacts directly;
+//   - the notices *shipping*, and `node_modules` not shipping, is `test/docker-context.js`
+//     via `test/docker-context.test.js`: it asserts every path `Dockerfile.fly` copies
+//     survives `.dockerignore`, and that nothing tracked is uploaded that no COPY takes.
+//
+// What is genuinely gone is the assertion that a *staged tree* ends up correct, as
+// distinct from the recipe that stages it being correct. That is worth knowing rather
+// than discovering.

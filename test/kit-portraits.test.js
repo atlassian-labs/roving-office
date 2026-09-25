@@ -67,14 +67,8 @@ test('both deploy targets ship the portraits', () => {
   // and the generated-office renders are in the published prose now, so the whole
   // directory ships. A recipe naming only the portraits would pass this test and leave
   // every other picture in the docs broken.
-  const at = (p) => fileURLToPath(new URL(`../${p}`, import.meta.url));
-  const read = (p) => readFileSync(at(p), 'utf8');
-  // `bin/kaizen-build.sh` is the maintainers' internal recipe and does not travel to the
-  // public repository, so each recipe is checked where it exists rather than assumed.
-  const recipes = ['Dockerfile.fly', '.dockerignore', 'bin/kaizen-build.sh']
-    .filter((p) => existsSync(at(p)));
-  assert.ok(recipes.length >= 2, 'expected at least the Fly recipe and its ignore file');
-  for (const path of recipes) {
+  const read = (p) => readFileSync(fileURLToPath(new URL(`../${p}`, import.meta.url)), 'utf8');
+  for (const path of ['Dockerfile.fly', '.dockerignore']) {
     assert.match(read(path), /docs\/images/, `${path} leaves the portraits behind`);
   }
 });

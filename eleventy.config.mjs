@@ -9,7 +9,7 @@
  *
  * Its output is **committed**. `.gitignore` argues against committing generated files and
  * is right to, but neither deploy target may build or fetch at deploy time: `Dockerfile.fly`
- * runs no `npm install` by design, and the Kaizen artifact is a file copy. So this follows
+ * runs no `npm install` by design. So this follows
  * the precedent of `src/agents/colour-names.js` — generated, committed, and guarded by a
  * drift check in `npm test` so the committed copy cannot quietly stop matching its source.
  */
@@ -58,7 +58,7 @@ export default function (eleventyConfig) {
   }
 
   // Both fonts' licences, from the vendored originals. `docs/site` is a distribution of
-  // its own — the Kaizen artifact and the Fly image each copy the directory whole — so
+  // its own — the Fly image copies the directory whole — so
   // the OFL text has to be inside it and not only in the repository root, which those
   // recipes copy separately.
   for (const [from, to] of [

@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "roving-office",
-  "version": "0.15.5",
+  "version": "0.15.6",
   "description": "Watch your Claude Code sessions as characters in a soft-3D isometric office: desks, bookshelf trips, coffee runs, subagents as ghosts, and a paper airplane for every task that lands.",
   "author": {
     "name": "Mike Cannon-Brookes"

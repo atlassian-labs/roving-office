@@ -1,5 +1,4 @@
 # Zero-dependency Node server — no npm install, no build step. Ships exactly what
-# bin/kaizen-build.sh ships for the Kaizen artifact, so the two deploy targets can't
 # drift out of sync with each other.
 #
 # The `.fly` suffix is the whole point of the name: as `Dockerfile` this failed the
@@ -14,7 +13,7 @@ WORKDIR /app
 COPY *.html styles.css favicon.ico server.cjs package.json ./
 # Complete licenses for the vendored browser library and derived colour data.
 COPY THIRD_PARTY_NOTICES.txt ./
-# The docs that are pages rather than prose — see bin/kaizen-build.sh, which ships the
+# The docs that are pages rather than prose — the
 # same set. `.dockerignore` excludes the rest of docs/ and lets these back through.
 COPY docs/*.html ./docs/
 # The built documentation site, served at /docs. Committed rather than built, because
@@ -28,7 +27,7 @@ COPY docs/images ./docs/images
 # The downloadable examples docs/user/layouts.md links at.
 COPY docs/examples ./docs/examples
 # The published Claude plugin — the marketplace JSON added by URL and the archive it
-# pins. bin/kaizen-build.sh ships the same directory, minus the same Codex tree
+# pins, minus the Codex tree
 # (excluded in .dockerignore here): a marketplace that existed on one deploy target and
 # 404ed on the other would be worse than one that existed on neither.
 COPY plugins ./plugins
@@ -39,15 +38,13 @@ COPY vendor ./vendor
 # The admin console's three files. It is reachable only when a deployment sets
 # ROVING_OFFICE_ADMIN_PASSWORD, and `server.cjs` serves these itself because the static
 # file server refuses this directory — so without them a configured console would answer
-# 404 to its own page and look broken rather than absent. bin/kaizen-build.sh ships the
-# same directory: a console that worked on one deploy target and not the other would be
-# worse than one that worked on neither.
+# 404 to its own page and look broken rather than absent.
 COPY admin ./admin
 
 # The published agent setup instructions, served at /agent-setup. An agent is told to
 # fetch `prompt.md` from this host by URL, so a deploy that omits the directory does not
 # degrade — it breaks the one install route that needs no clone, and reports 404 to
-# something that was told the file is authoritative. bin/kaizen-build.sh copies it too.
+# something that was told the file is authoritative.
 COPY agent-setup ./agent-setup
 
 ENV PORT=8080

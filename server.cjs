@@ -69,7 +69,7 @@ const PORT_RANGE = { from: 8080, to: 8095 };
  * for the same kind of reason — a platform's proxy reaches the process over the machine's
  * private interface, so it cannot use loopback. `Dockerfile.fly` sets it — the container
  * is what makes the wide bind correct, so the recipe that builds one is where it is said,
- * and `fly.toml` defers to it. Kaizen needs nothing: `bin/kaizen-entry.mjs` replaces
+ * and `fly.toml` defers to it. A dispatching host needs nothing: an entry shim replaces
  * `listen` so no socket is ever bound, and this value is inert on that route.
  *
  * Deliberately not a `--host` flag. The people who need it are writing a deployment
@@ -316,7 +316,7 @@ function isLocal(req) {
  * Whatever secret the request is presenting, by either accepted header.
  *
  * `X-Roving-Office-Token` wins, and the order matters more than it looks. Hosting layers
- * inject and rewrite `Authorization` — Kaizen's gateway treats it as its own credential —
+ * inject and rewrite `Authorization` — some gateways treat it as their own credential —
  * so a request can arrive carrying somebody else's bearer value alongside a perfectly
  * good office token. Checking `Authorization` first would read the platform's header,
  * fail the comparison, and report a wrong token to an emitter that sent the right one.
@@ -1608,7 +1608,7 @@ function adminReport() {
  * anything: the cap bounds the store and the whole-server limit bounds the rate. What
  * *this* one has to do is stop one caller in a loop, and a loop does twenty in under a
  * second and is then stopped for ten minutes — while nothing a person does comes near
- * it. Reception mints one office per click; `aop-connect` and the OpenClaw and Kaizen
+ * it. Reception mints one office per click; `aop-connect` and the OpenClaw
  * setup scripts mint one each.
  *
  * Deliberately not sized down to "what a visitor needs", which would be about three.
@@ -2167,7 +2167,7 @@ function listen(server) {
        * makes a stale callback harmless, because whichever one fires gets the same
        * true answer.
        *
-       * The fallback is for a server that never binds at all: `bin/kaizen-entry.mjs`
+       * The fallback is for a server that never binds at all: an entry shim
        * replaces `listen` with a stub that runs the callback and opens no socket, so
        * `address()` is null there and the port asked for is the right answer.
        */
@@ -2183,7 +2183,7 @@ function listen(server) {
       };
       server.once('error', onError);
       // Both the event and the callback, because the two live hosts disagree about
-      // which one exists: a real socket emits 'listening', and Kaizen's stub calls the
+      // which one exists: a real socket emits 'listening', and a dispatching stub calls the
       // callback and emits nothing. `settle` is idempotent via the promise itself.
       server.once('listening', settle);
       // The host is passed, never omitted: `listen(port, cb)` binds every interface,

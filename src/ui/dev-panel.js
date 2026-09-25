@@ -113,8 +113,8 @@ export function createDevPanel({ camera, controls, onPhoto }) {
     linkRow('Repository:', 'GitHub', 'https://github.com/atlassian-labs/roving-office'),
     // The links here that do not leave for the internet: these pages ship with the
     // server, so they are served by whichever office you are looking at. Root-relative
-    // and not origin-absolute, because an office on Fly, on Kaizen and on a laptop are
-    // three different origins and only one of them could ever be written down here —
+    // and not origin-absolute, because a hosted office and one on a laptop are
+    // different origins and only one of them could ever be written down here —
     // and not document-relative either, because an office lives at `/office/<keycard>`
     // and that would look for the docs inside it.
     linkRow('Docs:', [

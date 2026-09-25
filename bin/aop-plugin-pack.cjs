@@ -46,7 +46,7 @@
  *   plugins/codex/                           gitignored — nothing serves a Git tree
  *
  * Committing generated output is the precedent `docs/site` set and for the same reason:
- * neither deploy target may build. Kaizen's build is a file copy of the checkout and
+ * the deploy target may not build. 
  * `Dockerfile.fly` runs no `npm install` at all, so a marketplace assembled at deploy
  * time would exist on one target and 404 on the other. `--check` is the drift guard that
  * makes that safe, and it is part of `npm test`.

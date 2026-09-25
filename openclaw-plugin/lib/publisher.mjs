@@ -85,7 +85,7 @@ function post(endpoint, body) {
  * because the interesting cases are the ones where the office never got a say:
  *
  *   401  the receiver's own answer to a bad or missing token
- *   502  the *hosted* office's answer to the same thing — Kaizen's edge replaces the
+ *   502  the *hosted* office's answer to the same thing — an edge proxy replaces the
  *        receiver's 401 before it leaves, so a wrong token looks like a broken gateway
  *   403  nobody's answer: ingest never returns 403, so this came from a WAF or an egress
  *        proxy between the agent and the office, and no amount of fixing the token or the

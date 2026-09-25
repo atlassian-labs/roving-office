@@ -53,7 +53,7 @@ export default [
     },
   },
 
-  // Node ESM: the OpenClaw plugin, the kaizen entry, the tests, and the two configs.
+  // Node ESM: the OpenClaw plugin, the tests, and the two configs.
   //
   // `eleventy.config.mjs` was missing from this list for a while and passed lint only
   // because it happened to use no Node API. The first one it reached for — reading its own

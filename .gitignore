@@ -20,10 +20,8 @@ tmp_rovo_*
 # committed into the first.
 .worktrees/
 
-# Kaizen build output — assembled from the checkout by bin/kaizen-build.sh, and the
-# CLI's own bookkeeping about what it last uploaded
+# Build output
 .output/
-.kaizen/
 
 # Logs
 *.log

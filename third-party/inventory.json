@@ -54,11 +54,11 @@
   "distributionRecipes": [
     {
       "path": "Dockerfile.fly",
-      "sha256": "da55ac584715b7edec1f4479cd6d22da42fa1ca56c87b4b12719f98e1deb92c0"
+      "sha256": "4a8822a36c8c460d03e5c56f4b87fc6e51a9e3f50e0435154a4297138050c914"
     },
     {
       "path": ".dockerignore",
-      "sha256": "058c6d02e6931310214a5d5d92687c56bca5e996303f4f9d38231c2550a07fe8"
+      "sha256": "6b40997b44e620b676748c5c396d01420fa37491b13ae43cfbf6b3f9b50b7fa5"
     },
     {
       "path": "bin/aop-codex-install.cjs",
@@ -70,7 +70,7 @@
     },
     {
       "path": "bin/aop-plugin-pack.cjs",
-      "sha256": "1e90e7f7705c2b011206acf4cd47ecaaa80b539517c23937cfd627e04b44886f"
+      "sha256": "11ffa585e0bcb9e501f50d31020341cb15c8ebdda7de33066b31bb8b386861b5"
     },
     {
       "path": "bin/lib/zip.cjs",
@@ -78,7 +78,7 @@
     },
     {
       "path": "eleventy.config.mjs",
-      "sha256": "4b8e12f551d7e421e112303bdc20d6f2a11808a93204bc7ab467badf96322351"
+      "sha256": "5affa0b4b41e9f7f4073aca80b73a901c5f725162416da2de20dc3af412b04ef"
     },
     {
       "path": ".github/workflows/ci.yml",
@@ -629,7 +629,7 @@
         },
         {
           "path": "Dockerfile.fly",
-          "sha256": "da55ac584715b7edec1f4479cd6d22da42fa1ca56c87b4b12719f98e1deb92c0"
+          "sha256": "4a8822a36c8c460d03e5c56f4b87fc6e51a9e3f50e0435154a4297138050c914"
         }
       ],
       "licenseEvidence": []

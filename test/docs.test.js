@@ -173,24 +173,16 @@ test('the sidebar and the Markdown agree, in both directions', async () => {
   )
 })
 
-test('every deploy recipe ships the built docs and the imagery', () => {
+test('the deploy recipe ships the built docs and the imagery', () => {
   const docker = readFileSync(join(ROOT, 'Dockerfile.fly'), 'utf8')
   const ignore = readFileSync(join(ROOT, '.dockerignore'), 'utf8')
 
-  // Whatever one target serves at /docs, every other target serves too — recipes that
-  // drift apart produce a /docs that works on one host and 404s on another, and only
-  // the second gets noticed.
+  // There is one deploy target now, which is why this reads as a plain assertion. It
+  // used to guard two against drifting apart — a /docs that worked on one host and 404d
+  // on the other, where only the second ever got noticed.
   assert.match(docker, /^COPY docs\/site \.\/docs\/site$/m)
   assert.match(docker, /^COPY docs\/images \.\/docs\/images$/m)
 
-  // The maintainers' internal recipe, when it is here. It does not travel to the public
-  // repository — it names infrastructure nobody outside can reach — so this half is
-  // conditional rather than deleted: the guard still runs where the file exists.
-  if (existsSync(join(ROOT, 'bin/kaizen-build.sh'))) {
-    const kaizen = readFileSync(join(ROOT, 'bin/kaizen-build.sh'), 'utf8')
-    assert.match(kaizen, /cp -R "\$root\/docs\/site" "\$out\/docs\/site"/)
-    assert.match(kaizen, /cp -R "\$root\/docs\/images" "\$out\/docs\/images"/)
-  }
 
   // `docs` is excluded wholesale, so the exceptions are what actually let these through.
   assert.match(ignore, /^!docs\/site$/m)

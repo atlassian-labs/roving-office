@@ -33,9 +33,8 @@ docs/_nav.mjs
 #
 # The Markdown stays where it is on purpose. The repository is still private and nothing
 # here is a credential, so this list is only about it no longer reaching `docs/site` or
-# either deployed artifact. What must go with it is the committed HTML under
-# `docs/site/developer/`, because that directory is copied wholesale by `Dockerfile.fly`
-# and `bin/kaizen-build.sh`.
+# the deployed artifact. What must go with it is the committed HTML under
+# `docs/site/developer/`, because that directory is copied wholesale by `Dockerfile.fly`.
 #
 # Keeping it off the web is not the same as keeping it out of the public repository, and
 # both are wanted: `.exportignore` is the second list, and `test/public-surface.test.js`
@@ -46,6 +45,5 @@ docs/developer/design/fly-persistence-plan.md
 docs/developer/design/hosting-notes.md
 docs/developer/design/jira-coding-agent.md
 docs/developer/design/job-delivery-gaps.md
-docs/developer/design/kaizen-project-admin.md
 docs/developer/design/openclaw-open-questions.md
 docs/developer/design/origin-and-steps.md

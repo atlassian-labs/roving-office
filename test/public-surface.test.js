@@ -158,7 +158,7 @@ function exportedExclusions() {
  * - the two test files that carry the marker patterns themselves, this one included.
  */
 const SWEEP_ROOTS = ['src', 'bin', 'lib', 'hooks', 'openclaw-plugin', 'test', 'vendor', 'third-party', 'agent-setup']
-const SWEEP_ROOT_FILES = ['eslint.config.js', 'eleventy.config.mjs', 'styles.css', 'server.cjs', 'kaizen.toml', 'index.html', 'home.html']
+const SWEEP_ROOT_FILES = ['eslint.config.js', 'eleventy.config.mjs', 'styles.css', 'server.cjs', 'index.html', 'home.html']
 const SWEEP_EXTENSIONS = ['.js', '.cjs', '.mjs', '.sh', '.css', '.html', '.json', '.md', '.toml', '.yml']
 const SWEEP_EXEMPT = new Set([
   'src/agents/colour-names.js',         // generated colour data: "boysenberry pink"

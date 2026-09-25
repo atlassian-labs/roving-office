@@ -374,7 +374,7 @@ function post(endpoint, body, budget) {
       'Content-Length': data.length,
       // `X-Roving-Office-Token`, not `Authorization: Bearer`, and the difference is not
       // stylistic. `Authorization` is a header that hosting layers legitimately claim:
-      // Kaizen's gateway validates it as its *own* credential, so a bearer token meant
+      // Some gateways validate it as their *own* credential, so a bearer token meant
       // for the office is rejected before the office is reached — 401 from the app when
       // it strips the header, 502 "bridge token was rejected" when the gateway takes
       // offence. Verified against a real deployment, where the same request succeeds

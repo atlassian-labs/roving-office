@@ -33,7 +33,6 @@ const { auditTree, SPECIFIERS } = require('../bin/lib/pack-audit.cjs');
 const ROOT = path.resolve(__dirname, '..');
 const readJson = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
-const exists = (rel) => fs.existsSync(path.join(ROOT, rel));
 
 const VERSION = readJson('package.json').version;
 const BUILD = pack.build({ baseUrl: pack.DEFAULT_BASE_URL, version: VERSION });
@@ -239,20 +238,12 @@ test('no hook in the chain depends on an executable bit surviving extraction', (
   assert.match(read('bin/aop-plugin-hook.sh'), /^exec sh "\$plugin_root\/bin\/aop-node\.sh"/m);
 });
 
-test('every deploy target serves the published marketplace, and none ships the Codex tree', () => {
+test('the deploy target serves the published marketplace, and does not ship the Codex tree', () => {
   // A marketplace URL that works on one target and 404s on the other is worse than one
   // that works on neither, because only the second is noticed.
-  //
-  // The internal recipe is checked when present: it does not travel to the public
-  // repository, and this file already takes that shape for `bitbucket-pipelines.yml`.
-  if (exists('bin/kaizen-build.sh')) {
-    const kaizen = read('bin/kaizen-build.sh');
-    assert.match(kaizen, /^cp -R "\$root\/plugins" "\$out\/plugins"$/m);
-    assert.match(kaizen, /^rm -rf "\$out\/plugins\/codex"$/m);
-  }
   assert.match(read('Dockerfile.fly'), /^COPY plugins \.\/plugins$/m);
   assert.match(read('.dockerignore'), /^plugins\/codex$/m);
-  // Committed, because a Kaizen build is a file copy and the Fly image runs no install.
+  // Committed, because the Fly image runs no install.
   assert.match(read('.gitignore'), /^plugins\/codex\/$/m);
   // And served with a type: the server maps extensions, and .zip was not among them.
   assert.match(read('server.cjs'), /'\.zip': 'application\/zip'/);

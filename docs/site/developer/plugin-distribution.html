@@ -258,7 +258,7 @@ same gate as the missing licence below.</p>
 <h2 id="why-pluginsclaude-is-committed" tabindex="-1">Why <code>plugins/claude/</code> is committed</h2>
 <p>Generated output in the repository is exactly what <code>.gitignore</code> argues against, and
 <code>docs/site</code> is the precedent for doing it anyway: <strong>neither deploy target may build.</strong>
-<code>bin/kaizen-build.sh</code> is a file copy of the checkout and <code>Dockerfile.fly</code> runs no
+<code>Dockerfile.fly</code> runs no
 <code>npm install</code> at all — read either one; the reason is in their comments. So a marketplace
 assembled at deploy time would exist on one target and 404 on the other.</p>
 <p>So it is committed, both recipes ship it, and <code>npm test</code> guards it. The rule is: <strong>what

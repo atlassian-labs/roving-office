@@ -118,7 +118,7 @@ same gate as the missing licence below.
 
 Generated output in the repository is exactly what `.gitignore` argues against, and
 `docs/site` is the precedent for doing it anyway: **neither deploy target may build.**
-`bin/kaizen-build.sh` is a file copy of the checkout and `Dockerfile.fly` runs no
+`Dockerfile.fly` runs no
 `npm install` at all — read either one; the reason is in their comments. So a marketplace
 assembled at deploy time would exist on one target and 404 on the other.
 

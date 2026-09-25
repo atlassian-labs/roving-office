@@ -1,6 +1,6 @@
 {
   "name": "the-roving-office",
-  "version": "0.15.5",
+  "version": "0.15.6",
   "description": "A soft-3D isometric office where your agents come to life.",
   "type": "module",
   "scripts": {
