@@ -33,7 +33,7 @@ office with nothing to notice is a screensaver.
 | | |
 | --- | --- |
 | **Just watch something** | [Watching the office](watching.md) — two minutes, no install. What a job is, and how to read the room. |
-| **Run it yourself** | [Install and run it](install.md) — one command, and the room opens already full of people. |
+| **Run it yourself** | [Install and run it](install.md) — one command, and the room fills itself with people. |
 | **Point it at your own agents** | [Connect your agents](connect-your-agents.md) — one command per harness, then your real sessions walk in. |
 
 ## The rest of it

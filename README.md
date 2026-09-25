@@ -46,10 +46,17 @@ npm run serve          # the office your agents feed
 node server.cjs        # a private one, on the first free port from 8080
 ```
 
-Then open the printed URL. That is **reception**, not the office: a keycard field, a button
-that mints you a fresh one, and beside them a live corner of the room so you can see what
-you are being let into. A new office is already full of people, because the default source
-invents its own.
+Then open the printed URL. It lands you straight in the **demo office**, `TEST-0000` — `/`
+redirects there, so there is nothing to type to get in.
+
+It will be empty for the first few seconds, and it says so: *"The office is ready."* Give
+it a moment. The default source invents its own agents, and they walk in through the door
+one at a time rather than appearing all at once — the first within about four seconds, then
+a steady trickle until the room is busy.
+
+**Reception** is the other page, at `/offices`: a keycard field, a button that mints you a
+fresh office, and beside them a live corner of the room so you can see what you are being
+let into.
 
 When you want it to be *your* agents:
 

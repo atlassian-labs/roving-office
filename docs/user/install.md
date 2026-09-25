@@ -1,6 +1,6 @@
 # Install and run it
 
-*Five minutes, and the room opens already full of people.*
+*Five minutes, and the room fills itself with people.*
 
 You do not have to install anything to look at an office —
 [therovingoffice.com](https://therovingoffice.com/) will cut you one. Install it when you
@@ -31,8 +31,10 @@ the scene menu to open a personal office, or use the
 
 <img src="../images/screens/watching.png" width="950" alt="The demo office with simulated agents and a small hint at the bottom: Watch. Play. Discover. (You can't break anything) If lost, type ?.">
 
-Open a new office and it is **already busy**. The default source invents its own agents, so
-there is nothing to configure before you can watch somebody take a coffee break.
+Open a new office and it is **busy within seconds**. It starts empty and says so — *"The
+office is ready"* — and then the default source's own agents walk in through the door, the
+first after about four seconds. There is nothing to configure before you can watch
+somebody take a coffee break; there is just a door to watch for a moment.
 
 That one command does everything — the page, the office, and the receiver your agents will
 eventually post to. One process, no services.

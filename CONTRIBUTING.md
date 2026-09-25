@@ -131,13 +131,16 @@ re-render the docs imagery.
 
 ## Ship it
 
-**Open an issue first**, even for something small — one issue per piece of work, moved to
-in-progress when you start and closed when it lands. It is not bureaucracy: it is how
-somebody else finds out you are already doing the thing they were about to start.
+**Open an issue first**, even for something small, and say there that you are picking it
+up. It is not bureaucracy: it is how somebody else finds out you are already doing the
+thing they were about to start. One issue per piece of work.
 
-Then branch from `main`, open a pull request, and let CI go green. Cut the branch in a
-**worktree** rather than switching the primary checkout — [AGENTS.md](AGENTS.md) explains
-why, and it is one command.
+Then fork, branch from `main`, open a pull request, and let CI go green. If you are working
+in a checkout you can push to, cut the branch in a **worktree** rather than switching the
+primary checkout — [AGENTS.md](AGENTS.md) explains why, and it is one command.
+
+**Found a security problem? Do not open an issue.** [SECURITY.md](SECURITY.md) has the
+reporting route and what is in scope, including for the hosted demo.
 
 If your change touches the shared plugin files (`hooks/`, `bin/aop-send.cjs`,
 `bin/aop-node.sh`, `bin/aop-plugin-hook.sh`, `bin/mappers/`, `openclaw-plugin/`,

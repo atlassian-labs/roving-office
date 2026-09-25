@@ -3,57 +3,36 @@
 These are for an agent session working in this repository. The human-shaped mirror is
 [CONTRIBUTING.md](CONTRIBUTING.md), which is shorter and says most of the same things.
 
+Everything here applies wherever this code is checked out. The maintainers' own tracker,
+git host and deployment are **not** here, on purpose — instructions naming a system the
+reader cannot reach are worse than none. If your checkout has a `.maintainers/` directory,
+that is where they live and it is worth reading alongside this; if it does not, you are not
+missing anything you need in order to change this code.
+
 ## Three things, always
 
 Before a line of code is written:
 
-1. **A tracked issue.** No change without one. If none exists, open one — see below for
-   what that means.
+1. **An issue.** No change without one. If none exists, open one.
 2. **A branch.** Never commit to `main`.
 3. **A worktree**, cut from `main`. Not the primary checkout.
 
-These used to be preferences, hedged with *prefer* and *if*, and the hedge cost an afternoon:
-a session working in the primary checkout found somebody else's uncommitted changes to the
-very file it was refactoring, plus an unrelated build change, in the same tree — separable
-only by hand, and only because the collision happened to be noticed. A worktree is one
-command and it makes that impossible:
+The third used to be a preference, hedged with *prefer* and *if*, and the hedge cost an
+afternoon: a session working in the primary checkout found somebody else's uncommitted
+changes to the very file it was refactoring, plus an unrelated build change, in the same
+tree — separable only by hand, and only because the collision happened to be noticed. A
+worktree is one command and it makes that impossible:
 
 ```bash
 git worktree add .worktrees/issue-4 -b worktree-issue-4    # from the primary checkout
 ```
 
-The primary checkout is where `main` lives and where other people's work in progress sits.
-Treat it as somewhere to read from and merge into, not somewhere to write. `git worktree
-list` names it on its first line, from any worktree.
+The primary checkout is where `main` lives and where work in progress sits. Treat it as
+somewhere to read from and merge into, not somewhere to write. `git worktree list` names
+it on its first line, from any worktree.
 
-## Issues: one per change
-
-Every piece of work is bookended by its status, so the tracker reflects what is actually
-happening:
-
-1. **Before starting**, move the issue to in-progress — or confirm it is already there.
-   Before writing code, not after. An issue that stays open-and-untouched while its code is
-   written, reviewed and merged tells a reader nothing, and somebody has to ask.
-2. If there is no issue, open one. Ask what it should *say* if the shape of the work is
-   unclear — never skip having one.
-3. **When the work is merged**, close it. Do not do this unless you're 100% sure it's done.
-
-Read the status *name* rather than whatever bucket the tracker files it under: a
-"scheduled" or "up next" column often reports as in-progress to an API while nobody has
-touched the issue, so a category check will tell you work is underway when it is not.
-
-Which issue? Usually the worktree already says — see
-[The worktree names the task](#the-worktree-names-the-task).
-
-## Git: branches, worktrees and merging
-
-Work happens in a git worktree on its own branch, cut from `main` — always, per
-[Three things](#three-things-always). Land it with a **pull request**; some of this
-history was merged locally with `--no-ff` instead, which is why both shapes appear in
-`git log`, but a pull request is the route now.
-
-A worktree starts with no `node_modules` — it is gitignored, so it does not come across with
-the checkout. Tests and lint need it before they will run:
+A worktree starts with no `node_modules` — it is gitignored, so it does not come across
+with the checkout. Tests and lint need it before they will run:
 
 ```bash
 ln -s ../../node_modules node_modules                     # from .worktrees/<name>
@@ -66,24 +45,19 @@ shows up as untracked in every `git status` you run in that worktree — and an 
 thing at the top of a status is exactly what gets swept into a `git add .`. `npm ci`
 instead is slower but has no such edge.
 
-`main` is checked out in the primary worktree, so it cannot be checked out again in a
-second one: run the merge from the primary worktree with `git -C`, rather than trying to
-switch branches in place.
-
 ### The worktree names the task
 
 If the worktree path or its branch carries an issue reference — `.worktrees/issue-4`,
 `worktree-issue-4`, `issue-11-rename-the-protocol-layer` — then **that issue is the task by
-default**, with no need to ask which one. Read it before starting, and apply the status
-bookending above to it:
+default**, with no need to ask which one. Read it before starting:
 
 ```bash
 git rev-parse --show-toplevel      # or: git branch --show-current
 ```
 
 If the reference in the path and the one on the branch disagree, or a request names a
-different issue, ask rather than guessing. A worktree with no reference in its name (say
-`worktree-openclaw-datasource`) says nothing about the task — take it from the request.
+different issue, ask rather than guessing. A worktree with no reference in its name says
+nothing about the task — take it from the request.
 
 The convention only pays off if it is kept up, so it runs the other way too: **a new
 worktree for a known issue is named after it**, and so is its branch. Add a short slug when
@@ -101,17 +75,16 @@ the wrong one is a real error rather than untidiness:
 
 Cross-set links are fine and should say so in the link text ("→ developer docs").
 
-**Nothing that ships may name something only an Atlassian employee can open** — an
-internal wiki link, a `go/` shortlink, an internal hostname or tool, or a bare issue key
-as a citation. That covers code comments as much as prose, and it is a test rather than a
-habit: `test/public-surface.test.js` sweeps the two documentation sets, the built site,
-the three root Markdown files and the code the export ships, and names the file and the
-marker when it finds one. The reason it has to be a test is that the internal link is
+**Nothing that ships may cite something the reader cannot open.** A link to a private
+wiki, an internal hostname or tool, a company shortlink, or a bare tracker key used as a
+citation — all of it is a reference that answers the question for one reader and withholds
+it from everyone else. That covers code comments as much as prose, and it is a test rather
+than a habit: `test/public-surface.test.js` sweeps both documentation sets, the built site,
+the root Markdown files and the code this repository ships, and names the file and the
+marker when it finds one. The reason it has to be a test is that the unavailable link is
 always right there in the tab you are working from. **Say what the thing was** rather than
-citing where it is written down: "took a while to notice the asymmetry" carries the
-meaning that "took XYZ-168 to notice" carried, to every reader rather than to one.
-`.exportignore` is the other half — the list of what the public export leaves behind, and
-the only place that boundary is drawn.
+citing where it is written down: "took a while to notice the asymmetry" carries the meaning
+that "took XYZ-168 to notice" carried, to every reader rather than to one.
 
 **Some pages under those directories are deliberately never published**, and the list is
 the block at the bottom of `.eleventyignore`. `docs/site` is committed and both deploy
@@ -121,12 +94,12 @@ later gate. Do not link a published page at one of those, do not add one to
 commit. `test/docs.test.js` reads the list and fails if built HTML exists for anything on
 it.
 
-The project's design records — proposals, evaluations not taken, shipped plans — and its
-deployment runbooks are kept in the maintainers' own workspace rather than in this
-repository, because several of them describe behaviour the code no longer has and all of
-them cite infrastructure a contributor has no access to. Nothing you need in order to
-change this code is in them; if a decision's reasoning is worth having, it belongs in a
-comment next to the code or in `docs/developer/`.
+Some of the project's design records — proposals, evaluations not taken, shipped plans —
+and its deployment runbooks are not in this repository, because several of them describe
+behaviour the code no longer has and all of them cite infrastructure a contributor has no
+access to. Nothing you need in order to change this code is in them; if a decision's
+reasoning is worth having, it belongs in a comment next to the code or in
+`docs/developer/`.
 
 **A new page needs an entry in `docs/_nav.mjs`**, which is the sidebar and the only list of
 what the documentation contains; the Markdown files carry no front matter. A page that is
@@ -205,7 +178,7 @@ the checkout and says what is live, so run it rather than guessing.
   The sweep is **deterministic**: the scene dresses itself at random, so the probe seeds it and measures one fixed dressing. Before that it failed and passed the same commit at random, and `main` sat red over a docs change. So a red probe is a real red probe: **do not re-run it hoping**, and do not widen the baseline to make it green. Hunting for a pair that only some dressings produce is what `--seed=<n>` is for, and a baseline only means anything against the seed it was recorded under — the file carries it, and `--assert` refuses a mismatch.
 
   But know what it does **not** cover. The probe builds `buildEnvironment` only — the shell, the glass, the roof, the storeys — and **not `buildProps`**, so no desk, plant, standee or anything else that stands in the room is in it. A held baseline after changing a prop says nothing about that prop; the portrait and a scene screenshot are what check it. Read `sceneFor()` in `bin/coplanar-probe.js` before claiming the probe validated something.
-- **Editing a deployment recipe means regenerating the third-party inventory.** `third-party/inventory.json` pins the SHA-256 of `Dockerfile.fly`, `bitbucket-pipelines.yml`, `kaizen.toml` and the rest of the recipes, so a one-line change to any of them turns `npm test` red with "inventory.json is stale" and nothing about the message says which file you touched. The same goes for anything the inventory is *built from*: `third-party/components.json` is the curated input, and it pins every path it lists, so editing a provenance description there — or any file such a row names, `src/scene/standees.js` included — goes stale the same way. Run `node bin/gen-third-party.mjs`, then read the diff: only the hashes of files you actually edited should move, and anything else moving means the dependency tree shifted under you.
+- **Editing a deployment recipe means regenerating the third-party inventory.** `third-party/inventory.json` pins the SHA-256 of `Dockerfile.fly`, `.dockerignore`, `.github/workflows/ci.yml` and the rest of the recipes, so a one-line change to any of them turns `npm test` red with "inventory.json is stale" and nothing about the message says which file you touched. The same goes for anything the inventory is *built from*: `third-party/components.json` is the curated input, and it pins every path it lists, so editing a provenance description there — or any file such a row names, `src/scene/standees.js` included — goes stale the same way. Run `node bin/gen-third-party.mjs`, then read the diff: only the hashes of files you actually edited should move, and anything else moving means the dependency tree shifted under you.
 - **Do not regenerate a portrait whose prop you did not change.** `npm run portrait` is not byte-deterministic: re-rendering an untouched prop rewrites the PNG with a different shadow, so a bare `npm run portrait` quietly dirties two dozen images and buries the one that matters. Pass `--id=<id>`, and diff the pixels rather than the bytes if you need to know whether a change is real.
 - The scene is the product, so **look at it** for anything visual. A headless Chrome screenshot works and catches what a unit test cannot:
 
@@ -253,7 +226,7 @@ the checkout and says what is live, so run it rather than guessing.
 A task is not finished at the merge. When the work has landed and **the request says we are done**, clear the desk without being asked again:
 
 1. **Sweep first, while you still can.** Temp files, stray headless Chromes, `git status`, the health check on whatever is still serving — all of it happens *before* the removal, because the removal takes the shell's own working directory with it and nothing can be run afterwards. An agent that leaves the sweep till last finds it cannot even `pwd`, and has to recreate the path it just deleted to get a shell back.
-2. **Stop or move any server** started for the task. Ask what it is serving before killing it, with `lsof -p <pid> | awk '$4=="cwd"{print $NF}'`: a server whose `cwd` is the worktree dies with it, so if it is one you are keeping — the office on 8080, holding the endpoint — restart it from the primary worktree first and check it re-claimed `~/.roving-office/endpoint.json`.
+2. **Stop or move any server** started for the task. Ask what it is serving before killing it, with `lsof -p <pid> | awk '$4=="cwd"{print $NF}'`: a server whose `cwd` is the worktree dies with it, so if it is one you are keeping — the office holding the endpoint — restart it from the primary worktree first and check it re-claimed `~/.roving-office/endpoint.json`.
 3. **Remove the worktree**, then **delete the branch** — but only once it is merged.
 
 ```bash
