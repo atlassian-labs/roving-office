@@ -14,6 +14,20 @@ a new tab, keeping your office open.
 Tick more than one to put two crews in the same room. Keep Test Data ticked alongside a
 live feed while you are still getting the adapter working.
 
+**Or let the agent do it.** Paste this into any agent session and it sets itself up —
+works out which harness it is, mints you an office, installs the adapter and hands back
+the URL:
+
+> Fetch and execute the appropriate instructions to set me up for The Roving Office from
+> <https://therovingoffice.com/agent-setup/prompt.md>
+
+It asks you one question first, because connecting transmits what your agent is doing to
+a web server — [what the default actually sends](#what-the-default-actually-sends) is the
+list it shows you. Say *local only* and it will set up an office on your own machine
+instead, where nothing leaves it.
+[The agent setup page](https://therovingoffice.com/agent-setup/) explains the mechanism,
+and the instructions are plain text at that URL so you can read them before you run them.
+
 | Harness | Install it with | Page |
 | --- | --- | --- |
 | **Test Data** | Nothing to do — it is the default | [Test Data](sources/test-data.md) |

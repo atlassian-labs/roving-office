@@ -121,6 +121,9 @@ const MIME = {
   '.mjs': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
+  // agent-setup/prompt.md is fetched by an agent and read as text, so the type is
+  // the difference between instructions and a download. See agent-setup/index.html.
+  '.md': 'text/markdown; charset=utf-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
@@ -592,7 +595,7 @@ function normaliseAdminPath(raw) {
   if (path_.split('/').includes('..')) return complain('may not contain a dot segment');
   // The prefixes the router claims above this one, plus the two directories on disk that
   // the console's own files and the static guard live in.
-  for (const taken of ['/api', '/office', '/offices', '/aop', '/docs', '/assets', '/vendor', '/src', '/lib', '/plugins', '/admin']) {
+  for (const taken of ['/api', '/office', '/offices', '/aop', '/docs', '/assets', '/vendor', '/src', '/lib', '/plugins', '/admin', '/agent-setup']) {
     if (path_ === taken || path_.startsWith(`${taken}/`)) {
       return complain(`may not be ${taken} or inside it — that is a path this server already serves`);
     }
@@ -1895,6 +1898,10 @@ function serveStatic(req, res, url) {
     return res.end();
   }
   if (urlPath === '/offices' || urlPath === '/offices/') urlPath = '/home.html';
+  // The published agent setup instructions, at the URL the prompt itself names as
+  // its home. `prompt.md` beside it needs nothing: it is a real file under ROOT and
+  // falls through to `sendFile` like any other. Only the directory needs an index.
+  if (urlPath === '/agent-setup' || urlPath === '/agent-setup/') urlPath = '/agent-setup/index.html';
 
   const filePath = urlPath === '/docs' || urlPath.startsWith('/docs/')
     ? resolveDocs(urlPath)

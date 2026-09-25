@@ -68,7 +68,7 @@ const NO_KAIZEN = fs.existsSync(path.join(ROOT, 'bin/kaizen-build.sh'))
 test('the hosted artifact retains the complete runtime notices without shipping development dependencies', { skip: NO_KAIZEN }, (t) => {
   const { root, put } = fixture(t);
   for (const name of ['bin/kaizen-build.sh', 'THIRD_PARTY_NOTICES.txt', 'vendor/three/LICENSE', 'vendor/color-name-list/LICENSE']) put(name, read(name));
-  for (const name of ['bin/kaizen-entry.mjs', 'server.cjs', 'home.html', 'styles.css', 'favicon.ico', 'docs/library.html', 'docs/site/index.html', 'docs/images/example.png', 'docs/examples/layout.json', 'assets/icon.svg', 'lib/example.cjs', 'src/example.js', 'admin/console.html', 'plugins/claude/marketplace.json', 'plugins/codex/bin/example.cjs']) put(name, 'fixture');
+  for (const name of ['bin/kaizen-entry.mjs', 'server.cjs', 'home.html', 'styles.css', 'favicon.ico', 'docs/library.html', 'docs/site/index.html', 'docs/images/example.png', 'docs/examples/layout.json', 'assets/icon.svg', 'lib/example.cjs', 'src/example.js', 'admin/console.html', 'agent-setup/prompt.md', 'agent-setup/index.html', 'plugins/claude/marketplace.json', 'plugins/codex/bin/example.cjs']) put(name, 'fixture');
   put('node_modules/example/LICENSE', 'development-only fixture');
   execFileSync('bash', ['bin/kaizen-build.sh'], { cwd: root, stdio: 'pipe' });
   const staged = path.join(root, '.output/server');

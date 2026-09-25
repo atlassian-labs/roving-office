@@ -58,7 +58,12 @@ a steady trickle until the room is busy.
 fresh office, and beside them a live corner of the room so you can see what you are being
 let into.
 
-When you want it to be *your* agents:
+When you want it to be *your* agents, either let the agent set itself up —
+
+> Fetch and execute the appropriate instructions to set me up for The Roving Office from
+> <https://therovingoffice.com/agent-setup/prompt.md>
+
+— or do it yourself:
 
 ```bash
 npm run connect:rovo     # or: connect:claude / connect:cursor / connect:codex / connect:openclaw

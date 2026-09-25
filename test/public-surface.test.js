@@ -157,7 +157,7 @@ function exportedExclusions() {
  *   from a codename;
  * - the two test files that carry the marker patterns themselves, this one included.
  */
-const SWEEP_ROOTS = ['src', 'bin', 'lib', 'hooks', 'openclaw-plugin', 'test', 'vendor', 'third-party']
+const SWEEP_ROOTS = ['src', 'bin', 'lib', 'hooks', 'openclaw-plugin', 'test', 'vendor', 'third-party', 'agent-setup']
 const SWEEP_ROOT_FILES = ['eslint.config.js', 'eleventy.config.mjs', 'styles.css', 'server.cjs', 'kaizen.toml', 'index.html', 'home.html']
 const SWEEP_EXTENSIONS = ['.js', '.cjs', '.mjs', '.sh', '.css', '.html', '.json', '.md', '.toml', '.yml']
 const SWEEP_EXEMPT = new Set([

@@ -44,6 +44,12 @@ COPY vendor ./vendor
 # worse than one that worked on neither.
 COPY admin ./admin
 
+# The published agent setup instructions, served at /agent-setup. An agent is told to
+# fetch `prompt.md` from this host by URL, so a deploy that omits the directory does not
+# degrade — it breaks the one install route that needs no clone, and reports 404 to
+# something that was told the file is authoritative. bin/kaizen-build.sh copies it too.
+COPY agent-setup ./agent-setup
+
 ENV PORT=8080
 # `server.cjs` binds loopback by default, because on a laptop it serves the whole working
 # tree and that is not a thing to offer the network. A container is the other case: the

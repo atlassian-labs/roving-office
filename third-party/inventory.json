@@ -54,7 +54,7 @@
   "distributionRecipes": [
     {
       "path": "Dockerfile.fly",
-      "sha256": "61281ba343441f13313c98c7689875ec745fac98e87efa229827667da66c4f2a"
+      "sha256": "da55ac584715b7edec1f4479cd6d22da42fa1ca56c87b4b12719f98e1deb92c0"
     },
     {
       "path": ".dockerignore",
@@ -629,7 +629,7 @@
         },
         {
           "path": "Dockerfile.fly",
-          "sha256": "61281ba343441f13313c98c7689875ec745fac98e87efa229827667da66c4f2a"
+          "sha256": "da55ac584715b7edec1f4479cd6d22da42fa1ca56c87b4b12719f98e1deb92c0"
         }
       ],
       "licenseEvidence": []
