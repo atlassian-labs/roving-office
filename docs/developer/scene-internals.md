@@ -38,33 +38,6 @@ something to reflect without adding lights to every frame. `applyTimeOfDay()` lo
 intensity after dark alongside the existing sky and fill light. The visible sky and sun
 still follow the clock, season and orientation.
 
-### Reviewing the city and lighting experiments
-
-The four-city comparison compares the city backgrounds and lighting against the
-pre-experiment snapshot. Both sides use the original furniture models. Its 24 pairs show
-each office, neighbourhood, street plan, evening, winter and a turned camera, with the
-same clock, season, camera and seeded dressing on both sides. The furniture experiments
-and object gallery that went with it were a separate branch and were not kept.
-
-**The page is not committed — build it when you want it.** It is 7.7 MB of embedded
-renders and it is reproducible from the script below, so the script ships and the
-artifact does not.
-
-Build the gallery with `node bin/astra-comparison.js`. It compares two revisions —
-its own built-in baseline against `HEAD` by default — and writes
-`astra-city-comparison.html`.
-Use `--before=<commit>`, `--after=<commit>` and `--out=<file.html>` to override them.
-`--city=simple`, `warehouse`, `skyscraper` or `mansard` captures one city; the default
-`all` captures all four. `--quick` limits each city to its first three views.
-`--after=working` captures uncommitted source for iteration. Committed review artifacts
-use committed revisions. `--verify-only` checks the existing file's images and controls.
-The tool uses local Chrome and removes its temporary snapshots and renderer afterwards.
-The exported file contains its images and works offline.
-
-Scene records contain render-call and triangle counts, plus headless timing samples.
-Those timings compare the capture harness; they do not predict a user's frame rate or
-startup time.
-
 ### Four garden neighbourhoods
 
 `src/scene/outlooks/alder-layout.js` owns the street centres, plots, park, crossings,
@@ -134,10 +107,8 @@ illumination; pendant bulbs use the existing night-light emissive handling.
 World teardown also releases the sun's shadow render targets, so repeated building or
 season changes do not retain the previous world's shadow textures.
 
-Open [the interactive Canopy House preview](/canopy-house.html) on a running checkout
-to inspect the actual scene modules at three camera positions, times of day and seasons.
-Use **Scene → Building → Canopy House** in a Test Data office to review agent behaviour.
-The preview is a separate camera viewer; it does not save an office or change its layout.
+Use **Scene → Building → Canopy House** in a Test Data office to review agent behaviour
+at different camera positions, times of day and seasons.
 
 ## Three distinct office styles
 
@@ -169,11 +140,9 @@ object. Each outlook owns terrain beyond the common ground plane to keep its bou
 out of the review camera's range. The shared floor-clearance tests raycast the actual
 landscape surfaces, including instances, to catch scenery entering the working room.
 
-Open [the three-office viewer](/office-collection.html) to switch buildings while keeping
-the camera, season and time of day fixed. Room, window and setting camera presets make
-the architecture comparable; links retain the chosen building, season, time and preset.
-The viewer uses the actual scene modules and renders one office at a time. It has no
-saved layout or adapter connection. In the working app, select a building with `S`.
+In the working app, select a building with `S` to compare the architecture across camera
+position, season and time of day. Scene selection has no effect on a saved layout or
+adapter connection.
 
 `test/distinct-offices.test.js` checks native-theme switching, permanent floor clearance,
 agent entry/desk allocation/departure, and all four seasonal builds. It caps each

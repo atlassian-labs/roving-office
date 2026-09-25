@@ -9,11 +9,11 @@
     {
       "name": "roving-office",
       "description": "Watch your coding-agent sessions as characters in a soft-3D isometric office.",
-      "version": "0.15.6",
+      "version": "0.15.7",
       "source": {
         "source": "archive",
-        "url": "https://therovingoffice.com/plugins/claude/roving-office-0.15.6.zip",
-        "sha256": "f22223e731a77ad07778f53a8fbbb55fb9ba9fa4570a8183bbd2ebbd905a5597"
+        "url": "https://therovingoffice.com/plugins/claude/roving-office-0.15.7.zip",
+        "sha256": "6c24ef5cd3fd6ce07f3add5334f35f7981337be5f10119b4b3381aafb63d2a6c"
       }
     }
   ]

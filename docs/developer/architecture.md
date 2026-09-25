@@ -110,9 +110,6 @@ The unprefixed `/aop/v0/*` paths remain as an alias for whichever office current
 ```
 index.html            # the office: canvas, import map, UI overlay
 home.html             # /offices: enter a keycard or open a personal office
-debuglog.html         # the event log: the same header, no canvas and no three.js
-                      #   — and no import map, so nothing it loads may import
-                      #   three at all (test/debuglog-no-three.test.js)
 styles.css            # overlay styling, for all three pages
 favicon.ico           # the tab icon, at the root because that is where a browser
                       #   looks for one whether or not a page mentions it
@@ -197,6 +194,10 @@ openclaw-plugin/      # OpenClaw's adapter: a plugin, not a hook. Linked, not co
     shared.mjs        # the only file that reaches up into bin/, so it is the only
                       #   one the packer rewrites when vendoring for a server
 src/
+  debug/
+    debuglog.html     # the event log: the same header, no canvas and no three.js
+                      #   — and no import map, so nothing it loads may import
+                      #   three at all (test/debuglog-no-three.test.js)
   config.js           # the constants a scene is built against: palette,
                       #   statuses, room shell, windows, camera
   layout.js           # the furniture: floor plan, stations, obstacle footprints,
@@ -217,7 +218,7 @@ src/
                       #   extrudes them into the standee, ui/marks.js draws them
                       #   as the picker tile. A leaf importing nothing, because
                       #   the debug log reaches marks.js and must never load
-                      #   three.js (see debuglog.html above); a bare import there
+                      #   three.js (see src/debug/debuglog.html above); a bare import there
                       #   is a blank page, and only that page notices
   main.js             # bootstrap, UI wiring and the render loop
   world.js            # how a world is assembled and torn down; main decides when

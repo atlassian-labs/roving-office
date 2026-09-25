@@ -68,7 +68,7 @@ All present in the installed binary, v2.1.246 [verified locally]: `PreToolUse`, 
 Real stdin payloads from a probe session [verified locally]:
 
 ```json
-{"session_id":"478c3346-…","transcript_path":"/Users/mike/.claude/projects/-Users-mike-dev-roving-office/478c3346-….jsonl","cwd":"/Users/mike/dev/roving-office","hook_event_name":"SessionStart","source":"startup"}
+{"session_id":"478c3346-…","transcript_path":"/Users/you/.claude/projects/-Users-you-src-app/478c3346-….jsonl","cwd":"/Users/you/src/app","hook_event_name":"SessionStart","source":"startup"}
 {"session_id":"478c3346-…","transcript_path":"…","cwd":"…","prompt_id":"d16102d1-…","permission_mode":"acceptEdits","hook_event_name":"UserPromptSubmit","prompt":"Run the bash command: echo hello-from-hooks…"}
 {"session_id":"478c3346-…","transcript_path":"…","cwd":"…","prompt_id":"d16102d1-…","hook_event_name":"SessionEnd","reason":"other"}
 ```
@@ -383,7 +383,7 @@ claiming a silent install is healthy.
 
 ```yaml
 eventHooks:
-  logFile: /Users/mike/.rovo/event_hooks.log
+  logFile: /Users/you/.rovo/event_hooks.log
   events:
   - name: on_tool_start
     commands:
@@ -398,7 +398,7 @@ eventHooks:
 {
   "session_id": "b2b5e280-8b50-45d8-9346-7a3c2fa96774",
   "transcript_path": "/var/folders/…/T/tmpa0_pvr2_/message_history.json",
-  "cwd": "/Users/you/src/roving-office",
+  "cwd": "/Users/you/src/app",
   "timestamp": "2026-08-26T13:40:08.084525+00:00",
   "hook_event_name": "on_session_end",
   "attributes": {}

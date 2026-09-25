@@ -8,6 +8,8 @@
   
   <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="preload" href="/docs/assets/Inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/docs/assets/ui-theme.css" />
   <link rel="stylesheet" href="/docs/assets/docs.css" />
 </head>
 <body>
@@ -325,7 +327,7 @@
 <p>All present in the installed binary, v2.1.246 [verified locally]: <code>PreToolUse</code>, <code>PostToolUse</code>, <code>UserPromptSubmit</code>, <code>Notification</code>, <code>Stop</code>, <code>SubagentStart</code>, <code>SubagentStop</code>, <code>PermissionRequest</code>, <code>PreCompact</code>, <code>PostCompact</code>, <code>SessionStart</code>, <code>SessionEnd</code>, <code>TeammateIdle</code>. Official docs list a wider set (<code>PostToolUseFailure</code>, <code>PostToolBatch</code>, <code>PermissionDenied</code>, <code>FileChanged</code>, <code>CwdChanged</code>, <code>StopFailure</code>, …) [verified from docs].</p>
 <h3 id="22-payloads-captured-verbatim" tabindex="-1">2.2 Payloads — captured, verbatim</h3>
 <p>Real stdin payloads from a probe session [verified locally]:</p>
-<pre><code class="language-json">{&quot;session_id&quot;:&quot;478c3346-…&quot;,&quot;transcript_path&quot;:&quot;/Users/mike/.claude/projects/-Users-mike-dev-roving-office/478c3346-….jsonl&quot;,&quot;cwd&quot;:&quot;/Users/mike/dev/roving-office&quot;,&quot;hook_event_name&quot;:&quot;SessionStart&quot;,&quot;source&quot;:&quot;startup&quot;}
+<pre><code class="language-json">{&quot;session_id&quot;:&quot;478c3346-…&quot;,&quot;transcript_path&quot;:&quot;/Users/you/.claude/projects/-Users-you-src-app/478c3346-….jsonl&quot;,&quot;cwd&quot;:&quot;/Users/you/src/app&quot;,&quot;hook_event_name&quot;:&quot;SessionStart&quot;,&quot;source&quot;:&quot;startup&quot;}
 {&quot;session_id&quot;:&quot;478c3346-…&quot;,&quot;transcript_path&quot;:&quot;…&quot;,&quot;cwd&quot;:&quot;…&quot;,&quot;prompt_id&quot;:&quot;d16102d1-…&quot;,&quot;permission_mode&quot;:&quot;acceptEdits&quot;,&quot;hook_event_name&quot;:&quot;UserPromptSubmit&quot;,&quot;prompt&quot;:&quot;Run the bash command: echo hello-from-hooks…&quot;}
 {&quot;session_id&quot;:&quot;478c3346-…&quot;,&quot;transcript_path&quot;:&quot;…&quot;,&quot;cwd&quot;:&quot;…&quot;,&quot;prompt_id&quot;:&quot;d16102d1-…&quot;,&quot;hook_event_name&quot;:&quot;SessionEnd&quot;,&quot;reason&quot;:&quot;other&quot;}
 </code></pre>
@@ -688,7 +690,7 @@ claiming a silent install is healthy.</p>
 <p><strong>Built.</strong> <code>bin/aop-send.cjs</code> + <code>bin/mappers/rovo-cli.cjs</code>, installed by <code>bin/aop-rovo-install.cjs</code>. Two mechanisms exist and the recommendation is still <strong>both</strong>, but hooks turned out to reach further than this document first assumed — and to carry three constraints it did not know about.</p>
 <h3 id="41-push-eventhooks-in-rovoconfigyml-verified-on-202608251" tabindex="-1">4.1 Push: <code>eventHooks</code> in <code>~/.rovo/config.yml</code> [verified on 202608.25.1]</h3>
 <pre><code class="language-yaml">eventHooks:
-  logFile: /Users/mike/.rovo/event_hooks.log
+  logFile: /Users/you/.rovo/event_hooks.log
   events:
   - name: on_tool_start
     commands:
@@ -699,7 +701,7 @@ claiming a silent install is healthy.</p>
 <pre><code class="language-json">{
   &quot;session_id&quot;: &quot;b2b5e280-8b50-45d8-9346-7a3c2fa96774&quot;,
   &quot;transcript_path&quot;: &quot;/var/folders/…/T/tmpa0_pvr2_/message_history.json&quot;,
-  &quot;cwd&quot;: &quot;/Users/you/src/roving-office&quot;,
+  &quot;cwd&quot;: &quot;/Users/you/src/app&quot;,
   &quot;timestamp&quot;: &quot;2026-08-26T13:40:08.084525+00:00&quot;,
   &quot;hook_event_name&quot;: &quot;on_session_end&quot;,
   &quot;attributes&quot;: {}

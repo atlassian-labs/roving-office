@@ -5,8 +5,8 @@
 //
 //   {
 //     "session_id":      "478c3346-…",
-//     "transcript_path": "/Users/mike/.claude/projects/-Users-mike-dev-roving-office/478c3346-….jsonl",
-//     "cwd":             "/Users/mike/dev/roving-office",
+//     "transcript_path": "/Users/you/.claude/projects/-Users-you-src-app/478c3346-….jsonl",
+//     "cwd":             "/Users/you/src/app",
 //     "hook_event_name": "SessionStart",
 //     "source":          "startup"
 //   }

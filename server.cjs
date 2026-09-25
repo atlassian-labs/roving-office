@@ -110,7 +110,7 @@ const ROOT = __dirname;
 /**
  * The one path under an office that is not the app shell.
  *
- * Spelled once here and read by src/debuglog.js's sibling in the client (the link
+ * Spelled once here and read by src/debug/debuglog.js's sibling in the client (the link
  * out of the dev panel), so the page and the route that serves it cannot drift.
  */
 const DEBUG_LOG_PATH = '/debuglog';
@@ -127,6 +127,12 @@ const MIME = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
+  // The bundled latin subsets of Inter and JetBrains Mono. The type matters more than it
+  // looks: the documentation head preloads the Inter subset with `as="font"`, and a
+  // browser discards a preloaded response whose content type contradicts the `as` hint —
+  // then fetches it again on first use. Served as `application/octet-stream` the preload
+  // was costing a round trip rather than saving one.
+  '.woff2': 'font/woff2',
   '.ico': 'image/x-icon',
   // The published Claude plugin archive, under /plugins/claude. Claude Code fetches it
   // and verifies it against the SHA-256 in the marketplace JSON beside it, so what it
@@ -1990,8 +1996,8 @@ const server = http.createServer(async (req, res) => {
         // `/debuglog` is a different page rather than a route inside the app: it
         // reads the same office through the same header, but draws the event stream
         // as text and so loads no scene and no three.js at all. Serving the app
-        // shell here would defeat the entire point of it (see src/debuglog.js).
-        return sendFile(res, path.join(ROOT, rest === DEBUG_LOG_PATH ? 'debuglog.html' : 'index.html'));
+        // shell here would defeat the entire point of it (see src/debug/debuglog.js).
+        return sendFile(res, path.join(ROOT, rest === DEBUG_LOG_PATH ? 'src/debug/debuglog.html' : 'index.html'));
       }
       return json(res, 405, { error: 'GET only' });
     }

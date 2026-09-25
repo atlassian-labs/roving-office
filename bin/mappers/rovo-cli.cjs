@@ -6,7 +6,7 @@
 //   {
 //     "session_id":      "b2b5e280-e87c-41ed-9189-da867a77c3e1",
 //     "transcript_path": "/var/folders/…/message_history.json",
-//     "cwd":             "/Users/mike/dev/roving-office",
+//     "cwd":             "/Users/you/src/app",
 //     "timestamp":       "2026-08-26T13:40:08.084525+00:00",
 //     "hook_event_name": "on_session_end",
 //     "attributes":      {}

@@ -82,8 +82,7 @@ Every desk uses a **blank nameplate**, turned 30° on the tabletop. It sits half
 between the front edge and the monitors, and halfway between the left edge and the
 keyboard. The mug sits nearer the front-left corner, leaving the nameplate clear.
 The plate moves and turns with the desk, and rises with a sit-stand surface. Press **E**
-and select a desk to read **Assigned to**. The [nameplate preview](/desk-markers.html)
-lets you try different colours, lighting, assignments and desk heights.
+and select a desk to read **Assigned to**.
 
 Booking it at the door rather than at the first job is the whole point. A desk handed out
 per job is a desk handed *back* between jobs — so people visibly swapped seats between

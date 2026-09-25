@@ -1,6 +1,6 @@
 // The debug log must never reach three.js.
 //
-// debuglog.html carries no import map, deliberately: it answers "what is actually
+// src/debug/debuglog.html carries no import map, deliberately: it answers "what is actually
 // arriving?" on a machine where the room is too slow, too dark or too broken to
 // read, so it draws no scene and opens no WebGL context. A bare `import 'three'`
 // anywhere in its module graph is therefore not a heavier page — it is a blank
@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 
-/** The entry point debuglog.html loads, as the page's own `<script src>` gives it. */
+/** The entry point src/debug/debuglog.html loads, as the page's own `<script src>` gives it. */
 const ENTRY = 'src/debug/debuglog.js';
 
 /**
@@ -85,7 +85,7 @@ function walk(entry) {
   return { modules: seen, bare };
 }
 
-test('debuglog.html loads no module that imports a bare specifier', () => {
+test('the debug-log page loads no module that imports a bare specifier', () => {
   const { modules, bare } = walk(ENTRY);
   // Sanity: the walk actually found the graph rather than one file.
   assert.ok(modules.size > 5, `expected a real module graph, walked ${modules.size}`);
@@ -93,7 +93,7 @@ test('debuglog.html loads no module that imports a bare specifier', () => {
   assert.deepEqual(
     bare,
     [],
-    'debuglog.html has no import map, so a bare specifier here is an unresolvable module and a blank page: '
+    'the debug-log page has no import map, so a bare specifier here is an unresolvable module and a blank page: '
       + bare.map(({ from, specifier }) => `${from} imports "${specifier}"`).join(', '),
   );
 });

@@ -4,10 +4,10 @@
 // looking rather than by reading.
 //
 // **It is a generator and not a hand-written page, and that is the whole point.**
-// docs/looks.html was written once by hand and never regenerated, so when the
-// generator changed underneath it the page went on showing the same eighteen rooms
-// and quietly invited a second labelling session on the first session's data. A
-// gallery of generated output has to be as regenerable as the output.
+// An earlier hand-written comparison page went stale when the generator changed
+// underneath it: the page went on showing the same eighteen rooms and quietly invited
+// a second labelling session on the first session's data. A gallery of generated output
+// has to be as regenerable as the output.
 //
 // The renders are not made here — they need a real browser, because the scene is
 // WebGL (see bin/scene-map.js and the reasoning in bin/prop-portrait.js). Take the

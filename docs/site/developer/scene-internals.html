@@ -8,6 +8,8 @@
   
   <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="preload" href="/docs/assets/Inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/docs/assets/ui-theme.css" />
   <link rel="stylesheet" href="/docs/assets/docs.css" />
 </head>
 <body>
@@ -204,28 +206,6 @@ It lives for the renderer's lifetime, across world swaps, and gives existing mat
 something to reflect without adding lights to every frame. <code>applyTimeOfDay()</code> lowers its
 intensity after dark alongside the existing sky and fill light. The visible sky and sun
 still follow the clock, season and orientation.</p>
-<h3 id="reviewing-the-city-and-lighting-experiments" tabindex="-1">Reviewing the city and lighting experiments</h3>
-<p>The four-city comparison compares the city backgrounds and lighting against the
-pre-experiment snapshot. Both sides use the original furniture models. Its 24 pairs show
-each office, neighbourhood, street plan, evening, winter and a turned camera, with the
-same clock, season, camera and seeded dressing on both sides. The furniture experiments
-and object gallery that went with it were a separate branch and were not kept.</p>
-<p><strong>The page is not committed — build it when you want it.</strong> It is 7.7 MB of embedded
-renders and it is reproducible from the script below, so the script ships and the
-artifact does not.</p>
-<p>Build the gallery with <code>node bin/astra-comparison.js</code>. It compares two revisions —
-its own built-in baseline against <code>HEAD</code> by default — and writes
-<code>astra-city-comparison.html</code>.
-Use <code>--before=&lt;commit&gt;</code>, <code>--after=&lt;commit&gt;</code> and <code>--out=&lt;file.html&gt;</code> to override them.
-<code>--city=simple</code>, <code>warehouse</code>, <code>skyscraper</code> or <code>mansard</code> captures one city; the default
-<code>all</code> captures all four. <code>--quick</code> limits each city to its first three views.
-<code>--after=working</code> captures uncommitted source for iteration. Committed review artifacts
-use committed revisions. <code>--verify-only</code> checks the existing file's images and controls.
-The tool uses local Chrome and removes its temporary snapshots and renderer afterwards.
-The exported file contains its images and works offline.</p>
-<p>Scene records contain render-call and triangle counts, plus headless timing samples.
-Those timings compare the capture harness; they do not predict a user's frame rate or
-startup time.</p>
 <h3 id="four-garden-neighbourhoods" tabindex="-1">Four garden neighbourhoods</h3>
 <p><code>src/scene/outlooks/alder-layout.js</code> owns the street centres, plots, park, crossings,
 parking bays and pavement cuts. <code>alder.js</code> builds the shared kit, and <code>garden-districts.js</code>
@@ -283,10 +263,8 @@ across every season. The shared six ceiling lights retain responsibility for int
 illumination; pendant bulbs use the existing night-light emissive handling.
 World teardown also releases the sun's shadow render targets, so repeated building or
 season changes do not retain the previous world's shadow textures.</p>
-<p>Open <a href="/canopy-house.html">the interactive Canopy House preview</a> on a running checkout
-to inspect the actual scene modules at three camera positions, times of day and seasons.
-Use <strong>Scene → Building → Canopy House</strong> in a Test Data office to review agent behaviour.
-The preview is a separate camera viewer; it does not save an office or change its layout.</p>
+<p>Use <strong>Scene → Building → Canopy House</strong> in a Test Data office to review agent behaviour
+at different camera positions, times of day and seasons.</p>
 <h2 id="three-distinct-office-styles" tabindex="-1">Three distinct office styles</h2>
 <p>Tide Wharf (<code>tide</code>), Dune Atelier (<code>dune</code>) and Lantern Court (<code>lantern</code>) each own a
 shell, floor, palette, light specification and outlook. <code>src/office-styles/</code> contains
@@ -312,11 +290,9 @@ boats, building details and planting are batched so density does not require a m
 object. Each outlook owns terrain beyond the common ground plane to keep its boundary
 out of the review camera's range. The shared floor-clearance tests raycast the actual
 landscape surfaces, including instances, to catch scenery entering the working room.</p>
-<p>Open <a href="/office-collection.html">the three-office viewer</a> to switch buildings while keeping
-the camera, season and time of day fixed. Room, window and setting camera presets make
-the architecture comparable; links retain the chosen building, season, time and preset.
-The viewer uses the actual scene modules and renders one office at a time. It has no
-saved layout or adapter connection. In the working app, select a building with <code>S</code>.</p>
+<p>In the working app, select a building with <code>S</code> to compare the architecture across camera
+position, season and time of day. Scene selection has no effect on a saved layout or
+adapter connection.</p>
 <p><code>test/distinct-offices.test.js</code> checks native-theme switching, permanent floor clearance,
 agent entry/desk allocation/departure, and all four seasonal builds. It caps each
 environment at 250 mesh objects and 350,000 triangles, checks finite instance bounds and
@@ -602,7 +578,6 @@ needed it, because those are booked before they are walked to — which was the 
     <aside class="aside" aria-label="On this page">
       <h2>On this page</h2>
       <nav class="toc"><ul><li><a href="#where-things-are-declared">Where things are declared</a><ul><li><a href="#scene-reflections">Scene reflections</a></li>
-<li><a href="#reviewing-the-city-and-lighting-experiments">Reviewing the city and lighting experiments</a></li>
 <li><a href="#four-garden-neighbourhoods">Four garden neighbourhoods</a></li></ul></li>
 <li><a href="#canopy-house">Canopy House</a></li>
 <li><a href="#three-distinct-office-styles">Three distinct office styles</a></li>
