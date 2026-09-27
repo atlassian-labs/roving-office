@@ -495,16 +495,21 @@ html, body {
   .north-compass { transition: none; }
 }
 
-/* Just the agent's name: status and source are stated in full in the rows below,
-   each next to its own glyph, so the heading carries no lozenge or mark. */
+/* The agent's name, with its own portrait when one was supplied. Status and source
+   are stated in full in the rows below, each next to its own small mark. */
 #inspector h2 {
   margin: 0 0 12px; font-size: 16px; color: var(--text);
   display: flex; align-items: center; gap: 9px;
   padding-right: 24px;
 }
 #inspector h2 .insp-name {
-  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  display: flex; align-items: center; gap: 12px;
+  min-width: 0; overflow: hidden; white-space: nowrap;
 }
+#inspector h2 .insp-avatar { flex: 0 0 56px; width: 56px; height: 56px; }
+#inspector h2 .insp-avatar:empty { display: none; }
+#inspector h2 .insp-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+#inspector h2 .insp-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 /* ---- The way out of a panel, for a mouse --------------------------------------
    Every panel that can be dismissed carries one of these, and they are one rule
    rather than one per panel: an × drawn twice is an × that comes to look like two
@@ -2827,12 +2832,11 @@ body.debuglog #title-bar { max-width: none; border-radius: 0; }
 #inspector { padding: 24px; max-height: calc(100dvh - 116px); }
 #inspector h2 { font-size: var(--text-heading-large); line-height: 28px; letter-spacing: -0.4px; }
 #inspector h2 .insp-name { white-space: normal; overflow-wrap: anywhere; }
+#inspector h2 .insp-title { overflow-wrap: anywhere; }
 #inspector-body { font-size: var(--text-body); line-height: 20px; }
-#inspector-body .portrait { float: right; margin: 0 0 12px 12px; }
-#inspector-body .portrait img { width: 56px; height: 56px; border-radius: 12px; }
 .insp-follow { margin-top: 16px; min-height: 36px; width: 100%; background: var(--selected); color: var(--brand); border: 1px solid #b8d2f6; border-radius: 6px; font: 600 14px var(--font-sans); font-feature-settings: var(--font-variants-sans); cursor: pointer; }
 .insp-follow:hover { background: #d8e9ff; }
-.insp-job-title { clear: both; font-size: 14px; margin: 24px 0 8px; color: var(--text); }
+.insp-job-title { font-size: 14px; margin: 24px 0 8px; color: var(--text); }
 #inspector-body .job { font-size: var(--text-body); font-weight: 500; line-height: 20px; margin: 0; padding: var(--space-4); background: var(--sky-soft); border: 0; border-radius: var(--radius-surface); overflow-wrap: anywhere; }
 #inspector-body .job-idle { display: flex; align-items: center; gap: var(--space-3); padding: 12px 0; background: transparent; color: var(--muted); font-weight: 400; }
 .job-idle img { flex: 0 0 84px; }

@@ -94,12 +94,13 @@ export function createOverlay(initialManager, { onSelect, onFollowAlong } = {}) 
   // opened so a live event does not snap their checklist shut underneath them.
   const expandedJobs = new Set();
 
-  // Inspector heading: the agent's name, and nothing else. Status and source both
-  // used to be glyphs up here, but the rows below now state each of them in words
-  // beside its glyph — so the heading was saying less, twice, above its own answer.
-  const inspTitle = node('span', 'insp-name');
+  // Inspector heading: the agent's name and, where an identity supplied one, its
+  // portrait. Status and source both live in the rows below, where they can say
+  // what they are in words beside their own small mark.
+  const inspAvatar = node('span', 'insp-avatar');
+  const inspTitle = node('span', 'insp-title');
   inspName.textContent = '';
-  inspName.append(inspTitle);
+  inspName.append(inspAvatar, inspTitle);
 
   // The legend, built once and then only re-counted.
   //
@@ -280,23 +281,22 @@ export function createOverlay(initialManager, { onSelect, onFollowAlong } = {}) 
     inspector.classList.remove('hidden');
 
     inspTitle.textContent = a.name;
+    inspAvatar.replaceChildren();
 
-    inspBody.innerHTML = '';
-
-    // The portrait leads, when there is one. An identity that sent a picture of itself
-    // has said something no row can: this is what Florence looks like. A broken or slow
-    // URL removes itself rather than leaving a torn-image glyph in the panel, because the
-    // bytes came off somebody else's machine and may simply not be there any more.
+    // A supplied image is the agent's identity, so it belongs with their name
+    // rather than taking a separate corner of the detail card. A broken or slow
+    // URL removes itself rather than leaving a torn-image glyph in the heading:
+    // the bytes came off somebody else's machine and may simply not be there.
     if (a.avatar) {
-      const portrait = node('div', 'portrait');
       const img = document.createElement('img');
       img.alt = `${a.name}'s avatar`;
       img.loading = 'lazy';
-      img.addEventListener('error', () => portrait.remove());
+      img.addEventListener('error', () => inspAvatar.replaceChildren());
       img.src = a.avatar;
-      portrait.appendChild(img);
-      inspBody.appendChild(portrait);
+      inspAvatar.appendChild(img);
     }
+
+    inspBody.innerHTML = '';
 
     // Status carries the same lozenge as the roster row and the same one word —
     // one vocabulary, spelled one way wherever an agent's state is stated on its own.
