@@ -39,7 +39,7 @@ with the checkout. Tests and lint need it before they will run:
 
 ```bash
 ln -s ../../node_modules node_modules                     # from .worktrees/<name>
-echo node_modules >> "$(git rev-parse --git-dir)/info/exclude"
+echo node_modules >> "$(git rev-parse --git-common-dir)/info/exclude"
 ```
 
 The second line is not optional housekeeping. `.gitignore` says `node_modules/` with a
@@ -47,6 +47,14 @@ trailing slash, which matches a directory and **not** a symlink of that name, so
 shows up as untracked in every `git status` you run in that worktree — and an untracked
 thing at the top of a status is exactly what gets swept into a `git add .`. `npm ci`
 instead is slower but has no such edge.
+
+**`--git-common-dir` rather than `--git-dir`, and that one word is the whole of it.** In a
+linked worktree `--git-dir` resolves to `.git/worktrees/<name>`, but git reads
+`info/exclude` from the *common* directory. Write the entry to the first and it goes
+somewhere git never looks: the file is created, the entry is in it, `git status` is
+unchanged, and nothing errors. This line said `--git-dir` for a long time, which means it
+spent that time reading as housekeeping somebody had already done while leaving the
+symlink exposed in every status — the precise hazard the paragraph above describes.
 
 ### The worktree names the task
 
