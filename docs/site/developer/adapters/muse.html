@@ -151,10 +151,12 @@ machine:</p>
 <pre><code class="language-sh">node bin/aop-emit.cjs &lt;event-type&gt; '&lt;payload-json&gt;'
 </code></pre>
 <p><a href="../protocol/aop-spec.html#9-conformance-levels">Conformance level L2</a>.
-Redaction is metadata-only — what leaves the machine is tool names,
-tool classes, tidied paths, durations and counts; never file contents,
-prompts, replies or command output. The normative statement is
-<a href="../protocol/aop-spec.html#10-privacy-and-redaction">§10 of the spec</a>.</p>
+Redaction is the calling agent's responsibility: its permissions and
+instructions must compose metadata-only events containing only tool names,
+tool classes, tidied paths, durations and counts — never file contents,
+prompts, replies or command output. The emitter transports the payload it is
+given unchanged; it does not apply a second redaction pass. The normative
+statement is <a href="../protocol/aop-spec.html#10-privacy-and-redaction">§10 of the spec</a>.</p>
 <h2 id="why-a-spool-and-a-detached-sender" tabindex="-1">Why a spool and a detached sender</h2>
 <p>Every invocation appends one event to <code>~/.roving-office/spool.ndjson</code> and
 kicks a detached sender, then exits <code>0</code> — the agent never blocks on the
@@ -178,7 +180,8 @@ PUT the raw image bytes (PNG, JPEG, GIF or WebP, ≤ 2 MB) to
 <code>X-Roving-Office-Token</code> header; the response carries the path to save.</p>
 <h2 id="narration" tabindex="-1">Narration</h2>
 <p>The emitter is dumb on purpose — the interesting behaviour is the
-convention of the agent driving it. Descriptive <code>turn.start</code> titles (never
+convention of the agent driving it, including keeping its payload inside the
+agent's metadata-only permissions. Descriptive <code>turn.start</code> titles (never
 &quot;Working&quot;), the to-do list up front in the turn payload as <code>todos: [...]</code>,
 per-step <code>tool.start</code> / <code>tool.end</code> with a plain-language <code>label</code>, and
 <code>session.heartbeat</code> notes with progress on long tasks. The detail panel

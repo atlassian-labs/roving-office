@@ -26,9 +26,11 @@
  * Env overrides: AOP_HARNESS (default "muse"), AOP_ACTOR
  * (default "Muse"), AOP_PROJECT (default "muse").
  *
- * Redaction: metadata-mode shapes only — tool names, tool_class, tidied
- * paths, durations, counts. Never file contents, prompts, replies, or
- * command output. Keep it that way.
+ * Redaction: the agent that calls this program enforces metadata-only
+ * redaction through its permissions and instructions. It must pass only tool
+ * names, tool_class, tidied paths, durations and counts — never file contents,
+ * prompts, replies or command output. This emitter transports the payload it
+ * receives unchanged; it does not apply a second redaction pass.
  *
  * Licensed under the Apache License, Version 2.0 — see LICENSE.
  * Node built-ins only.

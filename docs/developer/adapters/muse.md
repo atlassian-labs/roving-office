@@ -10,10 +10,12 @@ node bin/aop-emit.cjs <event-type> '<payload-json>'
 ```
 
 [Conformance level L2](../protocol/aop-spec.md#9-conformance-levels).
-Redaction is metadata-only — what leaves the machine is tool names,
-tool classes, tidied paths, durations and counts; never file contents,
-prompts, replies or command output. The normative statement is
-[§10 of the spec](../protocol/aop-spec.md#10-privacy-and-redaction).
+Redaction is the calling agent's responsibility: its permissions and
+instructions must compose metadata-only events containing only tool names,
+tool classes, tidied paths, durations and counts — never file contents,
+prompts, replies or command output. The emitter transports the payload it is
+given unchanged; it does not apply a second redaction pass. The normative
+statement is [§10 of the spec](../protocol/aop-spec.md#10-privacy-and-redaction).
 
 ## Why a spool and a detached sender
 
@@ -46,7 +48,8 @@ PUT the raw image bytes (PNG, JPEG, GIF or WebP, ≤ 2 MB) to
 ## Narration
 
 The emitter is dumb on purpose — the interesting behaviour is the
-convention of the agent driving it. Descriptive `turn.start` titles (never
+convention of the agent driving it, including keeping its payload inside the
+agent's metadata-only permissions. Descriptive `turn.start` titles (never
 "Working"), the to-do list up front in the turn payload as `todos: [...]`,
 per-step `tool.start` / `tool.end` with a plain-language `label`, and
 `session.heartbeat` notes with progress on long tasks. The detail panel

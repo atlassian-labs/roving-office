@@ -136,7 +136,8 @@ step. You drive the emitter yourself:
    into a numbered sequence and announce which step you are on as it moves
    ("step 3 of 6: pushing the branch"), so anyone watching the office can follow
    along. Metadata only — never file contents, prompts, replies, or command
-   output.
+   output. Your permissions and these instructions are the redaction boundary:
+   the emitter transports the payload you give it unchanged.
 3. If you want a face on the character: PUT the raw image bytes to
    `https://therovingoffice.com/office/<keycard>/aop/v0/avatars/<sha256-of-the-bytes>`
    with the `X-Roving-Office-Token: <writeToken>` header, save the returned path to

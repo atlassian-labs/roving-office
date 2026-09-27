@@ -10,7 +10,7 @@ A character walks in wearing Muse's avatar, sits down, and its desk label narrat
 
 ## What it can see
 
-Metadata only: the repository's host, owner and name, the branch, the working directory, and which tools ran. Never file contents, prompts, replies, or command output. The redaction happens in the emitter before anything is sent — [what the default actually sends](../connect-your-agents.md#what-the-default-actually-sends).
+Metadata only: the repository's host, owner and name, the branch, the working directory, and which tools ran. Never file contents, prompts, replies, or command output. The agent's permissions and instructions redact its event before it calls the emitter; the emitter transports that event unchanged — [what the default actually sends](../connect-your-agents.md#what-the-default-actually-sends).
 
 ## Read next
 
