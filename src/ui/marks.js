@@ -250,5 +250,15 @@ export const testDataMark = mark(`
   </g>
 `);
 
+/** Muse — a small round face with two dot eyes, after the assistant's own avatar. */
+export const museMark = mark(`
+  <path d="M12 4.6 C7.3 4.6 4.9 8.1 4.9 12.4 C4.9 16.9 7.7 20 12 20 C16.3 20 19.1 16.9 19.1 12.4 C19.1 8.1 16.7 4.6 12 4.6 Z" />
+  <g fill="currentColor" stroke="none">
+    <circle cx="9.6" cy="11.7" r="1.15" />
+    <circle cx="14.4" cy="11.7" r="1.15" />
+  </g>
+  <path d="M10.3 14.7 Q12 15.7 13.7 14.7" />
+`);
+
 /** A plus, for the switcher's "New Office" row. */
 export const plusMark = mark('<path d="M12 5.5 V18.5" /><path d="M5.5 12 H18.5" />');

@@ -86,6 +86,7 @@ export const NAV = {
         { url: '/user/sources/cursor.html', title: 'Cursor' },
         { url: '/user/sources/codex.html', title: 'Codex' },
         { url: '/user/sources/openclaw.html', title: 'OpenClaw' },
+        { url: '/user/sources/muse.html', title: 'Muse' },
         { url: '/user/sources/openclaw-server.html', title: 'OpenClaw on a server' },
         { url: '/user/sources/openclaw-identity.html', title: 'OpenClaw: names and faces' },
       ],
@@ -151,6 +152,7 @@ export const NAV = {
         { url: '/developer/adapters/cursor.html', title: 'Cursor' },
         { url: '/developer/adapters/codex.html', title: 'Codex' },
         { url: '/developer/adapters/openclaw.html', title: 'OpenClaw' },
+        { url: '/developer/adapters/muse.html', title: 'Muse' },
       ],
     },
     {

@@ -36,6 +36,7 @@ and the instructions are plain text at that URL so you can read them before you 
 | **Cursor** | `npm run connect:cursor` | [Cursor](sources/cursor.md) |
 | **Codex** | `npm run connect:codex` | [Codex](sources/codex.md) |
 | **OpenClaw** | `npm run connect:openclaw` | [OpenClaw](sources/openclaw.md) |
+| **Muse** | No install — the agent runs the emitter itself | [Muse](sources/muse.md) |
 
 **Then start a *new* agent session.** Every harness reads its hooks when a session starts,
 so anything already open keeps posting wherever it was told at launch.

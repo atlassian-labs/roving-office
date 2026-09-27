@@ -32,7 +32,7 @@ and published under Apache-2.0 like the rest of the tree.
 | Project logo and icon set | `assets/logo.png`, `assets/logo-256.png`, `assets/logo-64.png`, `assets/icon-512.png`, `assets/icon-192.png`, `assets/apple-touch-icon.png`, `favicon.ico` | An isometric cutaway office in a rounded-hex silhouette. Cut from the scene's own render — the method is in [Developing on it](developing.md) |
 | Spot illustrations | `assets/airmail.svg`, `assets/arrivals.svg`, `assets/breather.svg`, `assets/curiosity.svg` | Hand-authored flat illustrations: a paper plane, a reception scene, a mug, a telescope |
 | UI theme | `assets/ui-theme.css` | Hand-authored CSS custom properties. Its colour values come from `@atlaskit/tokens` — see §4 |
-| In-house source glyphs | `src/ui/marks.js` — `cursorMark`, `testDataMark`, `plusMark` | Original geometry: a cursor chevron, a die, a plus. Not any vendor's logo. Cursor's tile is deliberately an original glyph rather than Cursor's mark |
+| In-house source glyphs | `src/ui/marks.js` — `cursorMark`, `testDataMark`, `museMark`, `plusMark` | Original geometry: a cursor chevron, a die, a small round Muse face, a plus. Not any vendor's logo. Cursor's tile is deliberately an original glyph rather than Cursor's mark |
 | The room, and every prop in it | `src/scene/`, `src/plan/` | Original geometry, apart from the two brand-mark standees in §3 |
 | Scene renders and screenshots | `docs/images/**` | Own renders and own screenshots — except the four in §5, which reproduce a mark |
 

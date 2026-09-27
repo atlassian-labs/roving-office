@@ -122,6 +122,30 @@ The only harness that needs no clone. Run these two, in order:
 Then tell the user to run `/reload-plugins`, or to restart the session. Hooks are read at
 session start, so nothing is emitted until one of those happens.
 
+### Muse
+
+If you are Muse — Meta's personal AI assistant — there is no plugin or marketplace
+step. You drive the emitter yourself:
+
+1. Copy `bin/aop-emit.cjs` from the checkout to somewhere stable outside the user's
+   project (for example `~/workspace/roving-office/aop-emit.cjs`).
+2. From now on, narrate your work through it. When a task begins, emit `turn.start`
+   with a descriptive title and your to-do list; for each notable step emit
+   `tool.start`/`tool.end` with a plain-language `label`; emit `artifact.change`
+   for deliverables and `turn.end` when the task is done. Break multi-step work
+   into a numbered sequence and announce which step you are on as it moves
+   ("step 3 of 6: pushing the branch"), so anyone watching the office can follow
+   along. Metadata only — never file contents, prompts, replies, or command
+   output.
+3. If you want a face on the character: PUT the raw image bytes to
+   `https://therovingoffice.com/office/<keycard>/aop/v0/avatars/<sha256-of-the-bytes>`
+   with the `X-Roving-Office-Token: <writeToken>` header, save the returned path to
+   `~/.roving-office/avatar.json`, and the emitter carries it as
+   `session.actor_avatar` on every event.
+
+The full emitter reference is at
+<https://therovingoffice.com/docs/developer/adapters/muse.html>.
+
 ### Codex, Cursor, Rovo CLI, OpenClaw
 
 These install from a checkout today. Clone it somewhere outside the user's project — the
