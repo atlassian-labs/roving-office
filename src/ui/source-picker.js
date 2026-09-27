@@ -90,7 +90,16 @@ export function createSourcePicker() {
   guide.href = '/docs/user/connect-your-agents.html';
   guide.target = '_blank';
   guide.rel = 'noopener noreferrer';
-  sub.append('Select one or more sources, and ', guide, '.');
+  // The same offer the welcome hint makes, repeated here because that hint is an
+  // *arrival*: it fades after twenty seconds, and any opened panel dismisses it —
+  // including this one. So the dialog a visitor came here to use is the only place they
+  // are guaranteed to meet the one-line route. Two links rather than one because they
+  // are two audiences: the first is for reading how, the second for having it done.
+  const selfSetup = node('a', '', 'let an agent set itself up');
+  selfSetup.href = '/agent-setup/';
+  selfSetup.target = '_blank';
+  selfSetup.rel = 'noopener noreferrer';
+  sub.append('Select one or more sources, and ', guide, ' — or ', selfSetup, '.');
   const illustration = node('img', 'sp-illustration');
   illustration.src = '/assets/arrivals.svg';
   illustration.alt = '';

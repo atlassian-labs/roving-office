@@ -162,3 +162,59 @@ test('the dismissal is not remembered — the next arrival is greeted again', ()
   // runner's event loop open for the whole twenty.
   greeted.dismiss();
 });
+
+/** The setup link inside the invitation, by the span that holds it. */
+const setupLinkIn = (ui) => ui.children
+  .find((c) => c.className?.includes('welcome-hint'))
+  ?.children.find((c) => c.className === 'welcome-invite')
+  ?.children[0];
+
+test('it offers the way in, not just the way around', () => {
+  // `?` answers "how do I drive this". The other question a visitor has is "how do I get
+  // my own agents in here", and before this link nothing in the running app answered it.
+  const p = page();
+  // Dismissed at the end of every one of these, and that is not tidiness: the hint arms a
+  // twenty-second fade timer on creation, so a test that leaves one showing holds the
+  // event loop open and `node --test` waits it out. Three undismissed hints took this
+  // file from 0.2 s to 20.7 s. The file's own header warns about exactly this for the
+  // MutationObserver; the timer has the same edge.
+  const hint = createWelcomeHint();
+  const link = setupLinkIn(p.ui);
+  assert.ok(link, 'the hint should carry a setup link');
+  assert.equal(link.textContent, 'Connect your agents');
+  hint.dismiss();
+});
+
+test('the setup link is root-relative, so it works on every host', () => {
+  // An office on Fly and one on a laptop are different origins, and only one of them
+  // could ever be written down here. The same rule dev-panel.js states at length.
+  const p = page();
+  const hint = createWelcomeHint();
+  const link = setupLinkIn(p.ui);
+  assert.equal(link.href, '/agent-setup/');
+  assert.doesNotMatch(link.href, /^https?:/, 'an origin was hard-coded into the office');
+  hint.dismiss();
+});
+
+test('the setup link opens a new tab, so the office is not navigated away', () => {
+  // The hint invites somebody further in. Following it in this tab would lose the room,
+  // the camera and the selection — and `rel` has to travel with `target`.
+  const p = page();
+  const hint = createWelcomeHint();
+  const link = setupLinkIn(p.ui);
+  assert.equal(link.target, '_blank');
+  assert.match(link.rel, /noopener/);
+  assert.match(link.rel, /noreferrer/);
+  hint.dismiss();
+});
+
+test('the × still dismisses, with the link beside it', () => {
+  // The close button is appended after the invitation now, so this is a guard against
+  // having reordered the children into a hint that cannot be closed.
+  const p = page();
+  const hint = createWelcomeHint();
+  assert.equal(hint.isShowing, true);
+  crossIn(p.ui).click();
+  assert.equal(hint.isShowing, false);
+  assert.equal(onScreen(p.ui), false);
+});
