@@ -29,7 +29,7 @@
 
 import { closeButton, ensureHost, node } from './dom.js';
 import { SOURCES, DEFAULT_SOURCE_ID } from '../data/sources.js';
-import { renderMark } from './marks.js';
+import { sourceVisual } from './marks.js';
 
 /** What the note says when the office cannot be repointed at all. */
 const LOCKED_NOTE = 'This is the shared demo office, so its sources are fixed — '
@@ -115,7 +115,7 @@ export function createSourcePicker() {
     btn.style.setProperty('--accent', def.accent);
 
     const logo = node('span', 'sp-logo');
-    logo.innerHTML = renderMark(def.mark);
+    logo.innerHTML = sourceVisual(def);
 
     const label = node('span', 'sp-label', def.label);
 

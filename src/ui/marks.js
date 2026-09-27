@@ -85,6 +85,20 @@ export function renderMark(markup) {
 }
 
 /**
+ * The HTML for a source's visual in 2D chrome: a portrait `<img>` where the
+ * source record carries one, otherwise the vector mark. The 3D name-tag
+ * (Agent.js) and the debug log keep the vector mark in all cases — a raster
+ * portrait cannot be stamped onto a canvas texture the way an SVG string can.
+ */
+export function sourceVisual(def) {
+  if (def.image) {
+    const label = String(def.label ?? '').replace(/"/g, '&quot;');
+    return `<img class="src-visual-img" src="${def.image}" alt="${label} portrait" draggable="false">`;
+  }
+  return renderMark(def.mark);
+}
+
+/**
  * A span carrying a source's mark, in the source's own colours.
  *
  * `color` is set for the sake of the in-house glyphs, which paint in
@@ -101,7 +115,7 @@ export function renderMark(markup) {
  */
 export function markSpan(def, className) {
   const el = node('span', className);
-  el.innerHTML = renderMark(def.mark);
+  el.innerHTML = sourceVisual(def);
   el.style.color = def.accent;
   el.title = `Source: ${def.label}`;
   return el;
@@ -250,14 +264,21 @@ export const testDataMark = mark(`
   </g>
 `);
 
-/** Muse — a small round face with two dot eyes, after the assistant's own avatar. */
+/**
+ * Muse — a laptop wearing headphones: the assistant at its desk.
+ *
+ * An in-house glyph, drawn for this source; there is no vendor vector to
+ * reproduce. Monochrome, so the picker's `--accent` (teal #2fa39a) tints it.
+ * The 2D chrome shows the source's portrait image instead (see `sourceVisual`);
+ * this glyph survives for the 3D name-tag and the debug log, which need vector
+ * artwork.
+ */
 export const museMark = mark(`
-  <path d="M12 4.6 C7.3 4.6 4.9 8.1 4.9 12.4 C4.9 16.9 7.7 20 12 20 C16.3 20 19.1 16.9 19.1 12.4 C19.1 8.1 16.7 4.6 12 4.6 Z" />
-  <g fill="currentColor" stroke="none">
-    <circle cx="9.6" cy="11.7" r="1.15" />
-    <circle cx="14.4" cy="11.7" r="1.15" />
-  </g>
-  <path d="M10.3 14.7 Q12 15.7 13.7 14.7" />
+  <path d="M6.2 11.6 C6.2 5.6 17.8 5.6 17.8 11.6" />
+  <rect x="4.9" y="9.4" width="2.7" height="5.4" rx="1.35" />
+  <rect x="16.4" y="9.4" width="2.7" height="5.4" rx="1.35" />
+  <rect x="8.6" y="11.2" width="6.8" height="4.9" rx="0.9" />
+  <path d="M6.4 18.4 H17.6" />
 `);
 
 /** A plus, for the switcher's "New Office" row. */

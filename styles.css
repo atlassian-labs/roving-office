@@ -217,13 +217,13 @@ html, body {
 .switcher-item-mark {
   flex: 0 0 18px; display: flex; color: var(--accent, var(--muted));
 }
-.switcher-item-mark svg { width: 18px; height: 18px; display: block; }
+.switcher-item-mark svg, .switcher-item-mark img { width: 18px; height: 18px; display: block; }
 .switcher-item-glyph { display: flex; color: var(--accent, var(--muted)); }
 /* Several sources overlap into the width of one, so a mixed office does not push
    every name in the menu across. The negative margin is undone on the first child
    so the stack still starts on the same left edge as a single mark. */
 .switcher-item-mark.stacked { flex-basis: 26px; }
-.switcher-item-mark.stacked svg { width: 14px; height: 14px; }
+.switcher-item-mark.stacked svg, .switcher-item-mark.stacked img { width: 14px; height: 14px; }
 .switcher-item-mark.stacked .switcher-item-glyph { margin-left: -5px; }
 .switcher-item-mark.stacked .switcher-item-glyph:first-child { margin-left: 0; }
 .switcher-item-name { font-size: 13px; font-weight: 600; }
@@ -263,12 +263,12 @@ html, body {
 .source-badge.clickable:hover { border-color: rgba(36, 50, 71, 0.28); }
 .sb-marks { display: flex; align-items: center; }
 .sb-mark { display: flex; color: var(--accent, var(--muted)); }
-.sb-mark svg { width: 15px; height: 15px; display: block; }
+.sb-mark svg, .sb-mark img { width: 15px; height: 15px; display: block; }
 /* Same overlap as the switcher rows: the pill sits in the title bar beside the
    office name and cannot grow a mark's width per source it listens to. */
 .sb-marks.stacked .sb-mark { margin-left: -4px; }
 .sb-marks.stacked .sb-mark:first-child { margin-left: 0; }
-.sb-marks.stacked svg { width: 13px; height: 13px; }
+.sb-marks.stacked svg, .sb-marks.stacked img { width: 13px; height: 13px; }
 .sb-label { font-weight: 600; color: var(--text); }
 /* Tabular figures the long way round, as at the other four sites in this file:
    `font-variant-numeric: tabular-nums` is overridden by the `font-feature-settings`
@@ -327,7 +327,7 @@ html, body {
 .agent-row.selected { border-color: var(--brand); background: var(--selected); }
 .agent-row .a-marks { grid-column: 1; grid-row: 1; display: flex; align-items: center; gap: 7px; }
 .agent-row .a-src { display: flex; flex: 0 0 auto; }
-.agent-row .a-src svg { width: 12px; height: 12px; display: block; }
+.agent-row .a-src svg, .agent-row .a-src img { width: 12px; height: 12px; display: block; }
 .agent-row .swatch { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
 .agent-row .name { grid-column: 2; grid-row: 1; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .agent-row .status { grid-column: 2; grid-row: 2; font-size: 11px; color: var(--muted); }
@@ -566,7 +566,7 @@ html, body {
   width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto;
 }
 #inspector-body .kv .v-src { display: flex; flex: 0 0 auto; }
-#inspector-body .kv .v-src svg { width: 13px; height: 13px; display: block; }
+#inspector-body .kv .v-src svg, #inspector-body .kv .v-src img { width: 13px; height: 13px; display: block; }
 #inspector-body .job { margin-top: 12px; padding: 10px; border-radius: 9px; background: rgba(36, 50, 71, 0.04); color: var(--text); }
 
 /* ---- Work log ---- */
@@ -1449,7 +1449,11 @@ html, body {
 }
 .sp-option.selected .sp-check { display: flex; }
 .sp-logo { color: var(--accent); }
-.sp-logo svg { width: 44px; height: 44px; display: block; }
+.sp-logo svg, .sp-logo img { width: 44px; height: 44px; display: block; }
+/* A source portrait stands in for the vector mark in 2D chrome (see
+   sourceVisual in src/ui/marks.js). It takes the same box as the svg it
+   replaces, cropped round. */
+img.src-visual-img { border-radius: 50%; object-fit: cover; }
 .sp-label { font-size: 14px; font-weight: 650; }
 .sp-blurb { font-size: 11.5px; color: var(--muted); line-height: 1.35; }
 .sp-tag {
@@ -1825,7 +1829,7 @@ html, body {
 /* Source glyph and status dot, sized as in the roster row so the same agent reads
    the same in both. */
 .fpv-marks { display: flex; align-items: center; flex: 0 0 auto; }
-.fpv-marks svg, .fpv-src svg { width: 13px; height: 13px; display: block; }
+.fpv-marks svg, .fpv-src svg, .fpv-marks img, .fpv-src img { width: 13px; height: 13px; display: block; }
 .fpv-src { display: flex; flex: 0 0 auto; }
 .fpv-swatch { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
 /* The agent's name is the title of the panel, so it takes the job's size. */
@@ -2508,7 +2512,7 @@ body[data-chrome='none'] #fpv-hud {
     transform: none;
   }
 
-  .sp-logo svg {
+  .sp-logo svg, .sp-logo img {
     width: 24px;
     height: 24px;
   }

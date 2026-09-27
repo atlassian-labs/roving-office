@@ -181,8 +181,12 @@ PUT the raw image bytes (PNG, JPEG, GIF or WebP, ≤ 2 MB) to
 convention of the agent driving it. Descriptive <code>turn.start</code> titles (never
 &quot;Working&quot;), the to-do list up front in the turn payload as <code>todos: [...]</code>,
 per-step <code>tool.start</code> / <code>tool.end</code> with a plain-language <code>label</code>, and
-<code>session.heartbeat</code> notes with progress (&quot;2/5: …&quot;) on long tasks. The
-detail panel becomes the play-by-play.</p>
+<code>session.heartbeat</code> notes with progress on long tasks. The detail panel
+becomes the play-by-play.</p>
+<p>Break multi-step work into a numbered sequence and say which step you are
+on for each job — &quot;step 3 of 6: pushing the branch&quot;, then &quot;step 4 of 6&quot; when
+it moves. A watcher should always be able to answer &quot;where is it up to?&quot;
+without reading the chat.</p>
 <h2 id="usage" tabindex="-1">Usage</h2>
 <pre><code class="language-sh"># announce a session (capabilities are what the office may expect)
 node bin/aop-emit.cjs session.start '{&quot;source&quot;:&quot;startup&quot;,&quot;capabilities&quot;:[&quot;session.start&quot;,&quot;session.end&quot;,&quot;turn.start&quot;,&quot;turn.end&quot;,&quot;tool.start&quot;,&quot;tool.end&quot;,&quot;artifact.change&quot;],&quot;redaction&quot;:&quot;metadata&quot;}'
