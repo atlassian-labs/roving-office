@@ -71,8 +71,8 @@ test('a seed is text, however it arrives', () => {
   assert.deepEqual(generateOffice(minted.seed).layout, minted.layout);
 });
 
-test('different seeds are different offices', () => {
-  const plans = new Set(sweep().map((o) => JSON.stringify(o.layout)));
+test('different seeds are different offices', async () => {
+  const plans = new Set((await sweep()).map((o) => JSON.stringify(o.layout)));
   // Not "all different" as a matter of principle — two seeds are allowed to
   // produce one room — but anything less than nearly all of them would mean the
   // seed is not reaching the decisions.
@@ -138,7 +138,7 @@ test('a brief always adds up', () => {
   }
 });
 
-test('no seat has its back to the group it is in', () => {
+test('no seat has its back to the group it is in', async () => {
   // The rule, as given: *"Sofas and armchairs, side tables etc. should always
   // face each other, or face at 90 degrees to each other, never away from each
   // other. Sofas ideally mostly on rugs."*
@@ -159,7 +159,7 @@ test('no seat has its back to the group it is in', () => {
   // The shared sweep rather than a private `facing-N` namespace: this is a population
   // statistic, and one arbitrary set of seeds is as good as another. It doubles the
   // sample to 240 and costs nothing, because the sweep is already built.
-  for (const office of sweep()) {
+  for (const office of await sweep()) {
     const pieces = Object.values(office.layout.furniture ?? {});
     const seating = pieces.filter((p) => p.kind === 'couch' || p.kind === 'armchair');
     const rugs = pieces.filter((p) => p.kind === 'rug').map((r) => {
@@ -221,7 +221,7 @@ test('no seat has its back to the group it is in', () => {
   assert.ok(onRug / couches > 0.8, `only ${((onRug / couches) * 100).toFixed(0)}% of couches stand on a rug`);
 });
 
-test('rugs that join up make a rectangle, not a staircase', () => {
+test('rugs that join up make a rectangle, not a staircase', async () => {
   // *"Rectangular rugs — or combined multiple rugs as a rectangle to indicate an
   // area — are definitely better than ragged ones."*
   //
@@ -238,7 +238,7 @@ test('rugs that join up make a rectangle, not a staircase', () => {
   let rooms = 0;
 
   // The shared sweep, for the same reason as the seats above.
-  for (const office of sweep()) {
+  for (const office of await sweep()) {
     const rugs = Object.values(office.layout.furniture ?? {})
       .filter((p) => p.kind === 'rug')
       .map((r) => {
@@ -259,9 +259,9 @@ test('rugs that join up make a rectangle, not a staircase', () => {
   assert.ok(ragged / rooms < 0.2, `${((ragged / rooms) * 100).toFixed(0)}% of rug areas are ragged`);
 });
 
-test('every seed produces a room that works', () => {
+test('every seed produces a room that works', async () => {
   const shortfalls = [];
-  for (const office of sweep()) {
+  for (const office of await sweep()) {
     const seed = office.seed;
     const r = office.report;
     assert.ok(r.ok, `${seed}: ${r.faults.join('; ')}`);
@@ -281,8 +281,8 @@ test('every seed produces a room that works', () => {
     `${shortfalls.length} of ${SWEEP} briefs came out short`);
 });
 
-test('a generated plan is a plan the editor could have made', () => {
-  for (const office of sweepSlice(80)) {
+test('a generated plan is a plan the editor could have made', async () => {
+  for (const office of await sweepSlice(80)) {
     const seed = office.seed;
     const blob = office.layout;
 
@@ -349,10 +349,10 @@ test('a generated plan is a plan the editor could have made', () => {
   resetLayout();
 });
 
-test('a generated plan survives a round trip through the editor', () => {
+test('a generated plan survives a round trip through the editor', async () => {
   // Applied, snapshotted, applied again: the second snapshot has to match the
   // first, or a generated room is one that changes the moment somebody saves it.
-  for (const office of sweepSlice(30)) {
+  for (const office of await sweepSlice(30)) {
     const seed = office.seed;
     resetLayout();
     // A private copy: applyLayout takes ownership of what it is handed, and the sweep is
@@ -365,8 +365,8 @@ test('a generated plan survives a round trip through the editor', () => {
   resetLayout();
 });
 
-test('the room is named after what is in it', () => {
-  for (const office of sweepSlice(120)) {
+test('the room is named after what is in it', async () => {
+  for (const office of await sweepSlice(120)) {
     const seed = office.seed;
     assert.ok(office.name.length >= 4 && office.name.length <= 40, `${seed}: "${office.name}"`);
     // No placeholders, no double spaces, no "undefined" — the three ways a
@@ -379,10 +379,10 @@ test('the room is named after what is in it', () => {
   }
 });
 
-test('the look is one a scene can be dressed in', () => {
+test('the look is one a scene can be dressed in', async () => {
   const seasons = new Set(['summer', 'autumn', 'winter', 'spring']);
   const buildings = new Set(['simple', 'warehouse', 'skyscraper', 'mansard']);
-  for (const { seed, look } of sweepSlice(40)) {
+  for (const { seed, look } of await sweepSlice(40)) {
     assert.ok(seasons.has(look.season), `${seed}: ${look.season}`);
     assert.ok(buildings.has(look.building), `${seed}: ${look.building}`);
   }
@@ -414,7 +414,7 @@ test('a plan that does not fit is refused rather than shipped', () => {
   assert.ok(check.faults.some((f) => f.includes('dispatch')), check.faults.join('; '));
 });
 
-test('nothing that would fence somebody in is ever put down', () => {
+test('nothing that would fence somebody in is ever put down', async () => {
   // `sweep-409` is the seed that found this: a bin in a corner the couch fenced
   // off, which failed the whole layout — a good office thrown away to protect a
   // wastepaper basket. The answer was to ask the question as each piece goes down
@@ -429,7 +429,7 @@ test('nothing that would fence somebody in is ever put down', () => {
   // And across the sweep, nobody is ever stranded — the fault exists, it is
   // checked for, and it does not happen. Which is a stronger statement than the
   // repair it replaced.
-  for (const office of sweep()) {
+  for (const office of await sweep()) {
     const seed = office.seed;
     const faults = office.report.attempts.flatMap((a) => a.faults);
     assert.ok(!faults.some((f) => f.includes('cannot be reached')),

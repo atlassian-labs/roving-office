@@ -78,10 +78,10 @@ test('a measure that cannot fail is not a measure', () => {
     many.parts.find((p) => p.key === 'errands').value);
 });
 
-test('the sweep holds its floor', () => {
+test('the sweep holds its floor', async () => {
   const totals = [];
   const worst = { seed: null, total: 1 };
-  for (const office of sweep()) {
+  for (const office of await sweep()) {
     const total = office.report.score.total;
     totals.push(total);
     if (total < worst.total) Object.assign(worst, { seed: office.seed, total });
@@ -97,7 +97,7 @@ test('the sweep holds its floor', () => {
     `a tenth of offices score below ${percentile(totals, 0.1).toFixed(2)}`);
 });
 
-test('no measure is allowed to be a constant', () => {
+test('no measure is allowed to be a constant', async () => {
   // The defence against a *deleted* measure, which is a different failure from a
   // measure going down and is not caught by anything else here.
   //
@@ -109,7 +109,7 @@ test('no measure is allowed to be a constant', () => {
   // the room, and a measure with no variance across sixty different offices is
   // one that has stopped looking.
   const spread = new Map();
-  for (const office of sweepSlice(60)) {
+  for (const office of await sweepSlice(60)) {
     for (const part of office.report.score.parts) {
       if (!spread.has(part.key)) spread.set(part.key, new Set());
       spread.get(part.key).add(Math.round(part.value * 1000));
@@ -121,13 +121,13 @@ test('no measure is allowed to be a constant', () => {
   }
 });
 
-test('teams sit together, and the card is how we know', () => {
+test('teams sit together, and the card is how we know', async () => {
   // The measure that earned its keep: it found benches whose within-bank pitch
   // was wider than the gap between banks, so the desk nearest yours was in the
   // next row and belonged to somebody else's team (see PITCH in furnish.js).
   // Nineteen rooms in four hundred were affected; the fix took it to six.
   let poor = 0;
-  for (const office of sweep()) {
+  for (const office of await sweep()) {
     const teams = office.report.score.parts.find((p) => p.key === 'teams');
     if (teams.value < 0.6) poor += 1;
   }
