@@ -225,8 +225,14 @@ votes for a thing the labels know nothing about.
 
 With a number and a guard, the generator can be improved by an autonomous loop:
 read the log, make **one** focused change, verify, keep or revert, write down what
-happened. `program.md` is the brief it works from and `autoresearch/*/results.tsv`
-is its memory. The skill is vendored under `.claude/skills/autoresearch/`.
+happened. [`program.md`](../../program.md) is the brief it works from, and each run kept a
+`results.tsv` beside it as its memory.
+
+**The loop itself is not in this repository.** It was a vendored third-party agent skill,
+and carrying it meant carrying an attribution obligation that no contributor to *this*
+project needs. The brief and the metric are first-party and are the reusable half: any
+autonomous-iteration harness can read `program.md`, call `npm run fitness`, and keep or
+revert on the number.
 
 Two runs so far.
 
@@ -342,7 +348,7 @@ bin/
   lib/looks-fit.js          # Bradley-Terry, Spearman, and the weighting rule
 docs/images/looks{,2,3}/    # three rounds: renders, frozen layouts, labels
 program.md                  # the brief the autonomous loop works from
-autoresearch/*/results.tsv  # every iteration, kept or not, and why
+results.tsv                 # every iteration, kept or not, and why
 ```
 
 ## Read next

@@ -3,18 +3,21 @@
 These are for an agent session working in this repository. The human-shaped mirror is
 [CONTRIBUTING.md](CONTRIBUTING.md), which is shorter and says most of the same things.
 
-Everything here applies wherever this code is checked out. The maintainers' own tracker,
-git host and deployment are **not** here, on purpose — instructions naming a system the
-reader cannot reach are worse than none. If your checkout has a `.maintainers/` directory,
-that is where they live and it is worth reading alongside this; if it does not, you are not
-missing anything you need in order to change this code.
+Everything here applies to anyone with a checkout, because there is nothing else — one
+repository, no withheld half. A separate file used to carry the tracker, the git host and
+the deployment, on the grounds that instructions naming a system the reader cannot reach
+are worse than none. That reasoning was sound and no longer applies: the tracker is this
+repository's issues, the host is this repository, and the deployment is a command anyone
+can read.
 
 ## Three things, always
 
 Before a line of code is written:
 
-1. **An issue.** No change without one. If none exists, open one.
-2. **A branch.** Never commit to `main`.
+1. **An issue.** No change without one. If none exists, open one. Say there that you are
+   picking it up — that is how somebody else finds out you are already doing the thing
+   they were about to start.
+2. **A branch.** Never commit to `main`; it is protected and will refuse you anyway.
 3. **A worktree**, cut from `main`. Not the primary checkout.
 
 The third used to be a preference, hedged with *prefer* and *if*, and the hedge cost an
@@ -170,6 +173,44 @@ claude plugin install roving-office@roving-office
 Either way the hooks are read at session start, so **restart the Claude or Codex
 session** afterwards. Each `--status` command compares the installed version with
 the checkout and says what is live, so run it rather than guessing.
+
+## Landing it
+
+A branch lands by **pull request**, and `main` is protected: both CI jobs must be green
+and up to date with `main`, one approval is required, and force-pushes and deletions are
+refused. CI is `.github/workflows/ci.yml` and it runs the six commands below — the same
+ones you run from a checkout, so there is no class of red build you cannot reproduce
+locally. A pull request from a fork waits for a maintainer to approve the workflow run
+before it starts; that is a repository setting rather than a comment on the change.
+
+`main` is checked out in the primary worktree, so it cannot be checked out again in a
+second one: run a merge from the primary worktree with `git -C`, rather than trying to
+switch branches in place.
+
+## Deploying
+
+One recipe, `Dockerfile.fly` and `fly.toml`:
+
+```bash
+flyctl deploy --app the-roving-office
+```
+
+`flyctl deploy` uploads the **local working directory** as the build context — no remote
+is involved, so you deploy the tree you are standing in and nothing has to be pushed
+first. Two constraints worth knowing before one surprises you:
+
+- **One machine, on purpose.** The volume holding every keycard, layout and ingest token
+  binds to a single machine, so `flyctl scale count 1` is required and a blue-green
+  deploy is not available: it would want a second machine with no volume to attach to.
+- **A deploy is not a merge.** The recipe copies a committed `docs/site`, so a merged
+  documentation fix is not live until the host is redeployed. Two fixes sat
+  merged-and-not-live long enough for it to be worth writing down.
+
+There used to be a second, internal deployment target. Nothing ran on it, and it was the
+single reason this repository had a withheld half at all — its hostnames and project id
+could not be published, which forced an exclusion list, which forced four tests to carry
+an "if the recipe exists" branch. Retiring it collapsed that whole chain. If a second
+target is ever wanted, the thing to preserve is that anyone can run it.
 
 ## Checking the work
 

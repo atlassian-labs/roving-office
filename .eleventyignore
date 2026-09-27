@@ -37,12 +37,12 @@ docs/_nav.mjs
 # `docs/site/developer/`, because that directory is copied wholesale by `Dockerfile.fly`.
 #
 # Keeping it off the web is not the same as keeping it out of the public repository, and
-# both are wanted: `.exportignore` is the second list, and `test/public-surface.test.js`
-# asserts that everything named below is on it.
+# This is the only such list now. Keeping a page out of the built site is not the same as
+# keeping it out of the repository, and only the first is wanted: these are design
+# records, which belong in a checkout and not in the published documentation.
 docs/developer/publishing.md
 docs/developer/design/cloudflare-deployment.md
 docs/developer/design/fly-persistence-plan.md
-docs/developer/design/hosting-notes.md
 docs/developer/design/jira-coding-agent.md
 docs/developer/design/job-delivery-gaps.md
 docs/developer/design/openclaw-open-questions.md

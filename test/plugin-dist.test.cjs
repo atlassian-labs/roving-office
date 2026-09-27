@@ -268,15 +268,11 @@ test('the provenance inventory records both published artifacts as distributions
 });
 
 test('CI builds and checks the artifacts by the same npm scripts a contributor runs', () => {
-  // The CI file is whichever one this repository has, and it may have none. `.exportignore`
-  // leaves `bitbucket-pipelines.yml` behind — it names internal infrastructure a
-  // contributor cannot reach — so in the public repository this half of the assertion has
-  // nothing to read until the public CI lands. Skipping it there is right; skipping it
-  // *here*, where the file exists, would not be, so this is a presence check and not a
-  // `try`. The half below is about `package.json` and holds either way.
-  if (fs.existsSync(path.join(ROOT, 'bitbucket-pipelines.yml'))) {
-    assert.match(read('bitbucket-pipelines.yml'), /^\s+- npm run pack:plugins$/m);
-  }
+  // One CI file, and it is the public one. This used to be a presence check, because a
+  // second pipeline existed that named infrastructure a contributor could not reach and
+  // so did not travel; with one repository there is one workflow and it can be asserted
+  // outright.
+  assert.match(read('.github/workflows/ci.yml'), /^\s+- run: npm run pack:plugins$/m);
   // `pack:plugins:check` is not listed on its own: it is called from this suite, so
   // `npm test` carries it and there is no second place for it to be forgotten.
   assert.equal(readJson('package.json').scripts['pack:plugins'], 'node bin/aop-plugin-pack.cjs --verify');

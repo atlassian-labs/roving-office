@@ -1,10 +1,10 @@
 /**
  * The documentation's own tests.
  *
- * `bitbucket-pipelines.yml` carries a rule in its header, and it governs the verification
- * step: that step runs what a contributor runs locally, by the same npm scripts, and
- * nothing a contributor cannot run. So rather than adding a pipeline step for the docs,
- * these checks live in `npm test` — which CI already runs, and which you already run.
+ * CI carries one rule and it governs everything: a job runs what a contributor runs
+ * locally, by the same npm scripts, and nothing a contributor cannot run. So rather than
+ * adding a CI step for the documentation, these checks live in `npm test` — which CI
+ * already runs, and which you already run.
  *
  * They are all cheap: no Eleventy, no browser, no network. What they buy is that the three
  * things most likely to rot quietly — the generated script reference, the committed HTML,

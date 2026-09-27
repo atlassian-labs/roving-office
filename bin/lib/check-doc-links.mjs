@@ -24,7 +24,7 @@
  *   - `test/docs.test.js` — fails `npm test`. The backstop, and not redundant: Eleventy
  *     writes files *before* `after` fires, so without this somebody can watch the build
  *     fail and commit anyway. It also means CI needs no new command, which keeps
- *     `bitbucket-pipelines.yml`'s rule about running only what a contributor runs.
+ *     CI's rule about running only what a contributor runs.
  *
  * One function behind two call sites is the same argument `reviseLayout()` makes over in
  * the layout: called at import *and* after every edit, so the two cannot drift apart.
