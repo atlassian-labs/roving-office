@@ -41,9 +41,10 @@ import { LOOKS } from '../bin/lib/looks-judge.js';
  */
 const compactOf = (rugs) => LOOKS.find((m) => m.key === 'compact').of({ rugs });
 
-/** How many seeds the sweep covers. Enough to be a claim; quick enough to run. */
-const SWEEP = 240;
-const seeds = Array.from({ length: SWEEP }, (_, i) => `sweep-${i}`);
+// The sweep is shared: the same seeds are asked different questions here and in
+// test/plan-score.test.js, and an office costs ~50 ms to build. See test/lib/plan-sweep.js
+// for why generating them once is the only honest reading of a deterministic generator.
+import { SWEEP, seeds, sweep, sweepSlice, cloneLayout } from './lib/plan-sweep.js';
 
 test('the same seed is always the same office', () => {
   for (const seed of ['brass-lantern-0007', '42', 'a sentence somebody typed']) {
@@ -71,7 +72,7 @@ test('a seed is text, however it arrives', () => {
 });
 
 test('different seeds are different offices', () => {
-  const plans = new Set(seeds.map((s) => JSON.stringify(generateOffice(s).layout)));
+  const plans = new Set(sweep().map((o) => JSON.stringify(o.layout)));
   // Not "all different" as a matter of principle — two seeds are allowed to
   // produce one room — but anything less than nearly all of them would mean the
   // seed is not reaching the decisions.
@@ -155,8 +156,10 @@ test('no seat has its back to the group it is in', () => {
   let onRug = 0;
   let couches = 0;
 
-  for (let i = 0; i < 120; i += 1) {
-    const office = generateOffice(`facing-${i}`);
+  // The shared sweep rather than a private `facing-N` namespace: this is a population
+  // statistic, and one arbitrary set of seeds is as good as another. It doubles the
+  // sample to 240 and costs nothing, because the sweep is already built.
+  for (const office of sweep()) {
     const pieces = Object.values(office.layout.furniture ?? {});
     const seating = pieces.filter((p) => p.kind === 'couch' || p.kind === 'armchair');
     const rugs = pieces.filter((p) => p.kind === 'rug').map((r) => {
@@ -234,8 +237,9 @@ test('rugs that join up make a rectangle, not a staircase', () => {
   let ragged = 0;
   let rooms = 0;
 
-  for (let i = 0; i < 120; i += 1) {
-    const rugs = Object.values(generateOffice(`rug-${i}`).layout.furniture ?? {})
+  // The shared sweep, for the same reason as the seats above.
+  for (const office of sweep()) {
+    const rugs = Object.values(office.layout.furniture ?? {})
       .filter((p) => p.kind === 'rug')
       .map((r) => {
         const w = worldExtent(r.facing ?? 0, FURNITURE_KINDS.rug.hw, FURNITURE_KINDS.rug.hd);
@@ -257,8 +261,8 @@ test('rugs that join up make a rectangle, not a staircase', () => {
 
 test('every seed produces a room that works', () => {
   const shortfalls = [];
-  for (const seed of seeds) {
-    const office = generateOffice(seed);
+  for (const office of sweep()) {
+    const seed = office.seed;
     const r = office.report;
     assert.ok(r.ok, `${seed}: ${r.faults.join('; ')}`);
     assert.ok(r.traits.desks >= 1, `${seed}: nobody can work here`);
@@ -278,8 +282,8 @@ test('every seed produces a room that works', () => {
 });
 
 test('a generated plan is a plan the editor could have made', () => {
-  for (const seed of seeds.slice(0, 80)) {
-    const office = generateOffice(seed);
+  for (const office of sweepSlice(80)) {
+    const seed = office.seed;
     const blob = office.layout;
 
     assert.equal(blob.layout, LAYOUT_VERSION);
@@ -348,9 +352,12 @@ test('a generated plan is a plan the editor could have made', () => {
 test('a generated plan survives a round trip through the editor', () => {
   // Applied, snapshotted, applied again: the second snapshot has to match the
   // first, or a generated room is one that changes the moment somebody saves it.
-  for (const seed of seeds.slice(0, 30)) {
+  for (const office of sweepSlice(30)) {
+    const seed = office.seed;
     resetLayout();
-    applyLayout(generateOffice(seed).layout);
+    // A private copy: applyLayout takes ownership of what it is handed, and the sweep is
+    // shared with every test after this one.
+    applyLayout(cloneLayout(office));
     const once = layoutSnapshot();
     assert.ok(applyLayout(once));
     assert.deepEqual(layoutSnapshot(), once, `${seed}: not stable through a save`);
@@ -359,8 +366,8 @@ test('a generated plan survives a round trip through the editor', () => {
 });
 
 test('the room is named after what is in it', () => {
-  for (const seed of seeds.slice(0, 120)) {
-    const office = generateOffice(seed);
+  for (const office of sweepSlice(120)) {
+    const seed = office.seed;
     assert.ok(office.name.length >= 4 && office.name.length <= 40, `${seed}: "${office.name}"`);
     // No placeholders, no double spaces, no "undefined" — the three ways a
     // generated phrase fails in public.
@@ -375,8 +382,7 @@ test('the room is named after what is in it', () => {
 test('the look is one a scene can be dressed in', () => {
   const seasons = new Set(['summer', 'autumn', 'winter', 'spring']);
   const buildings = new Set(['simple', 'warehouse', 'skyscraper', 'mansard']);
-  for (const seed of seeds.slice(0, 40)) {
-    const { look } = generateOffice(seed);
+  for (const { seed, look } of sweepSlice(40)) {
     assert.ok(seasons.has(look.season), `${seed}: ${look.season}`);
     assert.ok(buildings.has(look.building), `${seed}: ${look.building}`);
   }
@@ -423,8 +429,9 @@ test('nothing that would fence somebody in is ever put down', () => {
   // And across the sweep, nobody is ever stranded — the fault exists, it is
   // checked for, and it does not happen. Which is a stronger statement than the
   // repair it replaced.
-  for (const seed of seeds) {
-    const faults = generateOffice(seed).report.attempts.flatMap((a) => a.faults);
+  for (const office of sweep()) {
+    const seed = office.seed;
+    const faults = office.report.attempts.flatMap((a) => a.faults);
     assert.ok(!faults.some((f) => f.includes('cannot be reached')),
       `${seed}: ${faults.join('; ')}`);
   }
