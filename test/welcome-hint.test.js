@@ -163,13 +163,19 @@ test('the dismissal is not remembered — the next arrival is greeted again', ()
   greeted.dismiss();
 });
 
-/** The setup link inside the invitation, by the span that holds it. */
+/**
+ * The setup link inside the invitation.
+ *
+ * Found by tag rather than by position: the invitation reads "If agent, setup yourself."
+ * so the anchor sits between two text nodes, and an index would break the next time the
+ * wording moved a comma.
+ */
 const setupLinkIn = (ui) => ui.children
   .find((c) => c.className?.includes('welcome-hint'))
   ?.children.find((c) => c.className === 'welcome-invite')
-  ?.children[0];
+  ?.children.find((c) => c.tagName === 'A' || c.href !== undefined);
 
-test('it offers the way in, not just the way around', () => {
+test('it addresses the agent as well as the person', () => {
   // `?` answers "how do I drive this". The other question a visitor has is "how do I get
   // my own agents in here", and before this link nothing in the running app answered it.
   const p = page();
@@ -181,7 +187,9 @@ test('it offers the way in, not just the way around', () => {
   const hint = createWelcomeHint();
   const link = setupLinkIn(p.ui);
   assert.ok(link, 'the hint should carry a setup link');
-  assert.equal(link.textContent, 'Connect your agents');
+  // Addressed to the reader who can act on it: the page it points at is written to be
+  // fetched and executed, so an agent reading the room has both instruction and means.
+  assert.equal(link.textContent, 'setup yourself');
   hint.dismiss();
 });
 
