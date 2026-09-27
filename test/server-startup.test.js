@@ -35,7 +35,15 @@ function start(args = [], { home, waitMs = 8000, env = {} } = {}) {
     const deadline = setTimeout(() => done(reject, new Error(`server did not start: ${out}`)), waitMs);
     const tick = setInterval(() => {
       const hit = /running at http:\/\/localhost:(\d+)/.exec(out);
-      if (hit) done(resolve, Number(hit[1]));
+      if (hit) return done(resolve, Number(hit[1]));
+      // A refusal is a signal, not an absence. The server says why it will not start —
+      // a taken port, a bad argument — and waiting out the deadline to learn that turns
+      // a decisive answer into three seconds of nothing. Rejecting on the message keeps
+      // the assertion identical (`/did not start/` still matches) and makes the failing
+      // case as quick as the passing one.
+      if (/is already serving something else|refus|invalid|Error:/i.test(out)) {
+        return done(reject, new Error(`server did not start: ${out}`));
+      }
     }, 100);
   });
   return { child, ready, log: () => out };
