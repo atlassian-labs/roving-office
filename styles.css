@@ -2985,6 +2985,12 @@ body.debuglog #title-bar { max-width: none; border-radius: 0; }
 .welcome-hint { position: absolute; bottom: calc(24px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 25; pointer-events: auto; width: max-content; max-width: calc(100% - 48px); padding: 12px 40px 12px 16px; border-radius: var(--radius-surface); background: var(--panel-solid); box-shadow: var(--shadow-panel); color: var(--text); font-size: 13px; line-height: 20px; text-align: center; transition: opacity 600ms ease; }
 .welcome-hint.is-leaving { opacity: 0; pointer-events: none; }
 .welcome-shortcuts { display: inline-block; margin-left: 8px; white-space: nowrap; }
+/* Beside the shortcut hint, and the same shape as it. `--brand` because
+   developing.md's rule is that interactive accents use blue, and this is the only thing
+   in the hint that does anything. There is no generic anchor rule in this stylesheet, so
+   an unstyled link here would take the browser's default purple. */
+.welcome-invite { display: inline-block; margin-left: 8px; white-space: nowrap; }
+.welcome-invite a { color: var(--brand); }
 .welcome-shortcuts kbd { padding: 0 5px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface-soft); font-family: var(--font-mono); font-feature-settings: var(--font-variants-mono); }
 .welcome-close { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--muted); font: 20px var(--font-sans); font-feature-settings: var(--font-variants-sans); cursor: pointer; }
 .welcome-close:hover { background: var(--surface-hovered); }

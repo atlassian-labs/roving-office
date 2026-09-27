@@ -1,4 +1,5 @@
-// A short invitation on arrival, and the one thing that ends it early.
+// A short invitation on arrival, the way further in, and the one thing that ends it
+// early.
 //
 // It sits bottom-centre at z-index 25, which is directly over the strips along the
 // bottom of the screen. That was fine while it was the only thing on screen and
@@ -72,11 +73,36 @@ export function createWelcomeHint() {
   copy.append(node('strong', '', 'Watch. Play. Discover.'), " (You can't break anything)");
   const shortcuts = node('span', 'welcome-shortcuts');
   shortcuts.append('If lost, type ', node('kbd', '', '?'));
+
+  /*
+   * The other question a visitor has, and the only one the room could not answer.
+   *
+   * `?` answers "how do I drive this". It does not answer "how do I get *my* agents in
+   * here", and until this link there was nothing in the running app that did — somebody
+   * could watch a busy office for ten minutes without learning that connecting their own
+   * is one pasted sentence away.
+   *
+   * **A new tab, not this one.** Every other link in the office does the same, for a
+   * reason worth stating: navigating the office away loses the room, the camera and the
+   * selection, and this hint's whole job is to invite somebody further in rather than
+   * out. `rel` goes with `target` as it always must.
+   *
+   * Root-relative, not origin-absolute: an office on Fly and one on a laptop are
+   * different origins and only one of them could ever be written down here. Same rule as
+   * `src/ui/dev-panel.js`, which has the longer version of this note.
+   */
+  const invite = node('span', 'welcome-invite');
+  const setup = node('a', '', 'Connect your agents');
+  setup.href = '/agent-setup/';
+  setup.target = '_blank';
+  setup.rel = 'noopener noreferrer';
+  invite.append(setup);
+
   const close = node('button', 'welcome-close', '×');
   close.type = 'button';
   close.setAttribute('aria-label', 'Dismiss welcome hint');
   close.addEventListener('click', () => dismiss());
-  hint.append(copy, ' ', shortcuts, close);
+  hint.append(copy, ' ', shortcuts, ' ', invite, close);
   document.getElementById('ui').appendChild(hint);
 
   let removeTimer = null;
