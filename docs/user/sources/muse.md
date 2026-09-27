@@ -2,7 +2,7 @@
 
 *Meta's personal AI agent. No plugin — the agent drives the emitter itself.*
 
-Muse connects to an office by running the [standalone emitter](../../developer/adapters/muse.md) directly. There is no marketplace or install step: the agent saves `bin/aop-emit.cjs` from the checkout and narrates its work through it — a `turn.start` when a task begins, `tool.start`/`tool.end` for each notable step, `artifact.change` for deliverables, `turn.end` when done.
+Muse connects to an office by running the [standalone emitter](../../developer/adapters/muse.md) directly. There is no marketplace or install step: the agent saves `bin/aop-emit.cjs` from the checkout and narrates through it. Every turn gets a `turn.start`/`turn.end` pair — real work carries the full treatment (the to-do list up front, a numbered sequence of `tool.start`/`tool.end` steps in plain language, `artifact.change` for deliverables), while casual chat goes out as a simple job: a descriptive title, no task list. The emitter only sends what the agent hands it, so the agent itself decides when to emit; nothing on the office side narrates automatically.
 
 ## What you will see
 

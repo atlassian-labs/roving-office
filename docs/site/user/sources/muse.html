@@ -136,7 +136,7 @@
     <main id="doc" class="doc">
       <h1 id="muse" tabindex="-1">Muse</h1>
 <p><em>Meta's personal AI agent. No plugin — the agent drives the emitter itself.</em></p>
-<p>Muse connects to an office by running the <a href="../../developer/adapters/muse.html">standalone emitter</a> directly. There is no marketplace or install step: the agent saves <code>bin/aop-emit.cjs</code> from the checkout and narrates its work through it — a <code>turn.start</code> when a task begins, <code>tool.start</code>/<code>tool.end</code> for each notable step, <code>artifact.change</code> for deliverables, <code>turn.end</code> when done.</p>
+<p>Muse connects to an office by running the <a href="../../developer/adapters/muse.html">standalone emitter</a> directly. There is no marketplace or install step: the agent saves <code>bin/aop-emit.cjs</code> from the checkout and narrates through it. Every turn gets a <code>turn.start</code>/<code>turn.end</code> pair — real work carries the full treatment (the to-do list up front, a numbered sequence of <code>tool.start</code>/<code>tool.end</code> steps in plain language, <code>artifact.change</code> for deliverables), while casual chat goes out as a simple job: a descriptive title, no task list. The emitter only sends what the agent hands it, so the agent itself decides when to emit; nothing on the office side narrates automatically.</p>
 <h2 id="what-you-will-see" tabindex="-1">What you will see</h2>
 <p>A character walks in wearing Muse's avatar, sits down, and its desk label narrates what it is doing in plain language. Because the narration is written by the agent as it works, the labels read like a running commentary rather than hook output.</p>
 <h2 id="what-it-can-see" tabindex="-1">What it can see</h2>
