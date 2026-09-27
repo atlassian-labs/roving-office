@@ -72,15 +72,20 @@ export function createWelcomeHint() {
   const copy = node('span', 'welcome-copy');
   copy.append(node('strong', '', 'Watch. Play. Discover.'), " (You can't break anything)");
   const shortcuts = node('span', 'welcome-shortcuts');
-  shortcuts.append('If lost, type ', node('kbd', '', '?'));
+  shortcuts.append('If lost, type ', node('kbd', '', '?'), '.');
 
   /*
-   * The other question a visitor has, and the only one the room could not answer.
+   * The other question, and it is addressed to the other reader.
    *
-   * `?` answers "how do I drive this". It does not answer "how do I get *my* agents in
-   * here", and until this link there was nothing in the running app that did — somebody
-   * could watch a busy office for ten minutes without learning that connecting their own
-   * is one pasted sentence away.
+   * `?` answers "how do I drive this", to a person. The line beside it is written to an
+   * *agent* — which is not a joke, it is who tends to be looking: somebody pastes a
+   * screenshot of the room into a session, or an agent is driving the browser itself. The
+   * page it points at is a document written to be fetched and executed, so an agent that
+   * reads "If agent, setup yourself" has both the instruction and the means.
+   *
+   * For a person it still reads as the answer to "how do I get *my* agents in here",
+   * which until this link nothing in the running app answered — somebody could watch a
+   * busy office for ten minutes without learning it was one pasted sentence away.
    *
    * **A new tab, not this one.** Every other link in the office does the same, for a
    * reason worth stating: navigating the office away loses the room, the camera and the
@@ -92,11 +97,11 @@ export function createWelcomeHint() {
    * `src/ui/dev-panel.js`, which has the longer version of this note.
    */
   const invite = node('span', 'welcome-invite');
-  const setup = node('a', '', 'Connect your agents');
+  const setup = node('a', '', 'setup yourself');
   setup.href = '/agent-setup/';
   setup.target = '_blank';
   setup.rel = 'noopener noreferrer';
-  invite.append(setup);
+  invite.append('If agent, ', setup, '.');
 
   const close = node('button', 'welcome-close', '×');
   close.type = 'button';
