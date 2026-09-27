@@ -4,7 +4,7 @@
 // after looking at the rooms it got wrong rather than at the rooms it got right.
 // They live here rather than in bin/lib/looks-judge.js so that
 // bin/looks-explore.js can score them against every labelling round without any of
-// them influencing the fitness the autoresearch loop optimises.
+// them influencing the fitness an autonomous loop optimises.
 //
 // A measure moves into the judge when its pooled agreement clears the noise floor,
 // and when it moves it is **deleted from here**. Three of them (`balance`,

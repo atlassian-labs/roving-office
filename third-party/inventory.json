@@ -44,9 +44,9 @@
     "claude-marketplace": "bin/aop-claude-install.cjs adds the checkout as a marketplace, so Claude Code copies the source tree and its upstream notices into its plugin cache. This is the development route; the published route is claude-plugin-archive.",
     "claude-plugin-archive": "bin/aop-plugin-pack.cjs RUNTIME allowlist, published as plugins/claude/roving-office-<version>.zip and pinned by SHA-256 in plugins/claude/marketplace.json: the hook wrapper, the Node launcher, the adapter, aop-core, the Claude mapper and its three shared modules, hooks.json and assets/logo-256.png. The build asserts that every module the payload loads is one of those files or a Node builtin, so no npm package, Three.js, colour table, font or brand mark is present and no third-party notice applies to it. Node is supplied by the user. Carries a generated NOTICE and FILES.json; ships no LICENSE, because the source tree has none.",
     "codex-plugin-marketplace": "The same allowlist with the Codex manifest and both mappers, emitted as a complete Codex marketplace tree (plugins/codex, gitignored) for publication to a public Git repository that does not yet exist. Same payload properties as claude-plugin-archive.",
-    "codex-local-marketplace": "bin/aop-codex-install.cjs stageMarketplace copies bin, hooks, plugin manifests, package.json, README and an optional project LICENSE. No npm packages, Three.js, colour table, fonts, brand assets or autoresearch are copied. Node is supplied by the user.",
+    "codex-local-marketplace": "bin/aop-codex-install.cjs stageMarketplace copies bin, hooks, plugin manifests, package.json, README and an optional project LICENSE. No npm packages, Three.js, colour table, fonts or brand assets are copied. Node is supplied by the user.",
     "openclaw-tarball": "bin/aop-openclaw-pack.cjs allowlist: first-party plugin modules and two first-party adapter modules only; Node builtins, no bundled npm packages or visual assets. OpenClaw and Node are host prerequisites. No third-party notice applies to the current payload.",
-    "hosted-app": "Dockerfile.fly copies src, lib, assets, vendor, generated docs, images and examples. THIRD_PARTY_NOTICES.txt contains the bundled Three.js, colour-data and font licenses; vendor retains originals. npm development tools and autoresearch are not copied.",
+    "hosted-app": "Dockerfile.fly copies src, lib, assets, vendor, generated docs, images and examples. THIRD_PARTY_NOTICES.txt contains the bundled Three.js, colour-data and font licenses; vendor retains originals. npm development tools are not copied.",
     "docs-site": "Generated docs/site contains authored HTML/CSS/JS and copies of the two OFL fonts, their licences and the theme CSS. Eleventy and its npm dependencies execute at build time and are not bundled as libraries. Screenshots can reproduce the app's brand assets.",
     "fly-container": "Application payload plus the dynamically resolved node:24-slim image. A release needs the actual image digest, Node version, OS/package inventory and retained base-image notices. This source inventory does not claim to be an image SBOM.",
     "ci": ".github/workflows/ci.yml runs verification only, on the GitHub-hosted ubuntu-latest runner with Node 24 and Node 26 supplied by actions/setup-node. It installs no deployment tooling and holds no credential. These build tools are not bundled in application artifacts, and exact runner image versions are not pinned here."
@@ -58,7 +58,7 @@
     },
     {
       "path": ".dockerignore",
-      "sha256": "6b40997b44e620b676748c5c396d01420fa37491b13ae43cfbf6b3f9b50b7fa5"
+      "sha256": "7300b0a7102de998e35758cda7b38614ced7b44ab070444becbf0b0410799189"
     },
     {
       "path": "bin/aop-codex-install.cjs",

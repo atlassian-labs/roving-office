@@ -405,8 +405,13 @@ votes for a thing the labels know nothing about.</p>
 <h2 id="the-ratchet" tabindex="-1">The ratchet</h2>
 <p>With a number and a guard, the generator can be improved by an autonomous loop:
 read the log, make <strong>one</strong> focused change, verify, keep or revert, write down what
-happened. <code>program.md</code> is the brief it works from and <code>autoresearch/*/results.tsv</code>
-is its memory. The skill is vendored under <code>.claude/skills/autoresearch/</code>.</p>
+happened. <a href="https://github.com/atlassian-labs/roving-office/blob/main/program.md"><code>program.md</code></a> is the brief it works from, and each run kept a
+<code>results.tsv</code> beside it as its memory.</p>
+<p><strong>The loop itself is not in this repository.</strong> It was a vendored third-party agent skill,
+and carrying it meant carrying an attribution obligation that no contributor to <em>this</em>
+project needs. The brief and the metric are first-party and are the reusable half: any
+autonomous-iteration harness can read <code>program.md</code>, call <code>npm run fitness</code>, and keep or
+revert on the number.</p>
 <p>Two runs so far.</p>
 <p><strong>Pilot, 12 iterations:</strong> +0.0122 on tune, 3 kept. Two of those gained on tune and
 <em>lost</em> on the holdout and were reverted — which is the holdout doing the only job
@@ -506,7 +511,7 @@ them.</li>
   lib/looks-fit.js          # Bradley-Terry, Spearman, and the weighting rule
 docs/images/looks{,2,3}/    # three rounds: renders, frozen layouts, labels
 program.md                  # the brief the autonomous loop works from
-autoresearch/*/results.tsv  # every iteration, kept or not, and why
+results.tsv                 # every iteration, kept or not, and why
 </code></pre>
 <h2 id="read-next" tabindex="-1">Read next</h2>
 <ul>

@@ -236,7 +236,7 @@ this one, and a day that looks half-empty is usually that.
 It does, and the reasoning is worth keeping: the only secret is environment-only, so there
 is nothing in the repository for the console to leak. A public checkout of this code has no
 admin surface until somebody deliberately sets a variable, and a deployment that never sets
-one is indistinguishable from a build without the feature. Excluding it via `.exportignore`
+one is indistinguishable from a build without the feature. Excluding it from the build
 would mean the public repository's server had a 404 branch nobody could explain, and the
 next contributor would reinvent it worse.
 

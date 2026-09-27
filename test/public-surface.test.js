@@ -10,9 +10,9 @@
  * author is reading. So the rule is a test rather than a review habit, the same way
  * `test/docs.test.js` guards the user/developer split rather than trusting it.
  *
- * **The export manifest check** keeps `.exportignore` honest. That file lists what the
- * clean export leaves behind, and a path that has since been renamed is silently no
- * longer excluded — the worst kind of failure, because the list still *looks* right.
+ * **The curated-path check** keeps `third-party/components.json` honest. A provenance row
+ * whose path has been renamed is a component the inventory silently stops covering, and
+ * the row still *looks* right.
  *
  * Both are cheap: file reads, no build, no network.
  */
@@ -90,7 +90,7 @@ async function publicSurfaceFiles() {
   await walk(join(DOCS, 'user'), (name) => name.endsWith('.md'))
   await walk(join(DOCS, 'developer'), (name) => name.endsWith('.md'))
   await walk(join(DOCS, 'site'), (name) => name.endsWith('.html'))
-  return out.filter((rel) => !rel.startsWith('docs/developer/design/'))
+  return out
 }
 
 test('the public surface carries no internal reference', async () => {
@@ -113,44 +113,11 @@ test('the public surface carries no internal reference', async () => {
 })
 
 /**
- * Why a skip rather than a failure: these two tests keep `.exportignore` honest, and in a
- * tree with no such file there is no list to be dishonest about. Named so the reason
- * shows up in the runner's output rather than as a silent pass.
- */
-function noExportList() {
-  return existsSync(join(ROOT, '.exportignore'))
-    ? false
-    : 'no .exportignore: this is an exported tree, not the repository it was cut from'
-}
-
-/**
- * The export exclusion list, one path per line, comments and blanks dropped.
- *
- * **Empty when there is no `.exportignore`, which is the published repository's normal
- * state.** That file is the boundary drawn by the repository the export is cut *from*,
- * so it does not travel — and the two tests below that read it have nothing to check
- * once it is gone. Returning nothing rather than throwing is what lets one suite run in
- * both trees, and it costs no coverage: an empty exclusion list makes
- * `shippedCodeFiles()` sweep *every* file present instead of fewer, so the marker sweep
- * gets stricter in the export, not laxer.
- */
-function exportedExclusions() {
-  if (!existsSync(join(ROOT, '.exportignore'))) return []
-  return readFileSync(join(ROOT, '.exportignore'), 'utf8')
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line && !line.startsWith('#'))
-}
-
-/**
  * Code and configuration the export carries, and the few things exempt from the sweep.
  *
- * The exemptions are mostly *derived*: anything `.exportignore` drops is out of scope by
- * definition, so adding an entry there removes its exemption here at the same time and
- * nothing has to be remembered twice. That is not a theory — `bitbucket-pipelines.yml`
- * and `test/bitbucket-pipelines.test.js` were named here by hand until the export
- * excluded them, and excluding them is all it took to delete both lines. The remainder
- * are named by hand:
+ * Three exemptions, each named by hand and each for its own reason. The list used to be
+ * longer and partly derived from an exclusion list; with one repository and nothing
+ * withheld, everything is in scope unless it is here:
  *
  * - `src/agents/colour-names.js`, which is generated colour data on one very long line.
  *   It legitimately contains "boysenberry pink", and a codename sweep cannot tell that
@@ -167,9 +134,7 @@ const SWEEP_EXEMPT = new Set([
 ])
 
 async function shippedCodeFiles() {
-  const dropped = exportedExclusions()
-  const kept = (rel) => !dropped.some((path) => rel === path || rel.startsWith(`${path}/`))
-    && !SWEEP_EXEMPT.has(rel)
+  const kept = (rel) => !SWEEP_EXEMPT.has(rel)
   const out = SWEEP_ROOT_FILES.filter((rel) => existsSync(join(ROOT, rel)) && kept(rel))
   const walk = async (dir) => {
     for (const entry of await readdir(dir, { withFileTypes: true })) {
@@ -204,23 +169,10 @@ test('the code the export ships carries no internal reference', async () => {
   )
 })
 
-test('every path the export excludes still exists', { skip: noExportList() }, () => {
-  const gone = exportedExclusions().filter((path) => !existsSync(join(ROOT, path)))
-  assert.deepEqual(
-    gone,
-    [],
-    '.exportignore names paths that are not in the repository. A renamed path is a path '
-      + 'the export no longer excludes, and the list still looks correct — so fix the '
-      + `entry rather than deleting it:\n${gone.join('\n')}`,
-  )
-})
-
-test('every path the third-party inventory curates still exists', { skip: noExportList() }, () => {
+test('every path the third-party inventory curates still exists', () => {
   // `bin/gen-third-party.mjs` treats an absent curated path as "not shipped here", which
-  // is what lets the public export regenerate an inventory describing itself. That
-  // tolerance would also swallow a rename in this repository, where every curated path
-  // *does* exist — so the strict check lives here instead, and runs only in the tree the
-  // export is cut from.
+  // it has to, because a row can legitimately outlive the file it names for a commit or
+  // two. That tolerance would also swallow a rename, so the strict check lives here.
   const curated = JSON.parse(readFileSync(join(ROOT, 'third-party/components.json'), 'utf8'))
   const named = [
     ...curated.distributionRecipes,
@@ -236,21 +188,3 @@ test('every path the third-party inventory curates still exists', { skip: noExpo
   )
 })
 
-test('the export excludes every unpublished documentation page', { skip: noExportList() }, () => {
-  const excluded = new Set(exportedExclusions())
-  const unpublished = readFileSync(join(ROOT, '.eleventyignore'), 'utf8')
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith('docs/') && line.endsWith('.md'))
-
-  // A page held back from the site but shipped in the export is the same document on the
-  // same public repository, one click further away. The two lists have to agree, and this
-  // is the direction that matters: unpublished implies unexported.
-  const missing = unpublished.filter((page) => !excluded.has(page))
-  assert.deepEqual(
-    missing,
-    [],
-    'these pages are unpublished in .eleventyignore but would still be copied into the '
-      + `public repository. Add them to .exportignore:\n${missing.join('\n')}`,
-  )
-})

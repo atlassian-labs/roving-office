@@ -2,8 +2,7 @@
 //
 // One number for the whole layout generator.
 //
-// This is the metric the autoresearch loop optimises
-// (`.claude/skills/autoresearch/VENDORED.md`), which makes it the most
+// This is the metric an autonomous iteration loop optimises, which makes it the most
 // load-bearing file in the layout work: a loop can only ever be as good as the number it
 // ratchets on, and a number that measures the wrong thing will get exactly what
 // it asked for, overnight, in ninety commits.
@@ -34,7 +33,7 @@
 // * **A held-out seed set.** `--tune` is what the loop is allowed to see;
 //   `--hold` is a disjoint set it never does. An improvement on the first that
 //   does not appear on the second is the loop learning the sample, which is what
-//   the loudest autoresearch result in the wild stands accused of.
+//   the loudest such result in the wild stands accused of.
 // * **Nothing here is in the loop's scope.** The generator is mutable; this file,
 //   the simulator and the agent layer are not. The cheapest way to make agents
 //   stop bumping into furniture is to edit the walker, and the second cheapest is
@@ -241,7 +240,7 @@ async function measure(rig, seeds, { minutes }) {
  * So the office-likeness half is a **floor** rather than a dial. These may not
  * fall; everything else is free to move, because everything else is what we are
  * trying to improve. The mechanism is the loop's own `Guard:`, which reverts a
- * change regardless of the metric — see `.claude/skills/autoresearch/`.
+ * change regardless of the metric — see `program.md` for the brief.
  *
  * `clear` and `reliable` are in here too, and they are not about looks: walking
  * through the furniture and errands nobody completes are the two ways a room can

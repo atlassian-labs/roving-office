@@ -3,7 +3,7 @@
 // Three scorers in this repo ask the same shape of question — the office
 // scorecard (src/plan/score.js), the looks judge together with the measures that
 // have not earnt a weight yet (bin/lib/looks-judge.js,
-// bin/lib/looks-candidates.js), and the composite the autoresearch loop ratchets
+// bin/lib/looks-candidates.js), and the composite an autonomous loop ratchets
 // on (bin/office-fitness.js) — and each of them carried its own copy of these
 // one-liners. They belong in one place because a measure is only comparable to
 // another measure if "1" means the same thing in both: a ramp that clamps at one
