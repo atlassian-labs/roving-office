@@ -108,6 +108,28 @@ export function createWelcomeHint() {
   close.setAttribute('aria-label', 'Dismiss welcome hint');
   close.addEventListener('click', () => dismiss());
   hint.append(copy, ' ', shortcuts, ' ', invite, close);
+
+  /*
+   * The whole hint dismisses it, not only the ×.
+   *
+   * A 26-pixel target in a corner is a fine mouse affordance and a poor thumb one, and on
+   * a narrow screen it was worse than poor: the box ran past the right edge and took the ×
+   * with it, so the one way to put the hint away early was off screen. The edges are
+   * pinned now, but a dismissal that depends on a small box landing in exactly the right
+   * place is a dismissal that breaks again the next time the copy grows.
+   *
+   * So the target is the invitation itself — which is also what a person reaches for. The
+   * link is excluded, because tapping *it* means "yes, show me", and dismissing the hint
+   * out from under that tap would be the office deciding the visitor had finished reading.
+   */
+  hint.addEventListener('click', (e) => {
+    // The link by identity rather than `closest('a')`: an anchor whose only child is text
+    // *is* the event target for a tap on that text, so the two are equivalent here — and
+    // this one needs nothing of the element beyond `===`, which keeps it testable against
+    // the stub page in test/lib/dom.js. Revisit if the link ever gains a child element.
+    if (e.target === setup) return;
+    dismiss();
+  });
   document.getElementById('ui').appendChild(hint);
 
   let removeTimer = null;

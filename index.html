@@ -47,6 +47,16 @@
           <!-- Which source fills this scene, and whether it is connected.
                Filled in by src/ui/source-badge.js. -->
           <div id="source-badge" class="source-badge"></div>
+          <!-- The way in, for anyone without a keyboard.
+               Every panel in this office opens by key press, and eighteen of the
+               twenty-four bindings had no pointer route at all — so on a phone the
+               shortcuts overlay was unreachable, and with it the roster, the editor, the
+               buildings and first person. The markup shipped two buttons and both were
+               "Close": two ways to shut things and none to open one.
+               This is the one control that leads to all of them. Wired in src/main.js to
+               the same registry entry `?` fires, so the two cannot drift. -->
+          <button id="help-button" class="help-button" type="button"
+                  aria-label="Keyboard shortcuts and panels" aria-haspopup="dialog">?</button>
         </div>
       </header>
 
