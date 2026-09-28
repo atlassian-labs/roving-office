@@ -121,6 +121,9 @@
         <li>
           <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
         </li>
+        <li>
+          <a href="/docs/developer/adapters/muse.html">Muse</a>
+        </li>
       </ul>
       <h2>Libraries</h2>
       <ul>
@@ -188,8 +191,13 @@ and published under Apache-2.0 like the rest of the tree.</p>
 </tr>
 <tr>
 <td>In-house source glyphs</td>
-<td><code>src/ui/marks.js</code> — <code>cursorMark</code>, <code>testDataMark</code>, <code>plusMark</code></td>
-<td>Original geometry: a cursor chevron, a die, a plus. Not any vendor's logo. Cursor's tile is deliberately an original glyph rather than Cursor's mark</td>
+<td><code>src/ui/marks.js</code> — <code>cursorMark</code>, <code>testDataMark</code>, <code>museMark</code>, <code>plusMark</code></td>
+<td>Original geometry: a cursor chevron, a die, a laptop wearing headphones, a plus. Not any vendor's logo. Cursor's tile is deliberately an original glyph rather than Cursor's mark. The Muse glyph survives for the 3D name-tag and the debug log; the 2D chrome shows the portrait below</td>
+</tr>
+<tr>
+<td>Muse source portrait</td>
+<td><code>assets/muse-avatar.jpg</code></td>
+<td>The contributor's assistant avatar portrait, supplied to identify the Muse source. A source record's <code>image</code> field swaps it in for the vector mark in 2D chrome — picker, badge, switcher and rows — via <code>sourceVisual</code> in <code>src/ui/marks.js</code></td>
 </tr>
 <tr>
 <td>The room, and every prop in it</td>

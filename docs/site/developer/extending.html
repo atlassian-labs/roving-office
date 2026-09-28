@@ -121,6 +121,9 @@
         <li>
           <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
         </li>
+        <li>
+          <a href="/docs/developer/adapters/muse.html">Muse</a>
+        </li>
       </ul>
       <h2>Libraries</h2>
       <ul>
@@ -191,12 +194,15 @@ what a theme or a <code>BUILDINGS</code> entry points at.</li>
 <p>The registry validates both ways at import, and <code>npm run map</code> renders every
 theme's whole city so you can see what you built from above.</p>
 <h2 id="add-a-source" tabindex="-1">Add a source</h2>
-<p>A source fills an office with agents. The five that exist are declared in
+<p>A source fills an office with agents. The six that exist are declared in
 <code>src/data/sources.js</code>, and the picker, the badge and the switcher all read that
 list — none of them know the roster.</p>
 <ol>
 <li><strong>Declare it</strong> — a record in <code>SOURCES</code>: <code>id</code>, <code>label</code>, <code>blurb</code>, <code>accent</code>,
-a <code>mark</code> (inline SVG in <code>ui/marks.js</code>), <code>kind</code>, and a <code>create(ctx)</code> factory.</li>
+a <code>mark</code> (inline SVG in <code>ui/marks.js</code>), <code>kind</code>, and a <code>create(ctx)</code> factory.
+An <code>image</code> field (a static-asset path) optionally swaps a portrait in for the
+mark in 2D chrome — picker, badge, switcher and rows — while the 3D name-tag
+keeps the vector mark.</li>
 <li><strong>Implement it</strong> — a class with the <code>AgentSource</code> shape (<code>start(onEvent)</code>,
 <code>stop()</code>, optional capabilities like <code>sendJob</code>). For a live harness that
 speaks AOP, <code>AopSource</code> already is the implementation — a new AOP harness is

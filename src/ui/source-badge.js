@@ -12,7 +12,7 @@
 // tooltip, where `2 of 3 live` can be spelled out feed by feed.
 
 import { ensureHost, node } from './dom.js';
-import { renderMark } from './marks.js';
+import { sourceVisual } from './marks.js';
 
 /** What each feed state means to someone looking at an empty room. */
 const STATE_TEXT = {
@@ -87,7 +87,7 @@ export function createSourceBadge({ onClick = null } = {}) {
         // Each mark wears its own source's colour, so a mixed office is legible as
         // a mix rather than as one accent applied to three different logos.
         m.style.setProperty('--accent', def.accent);
-        m.innerHTML = renderMark(def.mark);
+        m.innerHTML = sourceVisual(def);
         marks.appendChild(m);
       }
       marks.classList.toggle('stacked', list.length > 1);

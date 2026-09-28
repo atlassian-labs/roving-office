@@ -1,7 +1,7 @@
 // Where an office's agents come from.
 //
-// Four of these are live harness feeds arriving over the Agent Office Protocol
-// (docs/developer/protocol/aop-spec.md); the fifth invents its own traffic so the room can be
+// Six of these are live harness feeds arriving over the Agent Office Protocol
+// (docs/developer/protocol/aop-spec.md); the seventh invents its own traffic so the room can be
 // watched, styled and debugged with nothing installed and nothing running.
 //
 // An office subscribes to as many of them as it likes and shows the results in
@@ -15,7 +15,7 @@ import { agentCapacity } from '../layout.js';
 import { MockSource } from './MockSource.js';
 import { AopSource } from './AopSource.js';
 import { officePath } from '../office/keycard.js';
-import { rovoMark, claudeMark, codexMark, cursorMark, openclawMark, testDataMark } from '../ui/marks.js';
+import { rovoMark, claudeMark, codexMark, cursorMark, openclawMark, museMark, testDataMark } from '../ui/marks.js';
 
 /**
  * @typedef {object} SourceDef
@@ -76,6 +76,20 @@ export const SOURCES = [
     kind: 'aop',
     harness: 'openclaw',
     create: aopFactory('openclaw'),
+  },
+  {
+    id: 'muse',
+    label: 'Muse',
+    blurb: 'Meta’s personal AI agent',
+    accent: '#2fa39a',
+    mark: museMark,
+    // The 2D chrome (picker, badge, switcher, rows) shows this portrait
+    // instead of the glyph: the contributor's assistant avatar, shipped as a
+    // static asset. The 3D name-tag keeps the vector mark — see Agent.js.
+    image: '/assets/muse-avatar.jpg',
+    kind: 'aop',
+    harness: 'muse',
+    create: aopFactory('muse'),
   },
   {
     id: 'test-data',

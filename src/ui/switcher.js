@@ -28,7 +28,7 @@
 
 import { node } from './dom.js';
 import { getSources } from '../data/sources.js';
-import { plusMark, renderMark } from './marks.js';
+import { plusMark, sourceVisual } from './marks.js';
 
 /** How long an armed trash can waits for the second click. */
 const ARM_MS = 3000;
@@ -122,7 +122,7 @@ export function createSceneSwitcher({
       for (const def of defs.slice(0, 3)) {
         const one = node('span', 'switcher-item-glyph');
         one.style.setProperty('--accent', def.accent);
-        one.innerHTML = renderMark(def.mark);
+        one.innerHTML = sourceVisual(def);
         badge.appendChild(one);
       }
 

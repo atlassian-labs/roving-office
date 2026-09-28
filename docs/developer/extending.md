@@ -58,12 +58,15 @@ theme's whole city so you can see what you built from above.
 
 ## Add a source
 
-A source fills an office with agents. The five that exist are declared in
+A source fills an office with agents. The six that exist are declared in
 `src/data/sources.js`, and the picker, the badge and the switcher all read that
 list — none of them know the roster.
 
 1. **Declare it** — a record in `SOURCES`: `id`, `label`, `blurb`, `accent`,
    a `mark` (inline SVG in `ui/marks.js`), `kind`, and a `create(ctx)` factory.
+   An `image` field (a static-asset path) optionally swaps a portrait in for the
+   mark in 2D chrome — picker, badge, switcher and rows — while the 3D name-tag
+   keeps the vector mark.
 2. **Implement it** — a class with the `AgentSource` shape (`start(onEvent)`,
    `stop()`, optional capabilities like `sendJob`). For a live harness that
    speaks AOP, `AopSource` already is the implementation — a new AOP harness is

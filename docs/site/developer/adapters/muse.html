@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Muse — The Roving Office</title>
+  <meta name="description" content="How the office is built, and how to change it." />
+  
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" href="/assets/icon-192.png" sizes="192x192" />
+  <link rel="preload" href="/docs/assets/Inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/docs/assets/ui-theme.css" />
+  <link rel="stylesheet" href="/docs/assets/docs.css" />
+</head>
+<body>
+  <a class="skip" href="#doc">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/logo-64.png" alt="" width="26" height="26" />
+      <span>The Roving Office</span>
+    </a>
+    <nav class="tabs" aria-label="Documentation sets">
+      <a href="/docs/user/index.html">For everyone</a>
+      <a href="/docs/developer/index.html" aria-current="page">For developers</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Contents</button>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="sidebar" aria-label="developer documentation">
+      <h2>Start here</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/index.html">Where to look</a>
+        </li>
+        <li>
+          <a href="/docs/developer/getting-the-code.html">Getting the code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/developing.html">Developing on it</a>
+        </li>
+        <li>
+          <a href="/docs/developer/npm-scripts.html">Every npm script</a>
+        </li>
+      </ul>
+      <h2>How it works</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/architecture.html">Architecture</a>
+        </li>
+        <li>
+          <a href="/docs/developer/physics.html">The physics of the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/scene-internals.html">Scene internals</a>
+        </li>
+        <li>
+          <a href="/docs/developer/job-delivery.html">Job delivery</a>
+        </li>
+        <li>
+          <a href="/docs/developer/editor.html">The furniture editor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/layout-algorithm.html">The layout algorithm</a>
+        </li>
+        <li>
+          <a href="/docs/developer/tuning-the-layouts.html">Tuning the layout generator</a>
+        </li>
+        <li>
+          <a href="/docs/developer/sources.html">The source model</a>
+        </li>
+        <li>
+          <a href="/docs/developer/test-data.html">The Test Data source</a>
+        </li>
+      </ul>
+      <h2>Changing it</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/extending.html">Extending the office</a>
+        </li>
+        <li>
+          <a href="/docs/developer/prop-portraits.html">Photographing a prop</a>
+        </li>
+        <li>
+          <a href="/docs/developer/visual-assets.html">Visual assets and their rights</a>
+        </li>
+        <li>
+          <a href="/docs/developer/coplanar-probe.html">The coplanar-face probe</a>
+        </li>
+        <li>
+          <a href="/docs/developer/plugin-distribution.html">Publishing the plugins</a>
+        </li>
+        <li>
+          <a href="/docs/developer/admin-console.html">The admin console</a>
+        </li>
+      </ul>
+      <h2>The protocol</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/protocol/aop-spec.html">The AOP spec</a>
+        </li>
+        <li>
+          <a href="/docs/developer/protocol/aop-harness-adapters.html">Adapter notes</a>
+        </li>
+      </ul>
+      <h2>Adapters</h2>
+      <ul>
+        <li>
+          <a href="/docs/developer/adapters/rovo-cli.html">Rovo CLI</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/claude-code.html">Claude Code</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/cursor.html">Cursor</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/codex.html">Codex</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/openclaw.html">OpenClaw</a>
+        </li>
+        <li>
+          <a href="/docs/developer/adapters/muse.html" aria-current="page">Muse</a>
+        </li>
+      </ul>
+      <h2>Libraries</h2>
+      <ul>
+        <li>
+          <a href="/docs/character-movements.html">Every character movement <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/item-movements.html">Every object, turning <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-seeds.html">Two dozen generated offices <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+        <li>
+          <a href="/docs/office-variety.html">Thirty offices, thirty seeds <span class="ext" aria-label="standalone page">↗</span></a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="doc" class="doc">
+      <h1 id="muse-adapter" tabindex="-1">Muse adapter</h1>
+<p><em>This is the emitter, not a mapper.</em> The other adapters turn a harness's
+native events into AOP on the wire; this one is for an agent that composes
+AOP events directly and just needs them delivered. It runs on the agent's
+machine:</p>
+<pre><code class="language-sh">node bin/aop-emit.cjs &lt;event-type&gt; '&lt;payload-json&gt;'
+</code></pre>
+<p><a href="../protocol/aop-spec.html#9-conformance-levels">Conformance level L2</a>.
+Redaction is the calling agent's responsibility: its permissions and
+instructions must compose metadata-only events containing only tool names,
+tool classes, tidied paths, durations and counts — never file contents,
+prompts, replies or command output. The emitter transports the payload it is
+given unchanged; it does not apply a second redaction pass. The normative
+statement is <a href="../protocol/aop-spec.html#10-privacy-and-redaction">§10 of the spec</a>.</p>
+<h2 id="why-a-spool-and-a-detached-sender" tabindex="-1">Why a spool and a detached sender</h2>
+<p>Every invocation appends one event to <code>~/.roving-office/spool.ndjson</code> and
+kicks a detached sender, then exits <code>0</code> — the agent never blocks on the
+network, and a slow or unreachable office never becomes a slow agent. If a
+flush fails the spool keeps the events and a later kick retries, so delivery
+is at-least-once and the office de-duplicates on event id. The spool caps
+itself at 2000 lines, keeping the newest three quarters when it trims.</p>
+<p>The session id and sequence counter live in <code>~/.roving-office/session.json</code>
+(mode <code>0600</code>, like everything here that could identify a machine).</p>
+<h2 id="a-first-class-source" tabindex="-1">A first-class source</h2>
+<p>Muse is the seventh source in the office's source list (<code>src/data/sources.js</code>,
+<code>kind: 'aop'</code>, <code>harness: 'muse'</code>), with its own mark and picker tile — so the
+emitter reports <code>muse</code> honestly. No costume, no borrowed identity: the
+<code>harness.name</code> on the wire is the source the room subscribes to. <code>AOP_HARNESS</code>
+overrides it, along with <code>AOP_ACTOR</code> and <code>AOP_PROJECT</code>.</p>
+<h2 id="avatar" tabindex="-1">Avatar</h2>
+<p>The emitter picks up <code>~/.roving-office/avatar.json</code> (<code>{&quot;path&quot;: &quot;&lt;path&gt;&quot;}</code>)
+and sends it as <code>session.actor_avatar</code> on every event. To get that path,
+PUT the raw image bytes (PNG, JPEG, GIF or WebP, ≤ 2 MB) to
+<code>/office/&lt;keycard&gt;/aop/v0/avatars/&lt;sha256&gt;</code> with the write token in the
+<code>X-Roving-Office-Token</code> header; the response carries the path to save.</p>
+<h2 id="narration" tabindex="-1">Narration</h2>
+<p>The emitter is dumb on purpose — the interesting behaviour is the
+convention of the agent driving it, including keeping its payload inside the
+agent's metadata-only permissions. Descriptive <code>turn.start</code> titles (never
+&quot;Working&quot;), the to-do list up front in the turn payload as <code>todos: [...]</code>,
+per-step <code>tool.start</code> / <code>tool.end</code> with a plain-language <code>label</code>, and
+<code>session.heartbeat</code> notes with progress on long tasks. The detail panel
+becomes the play-by-play.</p>
+<p>Break multi-step work into a numbered sequence and say which step you are
+on for each job — &quot;step 3 of 6: pushing the branch&quot;, then &quot;step 4 of 6&quot; when
+it moves. A watcher should always be able to answer &quot;where is it up to?&quot;
+without reading the chat.</p>
+<h2 id="usage" tabindex="-1">Usage</h2>
+<pre><code class="language-sh"># announce a session (capabilities are what the office may expect)
+node bin/aop-emit.cjs session.start '{&quot;source&quot;:&quot;startup&quot;,&quot;capabilities&quot;:[&quot;session.start&quot;,&quot;session.end&quot;,&quot;turn.start&quot;,&quot;turn.end&quot;,&quot;tool.start&quot;,&quot;tool.end&quot;,&quot;artifact.change&quot;],&quot;redaction&quot;:&quot;metadata&quot;}'
+
+# a unit of work, with its to-do list
+node bin/aop-emit.cjs turn.start '{&quot;title&quot;:&quot;Researching flights to Tokyo&quot;,&quot;trigger&quot;:&quot;user&quot;,&quot;todos&quot;:[{&quot;label&quot;:&quot;Search flight prices&quot;,&quot;done&quot;:false},{&quot;label&quot;:&quot;Compare the top 3&quot;,&quot;done&quot;:false}]}'
+
+# notable steps, labelled for watchers; tool_class is one of
+# read | search | edit | execute | network | knowledge | scm | agent | wait | other
+node bin/aop-emit.cjs tool.start '{&quot;tool_class&quot;:&quot;search&quot;,&quot;label&quot;:&quot;Searching flight prices&quot;}'
+node bin/aop-emit.cjs tool.end '{&quot;tool_class&quot;:&quot;search&quot;,&quot;label&quot;:&quot;Searching flight prices&quot;,&quot;status&quot;:&quot;ok&quot;,&quot;duration_ms&quot;:2400}'
+
+# a durable deliverable
+node bin/aop-emit.cjs artifact.change '{&quot;kind&quot;:&quot;report&quot;,&quot;path&quot;:&quot;~/workspace/tokyo-flights.md&quot;,&quot;summary&quot;:&quot;3 options compared&quot;}'
+
+# end of work, and a clean exit (the character walks out instead of lingering)
+node bin/aop-emit.cjs turn.end '{&quot;status&quot;:&quot;completed&quot;,&quot;title&quot;:&quot;Researching flights to Tokyo&quot;,&quot;summary&quot;:&quot;Found 3 options under budget&quot;}'
+node bin/aop-emit.cjs session.end '{&quot;reason&quot;:&quot;exit&quot;}'
+</code></pre>
+<p>Endpoint and token come from <code>~/.roving-office/endpoint.json</code> (mode <code>0600</code>;
+<code>AOP_URL</code> / <code>AOP_TOKEN</code> override it):</p>
+<pre><code class="language-json">{
+  &quot;url&quot;: &quot;https://therovingoffice.com/office/&lt;KEYCARD&gt;/aop/v0/events&quot;,
+  &quot;keycard&quot;: &quot;&lt;KEYCARD&gt;&quot;,
+  &quot;token&quot;: &quot;&lt;WRITE_TOKEN&gt;&quot;
+}
+</code></pre>
+
+    </main>
+
+    <aside class="aside" aria-label="On this page">
+      <h2>On this page</h2>
+      <nav class="toc"><ul><li><a href="#why-a-spool-and-a-detached-sender">Why a spool and a detached sender</a></li>
+<li><a href="#a-first-class-source">A first-class source</a></li>
+<li><a href="#avatar">Avatar</a></li>
+<li><a href="#narration">Narration</a></li>
+<li><a href="#usage">Usage</a></li></ul></nav>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    <p>
+      
+      Written for anyone with a checkout. If you just want to use the thing,
+      <a href="/docs/user/index.html">the user docs</a> are the other door.
+      
+    </p>
+    <p class="wink">It's very alpha. It was written mostly on a plane.</p>
+  </footer>
+
+  <script src="/docs/assets/docs.js"></script>
+</body>
+</html>
