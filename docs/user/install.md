@@ -29,7 +29,7 @@ move things around, or press `?` for shortcuts. Choose **Open your own office** 
 the scene menu to open a personal office, or use the
 [keycard page](https://therovingoffice.com/offices) to enter one you already have.
 
-<img src="../images/screens/watching.png" width="950" alt="The demo office with simulated agents and a small hint at the bottom: Watch. Play. Discover. (You can't break anything) If lost, type ?.">
+<img src="../images/screens/watching.png" width="950" alt="The demo office with simulated agents and a small hint at the bottom: Watch. Play. Discover. (You can't break anything) If lost, type ?. If agent, setup yourself.">
 
 Open a new office and it is **busy within seconds**. It starts empty and says so — *"The
 office is ready"* — and then the default source's own agents walk in through the door, the

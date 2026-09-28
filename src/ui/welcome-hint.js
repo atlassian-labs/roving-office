@@ -1,4 +1,5 @@
-// A short invitation on arrival, and the one thing that ends it early.
+// A short invitation on arrival, the way further in, and the one thing that ends it
+// early.
 //
 // It sits bottom-centre at z-index 25, which is directly over the strips along the
 // bottom of the screen. That was fine while it was the only thing on screen and
@@ -71,12 +72,42 @@ export function createWelcomeHint() {
   const copy = node('span', 'welcome-copy');
   copy.append(node('strong', '', 'Watch. Play. Discover.'), " (You can't break anything)");
   const shortcuts = node('span', 'welcome-shortcuts');
-  shortcuts.append('If lost, type ', node('kbd', '', '?'));
+  shortcuts.append('If lost, type ', node('kbd', '', '?'), '.');
+
+  /*
+   * The other question, and it is addressed to the other reader.
+   *
+   * `?` answers "how do I drive this", to a person. The line beside it is written to an
+   * *agent* — which is not a joke, it is who tends to be looking: somebody pastes a
+   * screenshot of the room into a session, or an agent is driving the browser itself. The
+   * page it points at is a document written to be fetched and executed, so an agent that
+   * reads "If agent, setup yourself" has both the instruction and the means.
+   *
+   * For a person it still reads as the answer to "how do I get *my* agents in here",
+   * which until this link nothing in the running app answered — somebody could watch a
+   * busy office for ten minutes without learning it was one pasted sentence away.
+   *
+   * **A new tab, not this one.** Every other link in the office does the same, for a
+   * reason worth stating: navigating the office away loses the room, the camera and the
+   * selection, and this hint's whole job is to invite somebody further in rather than
+   * out. `rel` goes with `target` as it always must.
+   *
+   * Root-relative, not origin-absolute: an office on Fly and one on a laptop are
+   * different origins and only one of them could ever be written down here. Same rule as
+   * `src/ui/dev-panel.js`, which has the longer version of this note.
+   */
+  const invite = node('span', 'welcome-invite');
+  const setup = node('a', '', 'setup yourself');
+  setup.href = '/agent-setup/';
+  setup.target = '_blank';
+  setup.rel = 'noopener noreferrer';
+  invite.append('If agent, ', setup, '.');
+
   const close = node('button', 'welcome-close', '×');
   close.type = 'button';
   close.setAttribute('aria-label', 'Dismiss welcome hint');
   close.addEventListener('click', () => dismiss());
-  hint.append(copy, ' ', shortcuts, close);
+  hint.append(copy, ' ', shortcuts, ' ', invite, close);
   document.getElementById('ui').appendChild(hint);
 
   let removeTimer = null;

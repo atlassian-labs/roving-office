@@ -74,9 +74,12 @@ deleted.
 ## Reception
 
 The front door opens straight into the **demo office**. A small invitation at the
-bottom says “Watch. Play. Discover. (You can't break anything) If lost, type `?`”.
-Press `?` to see what you can do. The hint fades away after twenty seconds, or you
-can dismiss it sooner.
+bottom says “Watch. Play. Discover. (You can't break anything) If lost, type `?`.
+If agent, setup yourself.” Press `?` to see what you can do, and follow **setup
+yourself** for the one-line route to having your own sessions walk in — it is written
+to an agent, because an agent is often the one reading the screen. The hint fades away
+after twenty seconds, or you can dismiss it sooner; the same link is in the **Choose
+sources** dialog, which does not go anywhere.
 
 It also gets out of the way the moment you open a panel — Scene, Developer, Edit
 Mode, an agent's detail panel, the keycard dialog, the datasources picker or the
