@@ -25,7 +25,8 @@ npm run serve
 Then open the URL it prints — usually `http://localhost:8080`. You arrive directly
 in the demo office, with a random building and season and a clock showing your
 local time. Simulated agents are already getting to work. Watch,
-move things around, or press `?` for shortcuts. Choose **Open your own office** in
+move things around, or press `?` — or tap the **?** button — for shortcuts. Choose
+**Open your own office** in
 the scene menu to open a personal office, or use the
 [keycard page](https://therovingoffice.com/offices) to enter one you already have.
 

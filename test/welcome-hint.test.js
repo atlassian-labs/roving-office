@@ -226,3 +226,26 @@ test('the × still dismisses, with the link beside it', () => {
   assert.equal(hint.isShowing, false);
   assert.equal(onScreen(p.ui), false);
 });
+
+test('the whole hint dismisses it, because a thumb is not a mouse pointer', () => {
+  // The × is a 26px corner target: fine for a pointer, poor for a thumb, and at narrow
+  // widths it had run off the screen entirely along with the box's right edge. So the
+  // target is the invitation itself.
+  const p = page();
+  const hint = createWelcomeHint();
+  const box = p.ui.children.find((c) => c.className?.includes('welcome-hint'));
+  box.click();
+  assert.equal(hint.isShowing, false, 'tapping the hint should dismiss it');
+  assert.equal(onScreen(p.ui), false);
+});
+
+test('but tapping the setup link does not dismiss it out from under the tap', () => {
+  // Following the link means "yes, show me". Dismissing on the same tap would be the
+  // office deciding the visitor had finished reading.
+  const p = page();
+  const hint = createWelcomeHint();
+  const link = setupLinkIn(p.ui);
+  link.click();
+  assert.equal(hint.isShowing, true, 'the link must not dismiss the hint');
+  hint.dismiss();
+});

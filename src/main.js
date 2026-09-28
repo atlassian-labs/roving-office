@@ -55,13 +55,43 @@ const loading = document.getElementById('loading');
 // so your camera framing survives the swap.
 
 const renderer = createRenderer({ canvas });
-renderer.setSize(window.innerWidth, window.innerHeight);
+
+/**
+ * How big the picture actually is, in CSS pixels.
+ *
+ * **The canvas's own box, never the window's.** On a desktop the two agree and it never
+ * mattered; on a phone they disagree constantly, and every disagreement is a visible bug:
+ *
+ *   - `window.innerHeight` is the *layout* viewport, which on iOS is sized as though the
+ *     URL bar were hidden. `#app` is `100dvh`, which is the area actually visible. Sizing
+ *     the renderer from the first while CSS lays out the second is what drew the scene
+ *     into part of the screen and left the rest as background.
+ *   - A host embedding the office in a frame has a canvas that is not the window at all.
+ *
+ * Reading the element is also what makes `updateStyle: false` safe below: CSS owns the
+ * box, this reads it back, and the two cannot drift. `src/scene/vignette.js` has done it
+ * this way all along.
+ *
+ * Falls back to the window before first layout, when the box is still zero.
+ */
+function canvasSize() {
+  const w = canvas.clientWidth || window.innerWidth;
+  const h = canvas.clientHeight || window.innerHeight;
+  return { w, h, aspect: w / h };
+}
+
+// `false` is the whole of the bug fixed. three.js defaults `updateStyle` to true and
+// writes `canvas.style.width/height` in pixels, which beats the stylesheet and pins the
+// element to whatever the viewport was at that instant — so a later change to the visible
+// area left the scene in a fixed box with background below it. The drawing buffer still
+// follows the size given here; only the element's CSS is left to CSS.
+renderer.setSize(canvasSize().w, canvasSize().h, false);
 
 const scene = new THREE.Scene();
 const reflections = createReflectionEnvironment(renderer);
 scene.environment = reflections.texture;
 
-const camera = createCamera(window.innerWidth / window.innerHeight);
+const camera = createCamera(canvasSize().aspect);
 const controls = createControls(camera, canvas);
 
 /**
@@ -69,7 +99,7 @@ const controls = createControls(camera, canvas);
  * cheap to hold and its own aspect has to survive resizes whether or not the view
  * is active, so it cannot be made on demand.
  */
-const fpvCamera = createFirstPersonCamera(window.innerWidth / window.innerHeight);
+const fpvCamera = createFirstPersonCamera(canvasSize().aspect);
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -856,6 +886,21 @@ register({
   onPress: () => shortcutsPanel.toggle(),
 });
 
+/*
+ * The same binding, for a finger.
+ *
+ * Through `press('help')` rather than calling `shortcutsPanel.toggle()` again, which is
+ * the rule the registry exists to enforce: one action, one definition, and a later change
+ * to what `?` does is a change to what this does too. Firing the id is also why the
+ * binding can stay `hidden` — the overlay teaches the key beside its own title, and this
+ * button is the way in for anyone who has no key to press.
+ *
+ * Guarded on the element, so an embed shipping its own chrome and `debuglog.html`, which
+ * has no title bar, are both unaffected.
+ */
+document.getElementById('help-button')
+  ?.addEventListener('click', () => press('help'));
+
 register({
   id: 'dev',
   keys: ['V'],
@@ -1196,8 +1241,13 @@ canvas.addEventListener('pointerup', (e) => {
   downXY = null;
   if (moved > 6) return;
 
-  pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
-  pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  // Relative to the canvas and offset by where it starts, not to the window. A canvas
+  // that does not fill the window — a phone whose visible area differs from the layout
+  // viewport, or an embed in a frame — made every tap land somewhere other than where the
+  // finger was, and the miss grew with the discrepancy.
+  const box = canvas.getBoundingClientRect();
+  pointer.x = ((e.clientX - box.left) / box.width) * 2 - 1;
+  pointer.y = -((e.clientY - box.top) / box.height) * 2 + 1;
   // Cast from whichever lens drew the frame, so clicking an agent seen from inside
   // another one's head selects who you actually pointed at.
   raycaster.setFromCamera(pointer, activeCamera());
@@ -1233,13 +1283,13 @@ setInterval(updateWallClock, 500);
  */
 setInterval(() => world?.manager.tidy(), 15_000);
 
-window.addEventListener('resize', () => {
-  const aspect = window.innerWidth / window.innerHeight;
+function viewportChanged() {
+  const { w, h, aspect } = canvasSize();
   updateCameraAspect(camera, aspect);
   // Both lenses, always: resizing while riding must fix the view you are in, and
   // resizing while outside must not leave a stale aspect waiting for the next `f`.
   updateFirstPersonAspect(fpvCamera, aspect);
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(w, h, false);
 
   /* Re-frame if a host asked for a frame mode.
    *
@@ -1255,7 +1305,31 @@ window.addEventListener('resize', () => {
   frameControl.refresh();
   // After the frame mode, because it may have changed the zoom this reads.
   refreshTagLegibility();
-});
+}
+
+/*
+ * Every event that can mean "the picture changed size", because `resize` alone does not
+ * cover a phone.
+ *
+ * On iOS Safari the URL bar collapsing and expanding changes the visible area and fires
+ * **no `resize` event at all** — only `visualViewport` hears about it. That is the whole
+ * reason the scene could end up drawn into part of the screen and stay there: nothing
+ * told the app to look again. `scroll` is on the list for the same reason, because the
+ * visual viewport reports a mid-collapse move as scrolling rather than resizing.
+ *
+ * `orientationchange` is belt and braces — it usually fires a `resize` too, but on some
+ * browsers it fires *before* the new dimensions settle, so the extra call lands the
+ * right numbers.
+ *
+ * Guarded rather than assumed: `visualViewport` is absent on older browsers, and a page
+ * without it keeps exactly the behaviour this replaced.
+ */
+window.addEventListener('resize', viewportChanged);
+window.addEventListener('orientationchange', viewportChanged);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', viewportChanged);
+  window.visualViewport.addEventListener('scroll', viewportChanged);
+}
 
 const timer = new THREE.Timer();
 window.__dbg = { get world(){return world} };
@@ -1339,7 +1413,7 @@ requestAnimationFrame(() => loading.classList.add('done'));
  */
 function refreshTagLegibility() {
   const scale = tagLegibilityFor({
-    viewportHeight: window.innerHeight,
+    viewportHeight: canvasSize().h,
     zoom: camera.zoom,
     frustum: CAMERA.frustum,
   });
@@ -1359,8 +1433,7 @@ function commitCameraView() {
 }
 
 function applyFrameMode(mode) {
-  const w = window.innerWidth;
-  const h = window.innerHeight;
+  const { w, h } = canvasSize();
   if (!w || !h) return;
 
   camera.updateMatrixWorld();

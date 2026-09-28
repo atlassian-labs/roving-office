@@ -1,6 +1,14 @@
 # Keys and panels
 
-*Everything the keyboard does. Press `?` in the app for the same list.*
+*Everything the keyboard does. Press `?` in the app for the same list — or tap the
+**?** button in the title bar, which is the way in on a phone or tablet where there is
+no key to press.*
+
+**The list is also the menu.** Every row whose shortcut can be fired on its own is a
+button: tap it and it does what the key does. So the panels, the editor, first person and
+the buildings are all reachable without a keyboard, through that one button. The rows that
+stay plain text are the ones that need a gesture — a drag, a scroll — or a key with the
+pointer somewhere particular.
 
 <img src="../images/panels/shortcuts.png" width="584" alt="The shortcuts panel: keys grouped under Agents, Scene, Edit Mode and Developer, each with the key on the left and what it does on the right.">
 

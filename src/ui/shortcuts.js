@@ -288,7 +288,26 @@ export function createShortcutsPanel() {
       section.appendChild(h);
 
       for (const item of group.items) {
-        const row = node('div', 'sc-row');
+        /*
+         * A row that can be fired is a button; one that cannot stays a div.
+         *
+         * This is what makes the office reachable without a keyboard. The overlay is
+         * already a complete list of everything registered, so turning its rows into
+         * controls turns it into the menu the app never had. `press` goes through the
+         * registry rather than repeating the action here, for the reason its own docblock
+         * gives: whatever `A` does to the roster is what this does, including later.
+         *
+         * `onPress` is absent for gestures and for bindings that need the event, so drag,
+         * scroll and the arrow keys still render as description. That is the honest split
+         * — a row is tappable when, and only when, its binding can be fired without one.
+         */
+        const actionable = typeof item.onPress === 'function';
+        const row = actionable ? node('button', 'sc-row sc-row-go') : node('div', 'sc-row');
+        if (actionable) {
+          row.type = 'button';
+          // Closed first, so a panel opened from the list is not covered by the list.
+          row.addEventListener('click', () => { hide(); press(item.id); });
+        }
 
         const keys = node('span', 'sc-keys');
         item.keys.forEach((k, i) => {

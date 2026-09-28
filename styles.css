@@ -12,7 +12,13 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-#app { position: relative; width: 100vw; height: 100vh; }
+/* `100dvh`, not `100vh`: on a phone `vh` is the *large* viewport — the height as if the
+   browser chrome were hidden — so a `100vh` shell is taller than the screen and the scene
+   sized to it hangs below the fold. `dvh` tracks what is visible. The `vh` line stays
+   first as the fallback for a browser without `dvh`, which is the behaviour this replaced.
+   `width: 100%` rather than `100vw` for the same family of reason: `vw` ignores a
+   scrollbar and overflows by its width. */
+#app { position: relative; width: 100%; height: 100vh; height: 100dvh; }
 
 #scene { display: block; width: 100%; height: 100%; }
 
@@ -27,6 +33,28 @@ html, body {
   pointer-events: none;
 }
 .brand { display: flex; align-items: center; gap: 10px; }
+
+/* The way into the shortcuts overlay for anyone without a keyboard. Sized to the 44px
+   touch target Apple and Android both ask for — the × on the welcome hint is 26px, which
+   is what a pointer wants and a thumb misses. */
+.help-button {
+  pointer-events: auto; flex: 0 0 auto;
+  min-width: 34px; min-height: 34px; padding: 0 10px;
+  border: 1px solid var(--border); border-radius: 999px;
+  background: var(--panel-solid); color: var(--muted);
+  font: 600 14px var(--font-sans); font-feature-settings: var(--font-variants-sans);
+  cursor: pointer;
+}
+.help-button:hover { color: var(--brand); border-color: var(--brand); }
+
+/* A row that fires its binding looks like a row and behaves like a button: the list is
+   the menu now, so the affordance has to read as one without turning the reference into
+   a wall of buttons. */
+.sc-row-go {
+  width: 100%; border: 0; border-radius: 8px; background: none;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+}
+.sc-row-go:hover { background: var(--surface-hovered); }
 /* The office's own mark, where a green lamp used to stand in for one. It lives
    inside the anchor, so the mark and the name are a single way back to reception
    rather than two targets side by side; `inline-flex` on the anchor is what puts
@@ -294,6 +322,12 @@ html, body {
   position: absolute;
   bottom: 16px; left: 16px;
   width: 264px;
+  /* Capped and scrollable, which `#inspector` has always been and this had not: the
+     roster grows with the number of agents, and on a short screen it simply ran off the
+     bottom — the STATUS legend and the mailbox line were unreachable rather than merely
+     below the fold. */
+  max-height: calc(100vh - 96px); max-height: calc(100dvh - 96px);
+  overflow: auto;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -438,7 +472,11 @@ html, body {
 #inspector {
   position: absolute;
   bottom: 16px; right: 16px;
-  width: 336px; max-height: calc(100vh - 96px);
+  width: 336px;
+  /* `dvh` for the same reason `#app` uses it: on a phone `vh` is the height as if the
+     browser chrome were hidden, so a panel capped in `vh` is capped too tall and runs
+     off the bottom of the screen. The `vh` line stays as the fallback. */
+  max-height: calc(100vh - 96px); max-height: calc(100dvh - 96px);
   overflow: auto;
   background: var(--panel);
   border: 1px solid var(--border);
@@ -1553,7 +1591,7 @@ img.src-visual-img { border-radius: 50%; object-fit: cover; }
    and a phone gets one column (see `.kd-grid`). */
 .kd-card {
   width: min(744px, 100%);
-  max-height: calc(100vh - 48px);
+  max-height: calc(100vh - 48px); max-height: calc(100dvh - 48px);
   overflow-y: auto;
   padding: 20px 22px 18px;
   background: var(--panel-solid);
@@ -2990,7 +3028,8 @@ body.debuglog #title-bar { max-width: none; border-radius: 0; }
 }
 
 /* The office is the front door; this invitation stays out of the room's way. */
-.welcome-hint { position: absolute; bottom: calc(24px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 25; pointer-events: auto; width: max-content; max-width: calc(100% - 48px); padding: 12px 40px 12px 16px; border-radius: var(--radius-surface); background: var(--panel-solid); box-shadow: var(--shadow-panel); color: var(--text); font-size: 13px; line-height: 20px; text-align: center; transition: opacity 600ms ease; }
+/* `cursor: pointer` because the whole box dismisses — see welcome-hint.js. */
+.welcome-hint { cursor: pointer; position: absolute; bottom: calc(24px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 25; pointer-events: auto; width: max-content; max-width: calc(100% - 48px); padding: 12px 40px 12px 16px; border-radius: var(--radius-surface); background: var(--panel-solid); box-shadow: var(--shadow-panel); color: var(--text); font-size: 13px; line-height: 20px; text-align: center; transition: opacity 600ms ease; }
 .welcome-hint.is-leaving { opacity: 0; pointer-events: none; }
 .welcome-shortcuts { display: inline-block; margin-left: 8px; white-space: nowrap; }
 /* Beside the shortcut hint, and the same shape as it. `--brand` because
@@ -3011,7 +3050,31 @@ body.debuglog #title-bar { max-width: none; border-radius: 0; }
 .offices-page .wz-recent { margin-top: 32px; }
 .offices-note { margin: 32px 0 0; font-size: 13px; line-height: 20px; color: var(--muted); }
 @media (max-width: 600px) {
-  .welcome-hint { bottom: calc(16px + env(safe-area-inset-bottom)); max-width: calc(100% - 32px); }
+  /* Anchored to both edges rather than centred-and-capped.
+   *
+   * `max-width` with `width: max-content` should have been enough and measurably was not:
+   * at 390px the box ran past the right edge, clipping the first line's closing bracket
+   * and taking the × off screen with it — and the × is the only way to dismiss the hint
+   * early, so on a phone it could not be dismissed at all. Pinning `left` and `right` and
+   * dropping the centring transform makes overflow arithmetically impossible instead of
+   * merely discouraged, which is the right trade for a box whose close button is the thing
+   * that goes missing.
+   *
+   * `width: auto` is required: the base rule sets `width: max-content`, which would win
+   * over the pinned edges and put the overflow straight back. */
+  .welcome-hint {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    left: 16px; right: 16px; width: auto; max-width: none; transform: none;
+    padding-right: 44px;
+  }
+  /* Room to breathe on two lines, and the separator between the clauses stops being a
+     margin on a nowrap span — which is what let them sit on one over-long line. */
+  .welcome-shortcuts, .welcome-invite { margin-left: 0; }
+  .welcome-invite { display: block; margin-top: 2px; }
+  /* Tighter still on a phone. The title bar wraps to two rows here and the invitation
+     takes three lines at this width, so the space a bottom-anchored panel actually has is
+     a good deal less than on a laptop. Without this the roster is drawn under both. */
+  #agent-panel, #inspector { max-height: calc(100dvh - 210px); }
   #wizard.offices-page { padding-top: 24px; }
   .offices-page h1 { font-size: 28px; line-height: 36px; }
   .offices-page .wz-input { flex-basis: auto; }
