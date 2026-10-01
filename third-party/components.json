@@ -10,7 +10,8 @@
     "bin/aop-plugin-pack.cjs",
     "bin/lib/zip.cjs",
     "eleventy.config.mjs",
-    ".github/workflows/ci.yml"
+    ".github/workflows/ci.yml",
+    ".github/workflows/deploy.yml"
   ],
   "distributions": {
     "source": "Git source archive/checkout: vendored code, assets, development source and notices. npm packages are not bundled; package-lock.json identifies the separate development install.",
@@ -23,7 +24,8 @@
     "hosted-app": "Dockerfile.fly copies src, lib, assets, vendor, generated docs, images and examples. THIRD_PARTY_NOTICES.txt contains the bundled Three.js, colour-data and font licenses; vendor retains originals. npm development tools are not copied.",
     "docs-site": "Generated docs/site contains authored HTML/CSS/JS and copies of the two OFL fonts, their licences and the theme CSS. Eleventy and its npm dependencies execute at build time and are not bundled as libraries. Screenshots can reproduce the app's brand assets.",
     "fly-container": "Application payload plus the dynamically resolved node:24-slim image. A release needs the actual image digest, Node version, OS/package inventory and retained base-image notices. This source inventory does not claim to be an image SBOM.",
-    "ci": ".github/workflows/ci.yml runs verification only, on the GitHub-hosted ubuntu-latest runner with Node 24 and Node 26 supplied by actions/setup-node. It installs no deployment tooling and holds no credential. These build tools are not bundled in application artifacts, and exact runner image versions are not pinned here."
+    "ci": ".github/workflows/ci.yml runs verification only, on the GitHub-hosted ubuntu-latest runner with Node 24 and Node 26 supplied by actions/setup-node. It installs no deployment tooling and holds no credential. These build tools are not bundled in application artifacts, and exact runner image versions are not pinned here.",
+    "deploy": ".github/workflows/deploy.yml deploys the hosted app from main on the GitHub-hosted ubuntu-latest runner. It installs flyctl through superfly/flyctl-actions/setup-flyctl, pinned by commit, and holds the Fly deploy token as a production environment secret; the image itself is built from Dockerfile.fly on Fly's remote builder, so the payload is the one described under fly-container and hosted-app. flyctl and the action are deployment tooling and are not bundled in any application artifact; neither their release versions nor the runner image version are pinned here."
   },
   "components": [
     {
@@ -337,14 +339,16 @@
       ],
       "paths": [
         "Dockerfile.fly",
-        ".github/workflows/ci.yml"
+        ".github/workflows/ci.yml",
+        ".github/workflows/deploy.yml"
       ],
       "licenseFiles": [],
       "distributions": [
         "fly-container",
-        "ci"
+        "ci",
+        "deploy"
       ],
-      "review": "Node includes MIT and separately licensed bundled components. The Fly image additionally contains Debian packages with their own licenses. node:24-slim and the GitHub-hosted runner images resolve later; no exact digest or OS package list can be concluded from this checkout. Capture an SBOM and license/source obligations for the actual released container, retaining /usr/share/doc and Node upstream notices. Host-provided browsers, Node and harness applications are not bundled with the source, Codex staging or OpenClaw tarball."
+      "review": "Node includes MIT and separately licensed bundled components. The Fly image additionally contains Debian packages with their own licenses. node:24-slim and the GitHub-hosted runner images resolve later; no exact digest or OS package list can be concluded from this checkout. Capture an SBOM and license/source obligations for the actual released container, retaining /usr/share/doc and Node upstream notices. Host-provided browsers, Node and harness applications are not bundled with the source, Codex staging or OpenClaw tarball. flyctl and superfly/flyctl-actions run on the deployment runner only: the action is pinned by commit, the flyctl release it installs resolves at run time, and neither is bundled in any artifact."
     }
   ],
   "npmEvidence": {

@@ -10,8 +10,11 @@
 # code from a fork hands that token to whoever wrote the diff. So: `pull_request`
 # rather than `pull_request_target` (the latter runs the base branch's workflow with
 # the base repository's secrets, which is the trap), read-only permissions, and no
-# secrets referenced anywhere below. Deployment is a maintainer action from a
-# checkout.
+# secrets referenced anywhere below.
+#
+# Deployment is `deploy.yml`, which does hold the token and is a separate file for
+# exactly that reason: it runs only on `push` to `main`, a trigger no pull request can
+# reach. None of that split survives a deploy step being added here.
 #
 # **One guard is not in this file and cannot be.** "Require approval for all external
 # contributors" is a repository setting, under Settings → Actions → General →
