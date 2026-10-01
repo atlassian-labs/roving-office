@@ -71,6 +71,11 @@ so there is no class of red build you cannot reproduce locally. If your pull req
 from a fork, a maintainer has to approve the workflow run before it starts; that is a
 repository setting, not a comment on your change.
 
+Deploying the hosted office is a second workflow, `.github/workflows/deploy.yml`, which
+runs when a change lands on `main` and is the only thing here holding a credential. It
+triggers on `push` to `main` alone, so nothing a pull request runs can reach it — which
+is also why the verification workflow must stay free of deploy steps.
+
 The probe seeds the scene's random dressing so its numbers do not move between runs. For
 anything visual, **look at the scene** — [developing.md](docs/developer/developing.md) has
 the headless screenshot recipe and its traps, and `npm run map` / `npm run portrait`

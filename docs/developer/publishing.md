@@ -56,6 +56,43 @@ flyctl deploy --app the-roving-office
 
 That deploys to **https://the-roving-office.fly.dev**.
 
+### It is automatic, and this is the runbook for when it is not
+
+A change landing on `main` deploys itself. `.github/workflows/deploy.yml` runs the
+command above on every push to `main`, so merging a pull request *is* the deploy, and
+the rest of this page is background plus the manual route.
+
+Three things follow from how it is wired, and they are the parts worth knowing:
+
+- **It is a separate workflow from CI, and must stay one.** `ci.yml` runs on
+  `pull_request`, which means it runs code from forks; a deploy token in reach of that
+  job is a token handed to whoever wrote the diff. `deploy.yml` triggers only on `push`
+  to `main` — something no pull request can cause — holds the token as an environment
+  secret, and is the only workflow here with a credential at all.
+- **Deployments are tracked for you.** The job names a `production` environment, so
+  GitHub records a deployment per run: the repository's Environments page lists which
+  commit went out, who caused it, when, and the URL. Nothing bespoke, nothing to keep
+  up to date. That environment also restricts deployable branches to `main`, and is
+  where a required reviewer would go if an approval gate were ever wanted.
+- **Deploys queue rather than overlap.** One machine holds one volume, so a second push
+  waits for the first deploy to finish instead of cancelling it — the opposite of CI's
+  choice, because a superseded test run is worthless while a half-finished deploy has a
+  machine in a lease.
+
+Two reasons to still run it by hand, and `workflow_dispatch` on the workflow covers the
+first without a checkout:
+
+- a redeploy with no commit behind it — a machine that needs replacing, or a rolled-back
+  Fly release
+- deploying a tree that is not `main`, which is a thing you can do from a checkout and
+  the workflow deliberately cannot
+
+The credential is an app-scoped, expiring Fly deploy token
+(`flyctl tokens create deploy -a the-roving-office -x 8760h`), held as the `production`
+environment secret `FLY_API_TOKEN` rather than a repository secret, so only a job naming
+that environment can read it. `flyctl tokens list` says what exists and when it lapses;
+rotating it is that pair of commands and nothing else.
+
 ### Why the recipe is called `Dockerfile.fly`
 
 Fly is the only deploy target here that builds an image at all, and for a while its

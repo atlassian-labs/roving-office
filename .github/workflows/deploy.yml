@@ -1,0 +1,89 @@
+# Deployment, and nothing else.
+#
+# This is the file that holds a credential, and it is a separate file for that reason.
+# `ci.yml` runs on `pull_request`, which means it runs code from forks; a deploy token
+# in reach of that job is a deploy token handed to whoever wrote the diff. The split is
+# the mitigation, and the trigger below is what enforces it: `push` to `main` cannot be
+# caused by a pull request, from a fork or otherwise. So this workflow never sees an
+# untrusted tree.
+#
+# For the same reason, resist three tempting edits:
+#
+#   * `pull_request` or `pull_request_target` here. The second runs the base branch's
+#     workflow with the base repository's secrets, which is precisely the trap.
+#   * `workflow_run`, unless it filters on branch *and* conclusion and checks out the
+#     base repository's SHA. It fires for fork pull requests too, with secrets available.
+#   * a deploy step in `ci.yml`. Its header promises it holds no credential; that promise
+#     is the only reason fork pull requests are safe to run at all.
+#
+# **No separate CI gate, on purpose.** `main` requires both `ci.yml` jobs green *and*
+# the branch up to date with `main` before a merge, so the tree that lands here is the
+# tree that passed. A `workflow_run` chain on top of that would re-test the same commit
+# and add a trigger with a sharper edge than the one it replaced.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # For a redeploy with no commit behind it — a rolled-back Fly release, or a machine
+  # that needs replacing. The same job, so there is one way this app is deployed.
+  workflow_dispatch:
+
+# Stated rather than inherited. Nothing here writes to the repository: the deploy reads
+# the checkout and talks to Fly, and `environment:` records the deployment without
+# needing `deployments: write` of its own.
+permissions:
+  contents: read
+
+# One machine and one volume, so two deploys cannot overlap. `cancel-in-progress: false`
+# is the opposite of `ci.yml`'s choice and for the opposite reason: a superseded test run
+# is worthless, while a half-finished deploy has a machine in a lease and an image part
+# way through a roll. Later pushes queue.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Fly
+    runs-on: ubuntu-latest
+
+    # The whole of deployment tracking. GitHub records a deployment per run against this
+    # environment, so Settings → Environments → production becomes the history: which
+    # commit, who caused it, when, and the URL it went to. The environment is also where
+    # `FLY_API_TOKEN` lives — an environment secret rather than a repository one, so a
+    # job that does not name the environment cannot read it — and it restricts deployable
+    # branches to `main` a second time, independently of the trigger above.
+    environment:
+      name: production
+      url: https://therovingoffice.com
+
+    # Generous. The build is a container image and the upload is the whole checkout;
+    # a deploy that has not finished in half an hour is stuck rather than slow.
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      # Pinned to a commit, not `@master` as Fly's own documentation shows. This is the
+      # one job in the repository holding a credential, and tracking somebody else's
+      # default branch would let a change there reach it unreviewed.
+      # ed8efb3 = superfly/flyctl-actions master at 2026-04-08.
+      - uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1
+
+      # Nothing is built first: `docs/site` and `plugins/claude/` are committed, there
+      # are no runtime dependencies, and `Dockerfile.fly` runs no `npm install`. The
+      # checkout is already the build context.
+      #
+      # `--app` is redundant with `fly.toml` and is here anyway, so that retargeting
+      # production takes an edit to this file rather than only to the config.
+      #
+      # No `--strategy`: the default rolling update is the only one this app can take.
+      # The volume holding every keycard, layout and ingest token binds to one machine,
+      # so `bluegreen` and `canary` both want a second machine with nothing to attach to.
+      - run: flyctl deploy --app the-roving-office --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

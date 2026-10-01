@@ -197,22 +197,37 @@ switch branches in place.
 
 ## Deploying
 
-One recipe, `Dockerfile.fly` and `fly.toml`:
+**A merge to `main` deploys.** `.github/workflows/deploy.yml` runs `flyctl deploy` on
+every push to `main`, and the repository's Environments → production page is the history
+of what went out and when. So landing a pull request is the deploy, and there is normally
+nothing to run.
+
+That workflow is separate from `ci.yml` and must stay separate: CI runs on
+`pull_request`, so it runs forks' code, and a deploy token within reach of that job is a
+token handed to whoever wrote the diff. `deploy.yml` triggers only on `push` to `main`,
+which no pull request can cause. Do not add a deploy step to `ci.yml`, and do not reach
+for `pull_request_target` or an unfiltered `workflow_run`.
+
+The same recipe by hand, for a redeploy with no commit behind it:
 
 ```bash
-flyctl deploy --app the-roving-office
+flyctl deploy --app the-roving-office          # from a checkout
 ```
 
 `flyctl deploy` uploads the **local working directory** as the build context — no remote
 is involved, so you deploy the tree you are standing in and nothing has to be pushed
-first. Two constraints worth knowing before one surprises you:
+first. `workflow_dispatch` on the workflow does the same thing from `main` without a
+checkout. Two constraints worth knowing before one surprises you:
 
 - **One machine, on purpose.** The volume holding every keycard, layout and ingest token
   binds to a single machine, so `flyctl scale count 1` is required and a blue-green
   deploy is not available: it would want a second machine with no volume to attach to.
-- **A deploy is not a merge.** The recipe copies a committed `docs/site`, so a merged
-  documentation fix is not live until the host is redeployed. Two fixes sat
-  merged-and-not-live long enough for it to be worth writing down.
+  It is also why the workflow queues rather than cancelling: two deploys cannot overlap.
+- **A deploy is not only the site.** The recipe copies a committed `docs/site` *and*
+  `plugins/claude`, whose manifest points at `therovingoffice.com` — so until this was
+  automatic, a merged documentation fix was not live and a bumped plugin was not
+  installable. Two documentation fixes sat merged-and-not-live long enough for it to be
+  worth writing down, which is the reason the workflow exists.
 
 There used to be a second, internal deployment target. Nothing ran on it, and it was the
 single reason this repository had a withheld half at all — its hostnames and project id
