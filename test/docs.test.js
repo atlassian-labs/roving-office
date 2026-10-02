@@ -18,7 +18,7 @@ import { readdir } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { allPages } from '../docs/_nav.mjs'
+import { allPages, NAV } from '../docs/_nav.mjs'
 import { checkDocLinks, formatProblems } from '../bin/lib/check-doc-links.mjs'
 import toolClasses from '../bin/mappers/lib/tool-classes.cjs'
 
@@ -205,6 +205,59 @@ test('llms.txt lists every published page, and nothing unpublished', () => {
   for (const page of unpublishedPages()) {
     const url = `/docs/${page.replace(/\.md$/, '.html')}`
     assert.ok(!index.includes(url), `llms.txt advertises the unpublished ${page}`)
+  }
+})
+
+test('llms.txt tells an agent how to set itself up, before anything else', () => {
+  const index = readFileSync(join(SITE, 'llms.txt'), 'utf8')
+  const prompt = readFileSync(join(ROOT, 'agent-setup/prompt.md'), 'utf8')
+
+  // Whoever reads this file is more likely than not to be the reader that section is
+  // for, so it comes before either documentation set.
+  const agents = index.indexOf('## For agents')
+  assert.ok(agents > 0, 'llms.txt has no section for agents')
+  for (const heading of ['## For everyone', '## For developers']) {
+    assert.ok(agents < index.indexOf(heading), `${heading} should come after For agents`)
+  }
+
+  // The authoritative document, linked rather than paraphrased.
+  assert.ok(
+    index.includes('/agent-setup/prompt.md'),
+    'llms.txt does not link the one document written for an agent',
+  )
+
+  // The summary in llms.txt is a summary, so the route it names has to be the route the
+  // prompt actually uses — otherwise an agent that reads only the index mints nothing.
+  assert.ok(
+    index.includes('POST https://therovingoffice.com/api/offices'),
+    'llms.txt does not name the mint route',
+  )
+  assert.ok(
+    prompt.includes('-X POST https://therovingoffice.com/api/offices'),
+    'the prompt mints from a different route than llms.txt advertises',
+  )
+
+  // The one instruction the prompt is most insistent about. An index that said "set
+  // yourself up" and left this out would be undercutting it.
+  assert.match(
+    index.slice(agents, index.indexOf('## For everyone')),
+    /ask the user first/i,
+    'the agent section omits the consent step the prompt requires',
+  )
+})
+
+test('the agent setup page is reachable from both sidebars', () => {
+  // It was published and listed nowhere: reachable only from a link in the body of one
+  // page, or by already knowing the URL. A page nothing navigates to is the orphan
+  // docs/_nav.mjs exists to prevent, and it does not have to be Markdown to count.
+  for (const section of ['user', 'developer']) {
+    const entries = NAV[section]
+      .flatMap((group) => group.pages)
+      .filter((page) => page.url === '/agent-setup/')
+    assert.equal(entries.length, 1, `/agent-setup/ is not in the ${section} sidebar`)
+    // `site` is what stops Eleventy's url filter turning this into /docs/agent-setup/.
+    assert.ok(entries[0].site, `/agent-setup/ in the ${section} sidebar needs site: true`)
+    assert.ok(entries[0].external, `/agent-setup/ has no Markdown, so it is external`)
   }
 })
 

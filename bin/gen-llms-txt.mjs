@@ -64,11 +64,44 @@ control for reading.
 
 The two documentation sets below are strictly separated and it is worth honouring. *For
 everyone* assumes a browser and nothing else. *For developers* assumes a checkout and an
-intent to change something. If you are an agent being asked to feed this office rather
-than to change it, the fastest route is the setup document, which is written to be
-fetched and followed:
+intent to change something.
+`;
 
-- [Set yourself up as a source](${SITE}/agent-setup/prompt.md): fetch-and-follow instructions for an agent connecting its own harness to an office.
+/**
+ * The section for the reader this file is actually for.
+ *
+ * An agent that lands here has usually been asked to do one of two quite different
+ * things, and both are a worse experience if it has to infer which pages apply: connect
+ * *itself* to an office so its session shows up in the room, or change this project's
+ * code. The first has a document written for it and nothing in the two sets below; the
+ * second is the whole developer set. Saying so costs eight lines and saves a reader from
+ * assembling the procedure out of an architecture page.
+ *
+ * **The steps are summarised, not restated.** `agent-setup/prompt.md` is authoritative
+ * and says so of itself, and a second copy of a procedure that mints credentials would be
+ * a second copy to go stale. What is here is enough to know what you are agreeing to
+ * before you fetch it — and the consent step especially, because an index that said "set
+ * yourself up" without it would be undercutting the one instruction that document is
+ * most insistent about. `test/docs.test.js` checks the mint route named here still
+ * matches the one the prompt uses.
+ */
+const FOR_AGENTS = `## For agents
+
+If you are an AI coding agent and somebody has asked you to connect **this session** to
+the office, do not assemble it from the pages below. There is one document written for
+you, it is authoritative, and it is meant to be fetched and followed:
+
+- [Set up The Roving Office](${SITE}/agent-setup/prompt.md): mint an office, install the adapter for your own harness, restart the session.
+
+What it will ask of you, so you know before you fetch it:
+
+1. **Ask the user first, once, and wait.** Connecting transmits — to \`therovingoffice.com\` — your repository's host, owner, name and branch, the working directory path, which tools ran and when, and the agent's name and model. It does **not** transmit file contents, prompts, replies or command output; redaction happens on your machine before anything leaves it. Anyone holding the office's keycard can watch it, so treat an office as public. The document carries the exact wording to show, and honours a "local only" answer that sends nothing anywhere.
+2. **Mint an office** with \`curl -fsS -X POST ${SITE}/api/offices\`. The response carries a \`keycard\` — eight characters, the read capability, the URL a person opens — and a write token, which is returned exactly once and cannot be retrieved later.
+3. **Install your harness's adapter and restart the session.** The restart is the one step you cannot do for the user.
+
+If you have instead been asked to **change this project's code**, none of the above
+applies: start from *For developers* below, and read \`AGENTS.md\` in the repository root,
+which is the working agreement for an agent session in this codebase.
 `;
 
 /**
@@ -158,7 +191,14 @@ function bullet({ title, url, description }) {
 
 function render() {
   const skip = unpublished();
-  const lines = [`# The Roving Office`, '', `> ${SUMMARY}`, '', PREAMBLE.trim(), ''];
+  const lines = [
+    `# The Roving Office`, '',
+    `> ${SUMMARY}`, '',
+    PREAMBLE.trim(), '',
+    // First, and before either documentation set: whoever is reading this file is more
+    // likely to be the reader that section is for than not.
+    FOR_AGENTS.trim(), '',
+  ];
 
   for (const section of SECTIONS) {
     const groups = NAV[section.id] ?? [];
@@ -192,7 +232,9 @@ function render() {
    */
   const libraries = (NAV.developer ?? [])
     .flatMap((group) => group.pages)
-    .filter((page) => page.external);
+    // `external` alone is not the test. `/agent-setup/` is external too and is the
+    // opposite of optional for the reader of this file — it has its own section above.
+    .filter((page) => page.external && !page.site);
   if (libraries.length) {
     lines.push(
       '## Optional',

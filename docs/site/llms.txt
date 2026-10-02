@@ -9,11 +9,25 @@ control for reading.
 
 The two documentation sets below are strictly separated and it is worth honouring. *For
 everyone* assumes a browser and nothing else. *For developers* assumes a checkout and an
-intent to change something. If you are an agent being asked to feed this office rather
-than to change it, the fastest route is the setup document, which is written to be
-fetched and followed:
+intent to change something.
 
-- [Set yourself up as a source](https://therovingoffice.com/agent-setup/prompt.md): fetch-and-follow instructions for an agent connecting its own harness to an office.
+## For agents
+
+If you are an AI coding agent and somebody has asked you to connect **this session** to
+the office, do not assemble it from the pages below. There is one document written for
+you, it is authoritative, and it is meant to be fetched and followed:
+
+- [Set up The Roving Office](https://therovingoffice.com/agent-setup/prompt.md): mint an office, install the adapter for your own harness, restart the session.
+
+What it will ask of you, so you know before you fetch it:
+
+1. **Ask the user first, once, and wait.** Connecting transmits — to `therovingoffice.com` — your repository's host, owner, name and branch, the working directory path, which tools ran and when, and the agent's name and model. It does **not** transmit file contents, prompts, replies or command output; redaction happens on your machine before anything leaves it. Anyone holding the office's keycard can watch it, so treat an office as public. The document carries the exact wording to show, and honours a "local only" answer that sends nothing anywhere.
+2. **Mint an office** with `curl -fsS -X POST https://therovingoffice.com/api/offices`. The response carries a `keycard` — eight characters, the read capability, the URL a person opens — and a write token, which is returned exactly once and cannot be retrieved later.
+3. **Install your harness's adapter and restart the session.** The restart is the one step you cannot do for the user.
+
+If you have instead been asked to **change this project's code**, none of the above
+applies: start from *For developers* below, and read `AGENTS.md` in the repository root,
+which is the working agreement for an agent session in this codebase.
 
 ## For everyone
 
