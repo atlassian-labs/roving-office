@@ -1,5 +1,7 @@
-# Zero-dependency Node server — no npm install, no build step. Ships exactly what
-# drift out of sync with each other.
+# Zero-dependency Node server — no npm install, no build step. The `COPY` lines below
+# and `.dockerignore` are the only two places the boundary of the image is drawn, and
+# `test/docker-context.test.js` walks the checkout the way the builder does to assert
+# they cannot drift out of sync with each other.
 #
 # The `.fly` suffix is the whole point of the name: as `Dockerfile` this failed the
 # trust scanner on pull requests that never touched deployment. Fly is told where to
@@ -13,8 +15,10 @@ WORKDIR /app
 COPY *.html styles.css favicon.ico server.cjs package.json ./
 # Complete licenses for the vendored browser library and derived colour data.
 COPY THIRD_PARTY_NOTICES.txt ./
-# The docs that are pages rather than prose — the
-# same set. `.dockerignore` excludes the rest of docs/ and lets these back through.
+# The docs that are pages rather than prose — the standalone HTML viewers at the top of
+# docs/, which are whole documents rather than Markdown Eleventy renders, so they are
+# served straight out of docs/ instead of from docs/site. `.dockerignore` excludes the
+# rest of docs/ and lets these back through.
 COPY docs/*.html ./docs/
 # The built documentation site, served at /docs. Committed rather than built, because
 # this image deliberately runs no `npm install` and Eleventy is a devDependency — see
@@ -56,5 +60,27 @@ ENV PORT=8080
 # that creates that boundary is where it is set.
 ENV HOST=0.0.0.0
 EXPOSE 8080
+
+# What this image is, and how it got here.
+#
+# `.git` is not in the build context and should not be, so an image cannot work its own
+# commit out — it has to be told at build time. `GET /api/health` reports these, which
+# makes "what is actually live?" a question a stranger with curl can answer instead of
+# one needing two consoles and a guess. Unstamped is a legitimate state and is reported
+# as one rather than filled in with a plausible value.
+#
+# **Declared last on purpose.** An `ARG` that changes invalidates every layer below it,
+# and these change on every single deploy — so they sit beneath everything worth
+# caching. Moving this block up would rebuild the whole image each time.
+ARG GIT_SHA=""
+ARG GIT_DIRTY=""
+ARG DEPLOY_SOURCE=""
+ARG DEPLOY_RUN=""
+ARG BUILD_TIME=""
+ENV ROVING_OFFICE_GIT_SHA=$GIT_SHA
+ENV ROVING_OFFICE_GIT_DIRTY=$GIT_DIRTY
+ENV ROVING_OFFICE_DEPLOY_SOURCE=$DEPLOY_SOURCE
+ENV ROVING_OFFICE_DEPLOY_RUN=$DEPLOY_RUN
+ENV ROVING_OFFICE_BUILD_TIME=$BUILD_TIME
 
 CMD ["node", "server.cjs"]
