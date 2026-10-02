@@ -81,8 +81,9 @@ checkout, because the site serves those files and no deploy target may build the
 
 `npm test` also covers the documentation: it checks that
 [the npm script reference](npm-scripts.md) still matches `package.json`, that every
-Markdown page has been built into `docs/site`, and that **every internal link and anchor
-resolves**. If you edited a doc, run `npm run docs`.
+Markdown page has been built into `docs/site`, that the `llms.txt` index below still
+matches the sidebar, and that **every internal link and anchor resolves**. If you edited
+a doc, run `npm run docs`.
 
 That link check also runs at the end of `npm run docs`, which is where you want to meet
 it — a moved page or a renamed heading fails the build seconds after you did it, naming
@@ -152,6 +153,34 @@ their supporting packages.
 That distinction is why `Dockerfile.fly` runs no `npm install` at all, and why
 `docs/site/` is committed rather than built at deploy time: a deploy copies files, so
 anything it serves has to already be a file.
+
+## The documentation has an index for language models
+
+`/llms.txt` follows the [llms.txt convention](https://llmstxt.org/): a short Markdown
+file at a fixed path, listing every published page with one line about each, so a model
+can find its way around without scraping a sidebar out of HTML. The office is a tool for
+watching coding agents, so a document written for one is not a novelty here — the
+[agent setup instructions](https://therovingoffice.com/agent-setup/) exist for the same
+reason, and the index links to them first.
+
+It is **generated**, by `bin/gen-llms-txt.mjs`, from two things that already exist: the
+sidebar in `docs/_nav.mjs`, which is the only inventory of what the documentation
+contains, and the opening line of each page, which is already a sentence saying what that
+page is. A hand-written copy would be wrong the first time anybody added a page, so there
+is nothing to maintain and nothing to remember: add a page to the sidebar, run
+`npm run docs`, and it appears. `npm test` fails if the two disagree.
+
+Two details that are decisions rather than accidents:
+
+- It is written into `docs/site/` and **rewritten to the root path** by `server.cjs`,
+  rather than kept as a second copy at the top of the repository. The convention fixes
+  the URL at the site root, but a file inside `docs/site` ships without a new rule —
+  `Dockerfile.fly` copies that directory whole — and one document in one place cannot go
+  stale against itself.
+- The unpublished set at the bottom of `.eleventyignore` is read by the generator as well
+  as by the build, and a page listed in both the sidebar and that set stops the generator
+  rather than being skipped. An index that advertises a runbook has published it just as
+  surely as building the HTML would have.
 
 ## For anything visual, look at the scene
 

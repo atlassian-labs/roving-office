@@ -124,6 +124,10 @@ const MIME = {
   // agent-setup/prompt.md is fetched by an agent and read as text, so the type is
   // the difference between instructions and a download. See agent-setup/index.html.
   '.md': 'text/markdown; charset=utf-8',
+  // `llms.txt` and the two font licences beside it in docs/site. Without an entry these
+  // were served as `application/octet-stream`, which a browser offers to save rather
+  // than show — and an index meant to be read in a tab is a poor download.
+  '.txt': 'text/plain; charset=utf-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
@@ -1939,6 +1943,12 @@ function serveStatic(req, res, url) {
   // its home. `prompt.md` beside it needs nothing: it is a real file under ROOT and
   // falls through to `sendFile` like any other. Only the directory needs an index.
   if (urlPath === '/agent-setup' || urlPath === '/agent-setup/') urlPath = '/agent-setup/index.html';
+  // The llms.txt index (https://llmstxt.org/), at the path the convention fixes: the site
+  // root, not under /docs with the pages it lists. It is generated into `docs/site` so
+  // that the deploy recipe carries it without a new rule — `Dockerfile.fly` copies that
+  // directory whole — and rerouted here rather than copied to the root, because a second
+  // copy in the repository is a second thing that can go stale.
+  if (urlPath === '/llms.txt') urlPath = '/docs/llms.txt';
 
   const filePath = urlPath === '/docs' || urlPath.startsWith('/docs/')
     ? resolveDocs(urlPath)

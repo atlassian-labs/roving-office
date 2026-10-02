@@ -129,6 +129,27 @@ test('the docs site is still served, and still cannot be escaped', async () => {
   assert.equal(escape.status, 403, 'past the checkout is refused wherever it started');
 });
 
+test('the llms.txt index is served at the root, as readable text', async () => {
+  // The convention (https://llmstxt.org/) fixes the path at the site root, while the file
+  // is generated into `docs/site` so the deploy recipe carries it with everything else
+  // there. That mismatch is bridged by one rewrite in `serveStatic`, and this is what
+  // notices if it goes: the file would still be built, still be shipped, and still 404.
+  const res = await fetch(`${BASE}/llms.txt`);
+  assert.equal(res.status, 200, '/llms.txt is not reachable at the root');
+  // Not `application/octet-stream`, which a browser offers to save rather than show.
+  assert.match(res.headers.get('content-type') ?? '', /text\/plain/);
+
+  const body = await res.text();
+  assert.match(body, /^# The Roving Office/, 'served something other than the index');
+  assert.match(body, /^> /m, 'the summary a reader gets without following a link');
+
+  // No second-URL assertion here, and the reason is worth recording: `resolveDocs` falls
+  // back to `docs/` for anything not in the built site, so `/docs/site/llms.txt` answers
+  // too — as does `/docs/site/` anything else. That is how the unbuilt half of `docs/`
+  // (the imagery, the standalone viewers) is reached, so it is the fallback working
+  // rather than a leak, and the root path above is simply the one the convention names.
+});
+
 test('health answers for an office — and an unknown keycard IS an office', async () => {
   const ok = await fetch(`${BASE}/office/TEST-0000/aop/v0/health`);
   assert.equal(ok.status, 200);

@@ -221,6 +221,11 @@ next <code>npm run docs</code> will overwrite you. Add a script, add its <code>s
 <td>Fail if this page has drifted from package.json. Part of <code>npm test</code>, so it cannot be forgotten.</td>
 </tr>
 <tr>
+<td><code>npm run docs:llms:check</code></td>
+<td><code>node bin/gen-llms-txt.mjs --check</code></td>
+<td>Fail if that index has drifted from the sidebar, so a new page that never reached it is a red build. Part of <code>npm test</code>.</td>
+</tr>
+<tr>
 <td><code>npm run test</code></td>
 <td><code>node --test</code></td>
 <td>The whole suite — unit, reducer, scene, server, docs. Plain node:test, no browser, no services, seconds.</td>
@@ -406,7 +411,7 @@ next <code>npm run docs</code> will overwrite you. Add a script, add its <code>s
 </tr>
 <tr>
 <td><code>npm run docs</code></td>
-<td><code>node bin/gen-npm-scripts.mjs &amp;&amp; eleventy</code></td>
+<td><code>node bin/gen-npm-scripts.mjs &amp;&amp; eleventy &amp;&amp; node bin/gen-llms-txt.mjs</code></td>
 <td>Regenerate this page, then build docs/site — the HTML served at /docs. Run it after editing any Markdown under docs/user or docs/developer.</td>
 </tr>
 <tr>
@@ -514,6 +519,11 @@ next <code>npm run docs</code> will overwrite you. Add a script, add its <code>s
 <td><code>npm run pack:plugins</code></td>
 <td><code>node bin/aop-plugin-pack.cjs --verify</code></td>
 <td>Build the Claude and Codex plugins as distribution artifacts, then install and fire a hook from a temp directory with no checkout above it. Writes the hosted marketplace the site serves; <code>pack:plugins:check</code> is what asserts you committed it.</td>
+</tr>
+<tr>
+<td><code>npm run docs:llms</code></td>
+<td><code>node bin/gen-llms-txt.mjs</code></td>
+<td>Rewrite docs/site/llms.txt — the <a href="https://llmstxt.org/">llms.txt</a> index served at <code>/llms.txt</code>, generated from the docs sidebar and the first line of each page. <code>npm run docs</code> does it for you.</td>
 </tr>
 </tbody>
 </table>

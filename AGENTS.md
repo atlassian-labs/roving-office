@@ -114,7 +114,9 @@ reasoning is worth having, it belongs in a comment next to the code or in
 
 **A new page needs an entry in `docs/_nav.mjs`**, which is the sidebar and the only list of
 what the documentation contains; the Markdown files carry no front matter. A page that is
-not in the nav is a failing test, not an orphan.
+not in the nav is a failing test, not an orphan. That entry is also what puts the page in
+`/llms.txt`, which `bin/gen-llms-txt.mjs` generates from the nav plus each page's opening
+line — so there is a second list to keep in step and nothing to do about it by hand.
 
 **After editing any Markdown under those two directories, run `npm run docs`.** It
 regenerates the generated pages and rebuilds `docs/site`, which is committed because

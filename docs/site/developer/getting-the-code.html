@@ -204,8 +204,9 @@ checkout, because the site serves those files and no deploy target may build the
 <a href="plugin-distribution.html">publishing the plugins</a>.</p>
 <p><code>npm test</code> also covers the documentation: it checks that
 <a href="npm-scripts.html">the npm script reference</a> still matches <code>package.json</code>, that every
-Markdown page has been built into <code>docs/site</code>, and that <strong>every internal link and anchor
-resolves</strong>. If you edited a doc, run <code>npm run docs</code>.</p>
+Markdown page has been built into <code>docs/site</code>, that the <code>llms.txt</code> index below still
+matches the sidebar, and that <strong>every internal link and anchor resolves</strong>. If you edited
+a doc, run <code>npm run docs</code>.</p>
 <p>That link check also runs at the end of <code>npm run docs</code>, which is where you want to meet
 it — a moved page or a renamed heading fails the build seconds after you did it, naming
 the file. It lives in <code>bin/lib/check-doc-links.mjs</code>, one function behind both call sites,
@@ -260,6 +261,31 @@ their supporting packages.</p>
 <p>That distinction is why <code>Dockerfile.fly</code> runs no <code>npm install</code> at all, and why
 <code>docs/site/</code> is committed rather than built at deploy time: a deploy copies files, so
 anything it serves has to already be a file.</p>
+<h2 id="the-documentation-has-an-index-for-language-models" tabindex="-1">The documentation has an index for language models</h2>
+<p><code>/llms.txt</code> follows the <a href="https://llmstxt.org/">llms.txt convention</a>: a short Markdown
+file at a fixed path, listing every published page with one line about each, so a model
+can find its way around without scraping a sidebar out of HTML. The office is a tool for
+watching coding agents, so a document written for one is not a novelty here — the
+<a href="https://therovingoffice.com/agent-setup/">agent setup instructions</a> exist for the same
+reason, and the index links to them first.</p>
+<p>It is <strong>generated</strong>, by <code>bin/gen-llms-txt.mjs</code>, from two things that already exist: the
+sidebar in <code>docs/_nav.mjs</code>, which is the only inventory of what the documentation
+contains, and the opening line of each page, which is already a sentence saying what that
+page is. A hand-written copy would be wrong the first time anybody added a page, so there
+is nothing to maintain and nothing to remember: add a page to the sidebar, run
+<code>npm run docs</code>, and it appears. <code>npm test</code> fails if the two disagree.</p>
+<p>Two details that are decisions rather than accidents:</p>
+<ul>
+<li>It is written into <code>docs/site/</code> and <strong>rewritten to the root path</strong> by <code>server.cjs</code>,
+rather than kept as a second copy at the top of the repository. The convention fixes
+the URL at the site root, but a file inside <code>docs/site</code> ships without a new rule —
+<code>Dockerfile.fly</code> copies that directory whole — and one document in one place cannot go
+stale against itself.</li>
+<li>The unpublished set at the bottom of <code>.eleventyignore</code> is read by the generator as well
+as by the build, and a page listed in both the sidebar and that set stops the generator
+rather than being skipped. An index that advertises a runbook has published it just as
+surely as building the HTML would have.</li>
+</ul>
 <h2 id="for-anything-visual-look-at-the-scene" tabindex="-1">For anything visual, look at the scene</h2>
 <p>The scene is the product, so a unit test cannot tell you it looks right. A headless
 screenshot takes seconds and catches what no assertion can —
@@ -294,6 +320,7 @@ explains the mechanism.</p>
 <li><a href="#installing-development-tooling">Installing development tooling</a></li>
 <li><a href="#maintaining-third-party-evidence">Maintaining third-party evidence</a></li>
 <li><a href="#what-has-no-dependencies-and-what-does">What has no dependencies, and what does</a></li>
+<li><a href="#the-documentation-has-an-index-for-language-models">The documentation has an index for language models</a></li>
 <li><a href="#for-anything-visual-look-at-the-scene">For anything visual, look at the scene</a></li>
 <li><a href="#before-you-open-a-pull-request">Before you open a pull request</a></li>
 <li><a href="#read-next">Read next</a></li></ul></nav>
