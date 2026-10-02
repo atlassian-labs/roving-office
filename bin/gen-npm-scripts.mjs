@@ -82,6 +82,13 @@ const SECTIONS = [
       + ' because they are derived from something else and would drift if they were typed.',
     claims: (name) => ['portrait', 'map', 'colours', 'docs', 'docs:serve', 'docs:scripts'].includes(name),
   },
+  {
+    title: 'Ship it',
+    blurb: 'Normally nothing to run: a merge to `main` deploys itself. These are for a tree'
+      + ' that is not `main`, or a redeploy when the workflow is not available, and they'
+      + ' need a Fly account and the app.',
+    claims: (name) => name.startsWith('deploy'),
+  },
 ];
 
 const REST = {

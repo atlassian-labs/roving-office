@@ -89,6 +89,15 @@ A handful of things in this repo are written by a script rather than by hand, be
 | `npm run docs:serve` | `eleventy --serve --port 8091` | Build the docs and watch them on 8091, so a Markdown edit reloads the page. |
 | `npm run docs:scripts` | `node bin/gen-npm-scripts.mjs` | Rewrite this page from package.json alone. `npm run docs` does it for you; this is for when that is all you changed. |
 
+## Ship it
+
+Normally nothing to run: a merge to `main` deploys itself. These are for a tree that is not `main`, or a redeploy when the workflow is not available, and they need a Fly account and the app.
+
+| Script | Runs | What for |
+| --- | --- | --- |
+| `npm run deploy` | `bash bin/fly-deploy.sh` | Deploy this working tree to Fly by hand, stamped with its commit, whether the tree was dirty, and `source: local` — so `/api/health` can tell a hand-run deploy from the workflow's. A merge to main deploys itself; this is for a tree that is not main, or a redeploy when the workflow is not available. Needs a Fly account and the app. |
+| `npm run deploy:dry` | `bash bin/fly-deploy.sh --dry-run` | Print what `deploy` would run, with the stamps it would apply, and deploy nothing. |
+
 ## Anything else
 
 Not yet filed under a heading above.

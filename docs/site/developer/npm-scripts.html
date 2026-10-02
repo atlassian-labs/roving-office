@@ -421,6 +421,29 @@ next <code>npm run docs</code> will overwrite you. Add a script, add its <code>s
 </tr>
 </tbody>
 </table>
+<h2 id="ship-it" tabindex="-1">Ship it</h2>
+<p>Normally nothing to run: a merge to <code>main</code> deploys itself. These are for a tree that is not <code>main</code>, or a redeploy when the workflow is not available, and they need a Fly account and the app.</p>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Runs</th>
+<th>What for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm run deploy</code></td>
+<td><code>bash bin/fly-deploy.sh</code></td>
+<td>Deploy this working tree to Fly by hand, stamped with its commit, whether the tree was dirty, and <code>source: local</code> — so <code>/api/health</code> can tell a hand-run deploy from the workflow's. A merge to main deploys itself; this is for a tree that is not main, or a redeploy when the workflow is not available. Needs a Fly account and the app.</td>
+</tr>
+<tr>
+<td><code>npm run deploy:dry</code></td>
+<td><code>bash bin/fly-deploy.sh --dry-run</code></td>
+<td>Print what <code>deploy</code> would run, with the stamps it would apply, and deploy nothing.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="anything-else" tabindex="-1">Anything else</h2>
 <p>Not yet filed under a heading above.</p>
 <table>
@@ -509,6 +532,7 @@ next <code>npm run docs</code> will overwrite you. Add a script, add its <code>s
 <li><a href="#connect-a-harness">Connect a harness</a></li>
 <li><a href="#point-this-machine-somewhere-else">Point this machine somewhere else</a></li>
 <li><a href="#regenerate-what-is-generated">Regenerate what is generated</a></li>
+<li><a href="#ship-it">Ship it</a></li>
 <li><a href="#anything-else">Anything else</a></li>
 <li><a href="#read-next">Read next</a></li></ul></nav>
     </aside>

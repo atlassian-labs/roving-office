@@ -202,6 +202,19 @@ every push to `main`, and the repository's Environments → production page is t
 of what went out and when. So landing a pull request is the deploy, and there is normally
 nothing to run.
 
+**Ask the host rather than assuming**, because a deploy that did not happen looks exactly
+like one that did:
+
+```bash
+curl -s https://therovingoffice.com/api/health    # .build names the live commit
+```
+
+`build.commit` is the commit serving right now, `build.source` is `github-actions` or
+`local` or `unknown`, and `build.dirty` says whether a hand-run deploy shipped an
+uncommitted tree. Use `npm run deploy` rather than a bare `flyctl deploy` so a manual
+deploy stamps itself too — an unstamped image cannot tell anyone apart from never
+having been deployed.
+
 That workflow is separate from `ci.yml` and must stay separate: CI runs on
 `pull_request`, so it runs forks' code, and a deploy token within reach of that job is a
 token handed to whoever wrote the diff. `deploy.yml` triggers only on `push` to `main`,
