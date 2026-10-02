@@ -35,6 +35,7 @@ Local checks and generation checks, using the same commands as the CI verificati
 | `npm run pack:openclaw` | `node bin/aop-openclaw-pack.cjs --verify` | Pack the OpenClaw plugin into dist/ and run the artifact from a temp dir. `--verify` is the point: it proves the vendored seam still works outside the repo. |
 | `npm run pack:plugins:check` | `node bin/aop-plugin-pack.cjs --check` | Fail if the committed Claude marketplace and archive have drifted from this checkout, or if the three manifests disagree about the version. Part of `npm test`. |
 | `npm run docs:scripts:check` | `node bin/gen-npm-scripts.mjs --check` | Fail if this page has drifted from package.json. Part of `npm test`, so it cannot be forgotten. |
+| `npm run docs:llms:check` | `node bin/gen-llms-txt.mjs --check` | Fail if that index has drifted from the sidebar, so a new page that never reached it is a red build. Part of `npm test`. |
 | `npm run test` | `node --test` | The whole suite — unit, reducer, scene, server, docs. Plain node:test, no browser, no services, seconds. |
 | `npm run lint` | `eslint .` | ESLint over everything it can read. Note it cannot read JavaScript inside HTML, so the standalone `docs/*.html` pages are checked by loading them and nothing else. |
 
@@ -85,7 +86,7 @@ A handful of things in this repo are written by a script rather than by hand, be
 | `npm run portrait` | `node bin/prop-portrait.js` | Photograph every catalogue object on its own, into docs/images/objects — the gallery in the kit. `-- --id=chair` for one, `-- --list` to see what there is. |
 | `npm run map` | `node bin/scene-map.js` | Photograph each theme's whole exterior from straight above, into docs/images/maps. `-- --theme=tower` for one. |
 | `npm run colours` | `node bin/gen-colour-names.mjs` | Rewrite src/agents/colour-names.js, the table that turns `burnt sienna` into a colour. Fetches a pinned list; run it about once a year. |
-| `npm run docs` | `node bin/gen-npm-scripts.mjs && eleventy` | Regenerate this page, then build docs/site — the HTML served at /docs. Run it after editing any Markdown under docs/user or docs/developer. |
+| `npm run docs` | `node bin/gen-npm-scripts.mjs && eleventy && node bin/gen-llms-txt.mjs` | Regenerate this page, then build docs/site — the HTML served at /docs. Run it after editing any Markdown under docs/user or docs/developer. |
 | `npm run docs:serve` | `eleventy --serve --port 8091` | Build the docs and watch them on 8091, so a Markdown edit reloads the page. |
 | `npm run docs:scripts` | `node bin/gen-npm-scripts.mjs` | Rewrite this page from package.json alone. `npm run docs` does it for you; this is for when that is all you changed. |
 
@@ -116,6 +117,7 @@ Not yet filed under a heading above.
 | `npm run fitness:record` | `node bin/office-fitness.js --seeds=96 --minutes=3 --record` | Rewrite test/fitness-floors.json from the current generator. Raises the ratchet, so run it deliberately and say why. |
 | `npm run fitness:noise` | `node bin/office-fitness.js --seeds=96 --minutes=3 --noise=6` | Measure the sampling error between disjoint seed sets of the same size. The smallest improvement worth believing. |
 | `npm run pack:plugins` | `node bin/aop-plugin-pack.cjs --verify` | Build the Claude and Codex plugins as distribution artifacts, then install and fire a hook from a temp directory with no checkout above it. Writes the hosted marketplace the site serves; `pack:plugins:check` is what asserts you committed it. |
+| `npm run docs:llms` | `node bin/gen-llms-txt.mjs` | Rewrite docs/site/llms.txt — the [llms.txt](https://llmstxt.org/) index served at `/llms.txt`, generated from the docs sidebar and the first line of each page. `npm run docs` does it for you. |
 
 ## Read next
 

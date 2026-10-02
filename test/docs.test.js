@@ -173,6 +173,61 @@ test('the sidebar and the Markdown agree, in both directions', async () => {
   )
 })
 
+test('the llms.txt index matches the sidebar', () => {
+  const result = spawnSync('node', ['bin/gen-llms-txt.mjs', '--check'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  })
+  assert.equal(
+    result.status,
+    0,
+    `docs/site/llms.txt is stale. Run \`npm run docs\`.\n${result.stderr}`,
+  )
+})
+
+test('llms.txt lists every published page, and nothing unpublished', () => {
+  const index = readFileSync(join(SITE, 'llms.txt'), 'utf8')
+
+  // The point of generating it: a new page appears here without anybody remembering to
+  // add it. Asserted against the sidebar rather than against a count, so the failure
+  // names the page instead of a number that moved.
+  const missing = allPages().filter((page) => !index.includes(`/docs${page.url})`))
+  assert.deepEqual(
+    missing.map((page) => page.url),
+    [],
+    'these pages are in the sidebar but not in llms.txt',
+  )
+
+  // And the half that matters more, for the reason the test above it gives: an index
+  // that advertises a runbook has published it just as surely as building the HTML
+  // would have. The generator throws rather than skipping if the two lists ever
+  // disagree; this checks the output in case it is ever written another way.
+  for (const page of unpublishedPages()) {
+    const url = `/docs/${page.replace(/\.md$/, '.html')}`
+    assert.ok(!index.includes(url), `llms.txt advertises the unpublished ${page}`)
+  }
+})
+
+test('llms.txt is shaped the way the convention expects', () => {
+  const lines = readFileSync(join(SITE, 'llms.txt'), 'utf8').split('\n')
+
+  // https://llmstxt.org/ — an H1 with the project name, then a blockquote summary. The
+  // H1 is the only required element, and the blockquote is what makes the file readable
+  // without following a single link, so both are worth holding.
+  assert.match(lines[0], /^# \S/, 'opens with an H1 naming the project')
+  assert.ok(
+    lines.slice(0, 6).some((line) => line.startsWith('> ')),
+    'carries a blockquote summary near the top',
+  )
+  assert.ok(
+    lines.some((line) => line === '## Optional'),
+    'uses the Optional heading the convention reserves for what can be skipped',
+  )
+  // Every link absolute: a model handed this file has no base to resolve against.
+  const relative_ = lines.filter((line) => /^- \[[^\]]*\]\((?!https:\/\/)/.test(line))
+  assert.deepEqual(relative_, [], 'these links are not absolute URLs')
+})
+
 test('the deploy recipe ships the built docs and the imagery', () => {
   const docker = readFileSync(join(ROOT, 'Dockerfile.fly'), 'utf8')
   const ignore = readFileSync(join(ROOT, '.dockerignore'), 'utf8')

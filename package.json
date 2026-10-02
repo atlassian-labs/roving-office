@@ -52,10 +52,12 @@
     "pack:plugins:check": "node bin/aop-plugin-pack.cjs --check",
     "deploy": "bash bin/fly-deploy.sh",
     "deploy:dry": "bash bin/fly-deploy.sh --dry-run",
-    "docs": "node bin/gen-npm-scripts.mjs && eleventy",
+    "docs": "node bin/gen-npm-scripts.mjs && eleventy && node bin/gen-llms-txt.mjs",
     "docs:serve": "eleventy --serve --port 8091",
     "docs:scripts": "node bin/gen-npm-scripts.mjs",
     "docs:scripts:check": "node bin/gen-npm-scripts.mjs --check",
+    "docs:llms": "node bin/gen-llms-txt.mjs",
+    "docs:llms:check": "node bin/gen-llms-txt.mjs --check",
     "test": "node --test",
     "lint": "eslint ."
   },
@@ -113,6 +115,8 @@
     "docs:serve": "Build the docs and watch them on 8091, so a Markdown edit reloads the page.",
     "docs:scripts": "Rewrite this page from package.json alone. `npm run docs` does it for you; this is for when that is all you changed.",
     "docs:scripts:check": "Fail if this page has drifted from package.json. Part of `npm test`, so it cannot be forgotten.",
+    "docs:llms": "Rewrite docs/site/llms.txt — the [llms.txt](https://llmstxt.org/) index served at `/llms.txt`, generated from the docs sidebar and the first line of each page. `npm run docs` does it for you.",
+    "docs:llms:check": "Fail if that index has drifted from the sidebar, so a new page that never reached it is a red build. Part of `npm test`.",
     "test": "The whole suite — unit, reducer, scene, server, docs. Plain node:test, no browser, no services, seconds.",
     "lint": "ESLint over everything it can read. Note it cannot read JavaScript inside HTML, so the standalone `docs/*.html` pages are checked by loading them and nothing else."
   },
