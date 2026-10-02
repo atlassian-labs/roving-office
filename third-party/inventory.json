@@ -83,7 +83,7 @@
     },
     {
       "path": "bin/gen-llms-txt.mjs",
-      "sha256": "82282c5f383d84ae2396af317927135920a7de2a1d421c09327dfd99607952a5"
+      "sha256": "2590f1b873525613f0dea97895888bf2429bc147d29fba41e6299da5a843a5dd"
     },
     {
       "path": ".github/workflows/ci.yml",

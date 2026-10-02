@@ -43,6 +43,13 @@ export const SECTIONS = [
  * three generated HTML libraries, which are served from `docs/` rather than `docs/site/`
  * and so are linked rather than rendered. They appear in both sidebars on purpose: they
  * are as much fun to look at as they are useful to check a change against.
+ *
+ * `site: true` goes with it for a page that is not under `/docs` at all. There is one:
+ * `/agent-setup/`, which lives at the server root because an agent is told to fetch it by
+ * URL. It was published and listed nowhere for a while — reachable only from a link in
+ * the body of one page, or by already knowing the address — which is exactly the orphan
+ * this file exists to prevent. The flag is needed because the sidebar runs every href
+ * through Eleventy's `url` filter, and that prepends `/docs/`.
  */
 export const NAV = {
   user: [
@@ -80,6 +87,12 @@ export const NAV = {
     {
       label: 'Connecting a harness',
       pages: [
+        {
+          url: '/agent-setup/',
+          title: 'Let an agent set itself up',
+          external: true,
+          site: true,
+        },
         { url: '/user/sources/test-data.html', title: 'Test Data' },
         { url: '/user/sources/rovo-cli.html', title: 'Rovo CLI' },
         { url: '/user/sources/claude-code.html', title: 'Claude Code' },
@@ -142,6 +155,12 @@ export const NAV = {
       pages: [
         { url: '/developer/protocol/aop-spec.html', title: 'The AOP spec' },
         { url: '/developer/protocol/aop-harness-adapters.html', title: 'Adapter notes' },
+        {
+          url: '/agent-setup/',
+          title: 'What an agent is told to do',
+          external: true,
+          site: true,
+        },
       ],
     },
     {

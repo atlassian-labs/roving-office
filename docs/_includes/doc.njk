@@ -36,7 +36,7 @@
       <ul>
         {%- for p in group.pages %}
         <li>
-          <a href="{{ p.url | url }}"{% if p.url == page.url %} aria-current="page"{% endif %}>{{ p.title }}{% if p.external %} <span class="ext" aria-label="standalone page">↗</span>{% endif %}</a>
+          <a href="{% if p.site %}{{ p.url }}{% else %}{{ p.url | url }}{% endif %}"{% if p.url == page.url %} aria-current="page"{% endif %}>{{ p.title }}{% if p.external %} <span class="ext" aria-label="standalone page">↗</span>{% endif %}</a>
         </li>
         {%- endfor %}
       </ul>

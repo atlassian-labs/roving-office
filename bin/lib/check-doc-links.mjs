@@ -58,6 +58,11 @@ function isExternal(target) {
 const OFFICE_ROUTE = /^\/office\/[0-9A-HJKMNP-TV-Z]{4}-?[0-9A-HJKMNP-TV-Z]{4}(?:\/.*)?$/;
 
 function isAppRoute(target) {
+  // `/agent-setup/` is a directory on disk, so the file check below would call it broken.
+  // `server.cjs` rewrites it to the index inside, which makes it a route like the others
+  // here — and only these exact strings pass, so a typo still fails rather than being
+  // waved through a prefix.
+  if (target === '/agent-setup' || target === '/agent-setup/') return true;
   if (target === '/' || target === '/docs' || target === '/debuglog') return true;
   return target.startsWith('/office/') && OFFICE_ROUTE.test(target);
 }
