@@ -50,12 +50,12 @@
     "docs-site": "Generated docs/site contains authored HTML/CSS/JS and copies of the two OFL fonts, their licences and the theme CSS. Eleventy and its npm dependencies execute at build time and are not bundled as libraries. Screenshots can reproduce the app's brand assets.",
     "fly-container": "Application payload plus the dynamically resolved node:24-slim image. A release needs the actual image digest, Node version, OS/package inventory and retained base-image notices. This source inventory does not claim to be an image SBOM.",
     "ci": ".github/workflows/ci.yml runs verification only, on the GitHub-hosted ubuntu-latest runner with Node 24 and Node 26 supplied by actions/setup-node. It installs no deployment tooling and holds no credential. These build tools are not bundled in application artifacts, and exact runner image versions are not pinned here.",
-    "deploy": ".github/workflows/deploy.yml deploys the hosted app from main on the GitHub-hosted ubuntu-latest runner. It installs flyctl through superfly/flyctl-actions/setup-flyctl, pinned by commit, and holds the Fly deploy token as a production environment secret; the image itself is built from Dockerfile.fly on Fly's remote builder, so the payload is the one described under fly-container and hosted-app. flyctl and the action are deployment tooling and are not bundled in any application artifact; neither their release versions nor the runner image version are pinned here."
+    "deploy": ".github/workflows/deploy.yml deploys the hosted app from main on the GitHub-hosted ubuntu-latest runner. It installs flyctl through superfly/flyctl-actions/setup-flyctl, pinned by commit, and holds the Fly deploy token as a production environment secret; the image itself is built from Dockerfile.fly on Fly's remote builder, so the payload is the one described under fly-container and hosted-app. flyctl and the action are deployment tooling and are not bundled in any application artifact; neither their release versions nor the runner image version are pinned here. Both this workflow and bin/fly-deploy.sh, the hand-run route, pass build arguments that Dockerfile.fly records as environment variables and GET /api/health reports: the commit, whether the tree was dirty, the deploy source, the workflow run URL and the build time. These describe the first-party payload only and add no third-party component to any artifact."
   },
   "distributionRecipes": [
     {
       "path": "Dockerfile.fly",
-      "sha256": "4a8822a36c8c460d03e5c56f4b87fc6e51a9e3f50e0435154a4297138050c914"
+      "sha256": "494b7bd57e34861f37d473d546601f598a907dc22b8cbd42387860d0dc4a9954"
     },
     {
       "path": ".dockerignore",
@@ -87,7 +87,11 @@
     },
     {
       "path": ".github/workflows/deploy.yml",
-      "sha256": "67aaa2f42e786fd0a1b08792bec9dfcac8be7694a91271ce9506b8260e10aed4"
+      "sha256": "a671c6349fa2fe96a4c4f50bd8747c161a8c30e286c733b7f8500bd49e6a0e4e"
+    },
+    {
+      "path": "bin/fly-deploy.sh",
+      "sha256": "d9f1c44af6d4af69b43aacfc25c630f223fd8133afb5ac5654814a50053a3f0d"
     }
   ],
   "components": [
@@ -636,11 +640,11 @@
         },
         {
           "path": ".github/workflows/deploy.yml",
-          "sha256": "67aaa2f42e786fd0a1b08792bec9dfcac8be7694a91271ce9506b8260e10aed4"
+          "sha256": "a671c6349fa2fe96a4c4f50bd8747c161a8c30e286c733b7f8500bd49e6a0e4e"
         },
         {
           "path": "Dockerfile.fly",
-          "sha256": "4a8822a36c8c460d03e5c56f4b87fc6e51a9e3f50e0435154a4297138050c914"
+          "sha256": "494b7bd57e34861f37d473d546601f598a907dc22b8cbd42387860d0dc4a9954"
         }
       ],
       "licenseEvidence": []

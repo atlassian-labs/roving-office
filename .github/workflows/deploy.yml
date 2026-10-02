@@ -84,6 +84,20 @@ jobs:
       # No `--strategy`: the default rolling update is the only one this app can take.
       # The volume holding every keycard, layout and ingest token binds to one machine,
       # so `bluegreen` and `canary` both want a second machine with nothing to attach to.
-      - run: flyctl deploy --app the-roving-office --remote-only
+      #
+      # The build args stamp the image with what it is and where it came from, which
+      # `GET /api/health` reports — so "what is live, and did a human or this workflow
+      # put it there?" is answerable with curl rather than by reading two consoles.
+      # `bin/fly-deploy.sh` passes the same set for a hand-run deploy, which is what
+      # makes `source` a real answer rather than an absence.
+      #
+      # No dirty flag here: a runner's checkout is `github.sha` and nothing else, so
+      # reporting a tree state nobody inspected would be a check that never ran.
+      - run: |
+          flyctl deploy --app the-roving-office --remote-only \
+            --build-arg "GIT_SHA=$GITHUB_SHA" \
+            --build-arg "DEPLOY_SOURCE=github-actions" \
+            --build-arg "DEPLOY_RUN=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --build-arg "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

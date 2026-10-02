@@ -87,6 +87,61 @@ first without a checkout:
 - deploying a tree that is not `main`, which is a thing you can do from a checkout and
   the workflow deliberately cannot
 
+For the second, use the script rather than the bare command, so a hand-run deploy stamps
+itself the way the workflow's does:
+
+```bash
+npm run deploy:dry        # what it would send, and the stamps it would apply
+npm run deploy            # this working tree, stamped
+```
+
+### Asking the live office what it is running
+
+```bash
+curl -s https://therovingoffice.com/api/health
+```
+
+```json
+{
+  "offices": 232,
+  "idleTtlMs": 2592000000,
+  "maxOffices": 500,
+  "build": {
+    "version": "0.15.7",
+    "commit": "4c25b6e55c05b6273ad740d6e799a274696e4336",
+    "dirty": false,
+    "source": "github-actions",
+    "run": "https://github.com/atlassian-labs/roving-office/actions/runs/…",
+    "builtAt": "2026-10-02T21:42:41Z"
+  }
+}
+```
+
+`.git` is not in the build context and should not be, so an image cannot work its own
+commit out — it has to be told. `flyctl deploy --build-arg` is that channel,
+`Dockerfile.fly` turns the arguments into environment variables, and `server.cjs` reads
+them once at startup, because none of it can change while the process lives. The `ARG`
+block sits at the **bottom** of the recipe on purpose: an `ARG` that changes invalidates
+every layer below it, and these change on every single deploy.
+
+Three of the fields carry a decision rather than a value:
+
+- **`source`** is `github-actions`, `local`, or `unknown`. The third is honest rather
+  than apologetic — a laptop running `npm start` has no stamps, and neither does an image
+  built by something that did not pass them. A plausible-looking default would be a lie
+  in the one field whose entire job is provenance.
+- **`dirty`** has three states, and `null` is *nobody said* rather than *clean*. A
+  hand-run deploy from an uncommitted tree ships something no commit names, so the hash
+  on its own would point at a tree that was never what shipped. The workflow passes no
+  dirty flag at all: a runner's checkout is the commit it was given, and reporting a tree
+  state nobody inspected would be a check that never ran.
+- **`run`** links back to the workflow log that built the image, which is the difference
+  between knowing a deploy was automatic and being able to read it.
+
+Before this existed, "is the fix live?" meant cross-referencing the Environments page
+against `flyctl releases` and still guessing, because Fly keeps a `User` and nothing
+else useful — `Description` reads `"Release"` on every release and `Metadata` is `null`.
+
 The credential is an app-scoped, expiring Fly deploy token
 (`flyctl tokens create deploy -a the-roving-office -x 8760h`), held as the `production`
 environment secret `FLY_API_TOKEN` rather than a repository secret, so only a job naming

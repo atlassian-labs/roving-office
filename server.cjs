@@ -210,6 +210,37 @@ const MAX_OFFICES = Number(process.env.ROVING_OFFICE_MAX_OFFICES) > 0
   ? Number(process.env.ROVING_OFFICE_MAX_OFFICES)
   : undefined;
 
+/**
+ * What this process is running, and how it got here.
+ *
+ * Read once at startup, because none of it can change while the process lives: an image
+ * is stamped at build time by `Dockerfile.fly`, from `--build-arg` values the deploy
+ * supplies. `.git` is not in the build context, so being told is the only way an image
+ * can know its own commit.
+ *
+ * **Unstamped is a real answer and is reported as one.** A laptop running `npm start`
+ * has none of these, and so does an image built by something that did not pass them;
+ * `source: 'unknown'` says that, where a plausible-looking default would be a lie about
+ * provenance in the one field whose entire job is provenance.
+ *
+ * `dirty` exists because a hand-run deploy from an uncommitted tree is exactly the
+ * deploy somebody later needs to know about, and the commit alone cannot say so — the
+ * hash would name a tree that was never what shipped.
+ */
+const BUILD = Object.freeze({
+  version: require('./package.json').version,
+  commit: process.env.ROVING_OFFICE_GIT_SHA || null,
+  // Three states, not two: `null` is "nobody said", which is different from a stamped
+  // image reporting a clean tree. Keyed off the commit rather than off its own variable,
+  // because a dirty flag with no hash beside it describes nothing.
+  dirty: process.env.ROVING_OFFICE_GIT_SHA
+    ? Boolean(process.env.ROVING_OFFICE_GIT_DIRTY)
+    : null,
+  source: process.env.ROVING_OFFICE_DEPLOY_SOURCE || 'unknown',
+  run: process.env.ROVING_OFFICE_DEPLOY_RUN || null,
+  builtAt: process.env.ROVING_OFFICE_BUILD_TIME || null,
+});
+
 // Faces, beside the registry and outside any one office: they are addressed by the hash of
 // their own bytes, so two offices watching one gateway share them (see lib/avatar-store.cjs).
 const avatarDir = path.join(stateDir, 'avatars');
@@ -2031,6 +2062,11 @@ const server = http.createServer(async (req, res) => {
         // The cap and the count together, because "how full is it?" is the question an
         // operator actually has, and one number without the other cannot answer it.
         maxOffices: store.MAX_OFFICES,
+        // Deliberately outside the `isLocal` gate above. That gate is there because a
+        // keycard is a read capability and handing one out unasked publishes the way
+        // into an office; a commit hash in a public repository is already public, and
+        // the entire value of this field is that a stranger can check what is live.
+        build: BUILD,
       });
     }
 

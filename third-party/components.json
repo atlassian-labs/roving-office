@@ -11,7 +11,8 @@
     "bin/lib/zip.cjs",
     "eleventy.config.mjs",
     ".github/workflows/ci.yml",
-    ".github/workflows/deploy.yml"
+    ".github/workflows/deploy.yml",
+    "bin/fly-deploy.sh"
   ],
   "distributions": {
     "source": "Git source archive/checkout: vendored code, assets, development source and notices. npm packages are not bundled; package-lock.json identifies the separate development install.",
@@ -25,7 +26,7 @@
     "docs-site": "Generated docs/site contains authored HTML/CSS/JS and copies of the two OFL fonts, their licences and the theme CSS. Eleventy and its npm dependencies execute at build time and are not bundled as libraries. Screenshots can reproduce the app's brand assets.",
     "fly-container": "Application payload plus the dynamically resolved node:24-slim image. A release needs the actual image digest, Node version, OS/package inventory and retained base-image notices. This source inventory does not claim to be an image SBOM.",
     "ci": ".github/workflows/ci.yml runs verification only, on the GitHub-hosted ubuntu-latest runner with Node 24 and Node 26 supplied by actions/setup-node. It installs no deployment tooling and holds no credential. These build tools are not bundled in application artifacts, and exact runner image versions are not pinned here.",
-    "deploy": ".github/workflows/deploy.yml deploys the hosted app from main on the GitHub-hosted ubuntu-latest runner. It installs flyctl through superfly/flyctl-actions/setup-flyctl, pinned by commit, and holds the Fly deploy token as a production environment secret; the image itself is built from Dockerfile.fly on Fly's remote builder, so the payload is the one described under fly-container and hosted-app. flyctl and the action are deployment tooling and are not bundled in any application artifact; neither their release versions nor the runner image version are pinned here."
+    "deploy": ".github/workflows/deploy.yml deploys the hosted app from main on the GitHub-hosted ubuntu-latest runner. It installs flyctl through superfly/flyctl-actions/setup-flyctl, pinned by commit, and holds the Fly deploy token as a production environment secret; the image itself is built from Dockerfile.fly on Fly's remote builder, so the payload is the one described under fly-container and hosted-app. flyctl and the action are deployment tooling and are not bundled in any application artifact; neither their release versions nor the runner image version are pinned here. Both this workflow and bin/fly-deploy.sh, the hand-run route, pass build arguments that Dockerfile.fly records as environment variables and GET /api/health reports: the commit, whether the tree was dirty, the deploy source, the workflow run URL and the build time. These describe the first-party payload only and add no third-party component to any artifact."
   },
   "components": [
     {
