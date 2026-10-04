@@ -6,8 +6,8 @@ The office normally runs on your laptop, because that is where the agents are. A
 who just wants to *use* a hosted one wants
 [sharing an office](../user/sharing-an-office.md) instead; this is the deploy runbook.
 
-The docs you are reading are part of the artifact, so both targets below ship
-`docs/site` — see [the docs build](#the-docs-are-part-of-both-artifacts).
+The docs you are reading are part of the artifact, so the deployed image ships
+`docs/site` — see [the docs build](#the-docs-are-part-of-the-artifact).
 
 **Local development does not need a deployment account.** Running the app, Test Data,
 the checks and the docs build uses Node and public npm tooling; start with
@@ -15,40 +15,35 @@ the checks and the docs build uses Node and public npm tooling; start with
 control; the commands below describe the maintainers' app, and nothing in them is an
 install or build prerequisite for contributing.
 
-There are a few places it can live, and they are not variations on a theme — they ask
-for genuinely different amounts of work. One of them, an internal Atlassian platform,
-was evaluated and has since been retired; what is left is what anybody can run.
-
 | Where | What it costs | What you get |
 | --- | --- | --- |
 | **Local** (`npm run serve`) | nothing | the real thing: live agents, durable offices |
-| **Kaizen** (`npm run redeploy`) | Atlassian access, Kaizen CLI and project permissions | an internal hosted office; offices vanish with the sandbox |
-| **Fly.io** (`flyctl deploy`) | a `Dockerfile.fly`, a volume, and two env vars read | a public URL outside Atlassian's network, offices that survive a deploy |
+| **Fly.io** (`flyctl deploy`) | a `Dockerfile.fly`, a volume, and two env vars read | a public URL, offices that survive a deploy |
 | **Cloudflare** | a rewrite of `server.cjs` | durable state and hosted ingest, eventually |
 
-## The retired Kaizen deployment
+## There used to be a second target
 
-Gone, and nothing ran on it. `bin/kaizen-publish.sh`, `bin/kaizen-build.sh`,
-`bin/kaizen-entry.mjs`, `kaizen.toml` and the design record that described the project
-setup are all deleted, along with the pipeline's install and promote steps and the
-`redeploy*` npm scripts.
+An internal Atlassian platform, evaluated and since retired. Nothing ever ran on it, its
+recipes are deleted, and the only reason it is mentioned at all is the cost it was
+carrying — which is worth not re-incurring.
 
-It is recorded here rather than silently absent because the cost it was carrying is the
-reason it went, and that is worth not re-incurring: an internal hostname and a platform
-project id put it over the Labs bar, so it had to be excluded from the public export —
-which forced the `redeploy*` scripts off too, which made the release branch unmergeable
-to `main`, which is why four tests had grown an "if the recipe exists" branch. One
-deployment target that deployed nothing was holding two trees apart.
+An internal hostname and a platform project id put it over the bar for a public
+repository, so it had to be excluded from the export; that forced its npm scripts out
+too, which made the release branch unmergeable to `main`, which is why four tests had
+grown an "if the recipe exists" branch. One deployment target that deployed nothing was
+holding two trees apart, and removing it collapsed the whole chain — there is no export
+list now, and no repository with a withheld half.
 
-If a second target is ever wanted, the thing to preserve is that it can be run by
-someone outside the maintainers, or it will pull the same chain again.
+So if a second target is ever wanted, the property to preserve is that **anybody can run
+it**. One that only the maintainers can reach pulls the same chain again.
 
 ## Fly.io
 
-[Fly.io](https://fly.io) runs an ordinary container on an ordinary VM, which is the
-other end of the spectrum from Kaizen's sandbox-per-request model — and the reason it
-is worth having as a third option: it does not depend on Atlassian's internal network,
-so it is the one place a link works for someone outside the company.
+[Fly.io](https://fly.io) runs an ordinary container on an ordinary VM, and that is the
+whole appeal: the process it starts is the same `node server.cjs` you run on a laptop,
+with no bridge, no shim and no rewrite. Everything below is about the three things a
+container changes — where the port comes from, which interface to bind, and where state
+lives when the filesystem is rebuilt on every deploy.
 
 ```bash
 flyctl deploy --app the-roving-office
@@ -185,21 +180,21 @@ no matching suffix.
 
 Fly runs `node server.cjs` directly inside the container
 [`Dockerfile.fly`](../../Dockerfile.fly) builds — no bridge, no shim, no captured
-`listen()` the way Kaizen needs. The only friction is where the port comes from: Fly's
-convention is `$PORT` in the environment, and `server.cjs` originally only read a CLI
-argument. It now checks both:
-
-Both hosted routes run the server in its default, **private** mode — no `--publish`, so nothing
-writes an endpoint file, which is right for a container where no adapter reads one. Both also
-set `PORT` explicitly (`Dockerfile.fly`, `fly.toml`, and Kaizen through `bin/kaizen-entry.mjs`),
-so the 8080–8095 search never runs there: a named port is bound or the boot fails, and a
-container quietly moving to 8081 behind a fixed `internal_port` would be a health check that
-never passes. The private banner prints the receiver's write token only to a terminal, so a
-deploy log gets a placeholder instead of a credential.
+`listen()`. The only friction is where the port comes from: Fly's convention is `$PORT`
+in the environment, and `server.cjs` originally only read a CLI argument. It now checks
+both:
 
 ```js
 const PORT = Number(process.env.PORT) || Number(args.find((a) => /^\d+$/.test(a))) || 8080;
 ```
+
+The container runs the server in its default, **private** mode — no `--publish`, so
+nothing writes an endpoint file, which is right where no adapter reads one. `PORT` is set
+explicitly in both `Dockerfile.fly` and `fly.toml`, so the 8080–8095 search never runs
+there: a named port is bound or the boot fails, and a container quietly moving to 8081
+behind a fixed `internal_port` would be a health check that never passes. The private
+banner prints the receiver's write token only to a terminal, so a deploy log gets a
+placeholder instead of a credential.
 
 **And `HOST`, which is the other half of the same seam.** `server.cjs` binds `127.0.0.1`
 unless told otherwise — it serves anything under the checkout, so on a laptop the narrow
@@ -208,26 +203,26 @@ proxy arrives on the machine's private interface, not on loopback, so a process 
 only on 127.0.0.1 refuses every forwarded request and the deploy dies on its health check
 with nothing in the log that says why. `Dockerfile.fly` therefore sets `HOST=0.0.0.0`,
 and it is set *there* rather than in `fly.toml` because it is true of any container and
-not of Fly in particular. Kaizen needs nothing: `bin/kaizen-entry.mjs` replaces `listen`
-so no socket is ever bound, and the value is inert on that route. A `HOST` this machine
-has no address for fails at boot naming the variable, which is the one new way this can
-go wrong.
+not of Fly in particular. A `HOST` this machine has no address for fails at boot naming
+the variable, which is the one new way this can go wrong.
 
-`Dockerfile.fly` copies exactly the file set
-[`bin/kaizen-build.sh`](../../bin/kaizen-build.sh) assembles for the Kaizen artifact
-(`*.html`, `styles.css`, `lib/`, `src/`, `vendor/`, `server.cjs`), written once as a
-comment there and read here rather than re-derived, so the two build lists cannot
-quietly drift apart. There is no `npm install` step: the server uses Node built-ins,
-and the browser's third-party code and data are vendored in the files being copied.
+`Dockerfile.fly` names the file set it copies a line at a time, with a comment on each
+saying why that directory is in the image — and `.dockerignore` is the other half of the
+same boundary. Those two are the only places it is drawn, and
+`test/docker-context.test.js` walks the checkout the way the builder does to assert they
+cannot drift apart; [the docs build](#the-docs-are-part-of-the-artifact) below is the
+case that made it necessary. There is no `npm install` step: the server uses Node
+built-ins, and the browser's third-party code and data are vendored in the files being
+copied.
 
 ### One machine, on purpose
 
 Fly's default deploy launches **two** machines per app, for high availability. For most
-apps that is exactly right; for this one it recreates the coherence bug `kaizen.toml`'s
-own comment warns about — `lib/office-store.cjs` keeps every office in an in-memory
-`Map`, so two machines are two independent stores, and which one answers a given
-request depends on Fly's load balancer rather than on anything the app controls. The
-fix is the same shape as Kaizen's `maxSandboxes = 1`:
+apps that is exactly right; for this one it breaks coherence outright —
+`lib/office-store.cjs` keeps every office in an in-memory `Map`, so two machines are two
+independent stores, and which one answers a given request depends on Fly's load balancer
+rather than on anything the app controls. One visitor opens an office, the next request
+lands on the machine that has never heard of it:
 
 ```bash
 flyctl scale count 1
@@ -241,7 +236,7 @@ one machine stops when nothing is asking for it and restarts on the next request
 is only affordable because the machine has somewhere to put its offices down first —
 see below, and note that the sleeping is exactly what makes the idle deadline matter.
 
-### Offices survive a deploy (TRO-142)
+### Offices survive a deploy
 
 `lib/office-store.cjs` writes the whole registry — every keycard, its scenes, their
 `look` and furniture `layout`, and the hashed ingest token — to `offices.json`, on a
@@ -353,11 +348,12 @@ All three limits count *creations*, not requests, so a mint and the browser's im
 
 ### What it still doesn't have
 
-It is unauthenticated and reachable by anyone who has the URL — the same exposure
-Kaizen has, minus even the option of `kaizen oauth` restrictions, so treat a Fly URL as
-public and set emitter-side redaction accordingly. Fly buys reachability from outside
-Atlassian's network and, now, durability; it does not buy access control, which is
-still the [Cloudflare](design/cloudflare-deployment.md) spec's job.
+**No access control.** The app is reachable by anyone who has the URL, and an office is
+readable by anyone holding its keycard. A passcode can be put on an individual office —
+[sharing an office](../user/sharing-an-office.md) covers that — but the deployment
+itself has no gate, so treat a hosted office as public and set emitter-side redaction
+accordingly. Fly buys reachability and, now, durability; it does not buy authentication,
+which is still the [Cloudflare](design/cloudflare-deployment.md) spec's job.
 
 Durability here is also a volume on one machine, which is a different claim from
 Cloudflare's. It survives deploys and restarts. Losing the host is a worse day: Fly
@@ -366,19 +362,16 @@ rather than from nothing, but restoring one is a manual `flyctl volumes fork` an
 whatever happened since the last snapshot is gone. And none of it scales past the one
 process that holds the disk.
 
-## The docs are part of both artifacts
+## The docs are part of the artifact
 
-The documentation is served by the app at `/docs`, so it ships in both targets — and it
-ships as **built HTML committed to the repository** rather than as something either build
+The documentation is served by the app at `/docs`, so it ships in the image — and it
+ships as **built HTML committed to the repository** rather than as something the build
 generates.
 
-That is a deliberate exception to the rule `.gitignore` states, and it exists because
-neither target can run a build:
-
-- **Fly** builds an image from `Dockerfile.fly`, which runs **no `npm install` at all**.
-  Runtime dependencies are already vendored, and Eleventy is a devDependency, so it
-  is not there to run.
-- **Kaizen** runs `bin/kaizen-build.sh`, which is a file copy by design.
+That is a deliberate exception to the rule `.gitignore` states, and it exists because the
+deploy cannot run a build: `Dockerfile.fly` runs **no `npm install` at all**. Runtime
+dependencies are already vendored and Eleventy is a devDependency, so it is not in the
+image to be run — a deploy copies files, so anything served has to already be a file.
 
 So `npm run docs` is a thing you run in a checkout, and its output travels. The precedent
 is `src/agents/colour-names.js`, which is committed generated code for the same reason: the
@@ -386,11 +379,10 @@ office never fetches anything at runtime. What makes the exception safe is the d
 — `npm test` fails when `docs/site` does not match the Markdown, so a committed copy cannot
 quietly stop matching its source.
 
-Three files know about it, and a test greps all three:
+Two files know about it, and a test greps both:
 
 | File | What it adds |
 | --- | --- |
-| `bin/kaizen-build.sh` | `cp -R docs/site` and `cp -R docs/images` into the artifact |
 | `Dockerfile.fly` | `COPY docs/site` and `COPY docs/images` |
 | `.dockerignore` | the `!docs/site` and `!docs/images` exceptions that let them through |
 
@@ -405,13 +397,12 @@ and silent in the build — a wrong guess in those exceptions once produced a de
 whose documentation was entirely 404.
 
 `server.cjs` serves `docs/site` **at** `/docs`, falling back to `docs/` for anything not in
-the build — the three standalone HTML libraries, and the imagery. One rule, and no file
+the build — the standalone HTML libraries, and the imagery. One rule, and no file
 duplicated in git to make it work.
 
 **A new documentation page therefore ships by existing**, exactly as a new root-level page
-does: both recipes copy directories rather than naming files, for the reason
-`bin/kaizen-build.sh`'s own comment gives — a page named individually is a page that
-silently 404s once deployed and nowhere else.
+does: the recipe copies directories rather than naming files, and that is the reason — a
+page named individually is a page that silently 404s once deployed and nowhere else.
 
 ## Cloudflare
 
@@ -420,9 +411,8 @@ rewritten against Durable Objects and KV. In exchange, state becomes genuinely d
 and hosted ingest becomes possible. See
 [cloudflare-deployment.md](design/cloudflare-deployment.md).
 
-Neither Kaizen nor Fly really rivals Cloudflare. Between themselves, Kaizen answers
-"can someone inside Atlassian see this?" and Fly answers "can anyone?" — and since
-TRO-142, Fly also answers "will it still be there next week?", which was the gap that
-made it a demo. What is left is the harder half: access control, and state that does
-not live on one machine's disk. Cloudflare answers "can this be a real hosted product?"
-later, and that is what it is still for.
+Fly does not really rival it. Fly answers "can anyone open this?" and, since the volume,
+"will it still be there next week?" — which was the gap that made it a demo rather than a
+deployment. What is left is the harder half: access control, and state that does not live
+on one machine's disk. Cloudflare answers "can this be a real hosted product?", and that
+is what it is still for.
