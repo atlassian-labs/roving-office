@@ -79,7 +79,7 @@
     },
     {
       "path": "eleventy.config.mjs",
-      "sha256": "663d5219308550d8859c7cb81c98b30bf69ae6bdcadd588d82723b60d3b44989"
+      "sha256": "b15ad46f4193924e77bec26e1be3fc09691358c2eb9a93808f94d7554564b058"
     },
     {
       "path": "bin/gen-llms-txt.mjs",
@@ -87,11 +87,11 @@
     },
     {
       "path": "bin/gen-docs-markdown.mjs",
-      "sha256": "7f1267a3d516ba03d82df2c02aeccbbb3e131dc707f55b41744259f9980c8d70"
+      "sha256": "5ad34f577f466bb5443f95e7c20f3f4e27736d0aeb5f721009f316b43099aead"
     },
     {
       "path": "bin/lib/docs-links.mjs",
-      "sha256": "0ac38ca516a379ceb4bc9900a7702a8a3668afc03234119ad840ead0961ce540"
+      "sha256": "632fc2e8d680da030de5ac5e78b2ac727a3741ed2484a7aa80b845abeb42a6bf"
     },
     {
       "path": ".github/workflows/ci.yml",
