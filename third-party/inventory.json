@@ -83,7 +83,7 @@
     },
     {
       "path": "bin/gen-llms-txt.mjs",
-      "sha256": "eade198b1d6e7fdbc662e248f2f98405fea18fbd4aab27bacb33e33853a31943"
+      "sha256": "3e6a3a75f6eeba2f204bb60c5eba980181dc1044764e62f5b00c74ca37ba6867"
     },
     {
       "path": "bin/gen-docs-markdown.mjs",

@@ -95,7 +95,7 @@ You have a checkout and something to change.
 
 Interactive galleries rather than prose — scripted HTML, best opened in a browser by a person. There is little here for a reader made of text.
 
-- [Every character movement](https://therovingoffice.com/character-movements.html)
-- [Every object, turning](https://therovingoffice.com/item-movements.html)
-- [Two dozen generated offices](https://therovingoffice.com/office-seeds.html)
-- [Thirty offices, thirty seeds](https://therovingoffice.com/office-variety.html)
+- [Every character movement](https://therovingoffice.com/docs/character-movements.html)
+- [Every object, turning](https://therovingoffice.com/docs/item-movements.html)
+- [Two dozen generated offices](https://therovingoffice.com/docs/office-seeds.html)
+- [Thirty offices, thirty seeds](https://therovingoffice.com/docs/office-variety.html)

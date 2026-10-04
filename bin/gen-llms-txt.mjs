@@ -259,7 +259,12 @@ function render() {
       'Interactive galleries rather than prose — scripted HTML, best opened in a browser '
       + 'by a person. There is little here for a reader made of text.',
       '',
-      ...libraries.map((page) => `- [${page.title}](${SITE}${page.url})`),
+      // `/docs`, like every other page here. These four are `external` because they are
+      // whole HTML documents Eleventy does not render — they are served out of `docs/`
+      // rather than `docs/site/` — but they are still *under* `/docs`, and the sidebar
+      // gets that right only because it runs them through Eleventy's `url` filter. This
+      // line did not, and shipped four 404s twice.
+      ...libraries.map((page) => `- [${page.title}](${SITE}/docs${page.url})`),
       '',
     );
   }
