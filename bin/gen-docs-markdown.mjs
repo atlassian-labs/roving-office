@@ -81,7 +81,7 @@ function publishedMarkdown(relHtml) {
   return fs.readFileSync(source, 'utf8').replace(
     /\]\((?!https?:|\/\/|#|mailto:)([^)\s]+)(\s+"[^"]*")?\)/g,
     (match, target, title) => (
-      escapesDocs(pageUrl, target) ? `](${repoUrlFor(target)}${title ?? ''})` : match
+      escapesDocs(pageUrl, target) ? `](${repoUrlFor(pageUrl, target)}${title ?? ''})` : match
     ),
   );
 }

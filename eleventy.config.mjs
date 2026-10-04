@@ -135,7 +135,7 @@ export default function (eleventyConfig) {
     return content.replace(/href="((?:\.\.\/)+[^"#]+)"/g, (match, target) => {
       // Still inside docs/ — a sibling page, or the imagery. Leave it alone.
       if (!escapes(page, target)) return match;
-      return `href="${repoUrlFor(target)}"`;
+      return `href="${repoUrlFor(page.url, target)}"`;
     });
   });
 
