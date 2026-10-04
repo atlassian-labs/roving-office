@@ -33,63 +33,63 @@ which is the working agreement for an agent session in this codebase.
 
 You have the app and a browser.
 
-- [What this is](https://therovingoffice.com/docs/user/index.html): An office full of characters, and the characters are your AI agents.
-- [Watching the office](https://therovingoffice.com/docs/user/watching.html): For anyone looking at the room.
-- [Install and run it](https://therovingoffice.com/docs/user/install.html): Five minutes, and the room fills itself with people.
-- [Keys and panels](https://therovingoffice.com/docs/user/keys.html): Everything the keyboard does.
-- [Offices, keycards and scenes](https://therovingoffice.com/docs/user/offices-and-keycards.html): How an office is named, shared, and — if you are careless — lost.
-- [Connect your agents](https://therovingoffice.com/docs/user/connect-your-agents.html): One command per harness, then your real sessions walk in through the door.
-- [Rearranging the furniture](https://therovingoffice.com/docs/user/rearranging-furniture.html): Press E, drag the desks about, and watch everybody's route bend round them.
-- [Layouts](https://therovingoffice.com/docs/user/layouts.html): An arrangement of furniture is a thing in its own right: it is kept, it can be named, and it can be handed to somebody else as a file.
-- [Sharing an office](https://therovingoffice.com/docs/user/sharing-an-office.html): Put the sessions running on your laptop into a room somebody else can open.
-- [Jobs: the one idea](https://therovingoffice.com/docs/user/concepts.html): What the office thinks work is, and why it needed its own word for it.
-- [Post, parcels and the bin](https://therovingoffice.com/docs/user/work-and-post.html): How work gets into the room, and how it leaves.
-- [The room, prop by prop](https://therovingoffice.com/docs/user/the-room.html): Every prop is somewhere an agent goes.
-- [Agent names](https://therovingoffice.com/docs/user/agent-names.html): Why somebody is called Chen Palette-Tidier, and why their surname keeps changing.
-- [Buildings and themes](https://therovingoffice.com/docs/user/buildings.html): Eight buildings.
-- [Solar geometry](https://therovingoffice.com/docs/user/solar-geometry.html): Where the sun is, what season it is, and which way the room faces.
-- [Generated offices](https://therovingoffice.com/docs/user/generated-offices.html): A seed is a room.
-- [Test Data](https://therovingoffice.com/docs/user/sources/test-data.html): The simulation, and the default.
-- [Rovo CLI](https://therovingoffice.com/docs/user/sources/rovo-cli.html): Atlassian's terminal agent.
-- [Claude Code](https://therovingoffice.com/docs/user/sources/claude-code.html): The richest feed there is: explicit turn boundaries and real subagents.
-- [Cursor](https://therovingoffice.com/docs/user/sources/cursor.html): An observer only: it watches Cursor Agent and never blocks or rewrites anything it does.
-- [Codex](https://therovingoffice.com/docs/user/sources/codex.html): OpenAI's coding agent.
-- [OpenClaw](https://therovingoffice.com/docs/user/sources/openclaw.html): The odd one out, in the good way: a real plugin rather than a command per event.
-- [Muse](https://therovingoffice.com/docs/user/sources/muse.html): Meta's personal AI agent.
-- [OpenClaw on a server](https://therovingoffice.com/docs/user/sources/openclaw-server.html): Where the Gateway and the checkout are not the same machine.
-- [OpenClaw: names and faces](https://therovingoffice.com/docs/user/sources/openclaw-identity.html): Your agents keep the identities they gave themselves.
+- [What this is](https://therovingoffice.com/docs/user/index.md): An office full of characters, and the characters are your AI agents.
+- [Watching the office](https://therovingoffice.com/docs/user/watching.md): For anyone looking at the room.
+- [Install and run it](https://therovingoffice.com/docs/user/install.md): Five minutes, and the room fills itself with people.
+- [Keys and panels](https://therovingoffice.com/docs/user/keys.md): Everything the keyboard does.
+- [Offices, keycards and scenes](https://therovingoffice.com/docs/user/offices-and-keycards.md): How an office is named, shared, and — if you are careless — lost.
+- [Connect your agents](https://therovingoffice.com/docs/user/connect-your-agents.md): One command per harness, then your real sessions walk in through the door.
+- [Rearranging the furniture](https://therovingoffice.com/docs/user/rearranging-furniture.md): Press E, drag the desks about, and watch everybody's route bend round them.
+- [Layouts](https://therovingoffice.com/docs/user/layouts.md): An arrangement of furniture is a thing in its own right: it is kept, it can be named, and it can be handed to somebody else as a file.
+- [Sharing an office](https://therovingoffice.com/docs/user/sharing-an-office.md): Put the sessions running on your laptop into a room somebody else can open.
+- [Jobs: the one idea](https://therovingoffice.com/docs/user/concepts.md): What the office thinks work is, and why it needed its own word for it.
+- [Post, parcels and the bin](https://therovingoffice.com/docs/user/work-and-post.md): How work gets into the room, and how it leaves.
+- [The room, prop by prop](https://therovingoffice.com/docs/user/the-room.md): Every prop is somewhere an agent goes.
+- [Agent names](https://therovingoffice.com/docs/user/agent-names.md): Why somebody is called Chen Palette-Tidier, and why their surname keeps changing.
+- [Buildings and themes](https://therovingoffice.com/docs/user/buildings.md): Eight buildings.
+- [Solar geometry](https://therovingoffice.com/docs/user/solar-geometry.md): Where the sun is, what season it is, and which way the room faces.
+- [Generated offices](https://therovingoffice.com/docs/user/generated-offices.md): A seed is a room.
+- [Test Data](https://therovingoffice.com/docs/user/sources/test-data.md): The simulation, and the default.
+- [Rovo CLI](https://therovingoffice.com/docs/user/sources/rovo-cli.md): Atlassian's terminal agent.
+- [Claude Code](https://therovingoffice.com/docs/user/sources/claude-code.md): The richest feed there is: explicit turn boundaries and real subagents.
+- [Cursor](https://therovingoffice.com/docs/user/sources/cursor.md): An observer only: it watches Cursor Agent and never blocks or rewrites anything it does.
+- [Codex](https://therovingoffice.com/docs/user/sources/codex.md): OpenAI's coding agent.
+- [OpenClaw](https://therovingoffice.com/docs/user/sources/openclaw.md): The odd one out, in the good way: a real plugin rather than a command per event.
+- [Muse](https://therovingoffice.com/docs/user/sources/muse.md): Meta's personal AI agent.
+- [OpenClaw on a server](https://therovingoffice.com/docs/user/sources/openclaw-server.md): Where the Gateway and the checkout are not the same machine.
+- [OpenClaw: names and faces](https://therovingoffice.com/docs/user/sources/openclaw-identity.md): Your agents keep the identities they gave themselves.
 
 ## For developers
 
 You have a checkout and something to change.
 
-- [Where to look](https://therovingoffice.com/docs/developer/index.html): Developer documentation.
-- [Getting the code](https://therovingoffice.com/docs/developer/getting-the-code.html): Run a checkout, install public development tooling, and check your changes.
-- [Developing on it](https://therovingoffice.com/docs/developer/developing.html): There is no app build step or npm runtime install.
-- [Every npm script](https://therovingoffice.com/docs/developer/npm-scripts.html): What each command in package.json does, and which of them you actually need.
-- [Architecture](https://therovingoffice.com/docs/developer/architecture.html): How a keystroke in a terminal becomes somebody walking across a room, and where the seams are.
-- [The physics of the office](https://therovingoffice.com/docs/developer/physics.html): How people move, stand, wait and sit, and the rules we keep rediscovering the hard way.
-- [Scene internals](https://therovingoffice.com/docs/developer/scene-internals.html): The code side of the room and the buildings round it: where the constants live, which rules keep the facades still, and the measurements behind the things that look arbitrary.
-- [Job delivery](https://therovingoffice.com/docs/developer/job-delivery.html): The mailbox machinery: how a request gets from a harness into an agent's hands, how finished work leaves again, and what happens to work that fails or is never collected.
-- [The furniture editor](https://therovingoffice.com/docs/developer/editor.html): The seams, the algorithms and the file format.
-- [The layout algorithm](https://therovingoffice.com/docs/developer/layout-algorithm.html): A seed in, a whole layout out.
-- [Tuning the layout generator](https://therovingoffice.com/docs/developer/tuning-the-layouts.html): The layout algorithm explains how a seed becomes an office.
-- [The source model](https://therovingoffice.com/docs/developer/sources.html): How several feeds share one room, and the two places a source's identity is not a string.
-- [The Test Data source](https://therovingoffice.com/docs/developer/test-data.html): The simulation, and the test rig.
-- [Extending the office](https://therovingoffice.com/docs/developer/extending.html): Four recipes, each ending in a working thing.
-- [Photographing a prop](https://therovingoffice.com/docs/developer/prop-portraits.html): How the object portraits are generated, and the measurements that came out of it.
-- [Visual assets and their rights](https://therovingoffice.com/docs/developer/visual-assets.html): Every visual asset that ships with The Roving Office, where it came from, and on what basis it is published.
-- [The coplanar-face probe](https://therovingoffice.com/docs/developer/coplanar-probe.html)
-- [Publishing the plugins](https://therovingoffice.com/docs/developer/plugin-distribution.html): How the Claude Code and Codex plugins reach somebody who has never cloned this repository — and what is still missing before they do.
-- [The admin console](https://therovingoffice.com/docs/developer/admin-console.html): A password-gated page of summary statistics about one deployment: how many offices have been opened and closed, how many harnesses have successfully connected, how much work has been delivered and finished, and what people set their rooms…
-- [The AOP spec](https://therovingoffice.com/docs/developer/protocol/aop-spec.html): Status: draft · Version string: "0.1" · Audience: anyone writing an adapter that feeds live agent activity into The Roving Office.
-- [Adapter notes](https://therovingoffice.com/docs/developer/protocol/aop-harness-adapters.html): Companion to aop-spec.md.
-- [Rovo CLI](https://therovingoffice.com/docs/developer/adapters/rovo-cli.html): Installing it is Rovo CLI.
-- [Claude Code](https://therovingoffice.com/docs/developer/adapters/claude-code.html): Installing it is Claude Code.
-- [Cursor](https://therovingoffice.com/docs/developer/adapters/cursor.html): Installing it is Cursor.
-- [Codex](https://therovingoffice.com/docs/developer/adapters/codex.html): Installing it is Codex.
-- [OpenClaw](https://therovingoffice.com/docs/developer/adapters/openclaw.html): Installing it is OpenClaw; the identity fields are names, colours and faces.
-- [Muse](https://therovingoffice.com/docs/developer/adapters/muse.html): This is the emitter, not a mapper.
+- [Where to look](https://therovingoffice.com/docs/developer/index.md): Developer documentation.
+- [Getting the code](https://therovingoffice.com/docs/developer/getting-the-code.md): Run a checkout, install public development tooling, and check your changes.
+- [Developing on it](https://therovingoffice.com/docs/developer/developing.md): There is no app build step or npm runtime install.
+- [Every npm script](https://therovingoffice.com/docs/developer/npm-scripts.md): What each command in package.json does, and which of them you actually need.
+- [Architecture](https://therovingoffice.com/docs/developer/architecture.md): How a keystroke in a terminal becomes somebody walking across a room, and where the seams are.
+- [The physics of the office](https://therovingoffice.com/docs/developer/physics.md): How people move, stand, wait and sit, and the rules we keep rediscovering the hard way.
+- [Scene internals](https://therovingoffice.com/docs/developer/scene-internals.md): The code side of the room and the buildings round it: where the constants live, which rules keep the facades still, and the measurements behind the things that look arbitrary.
+- [Job delivery](https://therovingoffice.com/docs/developer/job-delivery.md): The mailbox machinery: how a request gets from a harness into an agent's hands, how finished work leaves again, and what happens to work that fails or is never collected.
+- [The furniture editor](https://therovingoffice.com/docs/developer/editor.md): The seams, the algorithms and the file format.
+- [The layout algorithm](https://therovingoffice.com/docs/developer/layout-algorithm.md): A seed in, a whole layout out.
+- [Tuning the layout generator](https://therovingoffice.com/docs/developer/tuning-the-layouts.md): The layout algorithm explains how a seed becomes an office.
+- [The source model](https://therovingoffice.com/docs/developer/sources.md): How several feeds share one room, and the two places a source's identity is not a string.
+- [The Test Data source](https://therovingoffice.com/docs/developer/test-data.md): The simulation, and the test rig.
+- [Extending the office](https://therovingoffice.com/docs/developer/extending.md): Four recipes, each ending in a working thing.
+- [Photographing a prop](https://therovingoffice.com/docs/developer/prop-portraits.md): How the object portraits are generated, and the measurements that came out of it.
+- [Visual assets and their rights](https://therovingoffice.com/docs/developer/visual-assets.md): Every visual asset that ships with The Roving Office, where it came from, and on what basis it is published.
+- [The coplanar-face probe](https://therovingoffice.com/docs/developer/coplanar-probe.md)
+- [Publishing the plugins](https://therovingoffice.com/docs/developer/plugin-distribution.md): How the Claude Code and Codex plugins reach somebody who has never cloned this repository — and what is still missing before they do.
+- [The admin console](https://therovingoffice.com/docs/developer/admin-console.md): A password-gated page of summary statistics about one deployment: how many offices have been opened and closed, how many harnesses have successfully connected, how much work has been delivered and finished, and what people set their rooms…
+- [The AOP spec](https://therovingoffice.com/docs/developer/protocol/aop-spec.md): Status: draft · Version string: "0.1" · Audience: anyone writing an adapter that feeds live agent activity into The Roving Office.
+- [Adapter notes](https://therovingoffice.com/docs/developer/protocol/aop-harness-adapters.md): Companion to aop-spec.md.
+- [Rovo CLI](https://therovingoffice.com/docs/developer/adapters/rovo-cli.md): Installing it is Rovo CLI.
+- [Claude Code](https://therovingoffice.com/docs/developer/adapters/claude-code.md): Installing it is Claude Code.
+- [Cursor](https://therovingoffice.com/docs/developer/adapters/cursor.md): Installing it is Cursor.
+- [Codex](https://therovingoffice.com/docs/developer/adapters/codex.md): Installing it is Codex.
+- [OpenClaw](https://therovingoffice.com/docs/developer/adapters/openclaw.md): Installing it is OpenClaw; the identity fields are names, colours and faces.
+- [Muse](https://therovingoffice.com/docs/developer/adapters/muse.md): This is the emitter, not a mapper.
 
 ## Optional
 

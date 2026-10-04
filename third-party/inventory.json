@@ -47,7 +47,7 @@
     "codex-local-marketplace": "bin/aop-codex-install.cjs stageMarketplace copies bin, hooks, plugin manifests, package.json, README and an optional project LICENSE. No npm packages, Three.js, colour table, fonts or brand assets are copied. Node is supplied by the user.",
     "openclaw-tarball": "bin/aop-openclaw-pack.cjs allowlist: first-party plugin modules and two first-party adapter modules only; Node builtins, no bundled npm packages or visual assets. OpenClaw and Node are host prerequisites. No third-party notice applies to the current payload.",
     "hosted-app": "Dockerfile.fly copies src, lib, assets, vendor, generated docs, images and examples. THIRD_PARTY_NOTICES.txt contains the bundled Three.js, colour-data and font licenses; vendor retains originals. npm development tools are not copied.",
-    "docs-site": "Generated docs/site contains authored HTML/CSS/JS and copies of the two OFL fonts, their licences and the theme CSS, plus llms.txt — a first-party index written by bin/gen-llms-txt.mjs from docs/_nav.mjs and the pages' own opening lines, carrying no third-party content. Eleventy and its npm dependencies execute at build time and are not bundled as libraries. Screenshots can reproduce the app's brand assets.",
+    "docs-site": "Generated docs/site contains authored HTML/CSS/JS and copies of the two OFL fonts, their licences and the theme CSS, plus llms.txt — a first-party index written by bin/gen-llms-txt.mjs from docs/_nav.mjs and the pages' own opening lines — and a Markdown copy of every built page, written by bin/gen-docs-markdown.mjs from the same first-party sources with outward links redirected to the repository. Neither carries third-party content. Eleventy and its npm dependencies execute at build time and are not bundled as libraries. Screenshots can reproduce the app's brand assets.",
     "fly-container": "Application payload plus the dynamically resolved node:24-slim image. A release needs the actual image digest, Node version, OS/package inventory and retained base-image notices. This source inventory does not claim to be an image SBOM.",
     "ci": ".github/workflows/ci.yml runs verification only, on the GitHub-hosted ubuntu-latest runner with Node 24 and Node 26 supplied by actions/setup-node. It installs no deployment tooling and holds no credential. These build tools are not bundled in application artifacts, and exact runner image versions are not pinned here.",
     "deploy": ".github/workflows/deploy.yml deploys the hosted app from main on the GitHub-hosted ubuntu-latest runner. It installs flyctl through superfly/flyctl-actions/setup-flyctl, pinned by commit, and holds the Fly deploy token as a production environment secret; the image itself is built from Dockerfile.fly on Fly's remote builder, so the payload is the one described under fly-container and hosted-app. flyctl and the action are deployment tooling and are not bundled in any application artifact; neither their release versions nor the runner image version are pinned here. Both this workflow and bin/fly-deploy.sh, the hand-run route, pass build arguments that Dockerfile.fly records as environment variables and GET /api/health reports: the commit, whether the tree was dirty, the deploy source, the workflow run URL and the build time. These describe the first-party payload only and add no third-party component to any artifact."
@@ -79,11 +79,19 @@
     },
     {
       "path": "eleventy.config.mjs",
-      "sha256": "5affa0b4b41e9f7f4073aca80b73a901c5f725162416da2de20dc3af412b04ef"
+      "sha256": "b15ad46f4193924e77bec26e1be3fc09691358c2eb9a93808f94d7554564b058"
     },
     {
       "path": "bin/gen-llms-txt.mjs",
-      "sha256": "2590f1b873525613f0dea97895888bf2429bc147d29fba41e6299da5a843a5dd"
+      "sha256": "eade198b1d6e7fdbc662e248f2f98405fea18fbd4aab27bacb33e33853a31943"
+    },
+    {
+      "path": "bin/gen-docs-markdown.mjs",
+      "sha256": "5ad34f577f466bb5443f95e7c20f3f4e27736d0aeb5f721009f316b43099aead"
+    },
+    {
+      "path": "bin/lib/docs-links.mjs",
+      "sha256": "632fc2e8d680da030de5ac5e78b2ac727a3741ed2484a7aa80b845abeb42a6bf"
     },
     {
       "path": ".github/workflows/ci.yml",

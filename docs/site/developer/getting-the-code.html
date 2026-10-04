@@ -277,7 +277,23 @@ contains, and the opening line of each page, which is already a sentence saying 
 page is. A hand-written copy would be wrong the first time anybody added a page, so there
 is nothing to maintain and nothing to remember: add a page to the sidebar, run
 <code>npm run docs</code>, and it appears. <code>npm test</code> fails if the two disagree.</p>
-<p>Two details that are decisions rather than accidents:</p>
+<p><strong>Each page is also published as Markdown</strong>, beside its HTML — <code>/docs/user/install.md</code>
+next to <code>/docs/user/install.html</code> — and that is what the index links, because a built page
+carries the sidebar for its whole documentation set, a table of contents, a header, a
+footer and two font preloads. Pointing a model at one spends most of the response on
+navigation for forty other pages. <code>bin/gen-docs-markdown.mjs</code> writes the copies, and
+takes its set from the pages Eleventy actually built rather than from a list — so an
+unpublished page, having no HTML, is never copied, and the boundary stays the one in
+<code>.eleventyignore</code>.</p>
+<p>Those copies are <strong>not byte-for-byte</strong>, and the single difference is deliberate. These
+documents cite the code constantly, and <code>../../bin/aop-send.cjs</code> is exactly right in a
+checkout and meaningless on the web, since <code>bin/</code> is not in the deployed image at all.
+The HTML build already redirects links that climb out of <code>docs/</code> to the repository; the
+Markdown copy does the same, through the same
+<a href="https://github.com/atlassian-labs/roving-office/blob/main/bin/lib/docs-links.mjs"><code>bin/lib/docs-links.mjs</code></a> helper, so one source cannot
+produce two artifacts that disagree about the same link. Links staying inside <code>docs/</code> are
+left alone — they point at <code>.md</code>, and those are now real files.</p>
+<p>Three details that are decisions rather than accidents:</p>
 <ul>
 <li>It is written into <code>docs/site/</code> and <strong>rewritten to the root path</strong> by <code>server.cjs</code>,
 rather than kept as a second copy at the top of the repository. The convention fixes
@@ -288,6 +304,8 @@ stale against itself.</li>
 as by the build, and a page listed in both the sidebar and that set stops the generator
 rather than being skipped. An index that advertises a runbook has published it just as
 surely as building the HTML would have.</li>
+<li>Every link the index carries is an absolute URL. A model handed the file has no base to
+resolve a relative path against, and a test asserts it.</li>
 </ul>
 <h2 id="for-anything-visual-look-at-the-scene" tabindex="-1">For anything visual, look at the scene</h2>
 <p>The scene is the product, so a unit test cannot tell you it looks right. A headless
