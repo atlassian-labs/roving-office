@@ -20,6 +20,7 @@ import pluginTOC from '@uncenter/eleventy-plugin-toc';
 
 import { NAV, SECTIONS, titleFor } from './docs/_nav.mjs';
 import { checkDocLinks, formatProblems } from './bin/lib/check-doc-links.mjs';
+import { escapesDocs, repoUrlFor } from './bin/lib/docs-links.mjs';
 
 /**
  * The repository root, from this file's own location rather than `process.cwd()`.
@@ -74,18 +75,15 @@ export default function (eleventyConfig) {
   eleventyConfig.addFilter('titleFor', titleFor);
 
   /**
-   * How far above `docs/` a relative href climbs, or 0 if it stays inside.
+   * Whether a relative href climbs out of `docs/`.
    *
    * Both transforms below need this and they must agree about it, because a link that
-   * leaves `docs/` is not a page: it is a file on Bitbucket. Counting `../` against the
-   * page's own depth is the only way to tell, since `../../src/layout.js` from
-   * `user/sources/` and from `developer/` mean different things.
+   * leaves `docs/` is not a page: it is a file in the repository. The answer now comes
+   * from `bin/lib/docs-links.mjs`, because a third caller appeared —
+   * `bin/gen-docs-markdown.mjs` publishes a Markdown copy of every page and has to
+   * answer the same question about `[text](…)` that these two ask about `href="…"`.
    */
-  const escapesDocs = (page, target) => {
-    const depth = page.url.replace(/^\/|\/[^/]*$/g, '').split('/').filter(Boolean).length;
-    const ups = (target.match(/\.\.\//g) ?? []).length;
-    return ups > depth;
-  };
+  const escapes = (page, target) => escapesDocs(page.url, target);
 
   /**
    * Rewrite `foo.md` links to `foo.html` in the built page.
@@ -110,7 +108,7 @@ export default function (eleventyConfig) {
     const { page } = this;
     return content.replace(
       /href="(?!https?:|\/\/|#)([^"#]+)\.md(#[^"]*)?"/g,
-      (match, path, hash) => (escapesDocs(page, path) ? match : `href="${path}.html${hash ?? ''}"`),
+      (match, path, hash) => (escapes(page, path) ? match : `href="${path}.html${hash ?? ''}"`),
     );
   });
 
@@ -132,14 +130,12 @@ export default function (eleventyConfig) {
    */
   eleventyConfig.addTransform('source-links-to-repository', function (content) {
     if (!this.page.outputPath?.endsWith('.html')) return content;
-    const REPO = 'https://github.com/atlassian-labs/roving-office/blob/main';
     const { page } = this;
 
     return content.replace(/href="((?:\.\.\/)+[^"#]+)"/g, (match, target) => {
       // Still inside docs/ — a sibling page, or the imagery. Leave it alone.
-      if (!escapesDocs(page, target)) return match;
-      const path = target.replace(/(?:\.\.\/)+/, '');
-      return `href="${REPO}/${path}"`;
+      if (!escapes(page, target)) return match;
+      return `href="${repoUrlFor(target)}"`;
     });
   });
 
