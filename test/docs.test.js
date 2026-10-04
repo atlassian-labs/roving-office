@@ -258,15 +258,48 @@ test('the Markdown copies point their outward links at the repository', () => {
 test('llms.txt links the Markdown, and every link resolves', () => {
   const index = readFileSync(join(SITE, 'llms.txt'), 'utf8')
 
-  const docLinks = [...index.matchAll(/\]\(https:\/\/therovingoffice\.com\/docs(\/[^)]+)\)/g)]
-    .map(([, p]) => p)
-  assert.ok(docLinks.length > 40, `expected the whole documentation set, got ${docLinks.length}`)
+  // **Every** link to our own host, not those matching a prefix. The earlier version of
+  // this test matched `/docs(/…)` and so quietly excluded the four links that were
+  // missing that prefix — which were exactly the broken ones. A resolution test whose
+  // pattern decides what counts reports green over the case it exists for.
+  const links = [...index.matchAll(/\]\((https:\/\/therovingoffice\.com[^)]*)\)/g)]
+    .map(([, url]) => url.replace('https://therovingoffice.com', ''))
+  assert.ok(links.length > 50, `expected the whole documentation set, got ${links.length}`)
 
-  // The point of the exercise: prose, not a page wrapped in a sidebar.
-  assert.deepEqual(docLinks.filter((p) => p.endsWith('.html')), [], 'these still point at HTML')
+  // The standalone HTML viewers, taken from the sidebar rather than listed again here.
+  const standalone = new Set(
+    Object.values(NAV).flatMap((groups) => groups.flatMap((group) => group.pages))
+      .filter((page) => page.external && !page.site)
+      .map((page) => `/docs${page.url}`),
+  )
+  const isStandalone = (p) => standalone.has(p)
 
-  const broken = docLinks.filter((p) => !existsSync(join(SITE, p.replace(/^\//, ''))))
-  assert.deepEqual(broken, [], 'these links point at files that do not exist')
+  const docLinks = links.filter((p) => p.startsWith('/docs/'))
+  // The point of publishing the Markdown: prose, not a page wrapped in a sidebar. Only
+  // the pages Eleventy renders — the standalone viewers under Optional are HTML and
+  // have no Markdown to point at.
+  const html = docLinks.filter((p) => p.endsWith('.html') && !isStandalone(p))
+  assert.deepEqual(html, [], 'these still point at built HTML instead of the Markdown copy')
+
+  /**
+   * Where each link resolves, mirroring `resolveDocs` in `server.cjs`: the built site
+   * first, then `docs/` itself, which is how the standalone viewers and the imagery are
+   * served without being copied into the build.
+   */
+  const resolves = (p) => {
+    if (p === '/agent-setup/' || p.startsWith('/agent-setup/')) {
+      return existsSync(join(ROOT, p.replace(/^\//, '')))
+    }
+    if (!p.startsWith('/docs/')) return false
+    const rest = p.slice('/docs/'.length)
+    return existsSync(join(SITE, rest)) || existsSync(join(DOCS, rest))
+  }
+
+  assert.deepEqual(
+    links.filter((p) => !resolves(p)),
+    [],
+    'these links point at nothing the server would serve',
+  )
 })
 
 test('the llms.txt index matches the sidebar', () => {
