@@ -19,6 +19,7 @@ import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { allPages, NAV } from '../docs/_nav.mjs'
+import { isExcluded, parseIgnoreFile } from './lib/dockerignore.js'
 import { checkDocLinks, formatProblems } from '../bin/lib/check-doc-links.mjs'
 import toolClasses from '../bin/mappers/lib/tool-classes.cjs'
 
@@ -173,6 +174,101 @@ test('the sidebar and the Markdown agree, in both directions', async () => {
   )
 })
 
+test('the published Markdown copies match the built pages', () => {
+  const result = spawnSync('node', ['bin/gen-docs-markdown.mjs', '--check'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  })
+  assert.equal(
+    result.status,
+    0,
+    `docs/site Markdown copies are stale. Run \`npm run docs\`.\n${result.stderr}`,
+  )
+})
+
+test('every published page has a Markdown copy, and no unpublished page does', async () => {
+  // The dangerous direction first, and the reason this file guards the HTML the same way:
+  // docs/site is committed and the deploy recipe copies it whole, so a Markdown copy of a
+  // runbook *is* a published runbook. The generator derives its set from the built HTML
+  // precisely so this cannot happen; this asserts the result rather than trusting it.
+  const leaked = []
+  for (const page of unpublishedPages()) {
+    const copy = join(SITE, page)
+    if (existsSync(copy)) leaked.push(relative(ROOT, copy))
+  }
+  assert.deepEqual(
+    leaked,
+    [],
+    'these pages are unpublished but their Markdown is in docs/site, which ships',
+  )
+
+  // And the useful direction: a published page whose prose a model cannot fetch.
+  const missing = (await markdownPages()).filter((page) => !existsSync(join(SITE, page)))
+  assert.deepEqual(missing, [], 'these published pages have no Markdown copy in docs/site')
+})
+
+test('the deployed image carries the copies and not the sources', () => {
+  // The distinction this whole design rests on, and it is invisible from a checkout.
+  //
+  // A local server serves the working tree, so `/docs/developer/publishing.md` answers
+  // 200 on a laptop — it always has, for the same reason `/src/main.js` does. The
+  // deployment is the case that matters, and there `.dockerignore` excludes the whole
+  // `docs` tree and lets back only `docs/*.html`, `docs/site/**` and `docs/images/**`.
+  // So the published copies ship because they are inside `docs/site`, and the unpublished
+  // sources cannot, because nothing lets them in.
+  const patterns = parseIgnoreFile(readFileSync(join(ROOT, '.dockerignore'), 'utf8'))
+
+  for (const page of unpublishedPages()) {
+    assert.ok(
+      isExcluded(patterns, `docs/${page}`),
+      `docs/${page} would be uploaded to the builder, and the app would serve it`,
+    )
+  }
+  // And a published page's Markdown source is excluded too — it reaches the image only
+  // as the copy inside docs/site, which is what keeps one boundary rather than two.
+  assert.ok(isExcluded(patterns, 'docs/user/install.md'), 'the source should not ship')
+  assert.ok(!isExcluded(patterns, 'docs/site/user/install.md'), 'but the copy should')
+})
+
+test('the Markdown copies point their outward links at the repository', () => {
+  // A copy is not byte-for-byte, and this is the only difference. `../../bin/aop-send.cjs`
+  // is right in a checkout and meaningless on the web — `bin/` is not in the deployed
+  // image at all — so the HTML build sends those to the repository and the copy has to
+  // agree, or one source produces two artifacts that disagree about the same link.
+  const copy = readFileSync(join(SITE, 'developer/getting-the-code.md'), 'utf8')
+  assert.ok(
+    copy.includes('](https://github.com/atlassian-labs/roving-office/blob/main/'),
+    'outward links were copied verbatim, so they 404 on the site',
+  )
+  assert.ok(
+    !/\]\((?:\.\.\/){2,}(?:bin|third-party|vendor)\//.test(copy),
+    'an outward link to a path the image does not carry survived the copy',
+  )
+
+  // Links that stay inside docs/ are deliberately untouched: they point at `.md`, and
+  // once the copies exist those are real files sitting beside the HTML.
+  const install = readFileSync(join(SITE, 'user/install.md'), 'utf8')
+  assert.ok(
+    install.includes('](../developer/getting-the-code.md)'),
+    'an in-docs link was rewritten when it did not need to be',
+  )
+  assert.ok(existsSync(join(SITE, 'developer/getting-the-code.md')), 'and it resolves')
+})
+
+test('llms.txt links the Markdown, and every link resolves', () => {
+  const index = readFileSync(join(SITE, 'llms.txt'), 'utf8')
+
+  const docLinks = [...index.matchAll(/\]\(https:\/\/therovingoffice\.com\/docs(\/[^)]+)\)/g)]
+    .map(([, p]) => p)
+  assert.ok(docLinks.length > 40, `expected the whole documentation set, got ${docLinks.length}`)
+
+  // The point of the exercise: prose, not a page wrapped in a sidebar.
+  assert.deepEqual(docLinks.filter((p) => p.endsWith('.html')), [], 'these still point at HTML')
+
+  const broken = docLinks.filter((p) => !existsSync(join(SITE, p.replace(/^\//, ''))))
+  assert.deepEqual(broken, [], 'these links point at files that do not exist')
+})
+
 test('the llms.txt index matches the sidebar', () => {
   const result = spawnSync('node', ['bin/gen-llms-txt.mjs', '--check'], {
     cwd: ROOT,
@@ -191,7 +287,10 @@ test('llms.txt lists every published page, and nothing unpublished', () => {
   // The point of generating it: a new page appears here without anybody remembering to
   // add it. Asserted against the sidebar rather than against a count, so the failure
   // names the page instead of a number that moved.
-  const missing = allPages().filter((page) => !index.includes(`/docs${page.url})`))
+  // `.md`, not `.html`: the index links the published Markdown copy of each page.
+  const missing = allPages().filter(
+    (page) => !index.includes(`/docs${page.url.replace(/\.html$/, '.md')})`),
+  )
   assert.deepEqual(
     missing.map((page) => page.url),
     [],
@@ -202,9 +301,12 @@ test('llms.txt lists every published page, and nothing unpublished', () => {
   // that advertises a runbook has published it just as surely as building the HTML
   // would have. The generator throws rather than skipping if the two lists ever
   // disagree; this checks the output in case it is ever written another way.
+  // Both spellings, because the index links `.md` now and an older or hand-edited copy
+  // could still carry `.html` — either would be advertising the same page.
   for (const page of unpublishedPages()) {
-    const url = `/docs/${page.replace(/\.md$/, '.html')}`
-    assert.ok(!index.includes(url), `llms.txt advertises the unpublished ${page}`)
+    for (const url of [`/docs/${page}`, `/docs/${page.replace(/\.md$/, '.html')}`]) {
+      assert.ok(!index.includes(url), `llms.txt advertises the unpublished ${page}`)
+    }
   }
 })
 

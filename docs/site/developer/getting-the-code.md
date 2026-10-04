@@ -109,9 +109,9 @@ mirror makes other contributors depend on that mirror.
 
 ## Maintaining third-party evidence
 
-[The dependency inventory](../../third-party/inventory.json) records locked npm
+[The dependency inventory](https://github.com/atlassian-labs/roving-office/blob/main/third-party/inventory.json) records locked npm
 packages, vendored code, assets and the evidence available for their licenses. Its
-[component records](../../third-party/components.json) describe provenance and which
+[component records](https://github.com/atlassian-labs/roving-office/blob/main/third-party/components.json) describe provenance and which
 artifacts contain each component. Missing evidence remains an open review item;
 the inventory does not grant permission to redistribute a component.
 
@@ -123,7 +123,7 @@ npm ci
 node bin/gen-third-party.mjs
 ```
 
-Review the inventory and [runtime notices](../../THIRD_PARTY_NOTICES.txt) in the
+Review the inventory and [runtime notices](https://github.com/atlassian-labs/roving-office/blob/main/THIRD_PARTY_NOTICES.txt) in the
 diff. When updating colour names, run `npm run colours` first so the pinned data
 and its upstream license are updated together. `npm test` checks the inventory
 offline to catch stale evidence and notices; run `node bin/gen-third-party.mjs --check`
@@ -136,7 +136,7 @@ release basis in prose,
 and its last section is the checklist for adding or changing one. It exists because the
 inventory answers *what is this file* and the question that actually blocks a release is
 *may we publish it*. Some of the brand marks are other companies' trademarks that this
-project may use but cannot sublicense, so they are named in [`NOTICE`](../../NOTICE) as
+project may use but cannot sublicense, so they are named in [`NOTICE`](https://github.com/atlassian-labs/roving-office/blob/main/NOTICE) as
 excluded from the code licence grant: a permissive licence disclaims trademarks but not
 copyright in artwork, which is why the exclusion is written down rather than inferred.
 Take vendor artwork from the vendor, unaltered, and record where you got it — a source
@@ -184,7 +184,7 @@ documents cite the code constantly, and `../../bin/aop-send.cjs` is exactly righ
 checkout and meaningless on the web, since `bin/` is not in the deployed image at all.
 The HTML build already redirects links that climb out of `docs/` to the repository; the
 Markdown copy does the same, through the same
-[`bin/lib/docs-links.mjs`](../../bin/lib/docs-links.mjs) helper, so one source cannot
+[`bin/lib/docs-links.mjs`](https://github.com/atlassian-labs/roving-office/blob/main/bin/lib/docs-links.mjs) helper, so one source cannot
 produce two artifacts that disagree about the same link. Links staying inside `docs/` are
 left alone — they point at `.md`, and those are now real files.
 
@@ -219,7 +219,7 @@ pipeline go green.
 `bin/aop-node.sh`, `bin/aop-plugin-hook.sh`, `bin/mappers/`, `.claude-plugin/`,
 `.codex-plugin/` — **bump the plugin version.** Claude and Codex both run a copied snapshot
 keyed on that version, so an update offered a version it already holds does nothing at all,
-however far the files have drifted. [AGENTS.md](../../AGENTS.md) explains the trap;
+however far the files have drifted. [AGENTS.md](https://github.com/atlassian-labs/roving-office/blob/main/AGENTS.md) explains the trap;
 [the Claude adapter](adapters/claude-code.md#changing-the-plugin-means-bumping-the-version)
 explains the mechanism.
 

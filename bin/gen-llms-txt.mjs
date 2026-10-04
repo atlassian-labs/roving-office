@@ -184,9 +184,26 @@ function firstSentence(text) {
   return `${sentence.slice(0, cut > 0 ? cut : 240).trim()}…`;
 }
 
-/** `- [Title](url): description`, with the description left off when there is none. */
+/**
+ * `- [Title](url): description`, with the description left off when there is none.
+ *
+ * The URL is the **Markdown**, not the HTML, which is the rest of the convention. A built
+ * page carries the sidebar for its whole documentation set, a table of contents, a header,
+ * a footer and two font preloads — so pointing a model at it spends most of the response
+ * on navigation for forty other pages. `bin/gen-docs-markdown.mjs` publishes the copy
+ * beside the HTML, which is the only reason this can link it.
+ */
 function bullet({ title, url, description }) {
-  return `- [${title}](${SITE}/docs${url})${description ? `: ${description}` : ''}`;
+  const md = url.replace(/\.html$/, '.md');
+  // Not cosmetic. With the copy missing, every link in this index is a 404 and the file
+  // is worse than useless — it is confidently wrong. Fail the build instead.
+  if (!fs.existsSync(path.join(ROOT, 'docs', 'site', md.replace(/^\//, '')))) {
+    throw new Error(
+      `docs/site${md} does not exist, so llms.txt will not link it. Run \`npm run docs\`, `
+      + 'which publishes the Markdown copies before this runs.',
+    );
+  }
+  return `- [${title}](${SITE}/docs${md})${description ? `: ${description}` : ''}`;
 }
 
 function render() {
