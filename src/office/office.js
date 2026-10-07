@@ -356,7 +356,12 @@ export async function addScene() {
 export async function setSceneSources(id, sourceIds, { testDataPinned = false } = {}) {
   const updated = await patchScene(id, { sources: sourceIds, testDataPinned });
   if (!updated) return null;
-  return replace(updated);
+  const record = replace(updated);
+  // Asking only at load never asks for a freshly minted office: it opens on Test
+  // Data and has its harness ticked on here, so its hooks went on posting into
+  // whichever office held them — usually the demo, where nobody was looking.
+  await claimLocalEndpoint();
+  return record;
 }
 
 /** Store a look someone chose in the scene panel, so the room comes back that way. */
