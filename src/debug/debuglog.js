@@ -230,6 +230,7 @@ function openPicker() {
       await setSceneSources(scene.id, sourceIds, { testDataPinned });
       scene = getScene(scene.id) ?? scene;
       switcher.setScenes(listScenes());
+      keycardChip.setOffice(officeInfo());
       repaintWatched();
       paintBadge();
       restartSimulation();

@@ -69,8 +69,10 @@ When you want it to be *your* agents, either let the agent set itself up —
 npm run connect:rovo     # or: connect:claude / connect:cursor / connect:codex / connect:openclaw
 ```
 
-Start a new agent session, press `D`, and tick that harness. You can tick more than one —
-an office holds a set of sources, so a Rovo terminal and a Claude session can share a room.
+Then mint your own office at Reception — the demo's sources are fixed — tick that harness
+in the panel a new keycard opens with, and start a new agent session. `D` brings the panel
+back. You can tick more than one — an office holds a set of sources, so a Rovo terminal and
+a Claude session can share a room.
 
 Press `?` for everything else, including `F`, which puts you inside a selected character's
 head and lets you watch the office from the floor.

@@ -294,6 +294,7 @@ function openPicker() {
     onPick: async (sourceIds, { testDataPinned } = {}) => {
       const updated = await setSceneSources(scene.id, sourceIds, { testDataPinned });
       switcher.setScenes(listScenes());
+      keycardChip.setOffice(officeInfo());
       applySources(sourceIds, updated);
     },
   });
