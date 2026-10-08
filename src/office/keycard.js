@@ -72,11 +72,6 @@ export function parseKeycard(input) {
   return format(out);
 }
 
-/** True if this is a keycard we would hand out. */
-export function isKeycard(input) {
-  return parseKeycard(input) !== null;
-}
-
 /**
  * The same folding, applied to a half-typed keycard — for an input mask.
  *

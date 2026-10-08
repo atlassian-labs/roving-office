@@ -225,7 +225,15 @@ test('a path that would shadow the app is refused, and the office keeps working'
   // A console mounted at `/office` would silently take over every room on the server.
   // Refused — and refused by disabling the console rather than by failing to boot, since
   // a mistyped admin path must not be able to take the product down.
-  for (const [port, bad] of [[8257, '/office'], [8258, '/api/health'], [8259, '/../secrets'], [8260, '/has spaces']]) {
+  //
+  // `/agent-setup` is in the table because it is the newest reserved path and the one
+  // most likely to be forgotten — it is served out of the repository root rather than
+  // from a route beside the others. It was guarded by matching the reserved list in
+  // `server.cjs` as a string, which cannot tell whether that list is consulted.
+  for (const [port, bad] of [
+    [8257, '/office'], [8258, '/api/health'], [8259, '/../secrets'], [8260, '/has spaces'],
+    [8262, '/agent-setup'],
+  ]) {
     const server = start({ port, env: { ROVING_OFFICE_ADMIN_PASSWORD: PASSWORD, ROVING_OFFICE_ADMIN_PATH: bad } });
     const base = await server.ready;
     try {

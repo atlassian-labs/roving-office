@@ -238,43 +238,19 @@ test('no hook in the chain depends on an executable bit surviving extraction', (
   assert.match(read('bin/aop-plugin-hook.sh'), /^exec sh "\$plugin_root\/bin\/aop-node\.sh"/m);
 });
 
-test('the deploy target serves the published marketplace, and does not ship the Codex tree', () => {
-  // A marketplace URL that works on one target and 404s on the other is worse than one
-  // that works on neither, because only the second is noticed.
-  assert.match(read('Dockerfile.fly'), /^COPY plugins \.\/plugins$/m);
-  assert.match(read('.dockerignore'), /^plugins\/codex$/m);
-  // Committed, because the Fly image runs no install.
+test('the Codex tree is not committed, because only a checkout can use it', () => {
+  // The Claude half is committed — the Fly image runs no install, so the archive and its
+  // manifest have to be files already. The Codex half is a whole repository waiting for a
+  // repository, and nothing serves a clone, so it is rebuilt on every pack instead.
+  //
+  // `COPY plugins` and the `plugins/codex` exclusion belong to
+  // test/docker-context.test.js, which enumerates every file each COPY takes and names
+  // that hole in its DELIBERATE_HOLES. The archive's content type is a claim about a
+  // response, and is asserted against a running server in test/server-http.test.js.
   assert.match(read('.gitignore'), /^plugins\/codex\/$/m);
-  // And served with a type: the server maps extensions, and .zip was not among them.
-  assert.match(read('server.cjs'), /'\.zip': 'application\/zip'/);
 });
 
-test('the provenance inventory records both published artifacts as distributions', () => {
-  // The third-party inventory already carried a `claude-marketplace` entry that asked somebody
-  // to "verify actual installed snapshot/release archive before publication". These are
-  // that archive, so they are described rather than left to be inferred — and the logo is
-  // the one tracked component inside them, which is why its release gate now names them.
-  const curated = readJson('third-party/components.json');
-  for (const name of ['claude-plugin-archive', 'codex-plugin-marketplace']) {
-    assert.ok(curated.distributions[name], `${name} is not described`);
-  }
-  const artwork = curated.components.find((item) => item.id === 'project-artwork');
-  assert.ok(artwork.paths.includes('assets/logo-256.png'));
-  assert.ok(artwork.distributions.includes('claude-plugin-archive'));
-  assert.ok(artwork.distributions.includes('codex-plugin-marketplace'));
-  // The recipe's own bytes are evidence, exactly as the other packers' are.
-  assert.ok(curated.distributionRecipes.includes('bin/aop-plugin-pack.cjs'));
-  assert.ok(curated.distributionRecipes.includes('bin/lib/zip.cjs'));
-});
-
-test('CI builds and checks the artifacts by the same npm scripts a contributor runs', () => {
-  // One CI file, and it is the public one. This used to be a presence check, because a
-  // second pipeline existed that named infrastructure a contributor could not reach and
-  // so did not travel; with one repository there is one workflow and it can be asserted
-  // outright.
-  assert.match(read('.github/workflows/ci.yml'), /^\s+- run: npm run pack:plugins$/m);
-  // `pack:plugins:check` is not listed on its own: it is called from this suite, so
-  // `npm test` carries it and there is no second place for it to be forgotten.
-  assert.equal(readJson('package.json').scripts['pack:plugins'], 'node bin/aop-plugin-pack.cjs --verify');
-  assert.equal(readJson('package.json').scripts['pack:plugins:check'], 'node bin/aop-plugin-pack.cjs --check');
-});
+// What the inventory says about these artifacts is enforced by regenerating it
+// (test/third-party.test.js), not by reading `components.json` back and finding the keys
+// it contains. And whether CI runs `pack:plugins` is not something a test inside that
+// same check can usefully report on.

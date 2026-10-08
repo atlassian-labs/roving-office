@@ -15,7 +15,7 @@
 
 import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 let KIT_PORTRAITS, KIT_SECTIONS, kitItems;
@@ -55,23 +55,11 @@ test('the rows that explain rather than add have pictures too', () => {
   }
 });
 
-test('both deploy targets ship the portraits', () => {
-  // The checks above all read the checkout, which is why they were green the whole time
-  // the deployed menu was a column of broken images: the pictures live under docs/, and
-  // both deploy targets shipped only docs/*.html on the grounds that the rest of docs/ is
-  // prose. These pictures are not prose — they are app furniture served to the editor —
-  // so each target has to name them, and the .dockerignore has to let them back through.
-  //
-  // `docs/images` rather than `docs/images/objects`, because the portraits stopped being
-  // the exception the day the documentation itself started being served: the map gallery
-  // and the generated-office renders are in the published prose now, so the whole
-  // directory ships. A recipe naming only the portraits would pass this test and leave
-  // every other picture in the docs broken.
-  const read = (p) => readFileSync(fileURLToPath(new URL(`../${p}`, import.meta.url)), 'utf8');
-  for (const path of ['Dockerfile.fly', '.dockerignore']) {
-    assert.match(read(path), /docs\/images/, `${path} leaves the portraits behind`);
-  }
-});
+// The portraits are app furniture rather than prose — the editor's add menu fetches one
+// per row out of /docs/images/objects — so they have to reach the deployed image, which
+// every check in this file would miss: they read the checkout. That contract is owned by
+// test/docs.test.js, which asserts the exact COPY line and the exceptions that let it
+// through, and by test/docker-context.test.js, which models the ignore rules.
 
 test('no portrait is mapped for a key the kit does not offer', () => {
   // A stale entry is harmless but it is also a lie about what the room contains, and it

@@ -21,6 +21,16 @@ test('the package and both copied plugins share one version', () => {
   assert.equal(new Set(versions).size, 1);
 });
 
+/**
+ * The manifest's one contract, and the only test that owns it.
+ *
+ * It iterates what is actually in `hooks/hooks.json` rather than comparing it to a copy
+ * of the list. A test that kept its own copy sat here until it was noticed to be passing
+ * for the wrong reason: it named eleven Codex hooks, asserted ten of them were present,
+ * and was green only because `PostCompact` was missing — so adding that hook would have
+ * failed it. The list belongs in the manifest; what a test can usefully say is that every
+ * entry in it routes through the one wrapper.
+ */
 test('every bundled hook delegates through the host selector, named interpreter and all', () => {
   const groups = Object.values(readJson('hooks/hooks.json').hooks).flat();
   const handlers = groups.flatMap((group) => group.hooks);
@@ -36,16 +46,6 @@ test('every bundled hook delegates through the host selector, named interpreter 
   assert.ok(mode & 0o111, 'the plugin cache must preserve a runnable wrapper');
 });
 
-test('the shared manifest contains all ten Codex hooks without dropping Claude-only hooks', () => {
-  const configured = new Set(Object.keys(readJson('hooks/hooks.json').hooks));
-  const codex = new Set([
-    'PreToolUse', 'PermissionRequest', 'PostToolUse', 'PreCompact', 'PostCompact',
-    'SessionStart', 'SessionEnd', 'UserPromptSubmit', 'SubagentStart', 'SubagentStop', 'Stop',
-  ]);
-  const installedForCodex = [...configured].filter((name) => codex.has(name));
-  assert.equal(installedForCodex.length, 10);
-  assert.ok(configured.has('PostToolUseFailure'), 'Claude keeps its richer failure hook');
-});
 
 test('updating an installed Codex plugin replaces its immutable cache snapshot', () => {
   const source = '/tmp/roving-office-codex-marketplace';
