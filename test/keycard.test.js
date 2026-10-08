@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   ALPHABET, LENGTH, DEMO_KEYCARD,
-  parseKeycard, isKeycard, foldPartial, mint, officePath, officeUrl,
+  parseKeycard, foldPartial, mint, officePath, officeUrl,
 } from '../src/office/keycard.js';
 
 test('parseKeycard accepts every dialect of the same card', () => {
@@ -31,7 +31,8 @@ test('parseKeycard refuses what is not a keycard', () => {
 
 test('the demo keycard is a real keycard', () => {
   assert.equal(parseKeycard(DEMO_KEYCARD), DEMO_KEYCARD);
-  assert.ok(isKeycard('test 0000'));
+  // Lower case and a space for the hyphen: the dialects a person types.
+  assert.equal(parseKeycard('test 0000'), DEMO_KEYCARD);
 });
 
 test('foldPartial keeps prefixes legible while typing', () => {
@@ -43,12 +44,14 @@ test('foldPartial keeps prefixes legible while typing', () => {
 
 test('mint produces valid keycards and honours taken()', () => {
   const first = mint();
-  assert.ok(isKeycard(first));
+  // `parseKeycard` returns the canonical form, so this says more than a boolean would:
+  // a mint that produced an unhyphenated or lower-case card would fail here.
+  assert.equal(parseKeycard(first), first);
 
   // A taken() that refuses the first N candidates still gets an answer.
   let refusals = 3;
   const second = mint(() => refusals-- > 0);
-  assert.ok(isKeycard(second));
+  assert.equal(parseKeycard(second), second);
 });
 
 test('mint gives up rather than spinning when everything is taken', () => {

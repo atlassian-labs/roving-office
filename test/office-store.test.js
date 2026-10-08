@@ -52,7 +52,7 @@ test('visitors cannot change the shared demo starting scenes', () => {
 test('mint hands out a keycard no office holds', () => {
   const store = freshStore();
   const card = store.mint();
-  assert.ok(keycard.isKeycard(card));
+  assert.equal(keycard.parseKeycard(card), card);
 });
 
 test('write tokens verify for their own office and no other', () => {

@@ -22,7 +22,6 @@ const ROOT = fileURLToPath(new URL('../', import.meta.url))
 const PROMPT = readFileSync(join(ROOT, 'agent-setup/prompt.md'), 'utf8')
 const PAGE = readFileSync(join(ROOT, 'agent-setup/index.html'), 'utf8')
 const PACKAGE = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
-const SERVER = readFileSync(join(ROOT, 'server.cjs'), 'utf8')
 
 test('the prompt names every harness the project actually adapts', () => {
   // `connect:<harness>` is the list of things this project can connect, by definition —
@@ -69,27 +68,10 @@ test('every command the prompt tells an agent to run exists', () => {
   )
 })
 
-test('the routes the prompt and the page depend on are still served', () => {
-  // The prompt tells an agent that it is authoritative at a URL, and mints an office at
-  // another. Both are this server's routes; if one moves, the instructions send an agent
-  // somewhere that answers 404 while still reading as correct.
-  assert.match(SERVER, /'\/api\/offices'/, 'the mint route the prompt POSTs to has moved')
-  assert.match(
-    SERVER,
-    /urlPath === '\/agent-setup'/,
-    'the /agent-setup index mapping has gone, so the page the prompt names 404s',
-  )
-  assert.match(
-    SERVER,
-    /'\.md': 'text\/markdown/,
-    'prompt.md would be served without a text content type, which some clients download '
-      + 'rather than read',
-  )
-
-  // The console cannot be configured onto a path this server already serves, and
-  // /agent-setup is now one of them.
-  assert.match(SERVER, /'\/admin', '\/agent-setup'/, '/agent-setup is not a reserved console path')
-})
+// The routes this prompt depends on are fetched from a running server in
+// test/server-http.test.js, and `/agent-setup` being reserved against the admin console is
+// a row in the table in test/admin-console.test.js. Both say more than matching
+// `server.cjs` as a string could.
 
 test('the page and the prompt agree on the one line a user pastes', () => {
   // The landing page's whole job is to hand over one sentence. If it names a different

@@ -129,6 +129,41 @@ test('the docs site is still served, and still cannot be escaped', async () => {
   assert.equal(escape.status, 403, 'past the checkout is refused wherever it started');
 });
 
+test('the routes the agent setup prompt depends on answer, with readable types', async () => {
+  // These were four regexes over `server.cjs` in test/agent-setup.test.js, which is the
+  // weakest form this check can take: it passes for a route named in a comment, and it
+  // cannot see a route that exists but answers 404 for some other reason. They are HTTP
+  // routes and this file already has a server running, so they are asked directly.
+  //
+  // The prompt tells an agent that it is authoritative at a URL and mints an office at
+  // another. If either moves, the instructions send an agent somewhere that answers 404
+  // while still reading as correct.
+  const page = await fetch(`${BASE}/agent-setup/`);
+  assert.equal(page.status, 200, 'the page the prompt names as its home');
+  assert.match(page.headers.get('content-type') ?? '', /text\/html/);
+
+  const prompt = await fetch(`${BASE}/agent-setup/prompt.md`);
+  assert.equal(prompt.status, 200, 'the document an agent is told to fetch');
+  // The type is the difference between instructions and a download for some clients.
+  assert.match(prompt.headers.get('content-type') ?? '', /text\/markdown/);
+  assert.match(await prompt.text(), /^# Set up The Roving Office/);
+
+  // The mint route the prompt POSTs to. Its behaviour is covered below; this is only
+  // that it is still there, under the name the published document hard-codes.
+  const mint = await fetch(`${BASE}/api/offices`, { method: 'POST' });
+  assert.equal(mint.status, 201, 'the route the prompt mints an office from');
+
+  // The published Claude archive, which Claude downloads and digests. Served as a zip
+  // rather than as `application/octet-stream` — asserted here rather than by matching the
+  // MIME table in `server.cjs`, which is what test/plugin-dist.test.cjs used to do.
+  const archive = await fetch(`${BASE}/plugins/claude/marketplace.json`);
+  assert.equal(archive.status, 200);
+  const version = (await archive.json()).plugins[0].version;
+  const zip = await fetch(`${BASE}/plugins/claude/roving-office-${version}.zip`);
+  assert.equal(zip.status, 200, 'the archive the manifest pins is not served');
+  assert.match(zip.headers.get('content-type') ?? '', /application\/zip/);
+});
+
 test('the llms.txt index is served at the root, as readable text', async () => {
   // The convention (https://llmstxt.org/) fixes the path at the site root, while the file
   // is generated into `docs/site` so the deploy recipe carries it with everything else
