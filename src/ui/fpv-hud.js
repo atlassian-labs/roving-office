@@ -54,7 +54,7 @@ export function createFpvHud({ onExit } = {}) {
   const name = node('span', 'fpv-name');
 
   const exit = node('span', 'fpv-exit');
-  exit.innerHTML = '<kbd>f</kbd>to step out';
+  exit.innerHTML = '<kbd>f</kbd>to step out <span class="fpv-roam-hint">· <kbd>WASD</kbd> roam</span>';
 
   // The hint says which key; the × is for the reader who would rather click it. The
   // panel itself takes no pointer events — it is a caption over somebody's view, not a

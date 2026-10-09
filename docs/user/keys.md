@@ -46,6 +46,8 @@ changes the room's lighting; job timestamps still show real time.
 | `L` | Cycle the lights: follow the clock, force on, force off. |
 | `A` | Hide the agents roster, which covers the corner the camera usually points at. |
 | `F` | Look through the selected agent's eyes. Again to step out. |
+| `W` `A` `S` `D` / arrow keys | Roam through the map while in first person. The view leaves the agent and slides around furniture and walls. |
+| `N` | Start or stop the Nerf war: agents run around with foam blasters. Work pauses until you stop the game. The happy-hour trike cruises outside throughout the day. |
 | `E` | **Rearrange the furniture** — drag props about and watch the paths re-route. [More](rearranging-furniture.md) |
 | `P` | Show or hide the route ribbons: the paths people are walking. |
 | `T` | Airmail a job in. Only offered when something selected can invent one. |

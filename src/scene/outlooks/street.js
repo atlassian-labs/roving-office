@@ -14,6 +14,7 @@ import { buildAlderStreet } from './alder.js';
 import { GARDEN_DISTRICTS } from './garden-districts.js';
 import {
   WALK_Y, buildTree, buildBush, buildBench, buildStreetLamp, buildCar,
+  loadHappyHourTrike,
 } from './streetscape.js';
 
 // Band boundaries measured outward from each wall.
@@ -573,6 +574,9 @@ function buildStreetFurniture(mode = 'summer') {
   g.add(buildCar(4, -(ROAD_END - 1.6), 0x4a6fa5, 0, mode));
   g.add(buildCar(13, -(ROAD_END - 1.6), 0xb5544a, 0, mode));
   g.add(buildCar(30, -(ROAD_END - 1.6), 0x5c6b73, 0, mode));
+  // The happy-hour trike is the social vehicle: ride it around with drinks and
+  // snacks, gossiping and networking instead of commuting in a car.
+  loadHappyHourTrike(g, 21, -1.8, Math.PI / 2);
   // And one on the left street.
   g.add(buildCar(-(ROAD_END - 1.6), 12, 0x6d8a5a, Math.PI / 2, mode));
 
@@ -622,6 +626,7 @@ export const outlook = {
   build(g, { season, serviceYard, building }) {
     if (building === 'simple' || building === 'warehouse') {
       buildAlderStreet(g, season, building === 'warehouse' ? GARDEN_DISTRICTS.warehouse : undefined);
+      loadHappyHourTrike(g, 21, -1.8, Math.PI / 2);
       return;
     }
     g.add(buildSidewalks(season));

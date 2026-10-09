@@ -200,6 +200,7 @@ export const STATUS_GROUPS = [
     statuses: [
       { key: 'walking', label: 'walking', color: 0x6fb1e0 },
       { key: 'dancing', label: 'dancing', color: 0x4688ec },
+      { key: 'nerfWar', label: 'nerf war', color: 0xffa24d, alone: 'Nerf war' },
     ],
   },
 ];
@@ -525,6 +526,11 @@ export const FPV = {
   // The walk cycle already bobs the body 0.07, which is the whole charm of the
   // view; this only takes the edge off the sharpest turns. Higher is snappier.
   smoothing: 18,
+  // The ride can become a deliberately silly little FPS when a movement key is
+  // pressed. This is fast enough to cross the room without making the furniture
+  // disappear past the edges of the screen, and is separate from the agents' walk
+  // speed because the person holding the camera is not an agent controller.
+  moveSpeed: 5.5,
   // Name tags fade out as their owner gets close. Depth-testing them (see
   // `Agent.setTagMode`) stops them punching through furniture, but nothing stops a
   // label two feet from your face filling the frame — a perspective camera makes it
