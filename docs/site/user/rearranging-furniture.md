@@ -103,6 +103,11 @@ mode.
 
 ## The Add-item menu
 
+For a happy-hour drinks bar, open **Add item… → Jobs → Happy hour** and choose
+**Happy-hour trike**. You can add one per room, then move, rotate or remove it like
+the other stations. Agents can collect drinks there during their breaks. The trike
+you add stays where you park it; the separate trike outside cruises along the street.
+
 *ADD ITEM* sits above five tabs — **Furniture**, **Desks**, **Jobs**, **Plants**,
 **Other** — and that block does not move: the rows scroll under it, so which tab you are on
 is never scrolled away.
@@ -208,7 +213,7 @@ to go with it.
 | Floor plants | 0 to 24 | A room with no plants is a sadder room and a valid one |
 | Bookshelf, telescope | Any number, but at least one *between them* | Looking something up does not have to happen in a particular place. An agent walks to the nearest and uses *that* one |
 | Mailbox, inbox | At most 1 each | A room with two outboxes has an unanswerable question about which one the post is in |
-| Coffee machine, water cooler, bin, coat stand | At most 1 each | Physically singular, and nothing is gained by a second |
+| Coffee machine, water cooler, happy-hour trike, bin, coat stand | At most 1 each | Physically singular, and nothing is gained by a second |
 | Printer | Any number | It does real work now, so a second one at the far end of a big room is worth having |
 
 ### The minimum is a job, not a kind

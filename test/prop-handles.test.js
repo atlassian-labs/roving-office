@@ -31,6 +31,17 @@ beforeEach(() => layout.resetLayout());
 
 const build = () => buildProps(new THREE.Group());
 
+test('an added happy-hour trike builds a visible movable drinks station', () => {
+  const station = layout.addStation('happyHourTrike', { x: 8, z: 8 });
+  const handles = build();
+  const trike = handles.byStation[station.id].obj;
+  assert.ok(trike.children.length > 0);
+  assert.equal(trike.userData.movable.key, `station:${station.id}`);
+  assert.equal(trike.position.x, 8);
+  assert.equal(trike.position.z, 8);
+  assert.ok(layout.STATION_KINDS.happyHourTrike.serves.includes('water'));
+});
+
 test('every station that registers a handle is reachable by its own id', () => {
   const handles = build();
   for (const station of Object.values(layout.STATIONS)) {
