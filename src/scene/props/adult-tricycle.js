@@ -44,3 +44,9 @@ export function buildAdultTricycle() {
 
   return root;
 }
+
+/** The parked indoor drinks station uses the same model as the cruising trike. */
+export function buildHappyHourTrike() {
+  const obj = buildAdultTricycle();
+  return { obj, handle: { obj } };
+}

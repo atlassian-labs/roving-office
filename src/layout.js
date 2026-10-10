@@ -211,6 +211,11 @@ export const STATION_KINDS = {
     label: 'Coffee machine', max: 1, roles: ['refresh'], serves: ['tea', 'coffee'],
     hw: 1.43, hd: 0.82, offX: 0, offZ: 0.22, approachDist: 1.7,
   },
+  happyHourTrike: {
+    label: 'Happy-hour trike', max: 1, roles: ['refresh'], serves: ['water', 'tea', 'coffee'],
+    hw: 0.7, hd: 1.2, offX: 0, offZ: 0.02, approachDist: 1.85,
+    note: 'A three-wheeled drinks bar. Park it in the room for happy-hour breaks and conversation.',
+  },
   // Both, and the only kind that is: the post is where finished work leaves the room
   // and where new work arrives in it. A room may drop to one outbox or one inbox, but
   // not to neither, and while the mailbox is the only one of each it is the reason.

@@ -29,6 +29,7 @@ import { buildFloorLamp } from './floor-lamp.js';
 import { buildPrinter } from './printer.js';
 import { buildTelescope, mount as mountTelescope } from './telescope.js';
 import { mount as mountRug } from './rug.js';
+import { buildHappyHourTrike } from './adult-tricycle.js';
 
 /**
  * kind → { build, mount? }
@@ -43,6 +44,7 @@ export const PROPS = {
   bookshelf: { build: buildBookshelf, mount: mountBookshelf },
   waterCooler: { build: buildWaterCooler },
   coffee: { build: buildCoffeeStation },
+  happyHourTrike: { build: buildHappyHourTrike },
   mailbox: { build: buildMailbox, mount: mountMailbox },
   bin: { build: buildBin },
   inbox: { build: buildInbox },

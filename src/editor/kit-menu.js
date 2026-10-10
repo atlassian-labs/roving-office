@@ -91,6 +91,12 @@ export const KIT_SECTIONS = [
     }],
   },
   {
+    tab: 'Jobs',
+    name: 'Happy hour',
+    match: (key) => key === 'station:happyHourTrike',
+    blurb: 'A drinks bar for breaks and conversation. Park the trike wherever people gather.',
+  },
+  {
     tab: 'Plants',
     name: 'Greenery',
     match: (key) => key.startsWith('plant:'),
@@ -159,6 +165,7 @@ export const KIT_PORTRAITS = {
   'station:inbox': 'inbox',
   'station:waterCooler': 'waterCooler',
   'station:coffee': 'espressoMachine',
+  'station:happyHourTrike': 'happyHourTrike',
   'station:bin': 'bin',
   'station:coatStand': 'coatStand',
   'station:printer': 'printer',
