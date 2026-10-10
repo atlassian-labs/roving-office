@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { connectNerfState } from './nerf-state.js';
 import {
   keycard, loadOffice, officeInfo, watchOffice, claimLocalEndpoint,
   listScenes, getScene, initialSceneId, rememberActive,
@@ -240,7 +241,7 @@ function activateScene(sceneId, { keepOverrides = false } = {}) {
 
   applySceneLayout(sceneId);
   world = makeWorld(sceneId);
-  if (nerfWarRequested) world.manager.setNerfWar(true);
+  world.manager.setNerfWar(nerfState.enabled);
   overlay.attach(world.manager);
   // The room is all new objects, so whatever the editor had selected is gone. The
   // layout is still a singleton in the config, but it now carries this scene's
@@ -591,9 +592,11 @@ if (!office) throw new Error('no office to open');   // loadOffice() has redirec
  * experiments stay in this browser; each visit starts with a fresh building and season.
  */
 const reserved = Boolean(office.reserved);
-// A shareable spectator link can start directly in the nerf war.
-// The `N` shortcut remains the toggle once the room is open.
-const nerfWarRequested = new URL(window.location.href).searchParams.has('nerfwar');
+// Fetch before building the room; stream snapshots keep all visitors in step.
+const nerfState = await connectNerfState({
+  onChange: (enabled) => world?.manager.setNerfWar(enabled),
+});
+if (new URL(window.location.href).searchParams.has('nerfwar')) await nerfState.set(true);
 
 // The scene to open with: the one you were last in, else the office's first.
 const startId = initialSceneId();
@@ -609,7 +612,7 @@ if (reserved) {
 // Built against the first world, then re-pointed on each switch.
 applySceneLayout(startId);
 world = makeWorld(startId);
-if (nerfWarRequested) world.manager.setNerfWar(true);
+world.manager.setNerfWar(nerfState.enabled);
 
 // Before the overlay, not with the other panels further down: attaching a manager
 // reports "nothing selected" synchronously, so `selectionChanged` runs during
@@ -864,7 +867,7 @@ register({
   label: 'Start or stop the nerf war: run around with foam blasters',
   group: 'Agents',
   order: 3,
-  onPress: () => world?.manager.setNerfWar(!world.manager.nerfWar),
+  onPress: () => nerfState.set(!nerfState.enabled).catch((err) => console.warn(err.message)),
 });
 
 // Moving the camera about, which OrbitControls dispatches for itself — so these are
