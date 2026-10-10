@@ -1932,7 +1932,22 @@ export class AgentManager {
    * is required to be able to do.
    */
   _drinkStation(rec, drink) {
-    return stationForRole('refresh', { from: rec.agent.position, serves: drink?.kind });
+    const station = stationForRole('refresh', {
+      from: rec.agent.position, serves: drink?.kind,
+      available: (station) => station.kind !== 'happyHourTrike' || this._propAt(station)?.canServe === true,
+      resolve: (station) => station.kind === 'happyHourTrike' ? this._propAt(station)?.serviceStation(station) : station,
+    });
+    if (station?.kind !== 'happyHourTrike') return station;
+    return this._propAt(station)?.reserve(station, rec.agent.id) ?? null;
+  }
+
+  /** Recheck at handoff: an attendant removed during the walk cannot serve a cup. */
+  _collectDrink(station, agentId) {
+    if (station.kind !== 'happyHourTrike') return 'cup';
+    const prop = this._propAt(station);
+    const drink = prop?.serve() ? 'cup' : null;
+    prop?.release(agentId);
+    return drink;
   }
 
   /**
@@ -1959,7 +1974,7 @@ export class AgentManager {
       walk(() => this.spots.claim(station, rec.agent)),
       lookAt(station),
       wait(0.8),
-      carry('cup', { color: drink.color }),
+      carry(() => this._collectDrink(station, rec.agent.id), { color: drink.color }),
     ];
 
     if (spot.where === 'couch') {
@@ -2027,7 +2042,7 @@ export class AgentManager {
       walk(() => this.spots.claim(station, rec.agent)),
       lookAt(station),
       wait(1.0),
-      carry('cup', { color: drink.color }),
+      carry(() => this._collectDrink(station, rec.agent.id), { color: drink.color }),
       status('walking'),
       ...takeUpPostAtDesk(rec, desk, this.nav),
       // Actually drink some of it before getting back to work — fetching a coffee

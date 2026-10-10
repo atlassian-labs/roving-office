@@ -26,11 +26,14 @@ export function loadHappyHourTrike(parent, x, z, rotationY = 0) {
   mount.userData.description = 'Happy hour: ride around with drinks and snacks to gossip and network.';
   parent.add(mount);
 
-  mount.add(buildAdultTricycle());
+  const trike = buildAdultTricycle();
+  mount.add(trike);
   let elapsed = 0;
   // A smooth out-and-back circuit along the clear near pavement. Time belongs to
   // the room's render loop, so redecorating leaves no timers behind.
   mount.userData.cruise = (dt) => {
+    if (!trike.userData.refreshments.canServe) return;
+    trike.userData.pedal(dt);
     elapsed = (elapsed + dt) % 24;
     const angle = elapsed * Math.PI / 12;
     mount.position.x = x + Math.sin(angle) * 8;
