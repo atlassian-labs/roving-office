@@ -86,3 +86,4 @@ export { buildCouch } from './couch.js';
 export { buildArmchair } from './couch.js';
 export { buildSideTable } from './side-table.js';
 export { buildFloorLamp } from './floor-lamp.js';
+export { buildAdultTricycle } from './adult-tricycle.js';

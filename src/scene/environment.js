@@ -254,6 +254,9 @@ export function buildEnvironment(scene, theme) {
   // street lamps are built deep inside the exterior and threading handles back up
   // would touch every builder in between. Must run after buildExterior().
   handles.nightLights = collectNightLights(env);
+  const cruises = [];
+  env.traverse((part) => { if (part.userData.cruise) cruises.push(part.userData.cruise); });
+  handles.updateCruises = (dt) => { for (const cruise of cruises) cruise(dt); };
 
   return handles;
 }

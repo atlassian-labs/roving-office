@@ -131,6 +131,7 @@ const MIME = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
+  '.glb': 'model/gltf-binary',
   // The bundled latin subsets of Inter and JetBrains Mono. The type matters more than it
   // looks: the documentation head preloads the Inter subset with `as="font"`, and a
   // browser discards a preloaded response whose content type contradicts the `as` hint —

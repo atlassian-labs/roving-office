@@ -14,6 +14,7 @@
 
 import { FPV } from './config.js';
 import { aimFirstPerson } from './scene/camera.js';
+import * as THREE from 'three';
 
 /**
  * @param {object} deps
@@ -25,11 +26,68 @@ import { aimFirstPerson } from './scene/camera.js';
 export function createFpvRide({ fpvCamera, controls, fpvHud, getWorld }) {
   /** @type {?string} whose eyes, or null for the office view */
   let fpvId = null;
+  let roaming = false;
+  const held = new Set();
+  const forward = new THREE.Vector3();
+  const right = new THREE.Vector3();
+  const up = new THREE.Vector3(0, 1, 0);
+  const next = new THREE.Vector3();
+
+  const movementKeys = new Set(['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright']);
+  const onKeyDown = (event) => {
+    const key = event.key.toLowerCase();
+    if (!fpvId || !movementKeys.has(key)) return;
+    if (event.metaKey || event.ctrlKey || event.altKey || event.target?.isContentEditable
+      || ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target?.tagName)) return;
+    held.add(key);
+    roaming = true;
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  const onKeyUp = (event) => held.delete(event.key.toLowerCase());
+  const eventTarget = typeof window === 'undefined' ? null : window;
+  eventTarget?.addEventListener('keydown', onKeyDown, true);
+  eventTarget?.addEventListener('keyup', onKeyUp);
+  eventTarget?.addEventListener('blur', () => held.clear());
+
+  function move(dt) {
+    fpvCamera.getWorldDirection(forward);
+    forward.y = 0;
+    if (forward.lengthSq() < 1e-8) return;
+    forward.normalize();
+    right.crossVectors(forward, up).normalize();
+    next.set(0, 0, 0);
+    if (held.has('w') || held.has('arrowup')) next.add(forward);
+    if (held.has('s') || held.has('arrowdown')) next.sub(forward);
+    if (held.has('d') || held.has('arrowright')) next.add(right);
+    if (held.has('a') || held.has('arrowleft')) next.sub(right);
+    if (next.lengthSq() < 1e-8) return;
+    next.normalize().multiplyScalar(FPV.moveSpeed * dt);
+
+    const nav = getWorld()?.manager.nav;
+    const x = fpvCamera.position.x + next.x;
+    const z = fpvCamera.position.z + next.z;
+    // Try the whole move first, then each axis independently. The latter lets the
+    // player slide along desks and walls instead of sticking to a corner.
+    if (nav?.walkableAt(x, z)) {
+      fpvCamera.position.x = x;
+      fpvCamera.position.z = z;
+    } else {
+      if (nav?.walkableAt(fpvCamera.position.x + next.x, fpvCamera.position.z)) {
+        fpvCamera.position.x += next.x;
+      }
+      if (nav?.walkableAt(fpvCamera.position.x, fpvCamera.position.z + next.z)) {
+        fpvCamera.position.z += next.z;
+      }
+    }
+  }
 
   function enter(id) {
     const agent = getWorld()?.manager.getAgent(id);
     if (!agent) return;
     fpvId = id;
+    roaming = false;
+    held.clear();
     // Aim once before the next frame so the view opens already in the head, rather
     // than easing in from wherever the last ride left the camera.
     aimFirstPerson(fpvCamera, agent, 0);
@@ -43,6 +101,8 @@ export function createFpvRide({ fpvCamera, controls, fpvHud, getWorld }) {
   function exit() {
     if (!fpvId) return;
     fpvId = null;
+    roaming = false;
+    held.clear();
     controls.enabled = true;
     fpvHud.hide();
     sync();
@@ -81,7 +141,7 @@ export function createFpvRide({ fpvCamera, controls, fpvHud, getWorld }) {
       if (rec.beaming) continue;
       agent.setTagMode(mode);
       // Only the rider is inside their own head; everyone else keeps theirs.
-      agent.setHeadVisible(!(riding && agent.id === fpvId));
+      agent.setHeadVisible(!(riding && !roaming && agent.id === fpvId));
       if (!riding) continue;
       // Distance across the floor, not through the air. Two reasons, and the second
       // is the load-bearing one: "how far away is that person" is a question about the
@@ -106,6 +166,12 @@ export function createFpvRide({ fpvCamera, controls, fpvHud, getWorld }) {
     if (!fpvId) return;
     const agent = getWorld()?.manager.getAgent(fpvId);
     if (!agent) return exit();
+    if (roaming) {
+      move(dt);
+      fpvHud.update(agent, dt);
+      sync();
+      return;
+    }
     aimFirstPerson(fpvCamera, agent, dt);
     fpvHud.update(agent, dt);
     sync();
@@ -118,5 +184,7 @@ export function createFpvRide({ fpvCamera, controls, fpvHud, getWorld }) {
     exit,
     sync,
     track,
+    /** Whether the view has been released from the selected agent for free-roam. */
+    get roaming() { return roaming; },
   };
 }

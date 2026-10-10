@@ -9,6 +9,36 @@ import { COLORS } from '../../config.js';
 import { pick, spread } from '../../dice.js';
 import { markNightLight, streetLampLighting } from '../night-lights.js';
 import { box, cyl, group, mat, put } from '../build.js';
+import { buildAdultTricycle } from '../props/adult-tricycle.js';
+
+/**
+ * Add a cruising adult tricycle to a street scene.
+ *
+ * @param {THREE.Object3D} parent
+ * @param {number} x
+ * @param {number} z
+ * @param {number} [rotationY]
+ * @returns {THREE.Group} the visible trike and its cruise callback
+ */
+export function loadHappyHourTrike(parent, x, z, rotationY = 0) {
+  const mount = group(x, WALK_Y, z);
+  mount.rotation.y = rotationY;
+  mount.userData.description = 'Happy hour: ride around with drinks and snacks to gossip and network.';
+  parent.add(mount);
+
+  mount.add(buildAdultTricycle());
+  let elapsed = 0;
+  // A smooth out-and-back circuit along the clear near pavement. Time belongs to
+  // the room's render loop, so redecorating leaves no timers behind.
+  mount.userData.cruise = (dt) => {
+    elapsed = (elapsed + dt) % 24;
+    const angle = elapsed * Math.PI / 12;
+    mount.position.x = x + Math.sin(angle) * 8;
+    mount.position.z = z + Math.cos(angle) * 0.7;
+    mount.rotation.y = Math.atan2(8 * Math.cos(angle), -0.7 * Math.sin(angle));
+  };
+  return mount;
+}
 
 // Sidewalk surface (a step up from the road). Exported because anything that has
 // to *reach* the pavement — notably the external staircase — needs the real number:
