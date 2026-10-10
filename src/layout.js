@@ -214,7 +214,7 @@ export const STATION_KINDS = {
   happyHourTrike: {
     label: 'Happy-hour trike', max: 1, roles: ['refresh'], serves: ['water', 'tea', 'coffee'],
     hw: 0.7, hd: 1.2, offX: 0, offZ: 0.02, approachDist: 1.85,
-    note: 'A three-wheeled drinks bar. Park it in the room for happy-hour breaks and conversation.',
+    note: 'A three-wheeled drinks bar with its own rider and refreshment attendant. Park it in the room for happy-hour breaks and conversation.',
   },
   // Both, and the only kind that is: the post is where finished work leaves the room
   // and where new work arrives in it. A room may drop to one outbox or one inbox, but
@@ -389,10 +389,11 @@ export function rolesOf(station) {
  * @param {object} [opts]
  * @param {{x: number, z: number}} [opts.from]  measured to standing room, not the prop
  * @param {string} [opts.serves]  the sort wanted: a drink, or where work came from
+ * @param {(station: object) => boolean} [opts.available]  whether it can serve now
  * @returns {?object}
  */
-export function stationForRole(role, { from = null, serves = null } = {}) {
-  const all = stationsForRole(role);
+export function stationForRole(role, { from = null, serves = null, available = () => true } = {}) {
+  const all = stationsForRole(role).filter(available);
   if (!all.length) return null;
   const wanted = serves
     ? all.filter((s) => STATION_KINDS[s.kind]?.serves?.includes(serves))

@@ -1932,7 +1932,16 @@ export class AgentManager {
    * is required to be able to do.
    */
   _drinkStation(rec, drink) {
-    return stationForRole('refresh', { from: rec.agent.position, serves: drink?.kind });
+    return stationForRole('refresh', {
+      from: rec.agent.position, serves: drink?.kind,
+      available: (station) => station.kind !== 'happyHourTrike' || this._propAt(station)?.canServe === true,
+    });
+  }
+
+  /** Recheck at handoff: an attendant removed during the walk cannot serve a cup. */
+  _collectDrink(station) {
+    if (station.kind !== 'happyHourTrike') return 'cup';
+    return this._propAt(station)?.serve() ? 'cup' : null;
   }
 
   /**
@@ -1959,7 +1968,7 @@ export class AgentManager {
       walk(() => this.spots.claim(station, rec.agent)),
       lookAt(station),
       wait(0.8),
-      carry('cup', { color: drink.color }),
+      carry(() => this._collectDrink(station), { color: drink.color }),
     ];
 
     if (spot.where === 'couch') {
@@ -2027,7 +2036,7 @@ export class AgentManager {
       walk(() => this.spots.claim(station, rec.agent)),
       lookAt(station),
       wait(1.0),
-      carry('cup', { color: drink.color }),
+      carry(() => this._collectDrink(station), { color: drink.color }),
       status('walking'),
       ...takeUpPostAtDesk(rec, desk, this.nav),
       // Actually drink some of it before getting back to work — fetching a coffee

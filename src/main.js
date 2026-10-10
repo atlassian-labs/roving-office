@@ -1362,6 +1362,7 @@ function animate(timestamp) {
   const dt = Math.min(timer.getDelta(), 0.05);
   if (world) {
     world.manager.update(dt);
+    world.props.happyHourTrike?.update(dt);
     world.environment.updateCruises(dt);
     // Each desk runs the board on its second screen — and only while it is being
     // worked at, so this is one cheap early return per desk in an empty room.

@@ -1,5 +1,6 @@
 import { COLORS } from '../../config.js';
 import { box, cyl, group, put, sphere } from '../build.js';
+import { buildTrikeRider } from './trike-rider.js';
 
 /**
  * A small adult tricycle for the happy-hour cart.
@@ -42,11 +43,26 @@ export function buildAdultTricycle() {
     put(root, sphere(0.08, brass, { segments: 8 }), x, 1.78, -0.7);
   }
 
+  const rider = buildTrikeRider();
+  root.add(rider.obj);
+  root.userData.pedal = rider.pedal;
+  // Keep references to scene nodes out of userData: three.js serializes it when
+  // cloning, while these closures retain the animation rig without a cycle.
+  root.userData.refreshments = {
+    get canServe() { return rider.canServe; },
+    serve: () => rider.serve(),
+    update: (dt) => rider.update(dt),
+  };
+
   return root;
 }
 
 /** The parked indoor drinks station uses the same model as the cruising trike. */
 export function buildHappyHourTrike() {
   const obj = buildAdultTricycle();
-  return { obj, handle: { obj } };
+  return { obj, handle: { obj,
+    get canServe() { return obj.userData.refreshments.canServe; },
+    serve: () => obj.userData.refreshments.serve(),
+    update: (dt) => obj.userData.refreshments.update(dt),
+  } };
 }
