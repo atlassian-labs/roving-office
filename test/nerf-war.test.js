@@ -39,6 +39,18 @@ test('a spectator link can enable Nerf mode before the first agent arrives', () 
   assert.equal(manager.nerfGuns.size, 1);
 });
 
+test('a replacement office restores the global game before late arrivals join', () => {
+  const previous = arrived().manager;
+  previous.setNerfWar(true);
+  const globalFlag = previous.nerfWar;
+  const replacement = arrived().manager;
+  replacement.setNerfWar(globalFlag);
+  replacement.handleEvent({ type: 'spawn', id: 'late', name: 'Late visitor' });
+  play(replacement, 45);
+  assert.equal(replacement.getAgent('late').status, 'nerfWar');
+  assert.equal(replacement.nerfWar, true);
+});
+
 test('the happy-hour trike is visible immediately and cruises a closed circuit', async () => {
   const { loadHappyHourTrike } = await import('../src/scene/outlooks/streetscape.js');
   const trike = loadHappyHourTrike(new THREE.Group(), 21, -1.8);

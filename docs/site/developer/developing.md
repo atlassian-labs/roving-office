@@ -28,6 +28,18 @@ loopback reaches nothing at all.
 For a local simulation, open `/office/TEST-0000/` on the server's printed URL. Test Data
 runs without any connected harness, company account or external service.
 
+The Nerf game is deliberately server-wide. `N` and `?nerfwar` change the shared
+flag, not an individual visitor's preference. `GET` and `POST /api/nerf-war` read
+and set `{ "enabled": true|false }`; `/api/nerf-war/stream` sends an immediate
+snapshot and subsequent `nerf-war` events to every connected visitor. Writes
+require JSON and reject a different browser origin. There is no owner gate on
+this game switch: any visitor can start or stop it for everyone.
+
+`lib/nerf-state.cjs` persists the flag in `nerf-war.json` under
+`ROVING_OFFICE_STATE_DIR` (default `~/.roving-office`), outside the office registry.
+Reaping an office, changing scenes, reloading, or restarting the server therefore
+does not end a game. A new world applies the current flag before agents arrive.
+
 Almost every graphical glitch in this scene has turned out to be the same bug: two faces landing on exactly the same coordinate, which gives the depth buffer no way to order them, so the surfaces flicker against each other as the camera moves.
 
 ```bash
