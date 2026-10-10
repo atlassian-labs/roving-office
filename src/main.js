@@ -46,6 +46,7 @@ import { recallPanel, rememberPanel } from './ui/panel-state.js';
 import { officePath } from './office/keycard.js';
 import { createEditor } from './editor/editor.js';
 import { worldClock } from './time.js';
+import { updateTrikeTours } from './scene/props/trike-tour.js';
 
 const canvas = document.getElementById('scene');
 const loading = document.getElementById('loading');
@@ -240,6 +241,7 @@ function activateScene(sceneId, { keepOverrides = false } = {}) {
 
   applySceneLayout(sceneId);
   world = makeWorld(sceneId);
+  if (nerfWarRequested) world.manager.setNerfWar(true);
   overlay.attach(world.manager);
   // The room is all new objects, so whatever the editor had selected is gone. The
   // layout is still a singleton in the config, but it now carries this scene's
@@ -590,6 +592,9 @@ if (!office) throw new Error('no office to open');   // loadOffice() has redirec
  * experiments stay in this browser; each visit starts with a fresh building and season.
  */
 const reserved = Boolean(office.reserved);
+// A shareable spectator link can start directly in the nerf war.
+// The `N` shortcut remains the toggle once the room is open.
+const nerfWarRequested = new URL(window.location.href).searchParams.has('nerfwar');
 
 // The scene to open with: the one you were last in, else the office's first.
 const startId = initialSceneId();
@@ -605,6 +610,7 @@ if (reserved) {
 // Built against the first world, then re-pointed on each switch.
 applySceneLayout(startId);
 world = makeWorld(startId);
+if (nerfWarRequested) world.manager.setNerfWar(true);
 
 // Before the overlay, not with the other panels further down: attaching a manager
 // reports "nothing selected" synchronously, so `selectionChanged` runs during
@@ -843,6 +849,23 @@ register({
   group: 'Scene',
   order: 2,
   onPress: () => scenePanel.toggle(),
+});
+
+registerGesture({
+  id: 'fpv-roam',
+  keys: ['WASD'],
+  label: 'Roam through the map from first person (while riding an agent)',
+  group: 'Agents',
+  order: 2,
+});
+
+register({
+  id: 'nerf-war',
+  keys: ['N'],
+  label: 'Start or stop the nerf war: run around with foam blasters',
+  group: 'Agents',
+  order: 3,
+  onPress: () => world?.manager.setNerfWar(!world.manager.nerfWar),
 });
 
 // Moving the camera about, which OrbitControls dispatches for itself — so these are
@@ -1340,6 +1363,11 @@ function animate(timestamp) {
   const dt = Math.min(timer.getDelta(), 0.05);
   if (world) {
     world.manager.update(dt);
+    updateTrikeTours(world.props, dt, {
+      paused: editor?.isOpen,
+      agents: [...world.manager.agents.values()].map((rec) => rec.agent),
+    });
+    world.environment.updateCruises(dt);
     // Each desk runs the board on its second screen — and only while it is being
     // worked at, so this is one cheap early return per desk in an empty room.
     for (const desk of world.props.desks) desk.update(dt);

@@ -11,6 +11,26 @@ import { DESKS, STATIONS, FURNITURE, DECOR, STATION_KINDS, JOB_ROLES, ROLE_VERBS
 
 beforeEach(() => resetLayout());
 
+test('the happy-hour trike is offered in Jobs, placed, saved, and removable', () => {
+  const item = addableObjects().find((entry) => entry.key === 'station:happyHourTrike');
+  assert.ok(item, 'the trike must be an editor item, not only a catalogue portrait');
+  assert.deepEqual(item.roles, ['refresh']);
+  const section = groupKit(addableObjects()).find((entry) => entry.name === 'Happy hour');
+  assert.equal(section.tab, 'Jobs');
+  assert.ok(section.items.some((entry) => entry.key === item.key));
+  const made = addObject(item.key, { x: 8, z: 8, facing: Math.PI / 2 });
+  assert.ok(made);
+  const trike = stationsOfKind('happyHourTrike')[0];
+  assert.ok(stationsForRole('refresh').includes(trike));
+  assert.equal(addableObjects().some((entry) => entry.key === item.key), false, 'one per room');
+  const saved = layoutSnapshot({ round: false });
+  resetLayout();
+  applyLayout(saved);
+  assert.equal(stationsOfKind('happyHourTrike')[0].facing, Math.PI / 2);
+  assert.equal(removeObject(`station:${trike.id}`), true);
+  assert.ok(addableObjects().some((entry) => entry.key === item.key));
+});
+
 // --- round trips -------------------------------------------------------------
 
 test('an unrounded snapshot applies back to an identical room', () => {
