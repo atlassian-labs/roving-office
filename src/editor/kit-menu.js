@@ -94,7 +94,7 @@ export const KIT_SECTIONS = [
     tab: 'Jobs',
     name: 'Happy hour',
     match: (key) => key === 'station:happyHourTrike',
-    blurb: 'A drinks bar for breaks and conversation. Park the trike wherever people gather.',
+    blurb: 'A roaming drinks bar. Its rider tours the office and stops to serve refreshments.',
   },
   {
     tab: 'Plants',

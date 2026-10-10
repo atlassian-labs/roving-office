@@ -1,6 +1,7 @@
 import { COLORS } from '../../config.js';
 import { box, cyl, group, put, sphere } from '../build.js';
 import { buildTrikeRider } from './trike-rider.js';
+import { createTrikeTour } from './trike-tour.js';
 
 /**
  * A small adult tricycle for the happy-hour cart.
@@ -57,12 +58,16 @@ export function buildAdultTricycle() {
   return root;
 }
 
-/** The parked indoor drinks station uses the same model as the cruising trike. */
+/** The touring indoor drinks station uses the same model as the street trike. */
 export function buildHappyHourTrike() {
   const obj = buildAdultTricycle();
+  const tour = createTrikeTour(obj, obj.userData.refreshments);
   return { obj, handle: { obj,
     get canServe() { return obj.userData.refreshments.canServe; },
     serve: () => obj.userData.refreshments.serve(),
-    update: (dt) => obj.userData.refreshments.update(dt),
+    serviceStation: tour.serviceStation,
+    reserve: tour.reserve,
+    release: tour.release,
+    update: tour.update,
   } };
 }

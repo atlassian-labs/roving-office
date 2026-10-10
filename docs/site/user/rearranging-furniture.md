@@ -106,8 +106,10 @@ mode.
 For a happy-hour drinks bar, open **Add item… → Jobs → Happy hour** and choose
 **Happy-hour trike**. You can add one per room, then move, rotate or remove it like
 the other stations. Its rider doubles as a refreshment attendant and hands drinks
-to agents during their breaks. The trike
-you add stays where you park it; outside, the same rider pedals the cruising street trike.
+to agents during their breaks. Close Edit Mode and the rider tours the office,
+stopping while someone comes over for refreshments and yielding to people in the
+aisles. Opening Edit Mode parks the trike so you can move it. Outside, the same
+rider pedals the cruising street trike.
 
 *ADD ITEM* sits above five tabs — **Furniture**, **Desks**, **Jobs**, **Plants**,
 **Other** — and that block does not move: the rows scroll under it, so which tab you are on

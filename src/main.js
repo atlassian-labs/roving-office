@@ -46,6 +46,7 @@ import { recallPanel, rememberPanel } from './ui/panel-state.js';
 import { officePath } from './office/keycard.js';
 import { createEditor } from './editor/editor.js';
 import { worldClock } from './time.js';
+import { updateTrikeTours } from './scene/props/trike-tour.js';
 
 const canvas = document.getElementById('scene');
 const loading = document.getElementById('loading');
@@ -1362,7 +1363,10 @@ function animate(timestamp) {
   const dt = Math.min(timer.getDelta(), 0.05);
   if (world) {
     world.manager.update(dt);
-    world.props.happyHourTrike?.update(dt);
+    updateTrikeTours(world.props, dt, {
+      paused: editor?.isOpen,
+      agents: [...world.manager.agents.values()].map((rec) => rec.agent),
+    });
     world.environment.updateCruises(dt);
     // Each desk runs the board on its second screen — and only while it is being
     // worked at, so this is one cheap early return per desk in an empty room.
