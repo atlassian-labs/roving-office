@@ -131,6 +131,7 @@ const MIME = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
+  '.glb': 'model/gltf-binary',
   // The bundled latin subsets of Inter and JetBrains Mono. The type matters more than it
   // looks: the documentation head preloads the Inter subset with `as="font"`, and a
   // browser discards a preloaded response whose content type contradicts the `as` hint —
@@ -181,6 +182,7 @@ const stateDir = process.env.ROVING_OFFICE_STATE_DIR
 /** Loopback-only shared secret, published for adapters to read — at the agreed path. */
 const endpointFile = path.join(os.homedir(), '.roving-office', 'endpoint.json');
 const officeFile = path.join(stateDir, 'offices.json');
+const nerfState = require('./lib/nerf-state.cjs').createNerfState(path.join(stateDir, 'nerf-war.json'));
 /**
  * The daily counters, beside the registry and for the same reason.
  *
@@ -1986,6 +1988,35 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host ?? '127.0.0.1'}`);
 
   try {
+    if (url.pathname === '/api/nerf-war/stream' && req.method === 'GET') {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream; charset=utf-8',
+        'Cache-Control': 'no-store', Connection: 'keep-alive', 'X-Accel-Buffering': 'no',
+      });
+      const unsubscribe = nerfState.subscribe((enabled) => {
+        res.write(`event: nerf-war\ndata: ${JSON.stringify({ enabled })}\n\n`);
+      });
+      const heartbeat = setInterval(() => res.write(': heartbeat\n\n'), 25000);
+      req.on('close', () => { clearInterval(heartbeat); unsubscribe(); });
+      return undefined;
+    }
+    if (url.pathname === '/api/nerf-war') {
+      if (req.method === 'GET') return json(res, 200, { enabled: nerfState.enabled });
+      if (req.method !== 'POST') return json(res, 405, { error: 'GET or POST only' });
+      // Visitors deliberately share this switch, but another site's form must not flip it.
+      if (!req.headers['content-type']?.startsWith('application/json')) {
+        return json(res, 415, { error: 'application/json required' });
+      }
+      if (req.headers.origin && ![`http://${url.host}`, `https://${url.host}`].includes(req.headers.origin)) {
+        return json(res, 403, { error: 'same-origin only' });
+      }
+      let body;
+      try { body = await readJsonBody(req); }
+      catch (err) { return refuseBody(req, res, err); }
+      if (typeof body.enabled !== 'boolean') return json(res, 400, { error: 'enabled must be boolean' });
+      nerfState.set(body.enabled);
+      return json(res, 200, { enabled: nerfState.enabled });
+    }
     if (url.pathname === '/api/offices' && req.method === 'POST') return handleMint(req, res);
 
     // The admin console, at whatever path the operator configured, matched before

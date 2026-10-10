@@ -24,7 +24,7 @@ test('idle uses its family name and movement keeps its specific labels', () => {
   assert.equal(statusLabel('walking'), 'Walking');
   assert.equal(statusLabel('dancing'), 'Dancing');
   const moving = STATUS_GROUPS.find((group) => group.label === 'Moving');
-  assert.deepEqual(moving.statuses.map((s) => s.key), ['walking', 'dancing']);
+  assert.deepEqual(moving.statuses.map((s) => s.key), ['walking', 'dancing', 'nerfWar']);
 });
 
 test('a label too short to stand alone gets a longer word for it', () => {

@@ -169,6 +169,16 @@ looking at. The container recipe sets the same variable, because inside a contai
 loopback reaches nothing at all.</p>
 <p>For a local simulation, open <code>/office/TEST-0000/</code> on the server's printed URL. Test Data
 runs without any connected harness, company account or external service.</p>
+<p>The Nerf game is deliberately server-wide. <code>N</code> and <code>?nerfwar</code> change the shared
+flag, not an individual visitor's preference. <code>GET</code> and <code>POST /api/nerf-war</code> read
+and set <code>{ &quot;enabled&quot;: true|false }</code>; <code>/api/nerf-war/stream</code> sends an immediate
+snapshot and subsequent <code>nerf-war</code> events to every connected visitor. Writes
+require JSON and reject a different browser origin. There is no owner gate on
+this game switch: any visitor can start or stop it for everyone.</p>
+<p><code>lib/nerf-state.cjs</code> persists the flag in <code>nerf-war.json</code> under
+<code>ROVING_OFFICE_STATE_DIR</code> (default <code>~/.roving-office</code>), outside the office registry.
+Reaping an office, changing scenes, reloading, or restarting the server therefore
+does not end a game. A new world applies the current flag before agents arrive.</p>
 <p>Almost every graphical glitch in this scene has turned out to be the same bug: two faces landing on exactly the same coordinate, which gives the depth buffer no way to order them, so the surfaces flicker against each other as the camera moves.</p>
 <pre><code class="language-bash">npm run probe -- --sweep --assert=test/coplanar-baseline.json
 </code></pre>

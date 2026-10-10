@@ -28,6 +28,7 @@ import {
   buildCouch, buildDesk, buildEspressoMachine, buildFloorLamp, buildInbox,
   buildMailbox, buildPrinter, buildRug, buildSideTable, buildTelescope, buildWallClock,
   buildWaterCooler, codeScreenTexture,
+  buildAdultTricycle,
 } from './props/index.js';
 import { makeKanbanBoard } from './kanban.js';
 import {
@@ -716,6 +717,17 @@ export const CATALOGUE = [
     build: () => buildCar(0, 0, 0x4f7a8a, 0, 'summer'),
     face: 0.6,
     elevation: 0.4,
+  },
+  {
+    id: 'happyHourTrike',
+    group: 'outside',
+    label: 'Happy-hour adult tricycle',
+    blurb: 'A human-sized three-wheeler with two rear wheels, a saddle, handlebars and '
+      + 'a little cargo bar for drinks and snacks. Ride it around to gossip and network.',
+    build: buildAdultTricycle,
+    face: 0.2,
+    azimuth: 0.8,
+    elevation: 0.48,
   },
 ];
 

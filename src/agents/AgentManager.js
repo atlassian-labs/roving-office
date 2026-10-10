@@ -1,3 +1,4 @@
+import { buildFoamBlaster } from '../scene/props/foam-blaster.js';
 import { Agent } from './Agent.js';
 import {
   AgentController, walk, face, follow, lookAt, sit, stand, stepTo, turnChair, wait,
@@ -27,7 +28,7 @@ import { BeamUps } from '../scene/beam.js';
 // Event shape (identical for every source):
 //   { type:'spawn',    id, name, color? }
 //   { type:'rename',   id, name }         same person, new job
-//   { type:'status',   id, status:'working'|'waiting'|'error'|'idle' }
+//   { type:'status',   id, status:'working'|'waiting'|'error'|'idle'|'nerfWar' }
 //   { type:'job',     id, job }
 //   { type:'research', id, topic?, scope:'graph'|'web' }
 //     Where the answer is being looked for: the bookshelf holds what the company
@@ -375,6 +376,12 @@ export class AgentManager {
     this.scene = scene;
     this.props = props;          // desks, bookshelves, mailbox, waterCooler, ...
     this.nav = new NavGrid();
+    // A deliberately non-work state for demos and spectating. It lives on the
+    // manager rather than in the mock feed so a nerf war can interrupt whatever
+    // somebody was doing and does not pretend that a live harness sent a release
+    // plan. Normal offices leave this off.
+    this.nerfWar = false;
+    this.nerfGuns = new Map();
     // Where people stand when several of them want the same machine. Desks and
     // couch seats book themselves; a station is one point in the layout, so the
     // floor in front of it is handed out here (see crowd.js).
@@ -481,6 +488,63 @@ export class AgentManager {
   getAgent(id) { return this.agents.get(id)?.agent ?? null; }
 
   /**
+   * Put the room into or out of the nerf-war demo state.
+   *
+   * Entering clears the current choreography, stands everybody up, drops any
+   * release checklist from the presentation, and gives each person a continuous
+   * route through the walkable map. Work events are ignored while the flag is on,
+   * so the next mock timer cannot quietly put somebody back in a chair.
+   */
+  setNerfWar(enabled = true) {
+    if (this.nerfWar === Boolean(enabled)) return this.nerfWar;
+    this.nerfWar = Boolean(enabled);
+    if (this.nerfWar) {
+      for (const rec of this.agents.values()) {
+        if (rec.arriving || rec.leaving || rec.beaming) continue;
+        rec.controller.clear();
+        rec.pilot = null;
+        rec.onMailRun = false;
+        rec.agent.setStep(null, null);
+        rec.agent.setCarrying(null);
+        rec.agent.setStatus('nerfWar');
+        rec.controller.run([
+          ...this._release(rec),
+          walk(this.nav.randomInteriorPoint(), 'nerfWar'), wait(0.25),
+        ]);
+        this._equipNerfGun(rec);
+      }
+    } else {
+      for (const rec of this.agents.values()) {
+        this._unequipNerfGun(rec);
+        if (rec.arriving || rec.leaving || rec.beaming) continue;
+        rec.controller.clear();
+        rec.agent.setStatus('idle');
+        this._idle(rec);
+      }
+    }
+    this._emitChange();
+    return this.nerfWar;
+  }
+
+  /** Give an agent a foam blaster built with the scene's own geometry. */
+  _equipNerfGun(rec) {
+    if (this.nerfGuns.has(rec.agent.id)) return;
+    const gun = buildFoamBlaster();
+    gun.position.set(0.48, 1.35, 0.34);
+    gun.rotation.z = -0.18;
+    rec.agent.root.add(gun);
+    this.nerfGuns.set(rec.agent.id, gun);
+  }
+
+  _unequipNerfGun(rec) {
+    const gun = this.nerfGuns.get(rec.agent.id);
+    if (!gun) return;
+    gun.removeFromParent();
+    gun.traverse((part) => part.geometry?.dispose());
+    this.nerfGuns.delete(rec.agent.id);
+  }
+
+  /**
    * Whose desk this is, by first name, or null if nobody's.
    *
    * A desk is booked for as long as its occupant is in the building rather than for the
@@ -555,6 +619,8 @@ export class AgentManager {
    *   so a feed that cannot say is simply an agent with no mark.
    */
   handleEvent(ev, source = null) {
+    // Keep lifecycle events flowing, while work choreography pauses for the game.
+    if (this.nerfWar && !['spawn', 'exit', 'despawn', 'rename'].includes(ev.type)) return;
     if (ev.type === 'spawn') return this._spawn(ev, source);
 
     // A new job arrives by paper airplane. The job name rides along so it can
@@ -1866,7 +1932,22 @@ export class AgentManager {
    * is required to be able to do.
    */
   _drinkStation(rec, drink) {
-    return stationForRole('refresh', { from: rec.agent.position, serves: drink?.kind });
+    const station = stationForRole('refresh', {
+      from: rec.agent.position, serves: drink?.kind,
+      available: (station) => station.kind !== 'happyHourTrike' || this._propAt(station)?.canServe === true,
+      resolve: (station) => station.kind === 'happyHourTrike' ? this._propAt(station)?.serviceStation(station) : station,
+    });
+    if (station?.kind !== 'happyHourTrike') return station;
+    return this._propAt(station)?.reserve(station, rec.agent.id) ?? null;
+  }
+
+  /** Recheck at handoff: an attendant removed during the walk cannot serve a cup. */
+  _collectDrink(station, agentId) {
+    if (station.kind !== 'happyHourTrike') return 'cup';
+    const prop = this._propAt(station);
+    const drink = prop?.serve() ? 'cup' : null;
+    prop?.release(agentId);
+    return drink;
   }
 
   /**
@@ -1893,7 +1974,7 @@ export class AgentManager {
       walk(() => this.spots.claim(station, rec.agent)),
       lookAt(station),
       wait(0.8),
-      carry('cup', { color: drink.color }),
+      carry(() => this._collectDrink(station, rec.agent.id), { color: drink.color }),
     ];
 
     if (spot.where === 'couch') {
@@ -1961,7 +2042,7 @@ export class AgentManager {
       walk(() => this.spots.claim(station, rec.agent)),
       lookAt(station),
       wait(1.0),
-      carry('cup', { color: drink.color }),
+      carry(() => this._collectDrink(station, rec.agent.id), { color: drink.color }),
       status('walking'),
       ...takeUpPostAtDesk(rec, desk, this.nav),
       // Actually drink some of it before getting back to work — fetching a coffee
@@ -2173,6 +2254,11 @@ export class AgentManager {
 
   // Called when an agent's queue empties: keep them believably occupied.
   _idle(rec) {
+    if (this.nerfWar) {
+      this._equipNerfGun(rec);
+      rec.controller.run([walk(this.nav.randomInteriorPoint(), 'nerfWar'), wait(0.25)]);
+      return;
+    }
     // Being driven by hand, and the errand has run out of actions: stand still. This
     // is the hold, and pushing anything here would be the room deciding it had waited
     // long enough — which is the thing the buttons exist to stop. `_pilotTick` counts
@@ -2404,6 +2490,7 @@ export class AgentManager {
 
   _remove(rec) {
     if (!this.agents.has(rec.agent.id)) return;
+    this._unequipNerfGun(rec);
     // Their post goes with them: an envelope only they could have opened would
     // otherwise sit in the box forever, holding the flag up.
     this.post.dropFor(rec.agent.id);
@@ -2647,6 +2734,10 @@ export class AgentManager {
       if (rec.leaving && rec.leaveAt < deadline) (overdue ??= []).push(rec);
 
       rec.controller.update(dt);
+      if (this.nerfWar && !rec.arriving && !rec.leaving) {
+        rec.agent.refreshTagVisibility();
+        continue;
+      }
       this._pilotTick(rec, dt);
       this._deskDrink(rec, dt);
       this._checkDesk(rec);
