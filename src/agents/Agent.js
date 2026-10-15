@@ -329,7 +329,8 @@ export const HISTORY_SHOWN = 10;
 // Build a hairstyle group positioned at the head; the head is a box at y=2.2,
 // spanning y 1.89..2.51 and x/z -0.31..0.31. Long hair sits at the back (z < 0)
 // and drapes down without intersecting the torso (which spans z -0.25..0.25 and y 0.9..1.9).
-function buildHairstyle(style, color) {
+/** Exported so a test can look at a hairstyle on its own, without building a whole character. */
+export function buildHairstyle(style, color) {
   const hair = group(0, 0, 0);
 
   if (style === 'short') {
@@ -341,12 +342,18 @@ function buildHairstyle(style, color) {
     put(hair, box(0.18, 0.28, 0.28, color, { rough: 0.85 }), -0.38, 0.15, 0);  // left of head, past the ear
     put(hair, box(0.18, 0.28, 0.28, color, { rough: 0.85 }), 0.38, 0.15, 0);  // right of head, past the ear
   } else if (style === 'long') {
-    // Longer back panel reaching upper back, draping down the rear
-    // Head spans y 1.89..2.51. Hair from y 2.0 down to ~y 1.6 (upper back level)
-    // At z -0.3 to keep it behind the torso (torso is z -0.25..0.25)
+    // Long hair has to read as long hair from where the room is watched, which is above
+    // and in front. The back panel alone hung behind the head and nothing covered the
+    // crown, so from the camera a long-haired character looked bald. Now: the same crown
+    // slab as the short crop, side panels falling past the ears, and the back panel.
+    put(hair, box(0.66, 0.22, 0.66, color, { rough: 0.85 }), 0, 0.27);  // crown, as 'short'
+    // Sides: x 0.31..0.45, past the head (|x| <= 0.31); y 1.91..2.49 absolute, so they
+    // stop above the torso's top edge at 1.9 and never pass through it.
+    put(hair, box(0.14, 0.58, 0.5, color, { rough: 0.85 }), -0.38, 0, -0.06);
+    put(hair, box(0.14, 0.58, 0.5, color, { rough: 0.85 }), 0.38, 0, -0.06);
+    // Back: behind the head and the torso (torso is z -0.25..0.25), y ~1.8..2.4.
     const back = box(0.44, 0.6, 0.32, color, { rough: 0.85 });
-    back.position.set(0, -0.1, -0.3);  // y -0.1 relative to head at 2.2 = 2.1 absolute
-    // This reaches from y ~1.8 down to y ~2.4 in world coords
+    back.position.set(0, -0.1, -0.3);
     hair.add(back);
   } else if (style === 'ponytail') {
     // Short crop + a tapered tail behind, hanging down
