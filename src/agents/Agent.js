@@ -766,7 +766,6 @@ export class Agent {
   resizeTag() {
     this._sizeNameTag();
     if (this._tagLayout) this._placeTagSprites(this._tagLayout);
-    this._placeStepChip();
   }
 
   /** The pill's own size, which is all `_tagScale` means for the name sprite. */
