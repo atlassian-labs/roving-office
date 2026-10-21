@@ -44,6 +44,14 @@ export const AOP_EVENT_TYPES = [
 
 const REAP_INTERVAL_MS = 5_000;
 
+/**
+ * How long a tab may stay hidden before its stream is closed. A background tab
+ * still holds a connection open, and on a hosted office every open stream is one
+ * more subscriber the receiver keeps sending to. Coming back reopens it, and the
+ * reopen resyncs from a snapshot like any other reconnect (see `_resync`).
+ */
+export const HIDDEN_PAUSE_MS = 60_000;
+
 export class AopSource extends AgentSource {
   /**
    * @param {object}  opts
@@ -103,10 +111,29 @@ export class AopSource extends AgentSource {
     this._setState('connecting');
     this._hydrate();
     this.reaper = setInterval(() => this.reducer.reap(), REAP_INTERVAL_MS);
+    this._onVisibility = () => this._visibilityChanged();
+    globalThis.document?.addEventListener?.('visibilitychange', this._onVisibility);
     return this;
   }
 
+  /** Close the stream after a minute in the background; reopen it on the way back. */
+  _visibilityChanged() {
+    clearTimeout(this._hiddenTimer);
+    if (globalThis.document?.visibilityState === 'hidden') {
+      this._hiddenTimer = setTimeout(() => {
+        this.es?.close();
+        this.es = null;
+        this._pausedHidden = true;
+      }, HIDDEN_PAUSE_MS);
+    } else if (this._pausedHidden) {
+      this._pausedHidden = false;
+      this._subscribe();
+    }
+  }
+
   stop() {
+    globalThis.document?.removeEventListener?.('visibilitychange', this._onVisibility);
+    clearTimeout(this._hiddenTimer);
     this.es?.close();
     this.es = null;
     if (this.reaper) clearInterval(this.reaper);

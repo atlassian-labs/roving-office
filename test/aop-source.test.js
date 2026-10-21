@@ -90,3 +90,48 @@ test('the live stream hears a mid-turn retitle', () => {
   assert.equal(retitle.from, 'Have a look at the standing desk and see what you think of it');
   source.stop();
 });
+
+test('a tab hidden for a minute closes its stream, and showing it again reopens and resyncs', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
+  const listeners = new Map();
+  const realDocument = globalThis.document;
+  const realFetch = globalThis.fetch;
+  globalThis.document = {
+    visibilityState: 'visible',
+    addEventListener: (type, fn) => listeners.set(type, fn),
+    removeEventListener: (type) => listeners.delete(type),
+  };
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => ({ cursor: null, events: [] }) });
+  const streams = [];
+  const source = new AopSource({
+    harness: 'rovo-cli',
+    eventSourceFactory: () => {
+      const s = new FakeEventSource();
+      s.closed = false;
+      s.close = () => { s.closed = true; };
+      streams.push(s);
+      return s;
+    },
+  });
+  try {
+    source.start(() => {});
+    await new Promise((r) => setImmediate(r));   // the snapshot, then the first stream
+    assert.equal(streams.length, 1);
+
+    globalThis.document.visibilityState = 'hidden';
+    listeners.get('visibilitychange')();
+    t.mock.timers.tick(59_000);
+    assert.equal(streams[0].closed, false, 'a glance at another tab changes nothing');
+    t.mock.timers.tick(1_000);
+    assert.equal(streams[0].closed, true);
+
+    globalThis.document.visibilityState = 'visible';
+    listeners.get('visibilitychange')();
+    assert.equal(streams.length, 2, 'coming back opens a new stream');
+  } finally {
+    source.stop();
+    assert.equal(listeners.size, 0, 'stop() lets go of the page');
+    globalThis.document = realDocument;
+    globalThis.fetch = realFetch;
+  }
+});
