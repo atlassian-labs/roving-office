@@ -129,7 +129,8 @@ export class AopSource extends AgentSource {
   }
 
   /** Fetch the snapshot and reduce it. Separate so `_resync` can reuse it without
-   * opening a second stream. */
+   * opening a second stream. Says whether it loaded, so nobody reports a room it
+   * never saw. */
   async _snapshot() {
     const query = `?harness=${encodeURIComponent(this.harness)}`;
     try {
@@ -138,10 +139,17 @@ export class AopSource extends AgentSource {
         const snap = await res.json();
         this.cursor = snap.cursor ?? null;
         for (const ev of snap.events ?? []) this._reduce(ev);
+        return true;
       }
+      // An answer that is not the snapshot — a passcode the office now wants (401),
+      // a server error — is not an empty room. Saying "waiting" here would show a
+      // locked or broken office as one where nobody happens to be working.
+      this._setState('offline', `receiver said ${res.status}`);
+      return false;
     } catch {
       // No receiver yet is a normal state, not an error: the office runs fine
       // with nothing attached, and the stream below will keep retrying.
+      return false;
     }
   }
 
@@ -164,8 +172,7 @@ export class AopSource extends AgentSource {
    */
   async _resync() {
     this.reducer.resetSeen();
-    await this._snapshot();
-    this._setState(this.sessions.size ? 'live' : 'waiting');
+    if (await this._snapshot()) this._setState(this.sessions.size ? 'live' : 'waiting');
   }
 
   _subscribe() {

@@ -90,3 +90,23 @@ test('the live stream hears a mid-turn retitle', () => {
   assert.equal(retitle.from, 'Have a look at the standing desk and see what you think of it');
   source.stop();
 });
+
+test('a snapshot the receiver refuses is offline, not an empty room', async () => {
+  const states = [];
+  const source = new AopSource({ harness: 'rovo-cli', onStatus: (s) => states.push(s) });
+  const realFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => ({ ok: false, status: 401, json: async () => ({}) });
+    await source._resync();
+    assert.equal(source.state, 'offline');
+    assert.match(states.at(-1).detail, /401/);
+    assert.ok(!states.some((s) => s.state === 'waiting'), 'a locked office must not read as a quiet one');
+
+    globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => ({ cursor: '3', events: [] }) });
+    await source._resync();
+    assert.equal(source.state, 'waiting', 'once it answers, an empty room is an empty room');
+  } finally {
+    globalThis.fetch = realFetch;
+    source.stop();
+  }
+});
