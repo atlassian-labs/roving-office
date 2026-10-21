@@ -672,3 +672,48 @@ test('safeAvatar refuses everything that could become a decision', () => {
   assert.equal(safeAvatar('https://example.com/a.png'), 'https://example.com/a.png');
   assert.equal(safeAvatar('x'.repeat(600)), null);
 });
+
+// --- more than one open request ----------------------------------------------
+
+test('two open requests: answering one keeps the character waiting', () => {
+  const b = bench();
+  b.r.reduce(env('permission.request', 'S1', { request_id: 'r1' }));
+  b.r.reduce(env('permission.request', 'S1', { request_id: 'r2' }));
+  b.r.reduce(env('permission.resolve', 'S1', { request_id: 'r1', decision: 'allow' }));
+  assert.equal(b.last().status, 'waiting', 'r2 is still unanswered');
+  b.r.reduce(env('permission.resolve', 'S1', { request_id: 'r2', decision: 'allow' }));
+  assert.equal(b.last().status, 'working');
+});
+
+test('a harness that reports decisions keeps waiting past the end of its turn', () => {
+  const b = bench();
+  b.r.reduce(env('session.start', 'S1', { capabilities: ['permission.request', 'permission.resolve'] }));
+  b.r.reduce(env('permission.request', 'S1', { request_id: 'r1' }));
+  b.r.reduce(env('turn.end', 'S1', { status: 'completed' }));
+  assert.equal(b.last().status, 'waiting', 'the turn ended, the question did not');
+  assert.equal(b.out.filter((e) => e.type === 'dispatch').length, 0);
+  b.r.reduce(env('permission.resolve', 'S1', { request_id: 'r1', decision: 'deny' }));
+  assert.equal(b.last().status, 'working');
+});
+
+test('a harness that never reports decisions is released by the end of its turn, as before', () => {
+  const b = bench();
+  b.r.reduce(env('session.start', 'S1', { capabilities: ['permission.request'] }));
+  b.r.reduce(env('permission.request', 'S1', { request_id: 'r1' }));
+  b.r.reduce(env('turn.end', 'S1', { status: 'completed' }));
+  assert.equal(b.last().type, 'dispatch');
+  b.take();
+  b.r.reduce(env('tool.start', 'S1', { tool_call_id: 't1', tool_class: 'edit' }));
+  assert.ok(b.out.some((e) => e.type === 'status' && e.status === 'working'), 'and goes back to work');
+});
+
+test('an open request gets the long leash, not the short one', () => {
+  const b = bench();
+  b.r.reduce(env('permission.request', 'S1', { request_id: 'r1' }));
+  b.tick(SESSION_TTL_MS + 1);
+  b.r.reap();
+  assert.equal(b.r.sessions.size, 1, 'a person deciding is not a dead harness');
+  b.tick(FAREWELL_TTL_MS);
+  b.r.reap();
+  assert.equal(b.last().type, 'exit', 'the crash backstop still exists');
+});

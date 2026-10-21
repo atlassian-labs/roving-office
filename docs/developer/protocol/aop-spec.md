@@ -547,7 +547,7 @@ Normative mapping from AOP to the internal `AgentManager` events, so every adapt
 | `session.start` with `parent_id` | **ghost in** at the parent's desk, no walk-in |
 | `session.end` with `parent_id` | **ghost out** — hand a page to the parent, dissolve |
 | `permission.request` | `status: waiting` |
-| `permission.resolve` | back to `working` |
+| `permission.resolve` | back to `working`, once no other request is open |
 | `notification` level `warn`/`error` | `status: waiting` |
 | `error` | `status: error` |
 | `turn.end` status `completed` | `dispatch` with `payload.summary ?? title` |
@@ -561,6 +561,8 @@ Normative mapping from AOP to the internal `AgentManager` events, so every adapt
 | `session.heartbeat` | liveness only, no visible effect |
 
 **Precedence.** When signals conflict, higher wins: `error` > `waiting` > `delivering` > `researching` > `working` > `resting` > `idle`. So a `permission.request` during a `tool.start` shows as waiting, and the office does not flap back to working until `permission.resolve`.
+
+**Open requests are counted by `request_id`.** Two requests and one answer leave the character waiting. `turn.end` normally ends the wait, because for an adapter that never sends the optional `permission.resolve` it is the only sign a decision came in; an adapter that declares `permission.resolve` in `capabilities` is taken at its word, so a request still open at `turn.end` keeps the character waiting until it is answered.
 
 **Debounce.** Tool calls are often milliseconds long. The office MUST NOT start a walk animation for a `tool.start` whose matching `tool.end` arrives within 400 ms; it renders as continued desk work. Otherwise agents spend all day walking.
 
@@ -638,6 +640,7 @@ The protocol assumes an unreliable emitter, so receivers implement all four:
    | --- | --- | --- |
    | declares `session.end` | **30 min** | It has promised to say goodbye, so silence means "thinking", and the timer is only a backstop for a process that died mid-sentence |
    | does not | **5 min** | Nothing will ever announce the end, so the office has to guess — but slowly enough to survive a coffee |
+   | has a `permission.request` open | **30 min** | Waiting on a person is not a dead process: a decision can take longer than the short leash |
 
    An adapter that *can* heartbeat should, and keeps its character alive indefinitely. One now does: the OpenClaw plugin is in-process and long-lived, so heartbeating is a timer rather than an impossibility ([adapter notes §5.4](aop-harness-adapters.md#56-what-being-long-lived-actually-buys)). Ghost sessions (§6.1) reap after **30 s**, and are also dissolved when their parent ends or the spawning tool call closes — so a lost `session.end` for a subagent costs at most half a minute of a lingering ghost.
 

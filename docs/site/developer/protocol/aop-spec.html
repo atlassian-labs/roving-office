@@ -1230,7 +1230,7 @@ the picture on the next event that goes out.</p>
 </tr>
 <tr>
 <td><code>permission.resolve</code></td>
-<td>back to <code>working</code></td>
+<td>back to <code>working</code>, once no other request is open</td>
 </tr>
 <tr>
 <td><code>notification</code> level <code>warn</code>/<code>error</code></td>
@@ -1279,6 +1279,7 @@ the picture on the next event that goes out.</p>
 </tbody>
 </table>
 <p><strong>Precedence.</strong> When signals conflict, higher wins: <code>error</code> &gt; <code>waiting</code> &gt; <code>delivering</code> &gt; <code>researching</code> &gt; <code>working</code> &gt; <code>resting</code> &gt; <code>idle</code>. So a <code>permission.request</code> during a <code>tool.start</code> shows as waiting, and the office does not flap back to working until <code>permission.resolve</code>.</p>
+<p><strong>Open requests are counted by <code>request_id</code>.</strong> Two requests and one answer leave the character waiting. <code>turn.end</code> normally ends the wait, because for an adapter that never sends the optional <code>permission.resolve</code> it is the only sign a decision came in; an adapter that declares <code>permission.resolve</code> in <code>capabilities</code> is taken at its word, so a request still open at <code>turn.end</code> keeps the character waiting until it is answered.</p>
 <p><strong>Debounce.</strong> Tool calls are often milliseconds long. The office MUST NOT start a walk animation for a <code>tool.start</code> whose matching <code>tool.end</code> arrives within 400 ms; it renders as continued desk work. Otherwise agents spend all day walking.</p>
 <h3 id="61-subagents-are-ghosts" tabindex="-1">6.1 Subagents are ghosts</h3>
 <p>A subagent never walks through the door and never takes a desk. It <strong>materialises at its parent's workstation as a translucent clone</strong> — four people crowded around one screen, pair programming. The parent keeps the chair; the ghosts pull up phantom copies of it.</p>
@@ -1444,6 +1445,11 @@ the picture on the next event that goes out.</p>
 <td>does not</td>
 <td><strong>5 min</strong></td>
 <td>Nothing will ever announce the end, so the office has to guess — but slowly enough to survive a coffee</td>
+</tr>
+<tr>
+<td>has a <code>permission.request</code> open</td>
+<td><strong>30 min</strong></td>
+<td>Waiting on a person is not a dead process: a decision can take longer than the short leash</td>
 </tr>
 </tbody>
 </table>

@@ -173,6 +173,11 @@ export function createAopReducer({
         if (Array.isArray(p.capabilities) && p.capabilities.includes('session.end')) {
           rec.saysGoodbye = true;
         }
+        // And one that says it will report each decision: only then is an open request
+        // still open after its turn ends (see `pending` below).
+        if (Array.isArray(p.capabilities) && p.capabilities.includes('permission.resolve')) {
+          rec.reportsDecisions = true;
+        }
         return;
       }
       case 'session.heartbeat': { touch(key, ev); return; }
@@ -226,10 +231,15 @@ export function createAopReducer({
       case 'turn.end': {
         const rec = touch(key, ev);
         retitleJob(key, rec, p.title);
-        rec.waiting = false;
+        // The end of a turn is the only sign a decision came in for a harness that never
+        // sends `permission.resolve` (it is optional, L2). One that promised to send it
+        // has not answered yet if a request is still open, so the character keeps waiting.
+        if (!rec.reportsDecisions) rec.pending.clear();
+        rec.waiting = rec.pending.size > 0;
         // A step never outlives its turn (spec §4.2 rule 3), and the checklist goes
         // with it: it described this round, and the round is over.
         clearSteps(key, rec, { failed: p.status === 'error' });
+        if (rec.waiting) return emit({ type: 'status', id: key, status: 'waiting' });
         if (p.status === 'completed') {
           return emit({ type: 'dispatch', id: key, summary: p.summary ?? p.title });
         }
@@ -245,14 +255,19 @@ export function createAopReducer({
 
       case 'permission.request': {
         const rec = touch(key, ev);
+        rec.pending.add(p.request_id ?? ev.id);
         rec.waiting = true;
         return emit({ type: 'status', id: key, status: 'waiting' });
       }
 
       case 'permission.resolve': {
         const rec = touch(key, ev);
-        rec.waiting = false;
-        return emit({ type: 'status', id: key, status: 'working' });
+        // One decision answers one request (spec §5: both carry `request_id`). A second
+        // request still open keeps the character waiting; a resolve with no id is taken
+        // as answering everything, which is what this did before requests were counted.
+        if (p.request_id != null) rec.pending.delete(p.request_id); else rec.pending.clear();
+        rec.waiting = rec.pending.size > 0;
+        return emit({ type: 'status', id: key, status: rec.waiting ? 'waiting' : 'working' });
       }
 
       case 'notification': {
@@ -305,6 +320,8 @@ export function createAopReducer({
         lastSeen: now(),
         jobTitle: null,
         waiting: false,
+        // Permission requests not yet answered, by `request_id`.
+        pending: new Set(),
         tools: new Map(),
         // Which part of the round is in hand, and the checklist it came from. Both
         // null for the whole of a normal turn — see the steps block below.
@@ -313,6 +330,8 @@ export function createAopReducer({
         stepSeq: 0,
         // Set from session.start capabilities; decides which TTL applies below.
         saysGoodbye: false,
+        // Set from session.start capabilities: the harness sends `permission.resolve`.
+        reportsDecisions: false,
         // What the identity says they wear, as written, kept for the detail panel; the
         // parsed form goes to the character. Null means "nobody said", which is the
         // usual case and means the palette decides.
@@ -665,7 +684,9 @@ export function createAopReducer({
   function reap() {
     const at = now();
     for (const [key, rec] of sessions) {
-      const ttl = rec.saysGoodbye ? FAREWELL_TTL_MS : SESSION_TTL_MS;
+      // Waiting on a person is not silence from a dead harness: a decision can take longer
+      // than the short leash, so an open request gets the long one, still a crash backstop.
+      const ttl = rec.saysGoodbye || rec.pending.size > 0 ? FAREWELL_TTL_MS : SESSION_TTL_MS;
       if (rec.lastSeen < at - ttl) end(key);
     }
   }
