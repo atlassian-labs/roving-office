@@ -71,6 +71,21 @@ export function statusLines(a) {
   return [a.job ? `${said} · ${a.job}` : said];
 }
 
+/**
+ * Whether the once-a-second redraw of the inspector should wait.
+ *
+ * The redraw rebuilds the inspector's contents, buttons included. A click is a press
+ * and a release on the same element, so one that straddles a redraw lands on a button
+ * that no longer exists and does nothing — so "Follow along" was ignored now and then,
+ * for no visible reason, and text in the card could not be selected. While the
+ * pointer is over the card or focus is inside it, the clock waits; it catches up the
+ * moment the pointer leaves.
+ */
+export function inspectorBusy(inspector, doc = globalThis.document) {
+  if (!inspector) return false;
+  return inspector.matches?.(':hover') === true || inspector.contains?.(doc?.activeElement) === true;
+}
+
 export function createOverlay(initialManager, { onSelect, onFollowAlong } = {}) {
   // Held in a mutable binding rather than a parameter: switching projects builds
   // a brand-new AgentManager, and the overlay re-points at it via attach().
@@ -730,6 +745,7 @@ export function createOverlay(initialManager, { onSelect, onFollowAlong } = {}) 
   // otherwise sit frozen between events. Re-render the open inspector once a
   // second to keep its time log ticking.
   setInterval(() => {
+    if (inspectorBusy(inspector)) return;
     if (selectedId) renderInspector(manager.roster().find((r) => r.id === selectedId));
   }, 1000);
 
